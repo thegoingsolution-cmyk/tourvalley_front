@@ -1,0 +1,667 @@
+/* 계약/캐시조회 페이지 PC 스타일 */
+
+/* 페이지 컨테이너 */
+.contract-page-pc {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f5f7fb;
+  overflow: visible;
+}
+
+.contract-content-pc {
+  flex: 1;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 40px 20px 60px;
+  min-height: auto;
+  background-size: 4800px auto;
+  background-position: 52.2% -800px;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  overflow: visible;
+  max-height: none;
+  height: auto;
+}
+
+/* 폼 컨테이너 - 중앙 정렬, 최대 너비 제한 */
+.contract-form-container {
+  position: relative;
+  z-index: 100;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  overflow: visible;
+  background: #fff;
+}
+
+/* 헤더 라인 */
+.tour2023_header_line {
+  border-bottom: 1px solid #eaebef;
+  margin-bottom: 0;
+}
+
+.tour2023_header_inner {
+  position: relative;
+  height: 56px;
+  box-sizing: border-box;
+  padding: 0 20px;
+}
+
+.tourTop_title {
+  position: relative;
+  display: block;
+  font-size: 18px;
+  padding-top: 19px;
+  text-align: center;
+  line-height: 110%;
+  font-weight: 500;
+}
+
+/* 패딩 유틸리티 */
+.prow_01 {
+  padding: 0 20px;
+}
+
+/* 타이틀 */
+.tour2023_title04 {
+  font-family: 'NanumSquareNeoTTF-dEb', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 23px;
+  color: #202020;
+  letter-spacing: -1.2px;
+  text-align: left;
+  display: inline-block;
+  margin: 40px 0 12px 2px;
+  width: 100%;
+}
+
+/* 라디오 버튼 영역 */
+.tour2023_ra_Wrap {
+  position: relative;
+}
+
+.tour2023_ra_Wrap01 {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+}
+
+.tour2023_rdo_area {
+  margin-top: 5px;
+  width: 100%;
+  text-align: right;
+  position: relative;
+  display: inline-flex;
+  justify-content: space-between;
+}
+
+.tour2023_inp_rdo {
+  position: relative;
+  min-width: 49.6%;
+  display: inline-block;
+  min-height: 40px;
+  overflow-wrap: normal;
+  word-break: normal;
+  vertical-align: top;
+  box-sizing: border-box;
+}
+
+.tour2023_inp_rdo input {
+  position: absolute;
+  display: block;
+  width: 1px;
+  height: 1px;
+  margin: 0px;
+  padding: 0px;
+  border: 0px;
+  background: none;
+  border-radius: 0px;
+  appearance: none !important;
+}
+
+.tour2023_inp_rdo input + label::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: 9px;
+  left: 20px;
+  width: 24px;
+  height: 24px;
+  background: url("/icons/icon_rdo.png") center center no-repeat;
+  background-size: contain;
+}
+
+.tour2023_inp_rdo input:checked + label::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: 9px;
+  left: 20px;
+  width: 24px;
+  height: 24px;
+  background: url("/icons/icon_rdo_ov.png") center center no-repeat;
+  background-size: contain;
+}
+
+.tour2023_inp_rdo input + label {
+  display: inline-block;
+  height: 42px;
+  line-height: 20px;
+  font-size: 16px;
+  color: #b8b9bb !important;
+  padding: 11px 5px 0px 48px;
+  vertical-align: top;
+  letter-spacing: -0.8px;
+  border-radius: 100px;
+  border: 1px solid #b8b9bb;
+  background: #fff;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+}
+
+.tour2023_inp_rdo input:checked + label {
+  color: #4d60d6 !important;
+  border-radius: 100px;
+  border: 1px solid #4d60d6;
+  background: #eef0fc;
+  padding: 10px 5px 0px 48px;
+  box-sizing: border-box;
+}
+
+/* 입력 영역 */
+.tourGuard_Info {
+  position: relative;
+  margin: 11px 0 15px 0;
+}
+
+.input_area {
+  display: block;
+}
+
+/* 폼 입력 필드 */
+.tourGuard_form_tt {
+  position: relative;
+  height: 65px;
+  border: 1px solid #c3c6ce;
+  border-radius: 15px;
+  background: #fff;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.tourGuard_form_tt label {
+  position: absolute;
+  top: 6px;
+  left: 20px;
+  color: #9797a3;
+  font-size: 12px;
+  font-family: 'Malgun Gothic', '맑은고딕', dotum, '돋움', AppleGothic, sans-serif;
+  letter-spacing: -0.8px;
+}
+
+.tourGuard_form_tt input[type="text"],
+.tourGuard_form_tt input[type="tel"] {
+  height: 32px;
+  padding-left: 10px;
+  border: 0;
+  color: #000;
+  font-size: 18px;
+  letter-spacing: 0px;
+  caret-color: #222;
+  display: inline-block;
+  vertical-align: text-top;
+  padding-top: 0px;
+  margin-top: 23px;
+  margin-left: 10px;
+  background: transparent;
+}
+
+.tourGuard_form_tt input::placeholder {
+  color: #dddddd;
+}
+
+.tourGuard_input_w01 {
+  width: 38%;
+}
+
+.tourGuard_input_w02 {
+  width: 90%;
+}
+
+.tourGuard_input_w03 {
+  width: 28%;
+  margin-right: 2%;
+}
+
+.tourGuard_input_w03:last-child {
+  margin-right: 0;
+}
+
+/* 성별 라디오 버튼 */
+.tourG_rdo_area {
+  font-size: 0px;
+  width: 42%;
+  margin-right: 0;
+  vertical-align: middle;
+  text-align: center;
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.tourGuard_form_tt.tourG_line .tourG_rdo_area > label {
+  position: absolute;
+  top: 6px;
+  left: 0;
+  color: #9797a3;
+  font-size: 12px;
+  font-family: 'Malgun Gothic', '맑은고딕', dotum, '돋움', AppleGothic, sans-serif;
+  letter-spacing: -0.8px;
+  margin-right: 0;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+.tourG_inp_rdo {
+  position: relative;
+  width: 40%;
+  display: inline-block;
+  overflow-wrap: normal;
+  word-break: normal;
+  vertical-align: middle;
+  align-items: center;
+  text-align: center;
+  background: transparent;
+}
+
+
+.tourG_inp_rdo input {
+  position: absolute;
+  display: block;
+  width: 1px;
+  height: 1px;
+  margin: 0px;
+  padding: 0px;
+  border: 0px;
+  background: none;
+  background: transparent;
+}
+
+.tourG_inp_rdo input:checked + label {
+  background: transparent;
+  border: none;
+  z-index: 1;
+}
+
+.tourG_inp_rdo input + label {
+  position: static;
+  top: auto;
+  left: auto;
+  width: 100%;
+  height: 32px;
+  display: inline-block;
+  text-align: left;
+  font-size: 17px;
+  vertical-align: middle;
+  letter-spacing: -0.8px;
+  color: #dddddd;
+  box-sizing: border-box;
+  margin: 22px 0 0 0;
+  cursor: pointer;
+}
+
+.tourG_inp_rdo input:checked + label {
+  color: #0000ff;
+  font-weight: 500;
+}
+
+.one_line0 {
+  border-left: 0px !important;
+}
+
+.tourG_inp_rdo input:checked + label.one_line0 {
+  color: #0000ff;
+  border: none;
+}
+
+/* 인증받기 버튼 */
+.tour2023_event_file {
+  margin-right: 10px;
+}
+
+.tour2023_btn_b01 {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.tour2023_btn11 {
+  font-size: 15px;
+  padding: 8px 15px;
+  height: 38px;
+  background-color: #5294f2;
+  border-radius: 5px;
+  box-sizing: border-box;
+  color: #fff !important;
+  text-align: center;
+  border: 1px solid #5294f2;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tour2023_btn11:hover {
+  background-color: #4284e1;
+  border-color: #4284e1;
+}
+
+/* 인증번호 입력 영역 */
+.tour2023_timer {
+  margin-right: 10px;
+}
+
+.tour2023_timeLimit {
+  font-size: 16px;
+  color: #ff4040;
+  font-weight: 600;
+}
+
+/* 라인 스타일 */
+.tourG_line::after {
+  content: '';
+  position: absolute;
+  display: inline-block;
+  width: 47px;
+  height: 50px;
+  top: -4px;
+  left: 40%;
+  margin: 0px 0 0px 0px;
+  border-bottom: 1px solid #d5d7dd;
+  vertical-align: middle;
+  transform: rotate(297deg);
+  z-index: 1;
+}
+
+.tourG_line03::before {
+  content: '';
+  position: absolute;
+  display: inline-block;
+  width: 1px;
+  height: 50px;
+  top: 7px;
+  left: 33%;
+  margin: 0px 0 0px 0px;
+  background: #d5d7dd;
+}
+
+.tourG_line03::after {
+  content: '';
+  position: absolute;
+  display: inline-block;
+  width: 1px;
+  height: 50px;
+  top: 7px;
+  left: 66%;
+  margin: 0px 0 0px 0px;
+  background: #d5d7dd;
+}
+
+/* 회원 로그인 섹션 */
+.tour2023_cash_f {
+  position: relative;
+  width: 100%;
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.tour2023_txt33 {
+  font-size: 14px;
+  color: #333;
+}
+
+.tour2023_blue {
+  color: #1b37e1 !important;
+}
+
+.tour2023_btnLogin {
+  font-size: 15px;
+  padding-top: 7px;
+  letter-spacing: -1px;
+  width: 115px !important;
+  height: 38px;
+  background-color: #5294f2;
+  border-radius: 5px;
+  box-sizing: border-box;
+  color: #fff !important;
+  text-align: center;
+  border: 1px solid #5294f2;
+  text-decoration: none;
+  display: inline-block;
+  line-height: 24px;
+}
+
+.tour2023_btnLogin:hover {
+  background-color: #4284e1;
+  border-color: #4284e1;
+}
+
+/* 무사고캐시 버튼 */
+.btnWrap {
+  margin: 20px 0;
+}
+
+.ag_right {
+  text-align: right;
+}
+
+.btn {
+  display: inline-block;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.tourG_btn_cash01 {
+  color: #333 !important;
+  background-color: #fee600;
+  height: 40px;
+  border-radius: 5px;
+  font-size: 16px;
+  letter-spacing: -1.2px;
+  font-weight: 500;
+  padding: 10px 15px;
+  width: 140px;
+  text-align: center;
+  box-sizing: border-box;
+  display: inline-block;
+  line-height: 135%;
+  border: none;
+  cursor: pointer;
+}
+
+.tourG_btn_cash01:hover {
+  background-color: #fdd800;
+}
+
+.cash01_ico {
+  display: inline-block;
+  border-width: 9px 7px 0;
+  border-style: solid;
+  border-color: #222 transparent transparent;
+  vertical-align: baseline;
+  transform: rotate(270deg);
+  margin-left: 4px;
+  margin-bottom: 1px;
+}
+
+/* 조회하기 버튼 */
+.tourGuard_btn_b {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.tour2023_btn01 {
+  font-size: 21px;
+  padding-top: 15px;
+  height: 60px;
+  background-color: #2c3fb3;
+  border-radius: 10px;
+  box-sizing: border-box;
+  color: #fff !important;
+  text-align: center;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+.tour2023_btn01:hover {
+  background-color: #1e2e8f;
+}
+
+/* 안내 문구 */
+.tour2023_txt01 {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.tour2023_grey {
+  color: #a5a5a5;
+}
+
+.tourGuard_inline {
+  position: relative;
+  width: 100%;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: flex-start;
+}
+
+.tourGuard_inline li {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.tourGuard_inline_t01 {
+  margin-right: 5px;
+  color: #a5a5a5;
+}
+
+.tourGuard_inline_t02 {
+  width: 95%;
+  color: #a5a5a5;
+}
+
+/* 마진 유틸리티 */
+.tourG_mab03 {
+  margin-bottom: 10px !important;
+}
+
+.tourG_mab04 {
+  margin-bottom: 15px !important;
+}
+
+.tourG_mab05 {
+  margin-bottom: 20px;
+}
+
+.tourG_mab08 {
+  margin-bottom: 30px;
+}
+
+.tourG_mat04 {
+  margin-top: 20px !important;
+}
+
+.tourG_mat06 {
+  margin-top: 15px !important;
+}
+
+.tourG_mleft04 {
+  margin-left: 5px;
+}
+
+.mag5 {
+  margin-bottom: 5px;
+}
+
+/* Floating Buttons */
+.contract-page-pc .floating-buttons {
+  position: absolute;
+  left: calc(50% + 260px);
+  top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.contract-page-pc .floating-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 12px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: all 0.2s;
+  pointer-events: auto;
+  min-width: 120px;
+}
+
+.contract-page-pc .floating-btn:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+  background: #f9f9f9;
+}
+
+.contract-page-pc .floating-btn.service-btn {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.contract-page-pc .floating-btn.cash-btn {
+  background: #ffd600;
+}
+
+.contract-page-pc .floating-btn.cash-btn:hover {
+  background: #ffdb1a;
+}
+
+.contract-page-pc .floating-icon-img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  margin-bottom: 4px;
+}
+
+.contract-page-pc .floating-text {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.4;
+  text-align: center;
+}
+

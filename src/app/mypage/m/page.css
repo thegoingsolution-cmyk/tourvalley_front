@@ -1,0 +1,450 @@
+/* Mobile MyPage Styles */
+.mypage-mobile {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f5f5f5;
+}
+
+.mypage-content-mobile {
+  flex: 1;
+  padding: 20px 16px 40px;
+}
+
+.mypage-container-mobile {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.08);
+  padding: 24px 20px 32px;
+}
+
+/* Header */
+.mypage-header-mobile {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.mypage-title-mobile {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+.title-highlight {
+  color: #3b5998;
+}
+
+.withdraw-link-mobile {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+/* Form */
+.mypage-form-mobile {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-field-mobile {
+  margin-bottom: 16px;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.form-label-mobile {
+  display: block;
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.form-input-mobile {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 15px;
+  color: #333;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.form-input-mobile:focus {
+  outline: none;
+  border-color: #3b5998;
+}
+
+.form-input-mobile::placeholder {
+  color: #aaa;
+}
+
+.form-input-mobile.readonly {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.form-input-mobile.password-input {
+  background: #e8f0fe;
+  border-color: #3b5998;
+}
+
+/* 생년월일 / 성별 Row */
+.form-field-row-mobile {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.form-field-half-mobile {
+  flex: 1;
+}
+
+.gender-field-mobile {
+  flex: 0 0 120px;
+}
+
+.gender-buttons-mobile {
+  display: flex;
+  gap: 6px;
+  height: 44px;
+  align-items: center;
+}
+
+.gender-btn-mobile {
+  flex: 1;
+  height: 34px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  color: #999;
+  font-size: 13px;
+  cursor: not-allowed;
+}
+
+.gender-btn-mobile.active {
+  background: #fff;
+  border-color: #3b5998;
+  color: #3b5998;
+  font-weight: 600;
+}
+
+/* 이메일 입력 그룹 */
+.email-input-group-mobile {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.email-id-mobile {
+  flex: 1;
+}
+
+.email-at-mobile {
+  color: #666;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.email-domain-mobile {
+  flex: 1;
+}
+
+.form-select-mobile {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  background: #fff;
+}
+
+/* 수신 여부 */
+.receive-options-mobile {
+  margin-top: 8px;
+  margin-bottom: 24px;
+}
+
+.receive-row-mobile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.receive-row-mobile:last-child {
+  border-bottom: none;
+}
+
+.receive-label-mobile {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+.receive-buttons-mobile {
+  display: flex;
+  gap: 12px;
+}
+
+.receive-option-mobile {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.receive-option-mobile input[type="radio"] {
+  display: none;
+}
+
+.receive-btn-mobile {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: #999;
+}
+
+.receive-btn-mobile::before {
+  content: '';
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  background: #fff;
+  transition: all 0.2s;
+}
+
+.receive-btn-mobile.active {
+  color: #3b5998;
+}
+
+.receive-btn-mobile.active::before {
+  border-color: #3b5998;
+  background: #3b5998;
+  box-shadow: inset 0 0 0 3px #fff;
+}
+
+/* 버튼 */
+.form-buttons-mobile {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.btn-secondary-mobile {
+  flex: 1;
+  height: 48px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  color: #666;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-primary-mobile {
+  flex: 1.5;
+  height: 48px;
+  border: none;
+  border-radius: 4px;
+  background: #3b5998;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary-mobile:disabled {
+  background: #a0b3d6;
+  cursor: not-allowed;
+}
+
+/* Loading */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  font-size: 15px;
+  color: #666;
+}
+
+/* 법인회원 전용 스타일 (모바일) */
+
+/* 사업자번호 표시 */
+.business-number-display-mobile {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #f5f5f5;
+  color: #666;
+}
+
+.business-number-display-mobile .business-part {
+  font-size: 14px;
+}
+
+.business-number-display-mobile .business-divider {
+  margin: 0 8px;
+  color: #999;
+}
+
+/* 담당자 섹션 */
+.contact-section-mobile {
+  margin-bottom: 8px;
+}
+
+.contact-divider-mobile {
+  height: 1px;
+  background: #eee;
+  margin: 20px 0 16px;
+}
+
+/* 담당자 추가 버튼 */
+.add-contact-wrapper-mobile {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.add-contact-btn-mobile {
+  padding: 8px 14px;
+  border: 1px solid #3b5998;
+  border-radius: 4px;
+  background: #fff;
+  color: #3b5998;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* 포괄계약 신청 섹션 */
+.comprehensive-contract-section-mobile {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.section-title-mobile {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 14px;
+}
+
+.contract-options-mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.contract-option-mobile {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.contract-option-mobile input[type="radio"] {
+  display: none;
+}
+
+.contract-btn-mobile {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #999;
+}
+
+.contract-btn-mobile::before {
+  content: '';
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  background: #fff;
+  transition: all 0.2s;
+}
+
+.contract-btn-mobile.active {
+  color: #3b5998;
+}
+
+.contract-btn-mobile.active::before {
+  border-color: #3b5998;
+  background: #3b5998;
+  box-shadow: inset 0 0 0 3px #fff;
+}
+
+/* 포괄계약 안내 박스 */
+.contract-info-box-mobile {
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+.contract-info-box-mobile p {
+  font-size: 12px;
+  color: #555;
+  line-height: 1.6;
+  margin: 0 0 6px;
+}
+
+.contract-info-box-mobile p:last-child {
+  margin-bottom: 0;
+}
+
+.contract-info-box-mobile .highlight-red {
+  color: #e53935;
+  font-weight: 600;
+}
+
+.contract-info-box-mobile .contact-info {
+  font-size: 11px;
+  color: #666;
+  margin: 3px 0 0;
+}
+
+/* 협정서 보기 버튼 */
+.agreement-link-btn-mobile {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  color: #333;
+  font-size: 13px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.agreement-link-btn-mobile .arrow {
+  font-size: 18px;
+  color: #999;
+}
+

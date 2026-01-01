@@ -1,0 +1,750 @@
+/* PC MyPage Styles */
+.mypage-pc {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.mypage-content-pc {
+  flex: 1;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 40px 20px 60px;
+  min-height: calc(100vh - 160px);
+  background-size: 4800px auto;
+  background-position: 52.2% -800px;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-color: #f5f7fb;
+}
+
+.mypage-container {
+  width: 100%;
+  max-width: 480px;
+}
+
+.mypage-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 30px;
+}
+
+/* Header */
+.mypage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.mypage-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+.title-highlight {
+  color: #3b5998;
+}
+
+.withdraw-link {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.2s;
+}
+
+.withdraw-link:hover {
+  color: #333;
+}
+
+/* Form */
+.mypage-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.form-field {
+  margin-bottom: 16px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.form-label {
+  display: block;
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.form-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 15px;
+  color: #333;
+  background: #fff;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #3b5998;
+}
+
+.form-input::placeholder {
+  color: #aaa;
+}
+
+.form-input.readonly {
+  background: #f5f5f5;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.form-input.password-input {
+  background: #e8f0fe;
+  border-color: #3b5998;
+}
+
+/* 생년월일 / 성별 Row */
+.form-field-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.form-field-half {
+  flex: 1;
+}
+
+.form-field-half .form-label {
+  margin-bottom: 6px;
+}
+
+.gender-field {
+  flex: 0 0 140px;
+}
+
+.gender-buttons {
+  display: flex;
+  gap: 8px;
+  height: 46px;
+  align-items: center;
+}
+
+.gender-btn {
+  flex: 1;
+  height: 36px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  color: #999;
+  font-size: 14px;
+  cursor: not-allowed;
+  transition: all 0.2s;
+}
+
+.gender-btn.active {
+  background: #fff;
+  border-color: #3b5998;
+  color: #3b5998;
+  font-weight: 600;
+}
+
+/* 이메일 입력 그룹 */
+.email-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.email-id {
+  flex: 1;
+  min-width: 0;
+}
+
+.email-at {
+  color: #666;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.email-domain {
+  flex: 1;
+  min-width: 0;
+}
+
+.email-select {
+  flex: 0 0 100px;
+}
+
+.form-select {
+  height: 46px;
+  padding: 0 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  background: #fff;
+  cursor: pointer;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: #3b5998;
+}
+
+/* 수신 여부 */
+.receive-options {
+  margin-top: 8px;
+  margin-bottom: 24px;
+}
+
+.receive-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.receive-row:last-child {
+  border-bottom: none;
+}
+
+.receive-label {
+  font-size: 15px;
+  color: #333;
+  font-weight: 500;
+}
+
+.receive-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.receive-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.receive-option input[type="radio"] {
+  display: none;
+}
+
+.receive-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #999;
+  transition: color 0.2s;
+}
+
+.receive-btn::before {
+  content: '';
+  width: 18px;
+  height: 18px;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  background: #fff;
+  transition: all 0.2s;
+}
+
+.receive-btn.active {
+  color: #3b5998;
+}
+
+.receive-btn.active::before {
+  border-color: #3b5998;
+  background: #3b5998;
+  box-shadow: inset 0 0 0 3px #fff;
+}
+
+/* 버튼 */
+.form-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.btn-secondary {
+  flex: 1;
+  height: 52px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  color: #666;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #f5f5f5;
+  border-color: #ccc;
+}
+
+.btn-primary {
+  flex: 1.5;
+  height: 52px;
+  border: none;
+  border-radius: 4px;
+  background: #3b5998;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-primary:hover {
+  background: #2d4373;
+}
+
+.btn-primary:disabled {
+  background: #a0b3d6;
+  cursor: not-allowed;
+}
+
+/* Loading */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  font-size: 16px;
+  color: #666;
+}
+
+/* Floating Buttons */
+.floating-buttons {
+  position: fixed;
+  left: calc(50% + 280px);
+  top: 160px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 100;
+}
+
+@media (max-width: 1100px) {
+  .floating-buttons {
+    right: 20px;
+    left: auto;
+  }
+}
+
+.floating-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  min-width: 100px;
+}
+
+.floating-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.cash-btn {
+  background: #ffd600;
+}
+
+.cash-btn .floating-text {
+  white-space: nowrap;
+}
+
+.service-btn {
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  flex-direction: row !important;
+  gap: 8px;
+}
+
+.service-btn .floating-icon-img {
+  margin-bottom: 0;
+}
+
+.service-btn .floating-text {
+  text-align: left;
+  word-break: keep-all;
+  white-space: pre-wrap;
+}
+
+.floating-icon-img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  margin-bottom: 4px;
+}
+
+.floating-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1a1a1a;
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* 법인회원 전용 스타일 */
+
+/* 사업자번호 표시 */
+.business-number-display {
+  display: flex;
+  align-items: center;
+  height: 46px;
+  padding: 0 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #f5f5f5;
+  color: #666;
+}
+
+.business-part {
+  font-size: 15px;
+}
+
+.business-divider {
+  margin: 0 16px;
+  color: #999;
+}
+
+/* 담당자 섹션 */
+.contact-section {
+  margin-bottom: 8px;
+}
+
+.contact-divider {
+  height: 1px;
+  background: #eee;
+  margin: 24px 0 20px;
+}
+
+/* 담당자 추가 버튼 */
+.add-contact-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.add-contact-btn {
+  padding: 8px 16px;
+  border: 1px solid #3b5998;
+  border-radius: 4px;
+  background: #fff;
+  color: #3b5998;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.add-contact-btn:hover {
+  background: #f0f4ff;
+}
+
+/* 포괄계약 신청 섹션 */
+.comprehensive-contract-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #eee;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 16px;
+}
+
+.contract-options {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.contract-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.contract-option input[type="radio"] {
+  display: none;
+}
+
+.contract-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #999;
+  transition: color 0.2s;
+}
+
+.contract-btn::before {
+  content: '';
+  width: 18px;
+  height: 18px;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  background: #fff;
+  transition: all 0.2s;
+}
+
+.contract-btn.active {
+  color: #3b5998;
+}
+
+.contract-btn.active::before {
+  border-color: #3b5998;
+  background: #3b5998;
+  box-shadow: inset 0 0 0 3px #fff;
+}
+
+/* 포괄계약 안내 박스 */
+.contract-info-box {
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.contract-info-box p {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.6;
+  margin: 0 0 8px;
+}
+
+.contract-info-box p:last-child {
+  margin-bottom: 0;
+}
+
+.contract-info-box .highlight-red {
+  color: #e53935;
+  font-weight: 600;
+}
+
+.contract-info-box .contact-info {
+  font-size: 12px;
+  color: #666;
+  margin: 4px 0 0;
+}
+
+/* 협정서 보기 버튼 */
+.agreement-link-btn {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 24px;
+}
+
+.agreement-link-btn:hover {
+  background: #f5f5f5;
+  border-color: #ccc;
+}
+
+.agreement-link-btn .arrow {
+  font-size: 20px;
+  color: #999;
+}
+
+/* 파일 업로드 섹션 */
+.file-upload-section {
+  margin-top: 16px;
+}
+
+.file-upload-section .form-label {
+  display: block;
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.file-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-input-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  border: 1px solid #3b5998;
+  border-radius: 4px;
+  background: #fff;
+  color: #3b5998;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.file-input-btn:hover {
+  background: #f0f4ff;
+}
+
+.file-name {
+  font-size: 14px;
+  color: #333;
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 기존 파일 표시 스타일 */
+.existing-file-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.existing-file-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.file-icon {
+  font-size: 18px;
+}
+
+.existing-file-name {
+  color: #3b5998;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.existing-file-name:hover {
+  text-decoration: underline;
+}
+
+.file-change-btn {
+  display: inline-block;
+  padding: 8px 16px;
+  border: 1px solid #dc3545;
+  border-radius: 4px;
+  background: #fff;
+  color: #dc3545;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.file-change-btn:hover {
+  background: #fff5f5;
+}
+
+.file-cancel-btn {
+  display: inline-block;
+  padding: 8px 12px;
+  border: 1px solid #6c757d;
+  border-radius: 4px;
+  background: #fff;
+  color: #6c757d;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.file-cancel-btn:hover {
+  background: #f8f9fa;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .mypage-card {
+    padding: 24px 20px 32px;
+  }
+
+  .email-input-group {
+    flex-wrap: wrap;
+  }
+
+  .email-id {
+    flex: 1 1 100%;
+  }
+
+  .email-at {
+    display: none;
+  }
+
+  .email-domain {
+    flex: 1;
+  }
+
+  .email-select {
+    flex: 0 0 90px;
+  }
+
+  .floating-buttons {
+    display: none;
+  }
+  
+  .business-divider {
+    margin: 0 8px;
+  }
+  
+  .contract-options {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+

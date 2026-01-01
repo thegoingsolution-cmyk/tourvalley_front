@@ -1,0 +1,312 @@
+.long-term-stay-page-mobile {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f5f7fb;
+}
+
+.long-term-stay-content-mobile {
+  flex: 1;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px 16px 0;
+  min-height: calc(100vh - 120px);
+}
+
+/* Background Image */
+.long-term-stay-background-mobile {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 150px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.background-image-mobile {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
+}
+
+/* Form Section */
+.form-section-mobile {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 100%;
+}
+
+.form-container-mobile {
+  width: 100%;
+}
+
+.form-card-mobile {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Form Header */
+.form-header-mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.form-title-mobile {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+/* Step Indicator */
+.step-indicator-mobile {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.step-mobile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.step-number-mobile {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.step-mobile.active .step-number-mobile {
+  background: #3b5998;
+  color: #fff;
+}
+
+.step-label-mobile {
+  font-size: 9px;
+  color: #999;
+}
+
+.step-mobile.active .step-label-mobile {
+  color: #3b5998;
+  font-weight: 500;
+}
+
+.step-line-mobile {
+  width: 20px;
+  height: 1px;
+  background: #e0e0e0;
+  margin-bottom: 12px;
+}
+
+/* Form Fields */
+.form-fields-mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.field-row-mobile {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.field-group-mobile {
+  flex: 1;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.date-field-mobile {
+  flex: 2;
+}
+
+.time-field-mobile {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.birth-field-mobile {
+  flex: 2;
+}
+
+.gender-field-mobile {
+  flex: 1;
+}
+
+.field-separator-mobile {
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  color: #d0d0d0;
+  font-size: 18px;
+  font-weight: 300;
+  background: #fff;
+}
+
+.field-label-mobile {
+  font-size: 10px;
+  color: #999;
+  margin-bottom: 1px;
+}
+
+.field-input-mobile {
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: #333;
+  padding: 0;
+  background: transparent;
+  width: 100%;
+}
+
+.date-input-mobile {
+  font-size: 13px;
+  color: #999;
+}
+
+.date-input-mobile::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.time-select-mobile {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+  cursor: pointer;
+  text-align: center;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.birth-input-mobile::placeholder {
+  color: #ccc;
+  font-size: 13px;
+}
+
+/* Gender Options */
+.gender-options-mobile {
+  display: flex;
+  gap: 12px;
+}
+
+.gender-option-mobile {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+}
+
+.gender-radio-mobile {
+  display: none;
+}
+
+.gender-text-mobile {
+  font-size: 14px;
+  color: #999;
+  transition: color 0.2s;
+}
+
+.gender-option-mobile.selected .gender-text-mobile {
+  color: #3b5998;
+  font-weight: 600;
+}
+
+/* Calculate Button */
+.calculate-btn-mobile {
+  width: 100%;
+  padding: 16px;
+  background: #3b5998;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 16px;
+  margin-bottom: 32px;
+}
+
+.calculate-btn-mobile:hover {
+  background: #2d4373;
+}
+
+/* Group Insurance Section */
+.group-insurance-section-mobile {
+  text-align: center;
+  padding-top: 16px;
+}
+
+.group-insurance-link-mobile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 14px 32px;
+  border: 1px solid #e0e0e0;
+  border-radius: 25px;
+  color: #3b5998;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s;
+  margin-bottom: 12px;
+}
+
+.group-insurance-link-mobile:active {
+  background: #f8f9fc;
+  border-color: #3b5998;
+}
+
+.link-arrow-mobile {
+  font-size: 16px;
+  color: #f15a24;
+}
+
+.group-insurance-desc-mobile {
+  font-size: 12px;
+  color: #999;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.highlight-text-mobile {
+  color: #f15a24;
+}
+
