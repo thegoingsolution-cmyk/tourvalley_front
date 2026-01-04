@@ -4,8 +4,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getImagePath } from '@/utils/path';
-import { requestNicepayPayment, openNicepayWindow } from '@/services/paymentService';
+import { requestNicepayPayment, openNicepayWindow, processNaverPayPayment, processKakaoPayPayment } from '@/services/paymentService';
 import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 import { sendVerificationCode, verifyCode } from '@/services/smsService';
 import TravelInfoStep from '@/components/travel/TravelInfoStep';
 import ParticipantInfoStep from '@/components/travel/ParticipantInfoStep';
@@ -20,6 +21,7 @@ import { PlanType, PlanInfo, Participant, CalculatedPremiums, PaymentMethod, Pay
 import './page.css';
 
 export default function PCDomesticPage() {
+  const router = useRouter();
   // 회원 정보 가져오기
   const { member, isLoggedIn } = useAuth();
   
@@ -540,7 +542,7 @@ export default function PCDomesticPage() {
             total_premium: calculatedPremiums?.totalPremium || 0,
           },
           contractor: {
-            contractor_type: '개인',
+            contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: participants[0]?.name || '',
             resident_number: participants[0]?.birthDate ? `${participants[0].birthDate.substring(0, 6)}-${participants[0].birthDate.substring(6, 7)}${participants[0].gender === '남자' ? '1' : '2'}******` : '',
             mobile_phone: participants[0]?.phone || '',
@@ -615,9 +617,38 @@ export default function PCDomesticPage() {
             alert(paymentRequest.message || '결제 요청에 실패했습니다.');
           }
         } else if (paymentMethod === '네이버페이') {
-          alert('네이버페이 연동 준비 중입니다.');
+          try {
+            await processNaverPayPayment({
+              contractId: contract_id,
+              amount: receiptPremium,
+              productName: '국내여행보험',
+              productCount: participants.length,
+              customerName: participants[0]?.name || '',
+              customerEmail: participants[0]?.email1 && participants[0]?.email2 ? `${participants[0].email1}@${participants[0].email2}` : '',
+              customerPhone: participants[0]?.phone || '',
+              checkOutDate: arrivalDate,
+            });
+            // 네이버 페이 결제창이 열리면, 콜백으로 결과가 처리됩니다
+          } catch (error) {
+            console.error('네이버 페이 결제 오류:', error);
+            alert(error instanceof Error ? error.message : '네이버 페이 결제 중 오류가 발생했습니다.');
+          }
         } else if (paymentMethod === '카카오페이') {
-          alert('카카오페이 연동 준비 중입니다.');
+          try {
+            await processKakaoPayPayment({
+              contractId: contract_id,
+              amount: receiptPremium,
+              itemName: '국내여행보험',
+              quantity: participants.length,
+              customerName: participants[0]?.name || '',
+              customerEmail: participants[0]?.email1 && participants[0]?.email2 ? `${participants[0].email1}@${participants[0].email2}` : '',
+              customerPhone: participants[0]?.phone || '',
+            });
+            // 카카오페이 결제 페이지로 리다이렉트됨
+          } catch (error) {
+            console.error('카카오페이 결제 오류:', error);
+            alert(error instanceof Error ? error.message : '카카오페이 결제 중 오류가 발생했습니다.');
+          }
         }
       } else {
         // 기타결제 (무통장입금, 수기카드)는 바로 계약 등록
@@ -636,7 +667,7 @@ export default function PCDomesticPage() {
             total_premium: calculatedPremiums?.totalPremium || 0,
           },
           contractor: {
-            contractor_type: '개인',
+            contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: participants[0]?.name || '',
             resident_number: participants[0]?.birthDate ? `${participants[0].birthDate.substring(0, 6)}-${participants[0].birthDate.substring(6, 7)}${participants[0].gender === '남자' ? '1' : '2'}******` : '',
             mobile_phone: participants[0]?.phone || '',
@@ -956,10 +987,10 @@ export default function PCDomesticPage() {
           <CompletionStep
             participantName={participants[0]?.name || ''}
             onViewDetails={() => {
-              alert('가입내역 확인 기능은 추후 구현 예정입니다.');
+              router.push('/contracts');
             }}
             onGoHome={() => {
-              window.location.href = '/';
+              router.push('/');
             }}
           />
         )}

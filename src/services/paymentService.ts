@@ -208,40 +208,247 @@ export const approveNicepayPayment = async (data: any) => {
   }
 };
 
-// 네이버페이 결제 준비
-export const prepareNaverPayPayment = async (data: NaverPayPaymentRequest) => {
+// 네이버페이 SDK 로드
+export const loadNaverPaySDK = (): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    console.log('네이버 페이 SDK 로드 시작');
+    
+    // @ts-ignore
+    if (window.Naver && window.Naver.Pay) {
+      console.log('네이버 페이 SDK가 이미 로드되어 있음');
+      resolve();
+      return;
+    }
+
+    const script = document.createElement('script');
+    const isDev = process.env.NEXT_PUBLIC_NAVER_PAY_ENV === 'dev' || process.env.NEXT_PUBLIC_NAVER_PAY_ENV === 'development';
+    const sdkUrl = isDev 
+      ? 'https://test-nsp.pay.naver.com/sdk/js/naverpay.min.js'
+      : 'https://nsp.pay.naver.com/sdk/js/naverpay.min.js';
+    
+    console.log('네이버 페이 SDK URL:', sdkUrl);
+    script.src = sdkUrl;
+    script.async = true;
+    script.onload = () => {
+      console.log('네이버 페이 SDK 로드 완료');
+      resolve();
+    };
+    script.onerror = (error) => {
+      console.error('네이버 페이 SDK 로드 실패:', error);
+      reject(new Error('네이버 페이 SDK 로드 실패'));
+    };
+    document.head.appendChild(script);
+  });
+};
+
+// 네이버페이 결제 준비 및 실행
+export const processNaverPayPayment = async (data: {
+  contractId: number;
+  amount: number;
+  productName: string;
+  productCount: number;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  checkOutDate: string;
+}) => {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/payments/naverpay/prepare`, {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+    
+    // 1. 네이버 페이 SDK 로드
+    await loadNaverPaySDK();
+    
+    // 2. 예약 생성 API 호출 (계약 정보 준비)
+    const createResponse = await fetch(`${baseUrl}/api/travel/contracts/${data.contractId}/create-naver-payment`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
+      credentials: 'include',
+      body: JSON.stringify({
+        amount: data.amount,
+        productName: data.productName,
+        productCount: data.productCount,
+        customerName: data.customerName,
+        customerEmail: data.customerEmail,
+        customerPhone: data.customerPhone,
+        checkOutDate: data.checkOutDate,
+      }),
     });
-
-    const result = await response.json();
-    return result;
+    
+    if (!createResponse.ok) {
+      const errorData = await createResponse.json();
+      throw new Error(errorData.message || '결제 준비 실패');
+    }
+    
+    const createResult = await createResponse.json();
+    
+    if (!createResult.success || !createResult.data) {
+      throw new Error(createResult.message || '결제 준비 실패');
+    }
+    
+    const { orderId, merchantPayKey } = createResult.data;
+    
+    // 3. 네이버 페이 객체 생성
+    const naverPayClientId = process.env.NEXT_PUBLIC_NAVER_PAY_CLIENT_ID;
+    // chainId는 필수입니다 (샘플 코드 참고)
+    const naverPayChainId = process.env.NAVER_PAY_CHAIN_ID || "Y1dub1pDaDgyM0w"; // chainId가 없으면 clientId 사용
+    const isDev = process.env.NEXT_PUBLIC_NAVER_PAY_ENV === 'dev' || process.env.NEXT_PUBLIC_NAVER_PAY_ENV === 'development';
+    
+    if (!naverPayClientId) {
+      throw new Error('네이버 페이 CLIENT_ID가 설정되지 않았습니다.');
+    }
+    
+    // @ts-ignore
+    const NaverPay = window.Naver?.Pay;
+    if (!NaverPay) {
+      throw new Error('네이버 페이 SDK를 로드할 수 없습니다.');
+    }
+    
+    // 주의: 네이버 페이 SDK는 보안상의 이유로 window.location.origin을 강제로 사용합니다.
+    // 샘플 코드에 따르면 chainId도 필수입니다.
+    const sdkConfig: any = {
+      mode: isDev ? 'development' : 'production',
+      clientId: naverPayClientId,
+      chainId: naverPayChainId, // chainId 필수
+    };
+    
+    console.log('네이버 페이 SDK 설정:', {
+      mode: sdkConfig.mode,
+      clientId: sdkConfig.clientId,
+      chainId: sdkConfig.chainId,
+    });
+    
+    const oPay = NaverPay.create(sdkConfig);
+    
+    // 4. 이용완료일 설정
+    let useCfmYmdt: string | undefined = undefined;
+    if (data.checkOutDate) {
+      const checkoutDateObj = new Date(data.checkOutDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      checkoutDateObj.setHours(0, 0, 0, 0);
+      
+      if (checkoutDateObj >= today) {
+        useCfmYmdt = data.checkOutDate.replace(/-/g, '');
+      } else {
+        throw new Error('체크아웃 날짜는 오늘 이후여야 합니다.');
+      }
+    }
+    
+    // 5. 결제창 열기
+    const returnUrl = `${baseUrl}/api/travel/naver-pay-callback`;
+    
+    // 네이버 페이 SDK open() 메서드 파라미터 준비
+    // 샘플 코드와 동일하게 모든 값을 문자열로 전달해야 합니다
+    // totalPayAmount = taxScopeAmount + taxExScopeAmount 여야 합니다
+    const totalAmount = Math.round(data.amount);
+    const paymentParams: any = {
+      merchantPayKey: String(merchantPayKey || orderId),
+      productName: String(data.productName),
+      productCount: String(data.productCount),
+      totalPayAmount: String(totalAmount),
+      taxScopeAmount: String(totalAmount), // 과세 금액 (전체 금액을 과세로 설정)
+      taxExScopeAmount: String(0), // 면세 금액
+      returnUrl: String(returnUrl),
+    };
+    
+    // 이용완료일이 있는 경우에만 추가
+    // 개발 환경에서는 지원되지 않으므로 production 환경에서만 사용 (상용에서는 필수)
+    if (useCfmYmdt && !isDev) {
+      paymentParams.useCfmYmdt = String(useCfmYmdt);
+    }
+    
+    // 개발 환경에서는 productItems가 지원되지 않을 수 있음
+    // productItems: [{
+    //   categoryType: 'ETC',
+    //   categoryId: 'ETC',
+    //   uid: String(data.contractId),
+    //   name: String(data.productName),
+    //   count: String(data.productCount),
+    // }],
+    
+    console.log('네이버 페이 결제창 열기:', paymentParams);
+    
+    // 네이버 페이 결제창 열기
+    oPay.open(paymentParams);
+    
+    return {
+      success: true,
+      message: '네이버 페이 결제창을 열었습니다.',
+    };
   } catch (error) {
-    console.error('NaverPay prepare error:', error);
+    console.error('NaverPay process error:', error);
     throw error;
   }
 };
 
-// 카카오페이 결제 준비
-export const prepareKakaoPayPayment = async (data: KakaoPayPaymentRequest) => {
+// 카카오페이 결제 준비 및 실행
+export const processKakaoPayPayment = async (data: {
+  contractId: number;
+  amount: number;
+  itemName: string;
+  quantity: number;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+}) => {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/payments/kakaopay/prepare`, {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+    
+    console.log('카카오페이 결제 준비 시작:', data);
+    
+    // 1. 결제 준비 API 호출
+    const prepareResponse = await fetch(`${baseUrl}/api/travel/contracts/${data.contractId}/prepare-kakao-payment`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
+      credentials: 'include',
+      body: JSON.stringify({
+        amount: data.amount,
+        itemName: data.itemName,
+        quantity: data.quantity,
+        customerName: data.customerName,
+        customerEmail: data.customerEmail,
+        customerPhone: data.customerPhone,
+      }),
     });
-
-    const result = await response.json();
-    return result;
+    
+    if (!prepareResponse.ok) {
+      const errorData = await prepareResponse.json();
+      throw new Error(errorData.message || '카카오페이 결제 준비 실패');
+    }
+    
+    const prepareResult = await prepareResponse.json();
+    
+    if (!prepareResult.success || !prepareResult.data) {
+      throw new Error(prepareResult.message || '카카오페이 결제 준비 실패');
+    }
+    
+    const { tid, next_redirect_pc_url, next_redirect_mobile_url } = prepareResult.data;
+    
+    console.log('카카오페이 결제 준비 완료:', { tid, next_redirect_pc_url });
+    
+    // 2. 모바일/PC 구분하여 리다이렉트
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const redirectUrl = isMobile ? next_redirect_mobile_url : next_redirect_pc_url;
+    
+    if (!redirectUrl) {
+      throw new Error('카카오페이 리다이렉트 URL을 받지 못했습니다.');
+    }
+    
+    // 3. 카카오페이 결제 페이지로 이동
+    console.log('카카오페이 결제 페이지로 이동:', redirectUrl);
+    window.location.href = redirectUrl;
+    
+    return {
+      success: true,
+      message: '카카오페이 결제 페이지로 이동합니다.',
+      data: { tid },
+    };
   } catch (error) {
-    console.error('KakaoPay prepare error:', error);
+    console.error('카카오페이 결제 오류:', error);
     throw error;
   }
 };

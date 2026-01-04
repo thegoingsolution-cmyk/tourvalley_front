@@ -244,18 +244,20 @@ export default function ParticipantInfoStep({
                   </div>
                 </div>
 
-                {/* 영문이름 */}
-                <div className="participant-form-row">
-                  <div className="participant-form-group-item full-width">
-                    <label>영문이름</label>
-                    <input
-                      type="text"
-                      value={participant.englishName || ''}
-                      onChange={(e) => handleParticipantChange(index, 'englishName', e.target.value)}
-                      placeholder="예)HONG GIL DONG"
-                    />
+                {/* 영문이름 - 해외장기체류보험인 경우에만 표시 */}
+                {insuranceType === '해외장기체류보험' && (
+                  <div className="participant-form-row">
+                    <div className="participant-form-group-item full-width">
+                      <label>영문이름</label>
+                      <input
+                        type="text"
+                        value={participant.englishName || ''}
+                        onChange={(e) => handleParticipantChange(index, 'englishName', e.target.value)}
+                        placeholder="예)HONG GIL DONG"
+                      />
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* 생년월일, 성별 */}
                 <div className="participant-form-row">

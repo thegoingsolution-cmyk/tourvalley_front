@@ -7,11 +7,69 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { getImagePath } from '@/utils/path';
+import AccidentFreeCashModal from '@/components/travel/AccidentFreeCashModal';
+import { sendVerificationCode, verifyCode } from '@/services/smsService';
 import './page.css';
 
 export default function PCContractPage() {
   const router = useRouter();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, member } = useAuth();
+
+  // 로그인한 유저용 상태
+  const [searchType, setSearchType] = useState<'contract' | 'event'>('contract');
+  const [inYear, setInYear] = useState<number>(1);
+  const [cashInYear, setCashInYear] = useState<number>(1); // 무사고캐시 내역 조회용
+  const [mileageInYear, setMileageInYear] = useState<number>(1); // 마일리지 내역 조회용
+  
+  // 계약 목록 데이터 (JSON)
+  interface Contract {
+    id: number;
+    contractNumber: string;
+    insuranceType: string;
+    planTypes: string[];
+    departureDate: string;
+    arrivalDate: string;
+    totalPremium: number;
+    status: string;
+    createdAt: string;
+    travelRegion?: string | null;
+    travelCountry?: string | null;
+    travelPurpose?: string | null;
+  }
+  const [contracts, setContracts] = useState<Contract[]>([]);
+  const [contractPagination, setContractPagination] = useState<{
+    currentPage: number;
+    totalPages: number;
+    totalCount: number;
+    pageSize: number;
+  }>({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
+  
+  // 무사고캐시 데이터
+  interface CashHistory {
+    id: number;
+    type: string;
+    amount: number;
+    balance: number;
+    reason: string | null;
+    reason_detail: string | null;
+    created_at: string;
+  }
+  const [cashList, setCashList] = useState<CashHistory[]>([]);
+  const [cashInfo, setCashInfo] = useState<{ totalCash: number; expireCash: number }>({ totalCash: 0, expireCash: 0 });
+  
+  // 마일리지 데이터
+  interface MileageHistory {
+    id: number;
+    type: string;
+    amount: number;
+    balance: number;
+    reason: string | null;
+    reason_detail: string | null;
+    created_at: string;
+  }
+  const [mileageInfo, setMileageInfo] = useState<{ totalMileage: number }>({ totalMileage: 0 });
+  const [mileageList, setMileageList] = useState<MileageHistory[]>([]);
+  const [activeTab, setActiveTab] = useState<'contract' | 'cash' | 'mileage'>('contract');
 
   // 로그인 타입: 'I' (개인) 또는 'C' (단체)
   const [loginType, setLoginType] = useState<'I' | 'C'>('I');
@@ -39,6 +97,7 @@ export default function PCContractPage() {
   const [isVerificationSent, setIsVerificationSent] = useState(false);
   const [reSendYn, setReSendYn] = useState('N');
   const [beforeCtel, setBeforeCtel] = useState('');
+  const [showCashModal, setShowCashModal] = useState(false);
 
   // 타이머 효과
   useEffect(() => {
@@ -112,13 +171,22 @@ export default function PCContractPage() {
         setReSendYn('N');
       }
 
-      // TODO: API 호출하여 인증번호 발송
-      // 임시로 성공 처리
-      alert('인증번호가 발송되었습니다.');
-      setShowVerificationInput(true);
-      setRemainingTime(180); // 3분
-      setIsVerificationSent(true);
-      if (reSendYn === 'N') setReSendYn('Y');
+      try {
+        // API 호출하여 인증번호 발송
+        const result = await sendVerificationCode(cleanedPhone, false);
+        if (result.success) {
+          alert('인증번호가 발송되었습니다.');
+          setShowVerificationInput(true);
+          setRemainingTime(180); // 3분
+          setIsVerificationSent(true);
+          if (reSendYn === 'N') setReSendYn('Y');
+        } else {
+          alert(result.message || '인증번호 발송에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('인증번호 발송 오류:', error);
+        alert('인증번호 발송에 실패했습니다. 잠시 후 다시 시도해주세요.');
+      }
     } else {
       // 단체 검증
       if (!companyName.trim()) {
@@ -148,12 +216,22 @@ export default function PCContractPage() {
         setReSendYn('N');
       }
 
-      // TODO: API 호출하여 인증번호 발송
-      alert('인증번호가 발송되었습니다.');
-      setShowCompanyVerificationInput(true);
-      setCompanyRemainingTime(180); // 3분
-      setIsVerificationSent(true);
-      if (reSendYn === 'N') setReSendYn('Y');
+      try {
+        // API 호출하여 인증번호 발송
+        const result = await sendVerificationCode(cleanedPhone, false);
+        if (result.success) {
+          alert('인증번호가 발송되었습니다.');
+          setShowCompanyVerificationInput(true);
+          setCompanyRemainingTime(180); // 3분
+          setIsVerificationSent(true);
+          if (reSendYn === 'N') setReSendYn('Y');
+        } else {
+          alert(result.message || '인증번호 발송에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('인증번호 발송 오류:', error);
+        alert('인증번호 발송에 실패했습니다. 잠시 후 다시 시도해주세요.');
+      }
     }
   };
 
@@ -169,10 +247,19 @@ export default function PCContractPage() {
       return;
     }
 
-    // TODO: API 호출하여 인증번호 확인
-    // 임시로 성공 처리
-    alert('인증이 완료되었습니다.');
-    router.push('/contracts/list');
+    try {
+      const cleanedPhone = phoneNumber.replace(/-/g, '');
+      const result = await verifyCode(cleanedPhone, verificationCode);
+      if (result.success) {
+        alert('인증이 완료되었습니다.');
+        router.push('/contracts/list');
+      } else {
+        alert(result.message || '인증번호가 일치하지 않습니다.');
+      }
+    } catch (error) {
+      console.error('인증번호 확인 오류:', error);
+      alert('인증 확인에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    }
   };
 
   // 인증번호 확인 (단체)
@@ -187,9 +274,19 @@ export default function PCContractPage() {
       return;
     }
 
-    // TODO: API 호출하여 인증번호 확인
-    alert('인증이 완료되었습니다.');
-    router.push('/contracts/list');
+    try {
+      const cleanedPhone = companyPhoneNumber.replace(/-/g, '');
+      const result = await verifyCode(cleanedPhone, companyVerificationCode);
+      if (result.success) {
+        alert('인증이 완료되었습니다.');
+        router.push('/contracts/list');
+      } else {
+        alert(result.message || '인증번호가 일치하지 않습니다.');
+      }
+    } catch (error) {
+      console.error('인증번호 확인 오류:', error);
+      alert('인증 확인에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    }
   };
 
   // 조회하기
@@ -261,14 +358,201 @@ export default function PCContractPage() {
     }
   };
 
-  return (
-    <div className="contract-page-pc">
-      <Header isMobile={false} />
+  // 로그인한 유저용: 계약 목록 조회
+  const getContractList = async (page: number = 1) => {
+    if (!isLoggedIn || !member) return;
 
-      <main 
-        className="contract-content-pc"
-        style={{ backgroundImage: `url(${getImagePath('/202309_main_bg02.png')})` }}
-      >
+    try {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${API_BASE_URL}/api/contracts/list?member_id=${member.id}&inyear=${inYear}&block_type=C&str_cur_page=${page}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('API 호출 실패');
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setContracts(data.contracts || []);
+        setContractPagination(data.pagination || { currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
+      } else {
+        setContracts([]);
+        setContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
+      }
+    } catch (error) {
+      console.error('계약 목록 조회 오류:', error);
+      setContracts([]);
+      setContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
+    }
+  };
+
+  // 로그인한 유저용: 무사고캐시 정보 조회 (금액, 소멸예정 캐시)
+  const getCashInfo = async () => {
+    if (!isLoggedIn || !member) return;
+
+    try {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${API_BASE_URL}/api/cash/info?member_id=${member.id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setCashInfo({
+            totalCash: data.totalCash || 0,
+            expireCash: data.expireCash || 0,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('무사고캐시 정보 조회 오류:', error);
+    }
+  };
+
+  // 로그인한 유저용: 무사고캐시 내역 조회
+  const getCashList = async () => {
+    if (!isLoggedIn || !member) return;
+
+    try {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${API_BASE_URL}/api/cash/list?member_id=${member.id}&inyear=${cashInYear}&block_type=C&str_cur_page=1`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('API 호출 실패');
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setCashList(data.cashList || []);
+      } else {
+        setCashList([]);
+      }
+    } catch (error) {
+      console.error('무사고캐시 내역 조회 오류:', error);
+      setCashList([]);
+    }
+  };
+
+  // 무사고캐시 내역 조회 기간 변경 핸들러
+  const handleCashInYearChange = (value: number) => {
+    setCashInYear(value);
+  };
+
+  // 로그인한 유저용: 마일리지 정보 조회 (현재 마일리지)
+  const getMileageInfo = async () => {
+    if (!isLoggedIn || !member) return;
+
+    try {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${API_BASE_URL}/api/mileage/info?member_id=${member.id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setMileageInfo({
+            totalMileage: data.totalMileage || 0,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('마일리지 정보 조회 오류:', error);
+    }
+  };
+
+  // 로그인한 유저용: 마일리지 내역 조회
+  const getMileageList = async () => {
+    if (!isLoggedIn || !member) return;
+
+    try {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${API_BASE_URL}/api/mileage/list?member_id=${member.id}&inyear=${mileageInYear}&block_type=C&str_cur_page=1`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('API 호출 실패');
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setMileageList(data.mileageList || []);
+      } else {
+        setMileageList([]);
+      }
+    } catch (error) {
+      console.error('마일리지 내역 조회 오류:', error);
+      setMileageList([]);
+    }
+  };
+
+  // 마일리지 내역 조회 기간 변경 핸들러
+  const handleMileageInYearChange = (value: number) => {
+    setMileageInYear(value);
+  };
+
+  useEffect(() => {
+    if (isLoggedIn && member) {
+      if (activeTab === 'contract') {
+        getContractList(1);
+      } else if (activeTab === 'cash') {
+        getCashInfo();
+        getCashList();
+      } else if (activeTab === 'mileage') {
+        getMileageInfo();
+        getMileageList();
+      }
+    }
+  }, [isLoggedIn, member, inYear, activeTab]);
+
+  // 무사고캐시 내역 조회 기간 변경 시 리스트 다시 불러오기
+  useEffect(() => {
+    if (isLoggedIn && member && activeTab === 'cash') {
+      getCashList();
+    }
+  }, [cashInYear]);
+
+  // 마일리지 내역 조회 기간 변경 시 리스트 다시 불러오기
+  useEffect(() => {
+    if (isLoggedIn && member && activeTab === 'mileage') {
+      getMileageList();
+    }
+  }, [mileageInYear]);
+
+  // 로그인한 유저용: 기간 변경 핸들러
+  const handleInYearChange = (value: number) => {
+    setInYear(value);
+  };
+
+  // 로그인하지 않은 유저용 화면
+  const renderNonLoggedInView = () => (
+    <section className="form-section">
+      <div className="form-container">
         <div className="contract-form-container">
           <div className="tour2023_header_line prow_01">
             <div className="tour2023_header_inner">
@@ -277,308 +561,886 @@ export default function PCContractPage() {
           </div>
 
           <div className="prow_01">
-          <p className="tour2023_title04">가입자정보</p>
+            <p className="tour2023_title04">가입자정보</p>
 
-          {/* 개인/단체 선택 */}
-          <div className="tour2023_ra_Wrap tourG_mab08">
-            <ul className="tour2023_ra_Wrap01">
-              <li className="tour2023_rdo_area">
-                <span className="tour2023_inp_rdo">
-                  <input
-                    type="radio"
-                    id="login_type_I"
-                    value="I"
-                    name="login_type"
-                    checked={loginType === 'I'}
-                    onChange={(e) => {
-                      setLoginType('I');
-                      setShowVerificationInput(false);
-                      setIsVerificationSent(false);
-                      setRemainingTime(0);
-                    }}
-                  />
-                  <label htmlFor="login_type_I">개인</label>
-                </span>
-                <span className="tour2023_inp_rdo">
-                  <input
-                    type="radio"
-                    id="login_type_C"
-                    value="C"
-                    name="login_type"
-                    checked={loginType === 'C'}
-                    onChange={(e) => {
-                      setLoginType('C');
-                      setShowCompanyVerificationInput(false);
-                      setIsVerificationSent(false);
-                      setCompanyRemainingTime(0);
-                    }}
-                  />
-                  <label htmlFor="login_type_C">단체(사업자/법인)</label>
-                </span>
-              </li>
-            </ul>
-          </div>
-
-          <div className="tourGuard_Info">
-            {/* 개인 입력 영역 */}
-            {loginType === 'I' && (
-              <div id="input_I" className="input_area">
-                <div className="tourGuard_form_tt mag5 tourG_mab03">
-                  <label htmlFor="insured_name">대표가입자명</label>
-                  <input
-                    type="text"
-                    id="insured_name"
-                    name="insured_name"
-                    maxLength={15}
-                    placeholder="대표가입자명"
-                    className="tourGuard_input_w02"
-                    value={insuredName}
-                    onChange={(e) => setInsuredName(e.target.value)}
-                  />
-                </div>
-
-                <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line">
-                  <label htmlFor="birth_date">생년월일</label>
-                  <input
-                    type="tel"
-                    id="birth_date"
-                    name="birth_date"
-                    maxLength={8}
-                    placeholder="예)19990515"
-                    className="tourGuard_input_w01"
-                    value={birthDate}
-                    onChange={handleBirthDateChange}
-                  />
-
-                  <div className="tourG_rdo_area">
-                    <label htmlFor="gender_male">성별</label>
-                    <span className="tourG_inp_rdo">
-                      <input
-                        type="radio"
-                        id="gender_male"
-                        value="1"
-                        name="gender"
-                        checked={gender === '1'}
-                        onChange={(e) => setGender('1')}
-                      />
-                      <label htmlFor="gender_male">남자</label>
-                    </span>
-                    <span className="tourG_inp_rdo">
-                      <input
-                        type="radio"
-                        id="gender_female"
-                        value="2"
-                        name="gender"
-                        checked={gender === '2'}
-                        onChange={(e) => setGender('2')}
-                      />
-                      <label htmlFor="gender_female" className="one_line0">여자</label>
-                    </span>
-                  </div>
-                </div>
-
-                <div className="tourGuard_form_tt mag5 tourG_mab03">
-                  <label htmlFor="ctel_no">휴대폰 번호</label>
-                  <input
-                    type="tel"
-                    id="ctel_no"
-                    name="ctel_no"
-                    maxLength={11}
-                    placeholder="숫자만 입력해주세요."
-                    className="tourGuard_input_w02"
-                    value={phoneNumber}
-                    onChange={handlePhoneChange}
-                  />
-                  <div className="tour2023_event_file">
-                    <button
-                      type="button"
-                      onClick={handleSendVerification}
-                      className="tour2023_btn_b01 tour2023_btn11"
-                    >
-                      인증받기
-                    </button>
-                  </div>
-                </div>
-
-                {showVerificationInput && (
-                  <div id="signArea" className="tourGuard_form_tt mag5 tourG_mab03">
-                    <label htmlFor="signNo">인증번호</label>
+            {/* 개인/단체 선택 */}
+            <div className="tour2023_ra_Wrap tourG_mab08">
+              <ul className="tour2023_ra_Wrap01">
+                <li className="tour2023_rdo_area">
+                  <span className="tour2023_inp_rdo">
                     <input
-                      type="tel"
-                      id="signNo"
-                      name="signNo"
-                      maxLength={6}
-                      placeholder="6자리 입력"
-                      className="tourGuard_input_w02"
-                      value={verificationCode}
+                      type="radio"
+                      id="login_type_I"
+                      value="I"
+                      name="login_type"
+                      checked={loginType === 'I'}
                       onChange={(e) => {
-                        const value = e.target.value.replace(/[^0-9]/g, '');
-                        if (value.length <= 6) {
-                          setVerificationCode(value);
-                        }
+                        setLoginType('I');
+                        setShowVerificationInput(false);
+                        setIsVerificationSent(false);
+                        setRemainingTime(0);
                       }}
                     />
-                    <div className="tour2023_timer">
-                      <span className="tour2023_timeLimit">{formatTime(remainingTime)}</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* 단체 입력 영역 */}
-            {loginType === 'C' && (
-              <div id="input_C" className="input_area">
-                <div className="tourGuard_form_tt mag5 tourG_mab03">
-                  <label htmlFor="contract_company">단체(사업자/법인)명</label>
-                  <input
-                    type="text"
-                    id="contract_company"
-                    name="contract_company"
-                    maxLength={30}
-                    placeholder="단체(사업자/법인)명"
-                    className="tourGuard_input_w02"
-                    value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
-                  />
-                </div>
-
-                <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line03">
-                  <label htmlFor="resno1">사업자번호</label>
-                  <input
-                    type="tel"
-                    id="resno1"
-                    name="resno1"
-                    maxLength={3}
-                    placeholder=""
-                    className="tourGuard_input_w03"
-                    value={businessNumber1}
-                    onChange={handleBusinessNumber1Change}
-                  />
-                  <input
-                    type="tel"
-                    id="resno2"
-                    name="resno2"
-                    maxLength={2}
-                    placeholder=""
-                    className="tourGuard_input_w03"
-                    value={businessNumber2}
-                    onChange={handleBusinessNumber2Change}
-                  />
-                  <input
-                    type="tel"
-                    id="resno3"
-                    name="resno3"
-                    maxLength={5}
-                    placeholder=""
-                    className="tourGuard_input_w03"
-                    value={businessNumber3}
-                    onChange={handleBusinessNumber3Change}
-                  />
-                </div>
-
-                <div className="tourGuard_form_tt mag5 tourG_mab03">
-                  <label htmlFor="c_ctel_no">담당자 휴대폰 번호</label>
-                  <input
-                    type="tel"
-                    id="c_ctel_no"
-                    name="c_ctel_no"
-                    maxLength={11}
-                    placeholder="숫자만 입력해주세요."
-                    className="tourGuard_input_w02"
-                    value={companyPhoneNumber}
-                    onChange={handleCompanyPhoneChange}
-                  />
-                  <div className="tour2023_event_file">
-                    <button
-                      type="button"
-                      onClick={handleSendVerification}
-                      className="tour2023_btn_b01 tour2023_btn11"
-                    >
-                      인증받기
-                    </button>
-                  </div>
-                </div>
-
-                {showCompanyVerificationInput && (
-                  <div id="c_signArea" className="tourGuard_form_tt mag5 tourG_mab03">
-                    <label htmlFor="c_signNo">인증번호</label>
+                    <label htmlFor="login_type_I">개인</label>
+                  </span>
+                  <span className="tour2023_inp_rdo">
                     <input
-                      type="tel"
-                      id="c_signNo"
-                      name="c_signNo"
-                      maxLength={6}
-                      placeholder="6자리 입력"
-                      className="tourGuard_input_w02"
-                      value={companyVerificationCode}
+                      type="radio"
+                      id="login_type_C"
+                      value="C"
+                      name="login_type"
+                      checked={loginType === 'C'}
                       onChange={(e) => {
-                        const value = e.target.value.replace(/[^0-9]/g, '');
-                        if (value.length <= 6) {
-                          setCompanyVerificationCode(value);
-                        }
+                        setLoginType('C');
+                        setShowCompanyVerificationInput(false);
+                        setIsVerificationSent(false);
+                        setCompanyRemainingTime(0);
                       }}
                     />
-                    <div className="tour2023_timer">
-                      <span className="tour2023_timeLimit">{formatTime(companyRemainingTime)}</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* 회원 로그인 섹션 */}
-            <section className="tour2023_cash_f tourG_mab05">
-              <div className="tour2023_txt33 tour2023_blue">투어밸리 회원님은 회원 로그인 하세요.</div>
-              <div>
-                <Link href="/login" className="tour2023_btn_b tour2023_btnLogin">
-                  회원 LOGIN
-                </Link>
-              </div>
-            </section>
-
-            {/* 무사고캐시란 버튼 */}
-            <div className="btnWrap ag_right">
-              <button type="button" className="btn tourG_btn_cash01">
-                무사고캐시란? <span className="cash01_ico"></span>
-              </button>
-            </div>
-
-            {/* 조회하기 버튼 */}
-            <div className="tourG_mat04 tourG_mab02">
-              <button
-                type="button"
-                onClick={handleSearch}
-                className="tourGuard_btn_b tour2023_btn01"
-              >
-                조회하기
-              </button>
-            </div>
-
-            {/* 안내 문구 */}
-            <div className="tour2023_txt01 tour2023_grey tourG_mleft04 tourG_mab04 tourG_mat06">
-              <ul className="tourGuard_inline">
-                <li className="tourGuard_inline_t01">※</li>
-                <li className="tourGuard_inline_t02">사업자/법인 고객은 무사고캐시가 적용되지 않습니다.</li>
+                    <label htmlFor="login_type_C">단체(사업자/법인)</label>
+                  </span>
+                </li>
               </ul>
             </div>
+
+            <div className="tourGuard_Info">
+              {/* 개인 입력 영역 */}
+              {loginType === 'I' && (
+                <div id="input_I" className="input_area">
+                  <div className="tourGuard_form_tt mag5 tourG_mab03">
+                    <label htmlFor="insured_name">대표가입자명</label>
+                    <input
+                      type="text"
+                      id="insured_name"
+                      name="insured_name"
+                      maxLength={15}
+                      placeholder="대표가입자명"
+                      className="tourGuard_input_w02"
+                      value={insuredName}
+                      onChange={(e) => setInsuredName(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line">
+                    <label htmlFor="birth_date">생년월일</label>
+                    <input
+                      type="tel"
+                      id="birth_date"
+                      name="birth_date"
+                      maxLength={8}
+                      placeholder="예)19990515"
+                      className="tourGuard_input_w01"
+                      value={birthDate}
+                      onChange={handleBirthDateChange}
+                    />
+
+                    <div className="tourG_rdo_area">
+                      <label htmlFor="gender_male">성별</label>
+                      <span className="tourG_inp_rdo">
+                        <input
+                          type="radio"
+                          id="gender_male"
+                          value="1"
+                          name="gender"
+                          checked={gender === '1'}
+                          onChange={(e) => setGender('1')}
+                        />
+                        <label htmlFor="gender_male">남자</label>
+                      </span>
+                      <span className="tourG_inp_rdo">
+                        <input
+                          type="radio"
+                          id="gender_female"
+                          value="2"
+                          name="gender"
+                          checked={gender === '2'}
+                          onChange={(e) => setGender('2')}
+                        />
+                        <label htmlFor="gender_female" className="one_line0">여자</label>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="tourGuard_form_tt mag5 tourG_mab03">
+                    <label htmlFor="ctel_no">휴대폰 번호</label>
+                    <div className="tourGuard_input_wrapper">
+                      <input
+                        type="tel"
+                        id="ctel_no"
+                        name="ctel_no"
+                        maxLength={11}
+                        placeholder="숫자만 입력해주세요."
+                        className="tourGuard_input_w02"
+                        value={phoneNumber}
+                        onChange={handlePhoneChange}
+                      />
+                      <div className="tour2023_event_file">
+                        <button
+                          type="button"
+                          onClick={handleSendVerification}
+                          className="tour2023_btn_b01 tour2023_btn11"
+                        >
+                          인증받기
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {showVerificationInput && (
+                    <div id="signArea" className="tourGuard_form_tt mag5 tourG_mab03">
+                      <label htmlFor="signNo">인증번호</label>
+                      <div className="tourGuard_input_wrapper">
+                        <input
+                          type="tel"
+                          id="signNo"
+                          name="signNo"
+                          maxLength={6}
+                          placeholder="6자리 입력"
+                          className="tourGuard_input_w02"
+                          value={verificationCode}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/[^0-9]/g, '');
+                            if (value.length <= 6) {
+                              setVerificationCode(value);
+                            }
+                          }}
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              handleVerifyCode();
+                            }
+                          }}
+                        />
+                        <div className="tour2023_event_file">
+                          <button
+                            type="button"
+                            onClick={handleVerifyCode}
+                            className="tour2023_btn_b01 tour2023_btn11"
+                          >
+                            확인
+                          </button>
+                        </div>
+                      </div>
+                      <div className="tour2023_timer">
+                        <span className="tour2023_timeLimit">{formatTime(remainingTime)}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* 단체 입력 영역 */}
+              {loginType === 'C' && (
+                <div id="input_C" className="input_area">
+                  <div className="tourGuard_form_tt mag5 tourG_mab03">
+                    <label htmlFor="contract_company">단체(사업자/법인)명</label>
+                    <input
+                      type="text"
+                      id="contract_company"
+                      name="contract_company"
+                      maxLength={30}
+                      placeholder="단체(사업자/법인)명"
+                      className="tourGuard_input_w02"
+                      value={companyName}
+                      onChange={(e) => setCompanyName(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line03">
+                    <label htmlFor="resno1">사업자번호</label>
+                    <input
+                      type="tel"
+                      id="resno1"
+                      name="resno1"
+                      maxLength={3}
+                      placeholder=""
+                      className="tourGuard_input_w03"
+                      value={businessNumber1}
+                      onChange={handleBusinessNumber1Change}
+                    />
+                    <input
+                      type="tel"
+                      id="resno2"
+                      name="resno2"
+                      maxLength={2}
+                      placeholder=""
+                      className="tourGuard_input_w03"
+                      value={businessNumber2}
+                      onChange={handleBusinessNumber2Change}
+                    />
+                    <input
+                      type="tel"
+                      id="resno3"
+                      name="resno3"
+                      maxLength={5}
+                      placeholder=""
+                      className="tourGuard_input_w03"
+                      value={businessNumber3}
+                      onChange={handleBusinessNumber3Change}
+                    />
+                  </div>
+
+                  <div className="tourGuard_form_tt mag5 tourG_mab03">
+                    <label htmlFor="c_ctel_no">담당자 휴대폰 번호</label>
+                    <div className="tourGuard_input_wrapper">
+                      <input
+                        type="tel"
+                        id="c_ctel_no"
+                        name="c_ctel_no"
+                        maxLength={11}
+                        placeholder="숫자만 입력해주세요."
+                        className="tourGuard_input_w02"
+                        value={companyPhoneNumber}
+                        onChange={handleCompanyPhoneChange}
+                      />
+                      <div className="tour2023_event_file">
+                        <button
+                          type="button"
+                          onClick={handleSendVerification}
+                          className="tour2023_btn_b01 tour2023_btn11"
+                        >
+                          인증받기
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {showCompanyVerificationInput && (
+                    <div id="c_signArea" className="tourGuard_form_tt mag5 tourG_mab03">
+                      <label htmlFor="c_signNo">인증번호</label>
+                      <div className="tourGuard_input_wrapper">
+                        <input
+                          type="tel"
+                          id="c_signNo"
+                          name="c_signNo"
+                          maxLength={6}
+                          placeholder="6자리 입력"
+                          className="tourGuard_input_w02"
+                          value={companyVerificationCode}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/[^0-9]/g, '');
+                            if (value.length <= 6) {
+                              setCompanyVerificationCode(value);
+                            }
+                          }}
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              handleVerifyCompanyCode();
+                            }
+                          }}
+                        />
+                        <div className="tour2023_event_file">
+                          <button
+                            type="button"
+                            onClick={handleVerifyCompanyCode}
+                            className="tour2023_btn_b01 tour2023_btn11"
+                          >
+                            확인
+                          </button>
+                        </div>
+                      </div>
+                      <div className="tour2023_timer">
+                        <span className="tour2023_timeLimit">{formatTime(companyRemainingTime)}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* 회원 로그인 섹션 */}
+              <section className="tour2023_cash_f tourG_mab05">
+                <div className="tour2023_txt33 tour2023_blue">투어밸리 회원님은 회원 로그인 하세요.</div>
+                <div>
+                  <Link href="/login" className="tour2023_btn_b tour2023_btnLogin">
+                    회원 LOGIN
+                  </Link>
+                </div>
+              </section>
+
+              {/* 무사고캐시란 버튼 */}
+              <div className="btnWrap ag_right">
+                <button 
+                  type="button" 
+                  className="btn tourG_btn_cash01"
+                  onClick={() => setShowCashModal(true)}
+                >
+                  무사고캐시란? <span className="cash01_ico"></span>
+                </button>
+              </div>
+
+              {/* 조회하기 버튼 */}
+              <div className="tourG_mat04 tourG_mab02">
+                <button
+                  type="button"
+                  onClick={handleSearch}
+                  className="tourGuard_btn_b tour2023_btn01"
+                >
+                  조회하기
+                </button>
+              </div>
+
+              {/* 안내 문구 */}
+              <div className="tour2023_txt01 tour2023_grey tourG_mleft04 tourG_mab04 tourG_mat06">
+                <ul className="tourGuard_inline">
+                  <li className="tourGuard_inline_t01">※</li>
+                  <li className="tourGuard_inline_t02">사업자/법인 고객은 무사고캐시가 적용되지 않습니다.</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
+    </section>
+  );
+
+  // 로그인한 유저용 화면
+  const renderLoggedInView = () => (
+    <div className="container_box_w">
+      <div className="container_box">
+        {/* 상단 탭 메뉴 */}
+        <section id="tour2023_mypageTop">
+          <div className="tour2023_mypageTop_menu" style={{}}>
+            <a 
+              href="#" 
+              className={`tour2023_mypageTop_w tour2023_mypageTop_m01_w01 tour2023_mypageTop_m01 ${activeTab === 'contract' ? 'on' : ''}`}
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveTab('contract');
+              }}
+            >
+              가입/신청 내역
+            </a>
+            <a 
+              href="#" 
+              className={`tour2023_mypageTop_w tour2023_mypageTop_m01_w01 tour2023_mypageTop_m01 ${activeTab === 'cash' ? 'on' : ''}`}
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveTab('cash');
+              }}
+            >
+              무사고캐시 내역
+            </a>
+            <a 
+              href="#" 
+              className={`tour2023_mypageTop_w tour2023_mypageTop_m01_w01 tour2023_mypageTop_m01 ${activeTab === 'mileage' ? 'on' : ''}`}
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveTab('mileage');
+              }}
+            >
+              마일리지내역
+            </a>
+          </div>
+        </section>
+
+        <div className="prow_01">
+          {/* 가입/신청 내역 탭 내용 */}
+          {activeTab === 'contract' && (
+            <div className="prow_01">
+              {/* 여행자보험/행사보험 선택 */}
+              <div className="tour2023_ra_Wrap tourG_mat12 tourG_mab08">
+                <ul className="tour2023_ra_Wrap01">
+                  <li className="tour2023_rdo_area">
+                    <span className="tour2023_inp_rdo">
+                      <input
+                        type="radio"
+                        id="one_pgood01"
+                        value="contract"
+                        name="search_type"
+                        checked={searchType === 'contract'}
+                        onChange={(e) => setSearchType('contract')}
+                      />
+                      <label htmlFor="one_pgood01">여행자보험</label>
+                    </span>
+                    <span className="tour2023_inp_rdo">
+                      <input
+                        type="radio"
+                        id="one_pgood02"
+                        value="event"
+                        name="search_type"
+                        checked={searchType === 'event'}
+                        onChange={(e) => {
+                          setSearchType('event');
+                          router.push('/contracts/event');
+                        }}
+                      />
+                      <label htmlFor="one_pgood02">행사보험</label>
+                    </span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* 보험가입내역 조회 */}
+              <div className="tourGuard_form_tt mag5 tourG_mab04 tourG_mat10">
+                <label htmlFor="">보험가입내역 조회</label>
+                <div className="tourGuard_bg_join tourGuard_input_cell tourGuard_input_cell01 tourGuard" style={{ marginRight: 0 }}>
+                  <span className="tourGuard_ps_box">
+                    <select 
+                      className="tourGuard_sel" 
+                      id="inyear" 
+                      value={inYear}
+                      onChange={(e) => handleInYearChange(Number(e.target.value))}
+                    >
+                      <option value={1}>최근 1년이내</option>
+                      <option value={2}>최근 2년이내</option>
+                    </select>
+                  </span>
+                </div>
+              </div>
+
+              {/* 계약 리스트 */}
+              <div id="contractList" className="tourG_mat10" style={{ marginTop: 0, paddingTop: 40 }}>
+                {contracts.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '40px' }}>계약 내역이 없습니다.</div>
+                ) : (
+                  <>
+                    {(() => {
+                      // 헬퍼 함수들
+                      const formatDate = (dateStr: string) => {
+                        if (!dateStr) return '-';
+                        const date = new Date(dateStr);
+                        const year = date.getFullYear();
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const hour = date.getHours();
+                        return `${year}.${month}.${day} ${hour}시`;
+                      };
+
+                      const calculateDuration = (start: string, end: string) => {
+                        if (!start || !end) return '';
+                        const startDate = new Date(start);
+                        const endDate = new Date(end);
+                        const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+                        
+                        if (diffDays >= 1) {
+                          return `(${diffDays}일)`;
+                        } else {
+                          return `(${diffHours}시간)`;
+                        }
+                      };
+
+                      const getInsuranceTypeDisplay = (insuranceType: string) => {
+                        const longTermTypes = ['유학/어학연수', '해외출장/주재원/교환교수', '워킹홀리데이'];
+                        if (longTermTypes.includes(insuranceType)) {
+                          return '해외장기체류보험';
+                        }
+                        return insuranceType;
+                      };
+
+                      const getInsuranceCompany = (insuranceType: string) => {
+                        const longTermTypes = ['유학/어학연수', '해외출장/주재원/교환교수', '워킹홀리데이'];
+                        if (insuranceType === '국내여행') {
+                          return '라이나손해 국내여행보험';
+                        } else if (insuranceType === '해외여행') {
+                          return '라이나손해 해외여행보험';
+                        } else if (longTermTypes.includes(insuranceType)) {
+                          return '메리츠화재 해외장기체류보험';
+                        }
+                        return '라이나손해 해외여행보험';
+                      };
+
+                      return contracts.map((contract, index) => {
+
+                      return (
+                        <div key={contract.id}>
+                          {index === 0 && (
+                            <>
+                              <p className="tour2023_title02">가입/신청내역</p>
+                            </>
+                          )}
+                          
+                          <div className="tourG_line05 tourG_mat07 tourG_mab01"></div>
+                          <ul className="tour2023_conList_Wrap">
+                            <li className="tour2023_conList">
+                              <span className="tour2023_txt09">관리번호</span>
+                              <span className="tour2023_txt10">
+                                {contract.contractNumber}
+                              </span>
+                            </li>
+                            <li className="tour2023_conList">
+                              <span className="tour2023_txt09">가입자</span>
+                              <span className="tour2023_txt10">
+                                {member?.name || '-'}
+                              </span>
+                            </li>
+                            <li className="tour2023_conList">
+                              <span className="tour2023_txt09">보험종목/상품명</span>
+                              <span className="tour2023_txt10">
+                                {getInsuranceTypeDisplay(contract.insuranceType)}<br />
+                                {getInsuranceCompany(contract.insuranceType)}
+                              </span>
+                            </li>
+                            <li className="tour2023_conList">
+                              <span className="tour2023_txt09">보험기간</span>
+                              <span className="tour2023_txt10">
+                                {formatDate(contract.departureDate)} ~ {formatDate(contract.arrivalDate)}<br />
+                                {calculateDuration(contract.departureDate, contract.arrivalDate)}
+                              </span>
+                            </li>
+                            <li className="tour2023_conList">
+                              <span className="tour2023_txt09">여행지/여행목적</span>
+                              <span className="tour2023_txt10">
+                                {(() => {
+                                  const destination = contract.travelCountry || contract.travelRegion || null;
+                                  const purpose = contract.travelPurpose || null;
+                                  
+                                  if (destination && purpose) {
+                                    return `${destination}/${purpose}`;
+                                  } else if (purpose) {
+                                    return purpose;
+                                  } else if (destination) {
+                                    return destination;
+                                  }
+                                  return '-';
+                                })()}
+                              </span>
+                            </li>
+                            <li className="tour2023_conList">
+                              <span className="tour2023_txt09">진행단계</span>
+                              <span className="tour2023_txt10">{contract.status}</span>
+                            </li>
+                          </ul>
+                          <div className="tourG_line05 tourG_mat09 tourG_mab04"></div>
+                          <a 
+                            href="#" 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              // 팝업창으로 상세보기 열기
+                              const popupWidth = 500;
+                              const popupHeight = 700;
+                              const left = (window.screen.width - popupWidth) / 2;
+                              const top = (window.screen.height - popupHeight) / 2;
+                              
+                              window.open(
+                                `/contracts/detail/${contract.id}`,
+                                'contract_detail',
+                                `width=${popupWidth},height=${popupHeight},left=${left},top=${top},scrollbars=yes,resizable=yes`
+                              );
+                            }}
+                          >
+                            <span className="tour2023_txt19">자세히보기&nbsp;&gt;</span>
+                          </a>
+                          <div className="tourG_mat14 tourG_Wrap"></div>
+                        </div>
+                      );
+                    })})()}
+
+                    {/* 페이지네이션 */}
+                    <div className="board_foot" style={{ paddingBottom: '12px' }}>
+                      <ul className="paging">
+                        {Array.from({ length: contractPagination.totalPages }, (_, i) => i + 1).map((page) => (
+                          <li key={page} className={page === contractPagination.currentPage ? 'on' : ''}>
+                            <a 
+                              href="#" 
+                              onClick={(e) => {
+                                e.preventDefault();
+                                if (page !== contractPagination.currentPage) {
+                                  getContractList(page);
+                                }
+                              }}
+                            >
+                              {page}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* 무사고캐시 내역 탭 내용 */}
+          {activeTab === 'cash' && (
+            <div className="prow_01">
+            <div id="cashInfoDiv">
+              {/* 무사고캐시 정보 박스 */}
+              <section className="tour2023_cashBox01 tourG_mat14 tourG_mab05">
+                <div className="tour2023_cashBox_in">
+                  <p className="tour2023_cash_txt01 tourG_mab04">
+                    <b>고객님의 무사고캐시는 <span className="tour2023_cash_txt02">{cashInfo.totalCash.toLocaleString()}원</span>입니다.</b>
+                  </p>
+                  <p className="tour2023_cash_txt03">투어밸리 무사고캐시는 여행자보험에 재가입하는 경우 할인쿠폰으로 사용하실 수 있습니다.</p>
+                </div>
+              </section>
+              <a href="javascript:void(0);" onClick={() => {/* TODO: 소멸예정 캐시 팝업 */}}>
+                <span className="tour2023_cash_txt04">소멸예정 캐시 {cashInfo.expireCash.toLocaleString()}원&nbsp;&gt;</span>
+              </a>
+
+              <div className="tourG_line05 tourG_mat11 tourG_mab10"></div>
+
+              {/* 무사고캐시내역 조회 */}
+              <div className="tourGuard_form_tt mag5 tourG_mab05">
+                <label htmlFor="">무사고캐시내역 조회</label>
+                <div className="tourGuard_bg_join tourGuard_input_cell tourGuard_input_cell01 tourGuard" style={{ marginRight: 0 }}>
+                  <span className="tourGuard_ps_box">
+                    <select 
+                      className="tourGuard_sel" 
+                      id="cash_inyear" 
+                      value={cashInYear}
+                      onChange={(e) => handleCashInYearChange(Number(e.target.value))}
+                    >
+                      <option value={1}>최근 1년이내</option>
+                      <option value={2}>최근 2년이내</option>
+                    </select>
+                  </span>
+                </div>
+              </div>
+
+              {/* 무사고캐시 적립 및 사용내역 제목 */}
+              <div className="tourG_mat04 tourG_mab04 tour2023_title10">무사고캐시 적립 및 사용내역</div>
+
+              {/* 무사고캐시 내역 리스트 */}
+              <div id="cashList" className="tourG_mab03">
+                <table className="tour2023_ListB" border={1} cellSpacing={0}>
+                  <caption></caption>
+                  <colgroup>
+                    <col width="17%" />
+                    <col width="24%" />
+                    <col width="21%" />
+                    <col width="21%" />
+                    <col width="17%" />
+                  </colgroup>
+                  <tbody>
+                    <tr>
+                      <td className="sName tour2023_ListB_bg">일자</td>
+                      <td className="sName tour2023_ListB_bg">내역</td>
+                      <td className="sName tour2023_ListB_bg">캐시</td>
+                      <td className="sName tour2023_ListB_bg">잔여캐시</td>
+                      <td className="sName tour2023_ListB_bg">만료일자</td>
+                    </tr>
+
+                    {cashList.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} style={{ textAlign: 'center' }}>
+                          무사고캐시 적립 내역이 없습니다.
+                        </td>
+                      </tr>
+                    ) : (
+                      cashList.map((cash) => {
+                        const amount = Math.floor((Math.abs(cash.amount) || 0) / 10) * 10;
+                        const isPositive = cash.type === '충전';
+                        const expireDate = (() => {
+                          if (!cash.created_at) return '-';
+                          const date = new Date(cash.created_at);
+                          date.setFullYear(date.getFullYear() + 1);
+                          return date.toLocaleDateString('ko-KR');
+                        })();
+                        
+                        return (
+                          <tr key={cash.id}>
+                            <td>{cash.created_at ? new Date(cash.created_at).toLocaleDateString('ko-KR') : '-'}</td>
+                            <td>{cash.reason || '-'}</td>
+                            <td>
+                              {isPositive ? '+' : '-'}
+                              {amount.toLocaleString()}원
+                            </td>
+                            <td>{cash.balance ? cash.balance.toLocaleString() + '원' : '-'}</td>
+                            <td>{expireDate}</td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* 안내 문구 */}
+              <div className="tour2023_txt01 tour2023_grey tourG_mleft04 tourG_mab04 tourG_mat14">
+                <ul className="tourGuard_inline tour2023_blue">
+                  <li className="tourGuard_inline_t01">※</li>
+                  <li className="tourGuard_inline_t02">무사고캐시의 적립가능 기간은 보험기간 종료 후 1년입니다.</li>
+                </ul>
+                <ul className="tourGuard_inline tour2023_blue">
+                  <li className="tourGuard_inline_t01">※</li>
+                  <li className="tourGuard_inline_t02">무사고캐시 적립가능 보험상품은 해외여행보험, 국내여행보험입니다.</li>
+                </ul>
+                <ul className="tourGuard_inline tour2023_blue">
+                  <li className="tourGuard_inline_t01">※</li>
+                  <li className="tourGuard_inline_t02">무사고캐시는 개인가입자에 한해 적립하실 수 있습니다. (법인/단체 제외)</li>
+                </ul>
+              </div>
+            </div>
+            </div>
+          )}
+
+          {/* 마일리지 내역 탭 내용 */}
+          {activeTab === 'mileage' && (
+            <div className="prow_01">
+            <form name="mileageListForm" method="POST">
+              <div id="contentWrap">
+                {/* 마일리지 정보 박스 */}
+                <div className="tour2023_mypage_cashBox tourG_mat11 tourG_mab05">
+                  <p className="tour2023_txt34">
+                    <span className="tourGuard_blue">현재 고객님의 마일리지는 <em className="tour2023_txt38">{mileageInfo.totalMileage.toLocaleString()} P</em>입니다.</span>
+                  </p>
+                  <ul className="tour2023_mypage_cash tourG_mab09">
+                    <li className="tourG_mypage_cash02 tour2023_mypage_cashTxt">1. </li>
+                    <li className="tour2023_mypage_cashTxt01">마일리지의 유효기간은 12개월이며, 유효기간이 경과되면 소멸됩니다.</li>
+                  </ul>
+                  <ul className="tour2023_mypage_cash tourG_mab09">
+                    <li className="tourG_mypage_cash02 tour2023_mypage_cashTxt">2. </li>
+                    <li className="tour2023_mypage_cashTxt01">회원가입시 회원가입 축하 마일리지 1,000P가 적립됩니다.</li>
+                  </ul>
+                  <ul className="tour2023_mypage_cash tourG_mab09">
+                    <li className="tourG_mypage_cash02 tour2023_mypage_cashTxt">3. </li>
+                    <li className="tour2023_mypage_cashTxt01">여행자보험에 가입하는 경우 보험료의 3%가 추가 적립되며(1계약당 최대 30,000P 한도). 계약이 종료되는 날의 24시에 적립됩니다.(국내/해외여행보험에 한함)</li>
+                  </ul>
+                  <ul className="tour2023_mypage_cash tourG_mab09">
+                    <li className="tourG_mypage_cash02 tour2023_mypage_cashTxt">4. </li>
+                    <li className="tour2023_mypage_cashTxt01">마일리지는 문화상품권(온라인)으로 전환하여 사용하실 수 있으며 이 경우 1P는 1원으로 환원되며 10,000원 단위로 사용하실 수 있습니다.</li>
+                  </ul>
+                </div>
+
+                {/* 문화상품권 전환신청 버튼 */}
+                <div className="tourG_mat06 tourG_mab02">
+                  <a href="javascript:void(0);" onClick={(e) => { e.preventDefault(); /* TODO: 문화상품권 전환신청 모달 */ }} className="tourGuard_btn_b01 tour2023_btn19">
+                    문화상품권 전환신청&nbsp;&gt;
+                  </a>
+                </div>
+
+                {/* 마일리지내역 조회 */}
+                <div className="tourGuard_form_tt mag5 tourG_mab05">
+                  <label htmlFor="">마일리지내역 조회</label>
+                  <div className="tourGuard_bg_join tourGuard_input_cell tourGuard_input_cell01 tourGuard" style={{ marginRight: 0 }}>
+                    <span className="tourGuard_ps_box">
+                      <select 
+                        className="tourGuard_sel" 
+                        value={mileageInYear}
+                        onChange={(e) => handleMileageInYearChange(Number(e.target.value))}
+                      >
+                        <option value={1}>최근 1년이내</option>
+                        <option value={2}>최근 2년이내</option>
+                      </select>
+                    </span>
+                  </div>
+                </div>
+
+                {/* 회원 마일리지 적립 및 사용현황 제목 */}
+                <div className="tourG_mat04 tourG_mab04 tour2023_title10">회원 마일리지 적립 및 사용현황</div>
+
+                {/* 마일리지 내역 리스트 */}
+                <div id="mileageList" className="tourG_mab03">
+                  <table className="tour2023_ListB" border={1} cellSpacing={0}>
+                    <caption></caption>
+                    <colgroup>
+                      <col width="17%" />
+                      <col width="24%" />
+                      <col width="21%" />
+                      <col width="21%" />
+                      <col width="17%" />
+                    </colgroup>
+                    <tbody>
+                      <tr>
+                        <td className="sName tour2023_ListB_bg">일자</td>
+                        <td className="sName tour2023_ListB_bg">내역</td>
+                        <td className="sName tour2023_ListB_bg">마일리지</td>
+                        <td className="sName tour2023_ListB_bg">잔여마일리지</td>
+                        <td className="sName tour2023_ListB_bg">만료일자</td>
+                      </tr>
+
+                      {mileageList.length === 0 ? (
+                        <tr>
+                          <td colSpan={5} style={{ textAlign: 'center' }}>
+                            마일리지 적립 내역이 없습니다.
+                          </td>
+                        </tr>
+                      ) : (
+                        mileageList.map((mileage) => {
+                          const amount = Math.floor(Math.abs(mileage.amount) || 0);
+                          const isPositive = mileage.type === '적립';
+                          const expireDate = (() => {
+                            if (!mileage.created_at) return '-';
+                            const date = new Date(mileage.created_at);
+                            date.setFullYear(date.getFullYear() + 1);
+                            return date.toLocaleDateString('ko-KR').replace(/\. /g, '.').replace(/\.$/, '');
+                          })();
+                          
+                          return (
+                            <tr key={mileage.id}>
+                              <td className="ag_center">
+                                {mileage.created_at ? new Date(mileage.created_at).toLocaleDateString('ko-KR').replace(/\. /g, '.').replace(/\.$/, '') : '-'}
+                              </td>
+                              <td className="ag_center">{mileage.reason || mileage.reason_detail || '-'}</td>
+                              <td className="ag_center">
+                                <strong>
+                                  {amount.toLocaleString()} P {isPositive ? '적립' : '사용'}
+                                </strong>
+                              </td>
+                              <td className="ag_center">
+                                <strong>{mileage.balance ? mileage.balance.toLocaleString() + ' P' : '-'}</strong>
+                              </td>
+                              <td className="ag_center">{expireDate}</td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </form>
+            </div>
+          )}
         </div>
 
-        {/* Floating Buttons */}
-        <div className="floating-buttons">
-          <button className="floating-btn cash-btn">
-            <img src={getImagePath('/icons/icon_cash.png')} alt="무사고캐시" className="floating-icon-img" />
-            <span className="floating-text">무사고캐시란?</span>
-          </button>
-          <button className="floating-btn service-btn">
-            <img src={getImagePath('/icons/icon_menu.png')} alt="서비스 전체보기" className="floating-icon-img" />
-            <span className="floating-text">서비스<br/>전체보기</span>
-          </button>
+        {/* 오른쪽 고정 버튼 */}
+        <a href="#" onClick={(e) => { e.preventDefault(); setShowCashModal(true); }}>
+          <div className="fixedRight_b01">
+            <p className="icon_cash"><span className="icon_cash01"></span></p>
+            <p className="fixedRight_txt01">무사고캐시란?</p>
+          </div>
+        </a>
+
+        <a href="#" onClick={(e) => { e.preventDefault(); /* 서비스 전체보기 모달 */ }}>
+          <div className="fixedRight_b02" style={{}}>
+            <p className="icon_menu"><span className="icon_menu01"></span></p>
+            <p className="fixedRight_txt02">서비스<br/>전체보기</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="contract-page-pc">
+      <Header isMobile={false} />
+
+      <main 
+        className={isLoggedIn ? "main_bg01 main_bg01_w" : "contract-content-pc"}
+        style={isLoggedIn ? {} : { backgroundImage: `url(${getImagePath('/202309_main_bg02.png')})` }}
+      >
+        <div className={isLoggedIn ? "container_w" : ""}>
+          {isLoggedIn ? renderLoggedInView() : renderNonLoggedInView()}
         </div>
+
+        {/* Floating Buttons - 로그인하지 않은 유저만 */}
+        {!isLoggedIn && (
+          <div className="floating-buttons">
+            <button 
+              className="floating-btn cash-btn"
+              onClick={() => setShowCashModal(true)}
+            >
+              <img src={getImagePath('/icons/icon_cash.png')} alt="무사고캐시" className="floating-icon-img" />
+              <span className="floating-text">무사고캐시란?</span>
+            </button>
+            <button className="floating-btn service-btn">
+              <img src={getImagePath('/icons/icon_menu.png')} alt="서비스 전체보기" className="floating-icon-img" />
+              <span className="floating-text">서비스<br/>전체보기</span>
+            </button>
+          </div>
+        )}
       </main>
 
       <Footer isMobile={false} />
+
+      {/* 무사고캐시 모달 */}
+      <AccidentFreeCashModal
+        isOpen={showCashModal}
+        onClose={() => setShowCashModal(false)}
+      />
     </div>
   );
 }

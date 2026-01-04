@@ -28,15 +28,39 @@
   height: auto;
 }
 
-/* 폼 컨테이너 - 중앙 정렬, 최대 너비 제한 */
-.contract-form-container {
+/* form-section - domestic/pc/page.css와 통일성 유지 */
+.contract-page-pc .form-section {
   position: relative;
   z-index: 100;
-  width: 100%;
-  max-width: 480px;
+  width: 480px;
   margin: 0 auto;
+  margin-bottom: 0;
   overflow: visible;
-  background: #fff;
+  box-sizing: border-box;
+}
+
+.contract-page-pc .form-container {
+  width: 100%;
+  overflow: visible;
+}
+
+/* 폼 컨테이너 - 내부 컨테이너 (form-card 스타일 적용) */
+.contract-form-container {
+  position: relative;
+  width: 100%;
+  overflow: visible;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* contract-form-container 내부의 prow_01은 padding 제거 (form-card의 padding 사용) */
+.contract-form-container .prow_01 {
+  padding: 0;
 }
 
 /* 헤더 라인 */
@@ -65,6 +89,9 @@
 /* 패딩 유틸리티 */
 .prow_01 {
   padding: 0 20px;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* 타이틀 */
@@ -179,10 +206,14 @@
 .tourGuard_Info {
   position: relative;
   margin: 11px 0 15px 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .input_area {
   display: block;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* 폼 입력 필드 */
@@ -196,6 +227,170 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 10px;
+  width: 100%;
+  min-width: 0; /* flex item이 부모보다 작아질 수 있도록 */
+  max-width: 100%; /* 부모 너비를 넘지 않도록 */
+}
+
+/* 보험가입내역 조회 섹션 전용 스타일 */
+.tourGuard_form_tt:has(.tourGuard_bg_join) {
+  height: auto;
+  min-height: auto;
+  display: block;
+  padding: 20px;
+  flex-direction: column;
+}
+
+.tourGuard_form_tt:has(.tourGuard_bg_join) label {
+  position: static;
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #333;
+}
+
+/* 무사고캐시 관련 스타일 */
+.tour2023_cashBox01 {
+  width: 100%;
+  display: inline-flex;
+  justify-content: space-between;
+  border: 1px solid #c3c6ce;
+  background: #fff;
+  position: relative;
+  border-radius: 8px;
+  height: auto;
+  text-align: left;
+  box-sizing: border-box;
+  padding: 15px 12px 10px 20px;
+}
+
+.tour2023_cashBox_in {
+  position: relative;
+  width: 100%;
+  padding: 12px 8px 18px 8px;
+}
+
+.tour2023_cash_txt01 {
+  font-size: 18px;
+  color: #333;
+  text-align: center;
+  line-height: 130%;
+  letter-spacing: -0.8px;
+  vertical-align: top;
+}
+
+.tour2023_cash_txt02 {
+  font-size: 17px;
+  color: #fe4600;
+  font-weight: bold;
+  text-align: center;
+  line-height: 130%;
+  letter-spacing: -0.4px;
+  vertical-align: top;
+}
+
+.tour2023_cash_txt03 {
+  font-size: 14px;
+  color: #1b37e1;
+  text-align: left;
+  line-height: 130%;
+  letter-spacing: -1px;
+  vertical-align: top;
+  display: inline-block;
+}
+
+.tour2023_cash_txt04 {
+  font-size: 15px;
+  color: #333;
+  text-align: right;
+  line-height: 130%;
+  letter-spacing: -1px;
+  vertical-align: top;
+  text-decoration: underline;
+  display: inline-block;
+  width: 95%;
+}
+
+/* 마일리지 관련 스타일 */
+.tour2023_txt34 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 19px;
+  color: #1b37e1;
+  text-align: center;
+  line-height: 130%;
+  letter-spacing: -1px;
+  vertical-align: top;
+}
+
+.tour2023_txt38 {
+  font-family: 'NanumSquareNeoTTF-eHv';
+}
+
+.tour2023_mypage_cashBox {
+  position: relative;
+  background: #fefbd0;
+  border-radius: 15px;
+  box-shadow: 7px 7px 12px rgb(0 0 0 / 5%);
+  padding: 35px 25px 35px 25px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.tour2023_mypage_cash {
+  width: 100%;
+  position: relative;
+  display: inline-flex;
+  justify-content: flex-start;
+  margin: 10px 0 0 0;
+}
+
+.tour2023_mypage_cash li {
+  display: inline-block;
+}
+
+.tour2023_mypage_cashTxt {
+  font-size: 14px;
+  color: #333;
+  text-align: left;
+  line-height: 145%;
+  letter-spacing: -1.4px;
+  width: 15px;
+  padding-top: 1px;
+}
+
+.tour2023_mypage_cashTxt01 {
+  font-size: 14px;
+  color: #333;
+  text-align: left;
+  line-height: 145%;
+  letter-spacing: -1.2px;
+  width: 97%;
+  padding-top: 1px;
+}
+
+.tourG_mypage_cash02 {
+  width: 15px;
+}
+
+.tourGuard_btn_b01 {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.tour2023_btn19 {
+  font-size: 20px;
+  padding-top: 15px;
+  height: 55px;
+  background-color: #2c3fb3;
+  border-radius: 6px;
+  box-sizing: border-box;
+  color: #fff !important;
+  text-align: center;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
 }
 
 .tourGuard_form_tt label {
@@ -336,26 +531,30 @@
 
 /* 인증받기 버튼 */
 .tour2023_event_file {
-  margin-right: 10px;
+  position: absolute;
+  right: 10px;
+  bottom: 12px;  
+  margin-right: 0;
 }
 
 .tour2023_btn_b01 {
   position: relative;
-  display: block;
-  width: 100%;
-  margin: 0 auto;
+  display: inline-block;
+  width: auto;
+  margin: 0;
 }
 
 .tour2023_btn11 {
   font-size: 15px;
-  padding: 8px 15px;
-  height: 38px;
-  background-color: #5294f2;
+  letter-spacing: -1px;
+  width: 93px;
+  height: 37px;
+  background-color: #eef0fc;
   border-radius: 5px;
   box-sizing: border-box;
-  color: #fff !important;
+  color: #4d60d6 !important;
   text-align: center;
-  border: 1px solid #5294f2;
+  border: 1px solid #4d60d6;
   cursor: pointer;
   white-space: nowrap;
 }
@@ -423,8 +622,6 @@
   display: inline-flex;
   justify-content: space-between;
   align-items: center;
-  margin: 20px 0;
-  padding: 15px;
   border-radius: 10px;
 }
 
@@ -457,11 +654,6 @@
 .tour2023_btnLogin:hover {
   background-color: #4284e1;
   border-color: #4284e1;
-}
-
-/* 무사고캐시 버튼 */
-.btnWrap {
-  margin: 20px 0;
 }
 
 .ag_right {
@@ -518,7 +710,6 @@
 
 .tour2023_btn01 {
   font-size: 21px;
-  padding-top: 15px;
   height: 60px;
   background-color: #2c3fb3;
   border-radius: 10px;
@@ -587,6 +778,14 @@
   margin-bottom: 30px;
 }
 
+.tourG_mab09 {
+  margin-bottom: 5px;
+}
+
+.tourG_mab02 {
+  margin-bottom: 35px;
+}
+
 .tourG_mat04 {
   margin-top: 20px !important;
 }
@@ -601,6 +800,14 @@
 
 .mag5 {
   margin-bottom: 5px;
+}
+
+/* test.html과 동일한 구조를 위한 추가 스타일 */
+.container_box .prow_01 {
+  padding: 0 20px;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Floating Buttons */
@@ -663,5 +870,752 @@
   color: #333;
   line-height: 1.4;
   text-align: center;
+}
+
+/* 무사고캐시 모달 스타일 */
+.contract-page-pc .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.contract-page-pc .modal-content {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 480px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.contract-page-pc .accident-free-cash-modal {
+  width: 30%;
+  max-width: 600px;
+  min-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.contract-page-pc .tour2023_pcBox_top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.contract-page-pc .tour2023_pcBox_tit {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+.contract-page-pc .modal-close {
+  background: none;
+  border: none;
+  font-size: 36px;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.contract-page-pc .modal-close:hover {
+  color: #333;
+}
+
+.contract-page-pc .tour2023_pcBox_txt03 {
+  padding: 30px 24px;
+  text-align: center;
+}
+
+.contract-page-pc .tour2023_pcBox_txt01 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 8px 0;
+}
+
+.contract-page-pc .tour2023_pcBox_txt02 {
+  font-size: 18px;
+  color: #666;
+  margin: 0 0 20px 0;
+}
+
+.contract-page-pc .tour2023_pcBox_txt03_content {
+  font-size: 16px;
+  color: #333;
+  line-height: 1.6;
+  margin: 20px 0;
+}
+
+.contract-page-pc .tour2023_pcBox_txt04 {
+  font-size: 14px;
+  color: #999;
+  margin: 10px 0 20px 0;
+}
+
+.contract-page-pc .tour2023PC_cash_icon {
+  margin: 20px 0;
+}
+
+.contract-page-pc .cash_icon_pc {
+  max-width: 200px;
+  height: auto;
+}
+
+.contract-page-pc .btn_b {
+  display: inline-block;
+}
+
+.contract-page-pc .tour2023PC_btn01 {
+  display: inline-block;
+  background: #ffe500;
+  color: #333 !important;
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 18px;
+  font-weight: 700;
+  padding: 15px 40px;
+  border-radius: 6px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.contract-page-pc .tour2023PC_btn01:hover {
+  background: #ffd700;
+}
+
+.contract-page-pc .tour2023PC_bg01 {
+  background: #f5f5f5;
+  padding: 24px;
+}
+
+.contract-page-pc .tour2023PC_txt01 {
+  font-size: 14px;
+  color: #666;
+}
+
+.contract-page-pc .tour2023PC_cash_info {
+  display: flex;
+  margin-bottom: 12px;
+  list-style: none;
+  padding: 0;
+  line-height: 1.6;
+}
+
+.contract-page-pc .tour2023PC_cash_info:last-child {
+  margin-bottom: 0;
+}
+
+.contract-page-pc .tour2023PC_cash_info_w {
+  min-width: 25px;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.contract-page-pc .tour2023PC_cash_info li:last-child {
+  flex: 1;
+}
+
+/* 로그인한 유저용 스타일 */
+.main_bg01 {
+  min-height: 100vh;
+  background: url(/202309_main_bg02.png) no-repeat center top/5100px auto fixed;
+  margin: 0 auto;
+  width: 100%;
+  position: relative;
+  background-attachment: fixed;
+  background-size: 5100px auto;
+}
+
+.main_bg01_w {
+  background-position: -1830px -850px;
+}
+
+.main_bg01_w .container_w {
+  width: 100%;
+  padding: 55px 0;
+  box-sizing: border-box;
+  display: block;
+}
+
+.container_box {
+  margin: 0 auto;
+  width: 480px;
+  min-height: 700px;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 10px 15px 30px rgb(0 0 0 / 12%);
+}
+
+.container_box_w {
+  position: relative;
+  width: 605px;
+  margin: 0 auto;
+}
+
+/* 상단 탭 메뉴 */
+#tour2023_mypageTop {
+  position: relative;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.tour2023_mypageTop_menu {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.tour2023_mypageTop_w {
+  display: inline-block;
+  padding: 15px 30px;
+  text-decoration: none;
+  color: #666;
+  font-size: 16px;
+  font-weight: 500;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s;
+}
+
+.tour2023_mypageTop_m01_w01 {
+  min-width: 120px;
+  text-align: center;
+}
+
+.tour2023_mypageTop_m01 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+}
+
+.tour2023_mypageTop_m01.on {
+  color: #0042ff;
+  border-bottom-color: #0042ff;
+  font-weight: 700;
+}
+
+/* 보험가입내역 조회 */
+.tourGuard_bg_join {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.tourGuard_input_cell {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.tourGuard_input_cell01 {
+  margin-top: 10px;
+}
+
+.tourGuard_ps_box {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.tourGuard_sel {
+  width: 100%;
+  height: 50px;
+  padding: 0 15px;
+  border: 1px solid #c3c6ce;
+  border-radius: 15px;
+  background: #fff;
+  font-size: 16px;
+  color: #333;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23333' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 12px;
+  padding-right: 40px;
+  cursor: pointer;
+}
+
+.tourGuard_sel:focus {
+  outline: none;
+  border-color: #4d60d6;
+}
+
+/* 오른쪽 고정 버튼 */
+.container_box_w .fixedRight_b01 {
+  position: absolute;
+  top: 0px;
+  left: 562px;
+  width: 107px;
+  height: 90px;
+  background: #fade21;
+  border-radius: 10px;
+  box-shadow: 7px 7px 10px rgb(0 0 0 / 5%);
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+}
+
+.container_box_w .fixedRight_b02 {
+  position: absolute;
+  display: inline-block;
+  text-align: left;
+  top: 100px;
+  left: 562px;
+  width: 107px;
+  height: 58px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 7px 7px 10px rgb(0 0 0 / 5%);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.fixedRight_txt01 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 14px;
+  letter-spacing: -1.2px;
+  color: #333;
+  line-height: 100%;
+  box-sizing: border-box;
+  text-decoration: none;
+  text-align: center;
+  display: block;
+  margin-top: 8px;
+}
+
+.fixedRight_txt02 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 13px;
+  letter-spacing: -0.4px;
+  color: #333;
+  line-height: 120%;
+  box-sizing: border-box;
+  text-decoration: none;
+  text-align: left;
+  display: inline-block;
+  margin-left: 4px;
+  margin-top: 14px;
+}
+
+.icon_cash {
+  display: block;
+  width: 44px;
+  height: 43px;
+  background: url(/icons/icon_cash.png) no-repeat 0 0/contain;
+  margin: 13px 0 0 33px;
+}
+
+.icon_cash .icon_cash01 {
+  display: block;
+  box-sizing: border-box;
+  text-align: center;
+  margin: 0 auto;
+  padding: 10px 0 0 0;
+}
+
+.icon_menu {
+  display: inline-block;
+  width: 19px;
+  height: 19px;
+  background: url(/icons/icon_menu.png) no-repeat 0 0/contain;
+  vertical-align: top;
+  margin: 20px 0 0 17px;
+  text-align: left;
+}
+
+.icon_menu .icon_menu01 {
+  display: inline-block;
+  box-sizing: border-box;
+  text-align: center;
+  margin: 0 auto;
+  padding: 10px 0 0 0;
+}
+
+/* 계약 목록 테이블 스타일 */
+.tour2023_ListA {
+  width: 100%;
+  text-align: center;
+  font-size: 15px;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+.tour2023_ListA th {
+  padding: 12px 10px 10px 10px;
+  border-bottom: 1px solid #d8d8d8;
+  border-right: solid 1px #d8d8d8;
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 16px;
+  color: #333;
+  background: #fff;
+  font-weight: 600;
+  line-height: 125%;
+}
+
+.tour2023_ListA td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #d8d8d8;
+  border-right: solid 1px #d8d8d8;
+  letter-spacing: -1px;
+  color: #333;
+  background: #fff;
+  font-size: 15px;
+  line-height: 145%;
+  word-break: break-word;
+  vertical-align: middle;
+}
+
+.tour2023_ListA td.pa {
+  padding: 10px 10px 8px;
+}
+
+.tour2023_ListA td:last-child {
+  border-right: 0;
+}
+
+.tour2023_ListA td.sName {
+  padding: 12px 5px 10px 5px;
+  border-bottom: 1px solid #d8d8d8;
+  border-right: 1px solid #d8d8d8;
+  font-size: 14px;
+  color: #0042ff;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.tour2023_ListA td.sName.no {
+  border-right: none;
+}
+
+.tour2023_ListA td.sName01 {
+  padding: 12px 5px 10px 5px;
+  border-bottom: 1px solid #d8d8d8;
+  border-right: 1px solid #d8d8d8;
+  font-size: 14px;
+  color: #0042ff;
+  text-decoration: underline;
+}
+
+.tour2023_ListA td.ddT {
+  border-bottom: 1px solid #d8d8d8;
+  border-right: 1px solid #d8d8d8;
+  font-size: 16px;
+  color: #333;
+  font-weight: 500;
+}
+
+.tour2023_ListA td.dd {
+  border-bottom: 1px solid #d8d8d8;
+  border-right: 1px solid #d8d8d8;
+  font-size: 14px;
+  color: #999;
+}
+
+.tour2023_ListA td.dd.tb {
+  border-bottom: 1px solid #d8d8d8;
+  border-right: 1px solid #d8d8d8;
+  font-size: 14px;
+  color: #999;
+  border-top: none;
+}
+
+.tour2023_ListA td.box {
+  padding: 10px 10px 8px!important;
+}
+
+.tour2023_ListA td.box01 {
+  padding: 13px 10px 8px!important;
+}
+
+.tour2023_ListA_line {
+  border-right: solid 1px #d8d8d8;
+}
+
+.tour2023_ListA_bg {
+  background: #eff6fd;
+}
+
+.tour2023_ListA_line01 {
+  border-right: solid 1px #d8d8d8!important;
+}
+
+.tour2023_ListA_line_t {
+  border-top: 2px solid #000!important;
+}
+
+.tour2023_ListA_line_R {
+  border-right: 1px solid #cfe3f6!important;
+}
+
+/* 페이지네이션 스타일 */
+.tourG_mat10 {
+  margin-top: 35px;
+}
+
+/* 타이틀 스타일 */
+.tour2023_title10 {
+  font-family: 'NanumSquareNeoTTF-dEb';
+  font-size: 18px;
+  color: #202020;
+  letter-spacing: -0.8px;
+  text-align: left;
+  display: inline-block;
+  vertical-align: top;
+  line-height: 130%;
+}
+
+/* 라인 스타일 */
+.tourG_line05 {
+  border-top: 1px solid #dde1e5;
+}
+
+.tourG_mat11 {
+  margin-top: 45px;
+}
+
+.tourG_mat14 {
+  margin-top: 50px!important;
+}
+
+.tourG_mab10 {
+  margin-bottom: 45px;
+}
+
+.tourG_mat12 {
+  margin-top: 30px;
+}
+
+.tourG_mat10 {
+  margin-top: 35px;
+}
+
+/* 계약 리스트 카드 스타일 */
+.tour2023_title02 {
+  font-family: 'NanumSquareNeoTTF-dEb';
+  font-size: 24px;
+  color: #202020;
+  letter-spacing: -1.2px;
+  text-align: left;
+  display: inline-block;
+  width: 100%;
+}
+
+.tour2023_conList_Wrap {
+  position: relative;
+  width: 100%;
+  display: block;
+  margin: 0px 0 11px 0px;
+  list-style: none;
+  padding: 0;
+}
+
+.tour2023_conList {
+  position: relative;
+  width: 97%;
+  display: inline-flex;
+  justify-content: space-between;
+}
+
+.tour2023_conList_Wrap li {
+  margin: 17px 0 0 0;
+}
+
+.tour2023_conList_Wrap li:first-child {
+  margin-top: 0;
+}
+
+.tour2023_txt09 {
+  font-size: 16px;
+  color: #999999;
+  text-align: left;
+  line-height: 130%;
+  letter-spacing: -1.5px;
+  vertical-align: top;
+}
+
+.tour2023_txt10 {
+  font-size: 16px;
+  color: #333;
+  text-align: right;
+  line-height: 130%;
+  letter-spacing: -0.8px;
+  vertical-align: top;
+}
+
+.tour2023_txt19 {
+  font-size: 15px;
+  color: #1b37e1;
+  text-align: right;
+  line-height: 130%;
+  letter-spacing: -1px;
+  vertical-align: top;
+  text-decoration: underline;
+  display: inline-block;
+  width: 95%;
+}
+
+.tourG_mat07 {
+  margin-top: 10px;
+}
+
+.tourG_mat09 {
+  margin-top: 25px;
+}
+
+.tourG_mab01 {
+  margin-bottom: 25px;
+}
+
+.tourG_Wrap {
+  position: relative;
+}
+
+/* 페이지네이션 스타일 */
+.board_foot {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.board_foot .paging {
+  display: inline-flex;
+  gap: 5px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.board_foot .paging li {
+  display: inline-block;
+}
+
+.board_foot .paging li a {
+  display: inline-block;
+  padding: 8px 12px;
+  text-decoration: none;
+  color: #666;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.board_foot .paging li.on a {
+  background: #1b37e1;
+  color: #fff;
+  border-color: #1b37e1;
+  font-weight: bold;
+}
+
+.board_foot .paging li a:hover {
+  background: #f5f5f5;
+  border-color: #999;
+}
+
+.board_foot .paging li.on a:hover {
+  background: #1b37e1;
+  border-color: #1b37e1;
+}
+
+/* 무사고캐시/마일리지 테이블 스타일 (tour2023_ListB) */
+.tour2023_ListB {
+  width: 100%;
+  border: 0;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.tour2023_ListB th {
+  position: relative;
+  height: 46px;
+  padding: 5px 0px 5px 0px;
+  border: 0;
+  letter-spacing: -1.2px;
+  font-family: "Noto Sans KR", sans-serif,'Malgun Gothic','맑은 고딕';
+  font-size: 15px;
+  color: #333;
+  background: #fff;
+  font-weight: 500;
+}
+
+.tour2023_ListB td {
+  position: relative;
+  height: 46px;
+  padding: 5px 0px 5px 0px;
+  border: 0;
+  letter-spacing: -1.2px;
+  font-family: "Noto Sans KR", sans-serif,'Malgun Gothic','맑은 고딕';
+  font-size: 15px;
+  letter-spacing: -1px;
+  color: #333;
+  background: #fff;
+  font-weight: 400;
+  text-align: center;
+}
+
+.tour2023_ListB td.sName {
+  font-family: "Noto Sans KR", sans-serif,'Malgun Gothic','맑은 고딕';
+  border-top: solid 1px #000;
+  background: #cfe3f6;
+  font-size: 13px;
+  letter-spacing: -1.2px;
+  border-right: solid 1px #b5cadf;
+  padding: 16px 10px 14px;
+  color: #333;
+  font-weight: 500;
+  text-align: center;
+}
+
+.tour2023_ListB td.sName.no {
+  border-right: none;
+}
+
+.tour2023_ListB_bg {
+  background: #eff6fd;
+}
+
+.tour2023_ListB_bg01 {
+  background: #cfe3f6;
+}
+
+.tour2023_ListB td.dd {
+  padding: 16px 10px 14px;
+  border: 0;
+  border-bottom: solid 1px #b6b6b6;
+  font-size: 14px;
+  text-align: center;
+  color: #333;
+}
+
+/* 텍스트 중앙 정렬 */
+.ag_center {
+  text-align: center;
+}
+
+.ag_right {
+  text-align: right;
+}
+
+.ag_left {
+  text-align: left;
 }
 

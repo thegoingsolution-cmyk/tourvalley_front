@@ -30,7 +30,7 @@ const AccidentFreeCashModal: React.FC<AccidentFreeCashModalProps> = ({ isOpen, o
           </p>
           <div>
             <a 
-              href="/tour/tourvalley/rainbow/my/cash/listCash.jsp" 
+              href="/contracts" 
               target="_blank" 
               rel="noopener noreferrer"
               className="btn_b tour2023PC_btn01"

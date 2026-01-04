@@ -96,31 +96,40 @@ function PaymentCompleteContent() {
 
           if (approveResult.success) {
             console.log('✅ 결제 승인 성공!');
-            setStatus('success');
-            setMessage('결제가 완료되었습니다.');
-            setPaymentInfo({
-              orderId,
-              amount: parseInt(amount || '0'),
-              ...approveResult.data
-            });
             localStorage.removeItem('pendingPayment');
+            
+            // CompletionStep 페이지로 리다이렉트
+            const contractId = contract_id || approveResult.data?.contractId;
+            const customerName = approveResult.data?.customerName || pendingPayment?.customerName || '';
+            const contractNumber = approveResult.data?.contractNumber || orderId;
+            
+            router.push(`/payment/success?contractId=${contractId}&customerName=${encodeURIComponent(customerName)}&contractNumber=${contractNumber}`);
+            return;
           } else {
             console.error('❌ 결제 승인 실패:', approveResult.message);
-            setStatus('error');
-            setMessage(approveResult.message || '결제 승인에 실패했습니다.');
+            localStorage.removeItem('pendingPayment');
+            
+            // 실패 페이지로 리다이렉트
+            router.push(`/payment/fail?error=${encodeURIComponent(approveResult.message || '결제 승인 중 오류가 발생했습니다.')}`);
+            return;
           }
         } else {
           // 결제 실패
           console.error('❌ authResultCode가 0000이 아닙니다:', authResultCode);
           console.error('authResultMsg:', authResultMsg);
-          setStatus('error');
-          setMessage(authResultMsg || '결제에 실패했습니다.');
           localStorage.removeItem('pendingPayment');
+          
+          // 실패 페이지로 리다이렉트
+          router.push(`/payment/fail?error=${encodeURIComponent(authResultMsg || '결제에 실패했습니다.')}`);
+          return;
         }
       } catch (error) {
         console.error('Payment processing error:', error);
-        setStatus('error');
-        setMessage('결제 처리 중 오류가 발생했습니다.');
+        localStorage.removeItem('pendingPayment');
+        
+        // 실패 페이지로 리다이렉트
+        const errorMessage = error instanceof Error ? error.message : '결제 처리 중 오류가 발생했습니다.';
+        router.push(`/payment/fail?error=${encodeURIComponent(errorMessage)}`);
       }
     };
 

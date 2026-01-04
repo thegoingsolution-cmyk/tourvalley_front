@@ -4,8 +4,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getImagePath } from '@/utils/path';
-import { requestNicepayPayment, openNicepayWindow } from '@/services/paymentService';
+import { requestNicepayPayment, openNicepayWindow, processNaverPayPayment, processKakaoPayPayment } from '@/services/paymentService';
 import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 import { sendVerificationCode, verifyCode } from '@/services/smsService';
 import TravelInfoStep from '@/components/travel/TravelInfoStep';
 import ParticipantInfoStep from '@/components/travel/ParticipantInfoStep';
@@ -21,6 +22,7 @@ import { PlanType, PlanInfo, Participant, CalculatedPremiums, PaymentMethod, Pay
 import './page.css';
 
 export default function PCLongTermStayPage() {
+  const router = useRouter();
   // 회원 정보 가져오기
   const { member, isLoggedIn } = useAuth();
   
@@ -256,7 +258,7 @@ export default function PCLongTermStayPage() {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              insurance_type: travelPurpose || '유학/어학연수', // 여행목적이 insurance_type으로 사용됨
+              insurance_type: travelPurpose || '유학/어학연수',
               age: age,
               gender: genderValue,
               plan_type: planType,
@@ -695,7 +697,7 @@ export default function PCLongTermStayPage() {
             total_premium: calculatedPremiums?.totalPremium || 0,
           },
           contractor: {
-            contractor_type: '개인',
+            contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: participants[0]?.name || '',
             resident_number: participants[0]?.birthDate ? `${participants[0].birthDate.substring(0, 6)}-${participants[0].birthDate.substring(6, 7)}${participants[0].gender === '남자' ? '1' : '2'}******` : '',
             mobile_phone: participants[0]?.phone || '',
@@ -706,6 +708,7 @@ export default function PCLongTermStayPage() {
             return {
               sequence_number: idx + 1,
               name: p.name,
+              english_name: p.englishName || null,
               resident_number: `${p.birthDate.substring(0, 6)}-${p.birthDate.substring(6, 7)}${p.gender === '남자' ? '1' : '2'}******`,
               gender: p.gender,
               age: age || 0,
@@ -746,7 +749,7 @@ export default function PCLongTermStayPage() {
             contract_id,
             amount: receiptPremium,
             orderId: contractData_result.contract_number,
-            goodsName: '해외장기체류보험',
+            goodsName: `해외장기체류보험(${travelPurpose || '유학/어학연수'})`,
             buyerName: participants[0]?.name || '',
             buyerEmail: participants[0]?.email1 && participants[0]?.email2 ? `${participants[0].email1}@${participants[0].email2}` : '',
             buyerTel: participants[0]?.phone || '',
@@ -770,9 +773,38 @@ export default function PCLongTermStayPage() {
             alert(paymentRequest.message || '결제 요청에 실패했습니다.');
           }
         } else if (paymentMethod === '네이버페이') {
-          alert('네이버페이 연동 준비 중입니다.');
+          try {
+            await processNaverPayPayment({
+              contractId: contract_id,
+              amount: receiptPremium,
+              productName: '장기체류보험',
+              productCount: participants.length,
+              customerName: participants[0]?.name || '',
+              customerEmail: participants[0]?.email1 && participants[0]?.email2 ? `${participants[0].email1}@${participants[0].email2}` : '',
+              customerPhone: participants[0]?.phone || '',
+              checkOutDate: arrivalDate,
+            });
+            // 네이버 페이 결제창이 열리면, 콜백으로 결과가 처리됩니다
+          } catch (error) {
+            console.error('네이버 페이 결제 오류:', error);
+            alert(error instanceof Error ? error.message : '네이버 페이 결제 중 오류가 발생했습니다.');
+          }
         } else if (paymentMethod === '카카오페이') {
-          alert('카카오페이 연동 준비 중입니다.');
+          try {
+            await processKakaoPayPayment({
+              contractId: contract_id,
+              amount: receiptPremium,
+              itemName: '해외장기체류보험',
+              quantity: participants.length,
+              customerName: participants[0]?.name || '',
+              customerEmail: participants[0]?.email1 && participants[0]?.email2 ? `${participants[0].email1}@${participants[0].email2}` : '',
+              customerPhone: participants[0]?.phone || '',
+            });
+            // 카카오페이 결제 페이지로 리다이렉트됨
+          } catch (error) {
+            console.error('카카오페이 결제 오류:', error);
+            alert(error instanceof Error ? error.message : '카카오페이 결제 중 오류가 발생했습니다.');
+          }
         }
       } else {
         // 기타결제 (무통장입금, 수기카드)는 바로 계약 등록
@@ -791,7 +823,7 @@ export default function PCLongTermStayPage() {
             total_premium: calculatedPremiums?.totalPremium || 0,
           },
           contractor: {
-            contractor_type: '개인',
+            contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: participants[0]?.name || '',
             resident_number: participants[0]?.birthDate ? `${participants[0].birthDate.substring(0, 6)}-${participants[0].birthDate.substring(6, 7)}${participants[0].gender === '남자' ? '1' : '2'}******` : '',
             mobile_phone: participants[0]?.phone || '',
@@ -802,6 +834,7 @@ export default function PCLongTermStayPage() {
             return {
               sequence_number: idx + 1,
               name: p.name,
+              english_name: p.englishName || null,
               resident_number: `${p.birthDate.substring(0, 6)}-${p.birthDate.substring(6, 7)}${p.gender === '남자' ? '1' : '2'}******`,
               gender: p.gender,
               age: age || 0,
@@ -1162,10 +1195,10 @@ export default function PCLongTermStayPage() {
           <CompletionStep
             participantName={participants[0]?.name || ''}
             onViewDetails={() => {
-              alert('가입내역 확인 기능은 추후 구현 예정입니다.');
+              router.push('/contracts');
             }}
             onGoHome={() => {
-              window.location.href = '/';
+              router.push('/');
             }}
           />
         )}
