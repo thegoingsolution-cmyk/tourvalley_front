@@ -269,8 +269,8 @@ export default function Header({ isMobile = false }: HeaderProps) {
             단체여행보험
           </Link>
           <Link 
-            href="/main" 
-            className={`nav-link ${pathname?.startsWith('/main') && pathname !== '/main' && pathname !== '/' ? 'active' : ''}`}
+            href="/event-insurance" 
+            className={`nav-link ${pathname?.startsWith('/event-insurance') ? 'active' : ''}`}
           >
             행사보험
           </Link>

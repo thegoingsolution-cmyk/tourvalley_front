@@ -1316,7 +1316,7 @@
 .domestic-page-pc .floating-icon-img {
   width: 36px;
   height: 36px;
-  object-fit: contain;
+  object-fit: none;
   margin-bottom: 4px;
 }
 
@@ -1324,7 +1324,114 @@
   font-size: 14px;
   color: #333;
   line-height: 1.4;
+  text-align: left;
+}
+
+/* 오른쪽 고정 버튼 */
+.domestic-page-pc .container_box_w {
+  position: relative;
+  width: 605px;
+  margin: 0 auto;
+}
+
+.domestic-page-pc .container_box_w {
+  position: relative;
+  width: 605px;
+  margin: 0 auto;
+  min-height: 0;
+  height: 0;
+}
+
+.domestic-page-pc .container_box_w .fixedRight_b01 {
+  position: absolute;
+  top: 0px;
+  left: 562px;
+  width: 107px;
+  height: 90px;
+  background: #fade21;
+  border-radius: 10px;
+  box-shadow: 7px 7px 10px rgb(0 0 0 / 5%);
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  z-index: 100;
+}
+
+.domestic-page-pc .container_box_w .fixedRight_b02 {
+  position: absolute;
+  display: inline-block;
+  text-align: left;
+  top: 100px;
+  left: 562px;
+  width: 107px;
+  height: 58px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 7px 7px 10px rgb(0 0 0 / 5%);
+  cursor: pointer;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.domestic-page-pc .fixedRight_txt01 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 14px;
+  letter-spacing: -1.2px;
+  color: #333;
+  line-height: 100%;
+  box-sizing: border-box;
+  text-decoration: none;
   text-align: center;
+  display: block;
+  margin-top: 8px;
+}
+
+.domestic-page-pc .fixedRight_txt02 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 13px;
+  letter-spacing: -0.4px;
+  color: #333;
+  line-height: 120%;
+  box-sizing: border-box;
+  text-decoration: none;
+  text-align: left;
+  display: inline-block;
+  margin-left: 4px;
+  margin-top: 14px;
+}
+
+.domestic-page-pc .icon_cash {
+  display: block;
+  width: 44px;
+  height: 43px;
+  background: url(/icons/icon_cash.png) no-repeat 0 0/contain;
+  margin: 13px 0 0 33px;
+}
+
+.domestic-page-pc .icon_cash .icon_cash01 {
+  display: block;
+  box-sizing: border-box;
+  text-align: center;
+  margin: 0 auto;
+  padding: 10px 0 0 0;
+}
+
+.domestic-page-pc .icon_menu {
+  display: inline-block;
+  width: 19px;
+  height: 19px;
+  background: url(/icons/icon_menu.png) no-repeat 0 0/contain;
+  vertical-align: top;
+  margin: 20px 0 0 17px;
+  text-align: left;
+}
+
+.domestic-page-pc .icon_menu .icon_menu01 {
+  display: inline-block;
+  box-sizing: border-box;
+  text-align: center;
+  margin: 0 auto;
+  padding: 10px 0 0 0;
 }
 
 /* ========================================

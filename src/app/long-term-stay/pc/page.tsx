@@ -18,6 +18,8 @@ import DangerousActivityModal from '@/components/travel/DangerousActivityModal';
 import RestrictedCountryModal from '@/components/travel/RestrictedCountryModal';
 import ConsentModal from '@/components/travel/ConsentModal';
 import ExcelUploadModal from '@/components/travel/ExcelUploadModal';
+import AccidentFreeCashModal from '@/components/travel/AccidentFreeCashModal';
+import ServiceModal from '@/components/ServiceModal';
 import { PlanType, PlanInfo, Participant, CalculatedPremiums, PaymentMethod, PaymentSubMethod, Gender } from '@/components/travel/types';
 import './page.css';
 
@@ -69,6 +71,8 @@ export default function PCLongTermStayPage() {
   const [showPaymentScreen, setShowPaymentScreen] = useState(false); // 결제 화면
   const [showCompletionScreen, setShowCompletionScreen] = useState(false); // 완료 화면
   const [showExcelModal, setShowExcelModal] = useState(false);
+  const [showCashModal, setShowCashModal] = useState(false);
+  const [showServiceModal, setShowServiceModal] = useState(false);
   
   // STEP2-1 관련 상태
   const [hasDangerousActivity, setHasDangerousActivity] = useState<boolean | null>(null);
@@ -897,6 +901,23 @@ export default function PCLongTermStayPage() {
         className="long-term-stay-content-pc"
         style={{ backgroundImage: `url(${getImagePath('/202309_main_bg02.png')})` }}
       >
+        {/* 오른쪽 고정 버튼 */}
+        <div className="container_box_w">
+          <a href="#" onClick={(e) => { e.preventDefault(); setShowCashModal(true); }}>
+            <div className="fixedRight_b01">
+              <p className="icon_cash"><span className="icon_cash01"></span></p>
+              <p className="fixedRight_txt01">무사고캐시란?</p>
+            </div>
+          </a>
+
+          <a href="#" onClick={(e) => { e.preventDefault(); setShowServiceModal(true); }}>
+            <div className="fixedRight_b02" style={{}}>
+              <p className="icon_menu"><span className="icon_menu01"></span></p>
+              <p className="fixedRight_txt02">서비스<br/>전체보기</p>
+            </div>
+          </a>
+        </div>
+
         {/* STEP 1: 여행정보 입력 화면 */}
         {!showParticipantForm && !showStep2_1 && !showStep3 && !showPaymentScreen && !showCompletionScreen && (
           <TravelInfoStep
@@ -1227,20 +1248,21 @@ export default function PCLongTermStayPage() {
           currentParticipants={participants}
         />
 
-        {/* Floating Buttons */}
-        <div className="floating-buttons">
-          <button className="floating-btn cash-btn">
-            <img src={getImagePath('/icons/icon_cash.png')} alt="무사고캐시" className="floating-icon-img" />
-            <span className="floating-text">무사고캐시란?</span>
-          </button>
-          <button className="floating-btn service-btn">
-            <img src={getImagePath('/icons/icon_menu.png')} alt="서비스 전체보기" className="floating-icon-img" />
-            <span className="floating-text">서비스<br/>전체보기</span>
-          </button>
-        </div>
       </main>
 
       <Footer isMobile={false} />
+
+      {/* 무사고캐시 모달 */}
+      <AccidentFreeCashModal
+        isOpen={showCashModal}
+        onClose={() => setShowCashModal(false)}
+      />
+
+      {/* 서비스 전체보기 모달 */}
+      <ServiceModal 
+        isOpen={showServiceModal} 
+        onClose={() => setShowServiceModal(false)} 
+      />
     </div>
   );
 }

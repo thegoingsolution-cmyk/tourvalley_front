@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { getImagePath } from '@/utils/path';
 import AccidentFreeCashModal from '@/components/travel/AccidentFreeCashModal';
+import ServiceModal from '@/components/ServiceModal';
 import { sendVerificationCode, verifyCode } from '@/services/smsService';
 import './page.css';
 
@@ -42,7 +43,7 @@ export default function PCContractPage() {
     totalPages: number;
     totalCount: number;
     pageSize: number;
-  }>({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
+  }>({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 3 });
   
   // 무사고캐시 데이터
   interface CashHistory {
@@ -98,6 +99,7 @@ export default function PCContractPage() {
   const [reSendYn, setReSendYn] = useState('N');
   const [beforeCtel, setBeforeCtel] = useState('');
   const [showCashModal, setShowCashModal] = useState(false);
+  const [showServiceModal, setShowServiceModal] = useState(false);
 
   // 타이머 효과
   useEffect(() => {
@@ -364,7 +366,7 @@ export default function PCContractPage() {
 
     try {
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-      const response = await fetch(`${API_BASE_URL}/api/contracts/list?member_id=${member.id}&inyear=${inYear}&block_type=C&str_cur_page=${page}`, {
+      const response = await fetch(`${API_BASE_URL}/api/contracts/list?member_id=${member.id}&inyear=${inYear}&block_type=C&str_cur_page=${page}&pageSize=3`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -378,16 +380,28 @@ export default function PCContractPage() {
 
       const data = await response.json();
       if (data.success) {
-        setContracts(data.contracts || []);
-        setContractPagination(data.pagination || { currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
+        // 백엔드에서 받은 데이터를 최대 3개로 제한
+        const contractsData = data.contracts || [];
+        const limitedContracts = contractsData.slice(0, 3);
+        setContracts(limitedContracts);
+        
+        // 페이지네이션 정보 업데이트 (totalCount를 기반으로 totalPages 재계산)
+        const totalCount = data.pagination?.totalCount || 0;
+        const totalPages = Math.ceil(totalCount / 3);
+        setContractPagination({
+          currentPage: data.pagination?.currentPage || page,
+          totalPages: totalPages,
+          totalCount: totalCount,
+          pageSize: 3
+        });
       } else {
         setContracts([]);
-        setContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
+        setContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 3 });
       }
     } catch (error) {
       console.error('계약 목록 조회 오류:', error);
       setContracts([]);
-      setContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
+      setContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 3 });
     }
   };
 
@@ -551,9 +565,26 @@ export default function PCContractPage() {
 
   // 로그인하지 않은 유저용 화면
   const renderNonLoggedInView = () => (
-    <section className="form-section">
-      <div className="form-container">
-        <div className="contract-form-container">
+    <>
+      {/* 오른쪽 고정 버튼 */}
+      <div className="container_box_w">
+        <a href="#" onClick={(e) => { e.preventDefault(); setShowCashModal(true); }}>
+          <div className="fixedRight_b01">
+            <p className="icon_cash"><span className="icon_cash01"></span></p>
+            <p className="fixedRight_txt01">무사고캐시란?</p>
+          </div>
+        </a>
+
+        <a href="#" onClick={(e) => { e.preventDefault(); setShowServiceModal(true); }}>
+          <div className="fixedRight_b02" style={{}}>
+            <p className="icon_menu"><span className="icon_menu01"></span></p>
+            <p className="fixedRight_txt02">서비스<br/>전체보기</p>
+          </div>
+        </a>
+      </div>
+
+      <div className="container_box_w">
+        <div className="container_box">
           <div className="tour2023_header_line prow_01">
             <div className="tour2023_header_inner">
               <span className="tourTop_title">계약/캐시 조회</span>
@@ -889,7 +920,7 @@ export default function PCContractPage() {
           </div>
         </div>
       </div>
-    </section>
+    </>
   );
 
   // 로그인한 유저용 화면
@@ -1394,7 +1425,7 @@ export default function PCContractPage() {
           </div>
         </a>
 
-        <a href="#" onClick={(e) => { e.preventDefault(); /* 서비스 전체보기 모달 */ }}>
+        <a href="#" onClick={(e) => { e.preventDefault(); setShowServiceModal(true); }}>
           <div className="fixedRight_b02" style={{}}>
             <p className="icon_menu"><span className="icon_menu01"></span></p>
             <p className="fixedRight_txt02">서비스<br/>전체보기</p>
@@ -1415,23 +1446,6 @@ export default function PCContractPage() {
         <div className={isLoggedIn ? "container_w" : ""}>
           {isLoggedIn ? renderLoggedInView() : renderNonLoggedInView()}
         </div>
-
-        {/* Floating Buttons - 로그인하지 않은 유저만 */}
-        {!isLoggedIn && (
-          <div className="floating-buttons">
-            <button 
-              className="floating-btn cash-btn"
-              onClick={() => setShowCashModal(true)}
-            >
-              <img src={getImagePath('/icons/icon_cash.png')} alt="무사고캐시" className="floating-icon-img" />
-              <span className="floating-text">무사고캐시란?</span>
-            </button>
-            <button className="floating-btn service-btn">
-              <img src={getImagePath('/icons/icon_menu.png')} alt="서비스 전체보기" className="floating-icon-img" />
-              <span className="floating-text">서비스<br/>전체보기</span>
-            </button>
-          </div>
-        )}
       </main>
 
       <Footer isMobile={false} />
@@ -1440,6 +1454,12 @@ export default function PCContractPage() {
       <AccidentFreeCashModal
         isOpen={showCashModal}
         onClose={() => setShowCashModal(false)}
+      />
+
+      {/* 서비스 전체보기 모달 */}
+      <ServiceModal 
+        isOpen={showServiceModal} 
+        onClose={() => setShowServiceModal(false)} 
       />
     </div>
   );

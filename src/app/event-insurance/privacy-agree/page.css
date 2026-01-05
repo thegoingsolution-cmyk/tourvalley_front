@@ -1,0 +1,143 @@
+.privacy-agree-page {
+  background-color: #fff;
+  min-height: 100vh;
+}
+
+.privacy-agree-page #isbwrapper {
+  position: relative;
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+.privacy-agree-page #header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #fff;
+}
+
+.privacy-agree-page .tour2023_header_inner {
+  position: relative;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 50px;
+}
+
+.privacy-agree-page .tour2023_header_line {
+  border-bottom: 1px solid #eaebef;
+}
+
+.privacy-agree-page .tourTop_title {
+  font-family: 'NanumSquareNeoTTF-dEb', sans-serif;
+  font-size: 16px;
+  color: #202020;
+  letter-spacing: -1.2px;
+  text-align: center;
+  line-height: 100%;
+}
+
+.privacy-agree-page .close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  width: 20px;
+  height: 20px;
+  background: url(/icons/ico_btn_close_bl.png) no-repeat 50% 50%;
+  background-size: contain;
+  text-indent: -9999px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.privacy-agree-page .prow_01 {
+  padding: 0 20px;
+}
+
+.privacy-agree-page .tourG_mat12 {
+  margin-top: 30px;
+}
+
+.privacy-agree-page .tourG_mat17 {
+  margin-top: 160px;
+}
+
+.privacy-agree-page .tourG_Wrap {
+  position: relative;
+}
+
+.privacy-agree-page .tourGuard_ra_Wrap01 {
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.privacy-agree-page .tour2023_title19 {
+  font-family: 'NanumSquareNeoTTF-dEb', sans-serif;
+  font-size: 20px;
+  color: #202020;
+  letter-spacing: -1.2px;
+  text-align: left;
+  line-height: 132%;
+  padding: 2px 1px 15px 1px;
+}
+
+.privacy-agree-page .content_agree_Box {
+  position: relative;
+  border: 1px solid #e7e7e9;
+  border-radius: 10px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.privacy-agree-page .content_agree_Box01 {
+  font-family: 'NanumSquareNeoTTF-bRg', sans-serif;
+  font-size: 14px;
+  color: #3e3e3e;
+  letter-spacing: -0.4px;
+  line-height: 170%;
+  padding: 20px 15px;
+  text-align: left;
+  white-space: pre-wrap;
+  word-break: keep-all;
+}
+
+.privacy-agree-page #tour2023_fixedBanner {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 100;
+  background: #fff;
+  border-top: 1px solid #eaebef;
+}
+
+.privacy-agree-page .tour2023_bottom_btn {
+  padding: 10px 20px;
+}
+
+.privacy-agree-page .tour2023_btn_b {
+  display: block;
+  width: 100%;
+  text-decoration: none;
+}
+
+.privacy-agree-page .tour2023_btn07 {
+  height: 50px;
+  background-color: #fe5700;
+  border-radius: 7px;
+  box-sizing: border-box;
+  color: #fff !important;
+  text-align: center;
+  font-family: 'NanumSquareNeoTTF-dEb', sans-serif;
+  font-size: 16px;
+  letter-spacing: -1px;
+  line-height: 50px;
+  border: none;
+  cursor: pointer;
+}
+
+.privacy-agree-page .tour2023_btn07:hover {
+  opacity: 0.9;
+}
+

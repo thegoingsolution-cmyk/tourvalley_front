@@ -945,6 +945,295 @@
   text-align: center;
 }
 
+/* 오른쪽 고정 버튼 */
+.customer-center-page-pc .container_box_w {
+  position: relative;
+  width: 605px;
+  margin: 0 auto;
+  min-height: 0;
+  height: 0;
+}
+
+.customer-center-page-pc .container_box_w .fixedRight_b01 {
+  position: absolute;
+  top: 0px;
+  left: 562px;
+  width: 107px;
+  height: 90px;
+  background: #fade21;
+  border-radius: 10px;
+  box-shadow: 7px 7px 10px rgb(0 0 0 / 5%);
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  z-index: 100;
+}
+
+.customer-center-page-pc .container_box_w .fixedRight_b02 {
+  position: absolute;
+  display: inline-block;
+  text-align: left;
+  top: 100px;
+  left: 562px;
+  width: 107px;
+  height: 58px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 7px 7px 10px rgb(0 0 0 / 5%);
+  cursor: pointer;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.customer-center-page-pc .fixedRight_txt01 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 14px;
+  letter-spacing: -1.2px;
+  color: #333;
+  line-height: 100%;
+  box-sizing: border-box;
+  text-decoration: none;
+  text-align: center;
+  display: block;
+  margin-top: 8px;
+}
+
+.customer-center-page-pc .fixedRight_txt02 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 13px;
+  letter-spacing: -0.4px;
+  color: #333;
+  line-height: 120%;
+  box-sizing: border-box;
+  text-decoration: none;
+  text-align: left;
+  display: inline-block;
+  margin-left: 4px;
+  margin-top: 14px;
+}
+
+.customer-center-page-pc .icon_cash {
+  display: block;
+  width: 44px;
+  height: 43px;
+  background: url(/icons/icon_cash.png) no-repeat 0 0/contain;
+  margin: 13px 0 0 33px;
+}
+
+.customer-center-page-pc .icon_cash .icon_cash01 {
+  display: block;
+  box-sizing: border-box;
+  text-align: center;
+  margin: 0 auto;
+  padding: 10px 0 0 0;
+}
+
+.customer-center-page-pc .icon_menu {
+  display: inline-block;
+  width: 19px;
+  height: 19px;
+  background: url(/icons/icon_menu.png) no-repeat 0 0/contain;
+  vertical-align: top;
+  margin: 20px 0 0 17px;
+  text-align: left;
+}
+
+.customer-center-page-pc .icon_menu .icon_menu01 {
+  display: inline-block;
+  box-sizing: border-box;
+  text-align: center;
+  margin: 0 auto;
+  padding: 10px 0 0 0;
+}
+
+/* 무사고캐시 모달 스타일 */
+.customer-center-page-pc .modal-overlay,
+body:has(.customer-center-page-pc) .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.customer-center-page-pc .modal-content,
+body:has(.customer-center-page-pc) .modal-content {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 480px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.customer-center-page-pc .accident-free-cash-modal,
+body:has(.customer-center-page-pc) .accident-free-cash-modal {
+  width: 30%;
+  max-width: 600px;
+  min-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.customer-center-page-pc .tour2023_pcBox_top,
+body:has(.customer-center-page-pc) .tour2023_pcBox_top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.customer-center-page-pc .tour2023_pcBox_tit,
+body:has(.customer-center-page-pc) .tour2023_pcBox_tit {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+.customer-center-page-pc .modal-close,
+body:has(.customer-center-page-pc) .modal-close {
+  background: none;
+  border: none;
+  font-size: 36px;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.customer-center-page-pc .modal-close:hover,
+body:has(.customer-center-page-pc) .modal-close:hover {
+  color: #333;
+}
+
+.customer-center-page-pc .tour2023_pcBox_txt03,
+body:has(.customer-center-page-pc) .tour2023_pcBox_txt03 {
+  padding: 30px 24px;
+  text-align: center;
+}
+
+.customer-center-page-pc .tour2023_pcBox_txt01,
+body:has(.customer-center-page-pc) .tour2023_pcBox_txt01 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 8px 0;
+}
+
+.customer-center-page-pc .tour2023_pcBox_txt02,
+body:has(.customer-center-page-pc) .tour2023_pcBox_txt02 {
+  font-size: 18px;
+  color: #666;
+  margin: 0 0 20px 0;
+}
+
+.customer-center-page-pc .tour2023_pcBox_txt03_content,
+body:has(.customer-center-page-pc) .tour2023_pcBox_txt03_content {
+  font-size: 16px;
+  color: #333;
+  line-height: 1.6;
+  margin: 20px 0;
+}
+
+.customer-center-page-pc .tour2023_pcBox_txt04,
+body:has(.customer-center-page-pc) .tour2023_pcBox_txt04 {
+  font-size: 14px;
+  color: #999;
+  margin: 10px 0 20px 0;
+}
+
+.customer-center-page-pc .tour2023PC_cash_icon,
+body:has(.customer-center-page-pc) .tour2023PC_cash_icon {
+  margin: 20px 0;
+}
+
+.customer-center-page-pc .cash_icon_pc,
+body:has(.customer-center-page-pc) .cash_icon_pc {
+  max-width: 200px;
+  height: auto;
+}
+
+.customer-center-page-pc .btn_b,
+body:has(.customer-center-page-pc) .btn_b {
+  display: inline-block;
+}
+
+.customer-center-page-pc .tour2023PC_btn01,
+body:has(.customer-center-page-pc) .tour2023PC_btn01 {
+  display: inline-block;
+  background: #ffe500;
+  color: #333 !important;
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 18px;
+  font-weight: 700;
+  padding: 15px 40px;
+  border-radius: 6px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.customer-center-page-pc .tour2023PC_btn01:hover,
+body:has(.customer-center-page-pc) .tour2023PC_btn01:hover {
+  background: #ffd700;
+}
+
+.customer-center-page-pc .tour2023PC_bg01,
+body:has(.customer-center-page-pc) .tour2023PC_bg01 {
+  background: #f5f5f5;
+  padding: 24px;
+}
+
+.customer-center-page-pc .tour2023PC_txt01,
+body:has(.customer-center-page-pc) .tour2023PC_txt01 {
+  font-size: 14px;
+  color: #666;
+}
+
+.customer-center-page-pc .tour2023PC_cash_info,
+body:has(.customer-center-page-pc) .tour2023PC_cash_info {
+  display: flex;
+  margin-bottom: 12px;
+  list-style: none;
+  padding: 0;
+  line-height: 1.6;
+}
+
+.customer-center-page-pc .tour2023PC_cash_info:last-child,
+body:has(.customer-center-page-pc) .tour2023PC_cash_info:last-child {
+  margin-bottom: 0;
+}
+
+.customer-center-page-pc .tour2023PC_cash_info_w,
+body:has(.customer-center-page-pc) .tour2023PC_cash_info_w {
+  min-width: 25px;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.customer-center-page-pc .tour2023PC_cash_info li:last-child,
+body:has(.customer-center-page-pc) .tour2023PC_cash_info li:last-child {
+  flex: 1;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .customer-center-content-pc {

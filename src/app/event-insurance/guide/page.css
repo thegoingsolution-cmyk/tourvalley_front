@@ -1,0 +1,334 @@
+/* 기본 스타일 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #fff;
+  font-family: 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', sans-serif;
+  line-height: 1.6;
+  color: #333;
+}
+
+#isbwrapper {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  background: #fff;
+}
+
+/* 레이어 헤더 */
+.layer_header {
+  position: relative;
+  padding: 10px 15px;
+  border-bottom: 1px solid #eaebef;
+  background: #fff;
+}
+
+.layer_header.prow_01 {
+  width: 95%;
+  margin: 0 auto;
+}
+
+.layer_title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+  display: inline-block;
+  line-height: 40px;
+}
+
+.layer_header .close {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0;
+  background: none;
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.layer_header .close img {
+  display: block;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.layer_header .close:hover {
+  opacity: 0.7;
+}
+
+/* 본문 */
+#contentWrap {
+  padding: 20px 15px;
+}
+
+.prow_01 {
+  width: 95%;
+  margin: 0 auto;
+}
+
+.bgcolor_white {
+  background-color: #fff;
+}
+
+.ag_center {
+  text-align: center;
+}
+
+.ag_left {
+  text-align: left !important;
+}
+
+/* 투어가드 배경 */
+.tourGuard_bg {
+  background-color: #fff;
+  padding: 0;
+}
+
+.tourGuard_Topbg01 {
+  max-width: 100%;
+}
+
+/* Wrapper */
+.tourG_Wrap {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Margins - test.css의 정확한 값 */
+.tourG_mat04 {
+  margin-top: 20px !important;
+}
+
+.tourG_mat06 {
+  margin-top: 15px !important;
+}
+
+.tourG_mat11 {
+  margin-top: 45px;
+}
+
+.tourG_mat12 {
+  margin-top: 30px;
+}
+
+.tourG_mat22 {
+  margin-top: 5px;
+}
+
+.tourG_mat27 {
+  margin-top: 11px;
+}
+
+.tourG_mat23 {
+  margin-top: 160px;
+}
+
+/* 텍스트 스타일 - test.css 참조 */
+.tour2023_txt42 {
+  font-family: 'NanumSquareNeoTTF-dEb';
+  font-size: 30px;
+  letter-spacing: -1px;
+  color: #2c2c2c;
+  line-height: 126%;
+}
+
+.tour2023_txt32 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 17px;
+  letter-spacing: -0.5px;
+  color: #3e3e3e;
+  line-height: 158%;
+}
+
+.tourGuard_txt08 {
+  font-family: 'NanumSquareNeoTTF-dEb';
+  font-size: 19px;
+  letter-spacing: -1px;
+  color: #2c2c2c;
+  line-height: 158%;
+}
+
+/* 색상 */
+.tour2023_blue {
+  color: #1b37e1 !important;
+}
+
+.tour2023_red {
+  color: #ff3e5e !important;
+}
+
+.tourGuard_gray {
+  color: #999999;
+}
+
+/* 이벤트 박스 */
+.tour2023_event_Box {
+  padding: 15px 15px 15px 18px;
+  background-color: #f3f6fa;
+  border-radius: 10px;
+  line-height: 26px;
+}
+
+.tour2023_event_Box01 {
+  padding: 15px;
+  border: solid 1px #d8d8d8;
+  border-radius: 10px;
+  min-height: 52px;
+}
+
+/* 버튼 리스트 */
+.tourGuard_btn_bw {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tourGuard_btn_bw li {
+  flex: 1;
+}
+
+.tour2023_event_arrow {
+  flex: 0 0 auto !important;
+  text-align: center;
+  font-size: 18px;
+  color: #999999;
+  padding: 0 10px;
+}
+
+/* 하단 고정 버튼 */
+#tour2023_fixedBanner {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  padding: 15px 20px;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  border-top: 1px solid #eaebef;
+}
+
+.tour2023_bottom_btn {
+  width: 100%;
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+.tour2023_btn_b {
+  font-family: 'NanumSquareNeoTTF-bRg';
+  width: 100%;
+  font-size: 21px;
+  letter-spacing: -1px;
+  padding-top: 17px;
+  height: 60px;
+  background-color: #fe5700;
+  border-radius: 7px;
+  box-sizing: border-box;
+  color: #fff !important;
+  text-align: center;
+  display: inline-block;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+
+.tour2023_btn_b:hover {
+  background-color: #e54e00;
+}
+
+.tour2023_btn07 {
+  background-color: #fe5700;
+}
+
+.tour2023_btn07:hover {
+  background-color: #e54e00;
+}
+
+/* 리스트 스타일 */
+ul {
+  list-style: none;
+}
+
+li {
+  margin: 0;
+  padding: 0;
+}
+
+/* 링크 스타일 */
+a {
+  color: #1b37e1;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  #isbwrapper {
+    max-width: 100%;
+  }
+
+  .layer_header {
+    padding: 10px 15px;
+  }
+
+  .layer_title {
+    font-size: 16px;
+    line-height: 36px;
+  }
+
+  #contentWrap {
+    padding: 15px 10px;
+  }
+
+  .tour2023_txt42 {
+    font-size: 24px;
+  }
+
+  .tour2023_txt32 {
+    font-size: 15px;
+  }
+
+  .tourGuard_txt08 {
+    font-size: 17px;
+  }
+
+  .tourGuard_btn_bw {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .tourGuard_btn_bw li {
+    width: 100%;
+  }
+
+  .tour2023_event_arrow {
+    transform: rotate(90deg);
+    margin: 5px 0;
+    padding: 0;
+  }
+
+  .tour2023_btn_b {
+    font-size: 18px;
+    padding-top: 15px;
+    height: 52px;
+  }
+
+  .tour2023_bottom_btn {
+    max-width: 100%;
+  }
+}
+

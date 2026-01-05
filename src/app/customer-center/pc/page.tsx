@@ -4,6 +4,8 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import ServiceModal from '@/components/ServiceModal';
+import AccidentFreeCashModal from '@/components/travel/AccidentFreeCashModal';
 import { getImagePath } from '@/utils/path';
 import { useAuth } from '@/contexts/AuthContext';
 import './page.css';
@@ -44,6 +46,8 @@ function CustomerCenterContent() {
     totalPages: 0,
   });
   const [showQnaWriteModal, setShowQnaWriteModal] = useState<boolean>(false);
+  const [showCashModal, setShowCashModal] = useState(false);
+  const [showServiceModal, setShowServiceModal] = useState(false);
   const [qnaWriteForm, setQnaWriteForm] = useState({
     title: '',
     content: '',
@@ -531,25 +535,42 @@ function CustomerCenterContent() {
         className="customer-center-content-pc"
         style={{ backgroundImage: `url(${getImagePath('/202309_main_bg02.png')})` }}
       >
+        {/* 오른쪽 고정 버튼 */}
+        <div className="container_box_w">
+          <a href="#" onClick={(e) => { e.preventDefault(); setShowCashModal(true); }}>
+            <div className="fixedRight_b01">
+              <p className="icon_cash"><span className="icon_cash01"></span></p>
+              <p className="fixedRight_txt01">무사고캐시란?</p>
+            </div>
+          </a>
+
+          <a href="#" onClick={(e) => { e.preventDefault(); setShowServiceModal(true); }}>
+            <div className="fixedRight_b02" style={{}}>
+              <p className="icon_menu"><span className="icon_menu01"></span></p>
+              <p className="fixedRight_txt02">서비스<br/>전체보기</p>
+            </div>
+          </a>
+        </div>
+
         {view === 'main' && renderMainView()}
         {view === 'chubb' && renderChubbView()}
         {view === 'hyundai' && renderHyundaiView()}
         {view === 'qna' && renderQnaView()}
         {view === 'notice' && renderNoticeDetailView()}
-
-        {/* Floating Buttons */}
-        <div className="floating-buttons">
-          <button className="floating-btn cash-btn">
-            <img src={getImagePath('/icons/icon_cash.png')} alt="무사고캐시" className="floating-icon-img" />
-            <span className="floating-text">무사고캐시란?</span>
-          </button>
-          <button className="floating-btn service-btn">
-            <img src={getImagePath('/icons/icon_menu.png')} alt="서비스 전체보기" className="floating-icon-img" />
-            <span className="floating-text">서비스<br/>전체보기</span>
-          </button>
-        </div>
       </main>
       <Footer />
+
+      {/* 무사고캐시 모달 */}
+      <AccidentFreeCashModal
+        isOpen={showCashModal}
+        onClose={() => setShowCashModal(false)}
+      />
+
+      {/* 서비스 전체보기 모달 */}
+      <ServiceModal 
+        isOpen={showServiceModal} 
+        onClose={() => setShowServiceModal(false)} 
+      />
 
       {/* Q&A 질문 등록 모달 */}
       {showQnaWriteModal && (
