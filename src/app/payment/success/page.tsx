@@ -19,6 +19,27 @@ function PaymentSuccessContent() {
         const contractId = searchParams.get('contractId');
         const contractNumber = searchParams.get('contractNumber');
         
+        // group-insurance 결제인지 확인
+        const pendingPaymentStr = localStorage.getItem('pendingPayment');
+        if (pendingPaymentStr) {
+          const pendingPayment = JSON.parse(pendingPaymentStr);
+          
+          // group-insurance 결제인 경우 step5로 리다이렉트
+          if (pendingPayment.insuranceType === 'domestic') {
+            localStorage.removeItem('pendingPayment');
+            router.push(`/group-insurance/domestic/step5?paymentSuccess=true&paymentMethod=${encodeURIComponent(pendingPayment.payment_method || '나이스페이먼츠')}`);
+            return;
+          } else if (pendingPayment.insuranceType === 'overseas') {
+            localStorage.removeItem('pendingPayment');
+            router.push(`/group-insurance/overseas/step5?paymentSuccess=true&paymentMethod=${encodeURIComponent(pendingPayment.payment_method || '나이스페이먼츠')}`);
+            return;
+          } else if (pendingPayment.insuranceType === 'longstay') {
+            localStorage.removeItem('pendingPayment');
+            router.push(`/group-insurance/longstay/step5?paymentSuccess=true&paymentMethod=${encodeURIComponent(pendingPayment.payment_method || '나이스페이먼츠')}`);
+            return;
+          }
+        }
+        
         if (!contractId && !contractNumber) {
           setLoading(false);
           return;
@@ -29,7 +50,6 @@ function PaymentSuccessContent() {
         // const data = await response.json();
         
         // 임시로 localStorage에서 가져오기
-        const pendingPaymentStr = localStorage.getItem('pendingPayment');
         if (pendingPaymentStr) {
           const pendingPayment = JSON.parse(pendingPaymentStr);
           setContractInfo(pendingPayment);
@@ -44,7 +64,7 @@ function PaymentSuccessContent() {
     };
 
     loadContractInfo();
-  }, [searchParams]);
+  }, [searchParams, router]);
 
   const handleViewDetails = () => {
     router.push('/contracts/pc');

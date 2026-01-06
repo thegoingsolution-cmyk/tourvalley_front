@@ -96,6 +96,22 @@ function PaymentCompleteContent() {
 
           if (approveResult.success) {
             console.log('✅ 결제 승인 성공!');
+            
+            // group-insurance 결제인지 확인
+            if (pendingPayment?.insuranceType === 'domestic') {
+              localStorage.removeItem('pendingPayment');
+              router.push(`/group-insurance/domestic/step5?paymentSuccess=true&paymentMethod=${encodeURIComponent(pendingPayment.payment_method || '나이스페이먼츠')}`);
+              return;
+            } else if (pendingPayment?.insuranceType === 'overseas') {
+              localStorage.removeItem('pendingPayment');
+              router.push(`/group-insurance/overseas/step5?paymentSuccess=true&paymentMethod=${encodeURIComponent(pendingPayment.payment_method || '나이스페이먼츠')}`);
+              return;
+            } else if (pendingPayment?.insuranceType === 'longstay') {
+              localStorage.removeItem('pendingPayment');
+              router.push(`/group-insurance/longstay/step5?paymentSuccess=true&paymentMethod=${encodeURIComponent(pendingPayment.payment_method || '나이스페이먼츠')}`);
+              return;
+            }
+            
             localStorage.removeItem('pendingPayment');
             
             // CompletionStep 페이지로 리다이렉트

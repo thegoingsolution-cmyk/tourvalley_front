@@ -43,6 +43,11 @@ export default function DomesticInsuranceStep5Page() {
   const yearOptions = Array.from({ length: 6 }, (_, i) => currentYear + i);
 
   useEffect(() => {
+    // 결제 완료 후 리다이렉트 확인
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentSuccess = urlParams.get('paymentSuccess');
+    const paymentMethodParam = urlParams.get('paymentMethod');
+
     // Load data from localStorage
     const step1 = localStorage.getItem('domesticInsuranceStep1');
     const step2 = localStorage.getItem('domesticInsuranceStep2');
@@ -76,6 +81,31 @@ export default function DomesticInsuranceStep5Page() {
         }
         setInsuredList(insuredPersons);
       }
+    }
+
+    // 결제 완료 후 리다이렉트인 경우 상태 설정
+    if (paymentSuccess === 'true') {
+      // 결제 완료 상태로 설정
+      setPaymentCompleted(true);
+      if (paymentMethodParam) {
+        setPaymentMethod(paymentMethodParam);
+      }
+      // URL에서 파라미터 제거
+      window.history.replaceState({}, '', window.location.pathname);
+      
+      // 팝업창 크기 조정 (결제 완료 화면을 위해 더 크게)
+      try {
+        window.resizeTo(870, 930);
+        // 팝업창을 화면 중앙으로 이동
+        const left = (window.screen.width - 870) / 2;
+        const top = (window.screen.height - 930) / 2;
+        window.moveTo(left, top);
+      } catch (e) {
+        // 팝업창 크기 조정이 실패할 수 있음 (보안 제한)
+        console.log('팝업창 크기 조정 실패:', e);
+      }
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, []);
 
@@ -278,6 +308,7 @@ export default function DomesticInsuranceStep5Page() {
               contract_id,
               payment_method: paymentMethodName,
               amount: step3Data?.total_premium || 0,
+              insuranceType: 'domestic',
             }));
             try {
               await openNicepayWindow(paymentRequest);
@@ -292,6 +323,12 @@ export default function DomesticInsuranceStep5Page() {
           }
         } else if (payMethod === 'N') {
           // 네이버페이
+          localStorage.setItem('pendingPayment', JSON.stringify({
+            contract_id,
+            payment_method: paymentMethodName,
+            amount: step3Data?.total_premium || 0,
+            insuranceType: 'domestic',
+          }));
           try {
             await processNaverPayPayment({
               contractId: contract_id,
@@ -310,6 +347,12 @@ export default function DomesticInsuranceStep5Page() {
           }
         } else if (payMethod === 'K') {
           // 카카오페이
+          localStorage.setItem('pendingPayment', JSON.stringify({
+            contract_id,
+            payment_method: paymentMethodName,
+            amount: step3Data?.total_premium || 0,
+            insuranceType: 'domestic',
+          }));
           try {
             await processKakaoPayPayment({
               contractId: contract_id,
@@ -357,6 +400,19 @@ export default function DomesticInsuranceStep5Page() {
             setPaymentMethod('가상계좌');
           }
           setPaymentCompleted(true);
+          
+          // 팝업창 크기 조정 (결제 완료 화면을 위해 더 크게)
+          try {
+            window.resizeTo(1200, 1000);
+            // 팝업창을 화면 중앙으로 이동
+            const left = (window.screen.width - 1200) / 2;
+            const top = (window.screen.height - 1000) / 2;
+            window.moveTo(left, top);
+          } catch (e) {
+            // 팝업창 크기 조정이 실패할 수 있음 (보안 제한)
+            console.log('팝업창 크기 조정 실패:', e);
+          }
+          
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
           alert(data.message || '계약 등록에 실패했습니다.');
