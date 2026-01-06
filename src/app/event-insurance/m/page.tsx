@@ -196,7 +196,7 @@ export default function MobileEventInsurancePage() {
     // 견적 신청 처리
     try {
       // 로그인한 회원 정보 가져오기
-      const memberInfo = localStorage.getItem('memberInfo');
+      const memberInfo = localStorage.getItem('member');
       const memberId = memberInfo ? JSON.parse(memberInfo).id : null;
 
       const formData = new FormData();

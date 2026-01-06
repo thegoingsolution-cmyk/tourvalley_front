@@ -17,6 +17,20 @@ export default function Header({ isMobile = false }: HeaderProps) {
   const [isServiceModalOpen, setIsServiceModalOpen] = useState<boolean>(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const pathname = usePathname();
+
+  // 단체여행보험 팝업 열기
+  const openGroupInsurancePopup = () => {
+    const width = 870;
+    const height = 930;
+    const left = (window.screen.width - width) / 2;
+    const top = (window.screen.height - height) / 2;
+    
+    window.open(
+      '/group-insurance/domestic/popup',
+      'groupInsurancePopup',
+      `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
+    );
+  };
   
   // 인증 상태 가져오기
   const { isLoggedIn, member, logout, isLoading } = useAuth();
@@ -133,7 +147,15 @@ export default function Header({ isMobile = false }: HeaderProps) {
                 <span className="mobile-menu-text">국내여행자보험</span>
                 <span className="mobile-menu-arrow">›</span>
               </Link>
-              <Link href="/main" className="mobile-menu-item" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link 
+                href="#"
+                className="mobile-menu-item" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsMobileMenuOpen(false);
+                  openGroupInsurancePopup();
+                }}
+              >
                 <span className="mobile-menu-text">단체여행자보험</span>
                 <span className="mobile-menu-arrow">›</span>
               </Link>
@@ -263,8 +285,12 @@ export default function Header({ isMobile = false }: HeaderProps) {
             해외장기체류보험
           </Link>
           <Link 
-            href="/main" 
-            className={`nav-link ${pathname?.startsWith('/main') && pathname !== '/main' && pathname !== '/' ? 'active' : ''}`}
+            href="#" 
+            className="nav-link"
+            onClick={(e) => {
+              e.preventDefault();
+              openGroupInsurancePopup();
+            }}
           >
             단체여행보험
           </Link>

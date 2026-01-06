@@ -1,0 +1,360 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import '../../popup/page.css';
+
+export default function OverseasInsurancePopupPage() {
+  const [startDate, setStartDate] = useState('');
+  const [startHour, setStartHour] = useState('01');
+  const [endDate, setEndDate] = useState('');
+  const [endHour, setEndHour] = useState('01');
+  const [tourContinent, setTourContinent] = useState('');
+  const [tourPlace, setTourPlace] = useState('');
+  const [tourGoal, setTourGoal] = useState('');
+  const [tourNum, setTourNum] = useState('1');
+
+  useEffect(() => {
+    const now = new Date();
+    
+    // 현재 시간 + 2시간 계산
+    const futureTime = new Date(now.getTime() + 2 * 60 * 60 * 1000); // 2시간 추가
+    
+    // 로컬 시간 기준으로 날짜 포맷 (YYYY-MM-DD)
+    const year = futureTime.getFullYear();
+    const month = String(futureTime.getMonth() + 1).padStart(2, '0');
+    const day = String(futureTime.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+    
+    // 시간 계산 (1~24 형식)
+    let calculatedHour = futureTime.getHours();
+    if (calculatedHour === 0) {
+      calculatedHour = 24;
+    }
+    
+    const defaultHour = String(calculatedHour).padStart(2, '0');
+
+    setStartDate(formattedDate);
+    setEndDate(formattedDate);
+    setStartHour(defaultHour);
+    setEndHour(defaultHour);
+  }, []);
+
+  const handleSubmit = () => {
+    if (!startDate || !endDate) {
+      alert('출발일과 도착일을 입력해주세요.');
+      return;
+    }
+    if (!tourPlace) {
+      alert('여행지를 선택해주세요.');
+      return;
+    }
+    if (!tourGoal) {
+      alert('여행목적을 선택해주세요.');
+      return;
+    }
+    
+    // 입력한 정보를 localStorage에 저장
+    const formData = {
+      startDate,
+      startHour,
+      endDate,
+      endHour,
+      tourContinent,
+      tourPlace,
+      tourGoal,
+      tourNum
+    };
+    localStorage.setItem('overseasInsuranceStep1', JSON.stringify(formData));
+    
+    // 2단계 페이지로 이동
+    window.location.href = '/group-insurance/overseas/step2';
+  };
+
+  const continentPlaces: { [key: string]: { value: string; label: string }[] } = {
+    EU: [
+      { value: 'FR', label: '프랑스' },
+      { value: 'DE', label: '독일' },
+      { value: 'IT', label: '이탈리아' },
+      { value: 'ES', label: '스페인' },
+      { value: 'GB', label: '영국' },
+    ],
+    AS: [
+      { value: 'JP', label: '일본' },
+      { value: 'CN', label: '중국' },
+      { value: 'TH', label: '태국' },
+      { value: 'VN', label: '베트남' },
+      { value: 'SG', label: '싱가포르' },
+    ],
+    AF: [
+      { value: 'EG', label: '이집트' },
+      { value: 'ZA', label: '남아프리카공화국' },
+    ],
+    AU: [
+      { value: 'AU', label: '호주' },
+      { value: 'NZ', label: '뉴질랜드' },
+    ],
+    NA: [
+      { value: 'US', label: '미국' },
+      { value: 'CA', label: '캐나다' },
+    ],
+    SA: [
+      { value: 'BR', label: '브라질' },
+      { value: 'AR', label: '아르헨티나' },
+    ],
+  };
+
+  return (
+    <div className="speed_Wrap" style={{ background: '#fff' }}>
+      <section className="tour2023_pc_SpeedTop_w">
+        <div className="tour2023_pc_SpeedTop">
+          <p className="tour2023_pc_SpeedTop_icon"></p>
+          <p className="tour2023_pc_SpeedTop01">
+            <span className="tour2023_pc_SpeedTop_title">
+              단체여행자보험<em className="tour2023_pc_SpeedTop_title01">(법인/단체)</em>
+            </span>
+            <span className="tour2023_pc_SpeedTop_title02">
+              사업자등록증(고유번호증) 있는 법인/단체 포괄회원 가입으로 보다 편리하게 이용하실 수 있습니다.
+            </span>
+          </p>
+          <a className="close" href="#" onClick={(e) => { e.preventDefault(); window.close(); }}>닫기</a>
+        </div>
+      </section>
+
+      <div className="speed_content">
+        <div className="con01">
+          <div className="tour2023_pc_menu_wrap tourG_mat05 tourG_mab05">
+            <span className="menu"><a href="/group-insurance/domestic/popup">국내여행자보험</a></span>
+            <span className="menu on"><a href="javascript:void(0);">해외여행자보험</a></span>
+            <span className="menu"><a href="/group-insurance/longstay/popup">해외장기체류보험</a></span>
+          </div>
+
+          <ul>
+            <li className="tour2023_pc_SpeedTop_title03">- 기간 : 1일-3개월 (4개월 초과는 해외장기체류보험으로 가입 가능)</li>
+            <li className="tour2023_pc_SpeedTop_title03">- 목적 : 여행, 관광, 연수, 출장, 단기어학연수 등 (운동경기 및 기타 위험한 활동 가입불가)</li>
+          </ul>
+        </div>
+
+        <div className="con02">
+          <div className="tour2023_pc_SpeedTop_line01">
+            <span className="tour2023_pc_SpeedTop_title05">해외여행자보험 기본정보 입력</span>
+          </div>
+          <div className="detailView01 bgcolor_white ps_ab">
+            <form name="inputForm" method="post">
+              <table className="specialB" border={1} cellSpacing="0" style={{ borderCollapse: 'collapse' }}>
+                <caption>최근 여행보험 가입내역</caption>
+                <colgroup>
+                  <col width="20%" />
+                  <col width="*" />
+                </colgroup>
+                <tbody>
+                  <tr>
+                    <td className="sName_m ag_left main_font bgcolor_white line_none01">출발일시</td>
+                    <td className="dd ag_left box02 line_none01">
+                      <div className="in_wrap01">
+                        <div className="bg_join input_cell_01 wd_55">
+                          <input
+                            type="date"
+                            className="tf_g dicon"
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            placeholder="출발일"
+                          />
+                        </div>
+                        <div className="bg_join input_cell_01 wd_40 ml10">
+                          <span className="ps_box02 wd_100">
+                            <select
+                              className="sel01"
+                              value={startHour}
+                              onChange={(e) => setStartHour(e.target.value)}
+                            >
+                              {Array.from({ length: 24 }, (_, i) => i + 1).map(h => (
+                                <option key={h} value={String(h).padStart(2, '0')}>{h}시</option>
+                              ))}
+                            </select>
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="sName_m ag_left main_font bgcolor_white line_none">도착일시</td>
+                    <td className="dd ag_left box02 line_none">
+                      <div className="in_wrap01">
+                        <div className="bg_join input_cell_01 wd_55">
+                          <input
+                            type="date"
+                            className="tf_g dicon"
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            placeholder="도착일"
+                          />
+                        </div>
+                        <div className="bg_join input_cell_01 wd_40 ml10">
+                          <span className="ps_box02 wd_100">
+                            <select
+                              className="sel01"
+                              value={endHour}
+                              onChange={(e) => setEndHour(e.target.value)}
+                            >
+                              {Array.from({ length: 24 }, (_, i) => i + 1).map(h => (
+                                <option key={h} value={String(h).padStart(2, '0')}>{h}시</option>
+                              ))}
+                            </select>
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="sName_m ag_left main_font bgcolor_white line_none">여&nbsp;&nbsp;행&nbsp;&nbsp;지</td>
+                    <td className="dd ag_left box02 line_none">
+                      <div className="in_wrap01">
+                        <div className="bg_join input_cell_01 wd_48">
+                          <span className="ps_box02 wd_100">
+                            <select
+                              className="sel01"
+                              value={tourContinent}
+                              onChange={(e) => {
+                                setTourContinent(e.target.value);
+                                setTourPlace('');
+                              }}
+                            >
+                              <option value="">선택</option>
+                              <option value="EU">유럽</option>
+                              <option value="AS">아시아</option>
+                              <option value="AF">아프리카</option>
+                              <option value="AU">오세아니아</option>
+                              <option value="NA">북아메리카</option>
+                              <option value="SA">남아메리카</option>
+                            </select>
+                          </span>
+                        </div>
+                        <div className="bg_join input_cell_01 wd_48 ml10">
+                          <span className="ps_box02 wd_100">
+                            <select
+                              className="sel01"
+                              value={tourPlace}
+                              onChange={(e) => setTourPlace(e.target.value)}
+                              disabled={!tourContinent}
+                            >
+                              <option value="">선택</option>
+                              {tourContinent && continentPlaces[tourContinent]?.map(place => (
+                                <option key={place.value} value={place.value}>{place.label}</option>
+                              ))}
+                            </select>
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="sName_m ag_left main_font bgcolor_white line_none">여행목적</td>
+                    <td className="dd ag_left box02 line_none">
+                      <div className="in_wrap01">
+                        <div className="bg_join input_cell_01 wd_50">
+                          <span className="ps_box02 wd_100">
+                            <select
+                              className="sel01"
+                              value={tourGoal}
+                              onChange={(e) => setTourGoal(e.target.value)}
+                            >
+                              <option value="">선택하세요</option>
+                              <option value="001">일반관광</option>
+                              <option value="002">출장/연수/교육(체험학습)</option>
+                            </select>
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="sName_m ag_left main_font bgcolor_white line_none">인&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;원</td>
+                    <td className="dd ag_left box02 line_none">
+                      <div className="in_wrap01">
+                        <div className="bg_join input_cell_01 wd_50">
+                          <span className="ps_box02 wd_100">
+                            <select
+                              className="sel01"
+                              value={tourNum}
+                              onChange={(e) => setTourNum(e.target.value)}
+                            >
+                              {Array.from({ length: 250 }, (_, i) => i + 1).map(n => (
+                                <option key={n} value={n}>{n}명</option>
+                              ))}
+                            </select>
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </form>
+          </div>
+        </div>
+
+        <div className="con03">
+          <div>
+            <span className="con3Tit">GUIDE</span>
+            <ul>
+              <li>- 해외여행보험의 보험기간은 최대 3개월입니다.<br />3개월이 넘는 경우에는 목적에 따라 해외장기체류 보험의 유학생플랜, 어학연수 플랜, 교환교수(학생)플랜, 해외장기출장(주재원)플랜을 선택하시기 바랍니다.</li>
+              <li>- 이미 출국하셨거나 해외에 거주하는 경우 여행보험에 가입하실 수 없습니다.</li>
+              <li>- 2개 이상의 국가를 여행하는 경우 최초 방문하는 국가를 선택하시기 바랍니다.(단, 여행국가 중에 체코가 포함되는 경우 체코를 선택하시기 바랍니다.)</li>
+              <li>- 여행예정인 국가 중 보험인수 제한 국가가 포함되어 있을 경우 여행 보험 가입이 불가능합니다.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="con_btnWrap mb40">
+          <a href="#" onClick={(e) => { e.preventDefault(); handleSubmit(); }}>설계하기</a>
+        </div>
+
+        <section className="tour2023_pc_insuBox">
+          <div className="tour2023_pc_insuBox01">
+            <span className="tour2023_pc_txt01">투어밸리 회원님은 회원 로그인후 이용하세요. (마일리지 적립)</span>
+          </div>
+          <a href="#" className="tour2023PC_btn_b tour2023_pc_btnLogin">회원 LOGIN</a>
+        </section>
+
+        <section className="tour2023_pc_joinBox">
+          <div className="tour2023_pc_joinBox01">
+            <span className="tour2023_pc_joinTxt">
+              아직 투어밸리 회원이 아니신가요? 투어밸리 법인단체 회원에 가입하세요.<br />
+              보다 편리하게 여행자보험을 관리할 수 있습니다.
+            </span>
+          </div>
+          <a href="#"><span className="tour2023_pc_joinTxt01">회원가입&nbsp;&gt;</span></a>
+        </section>
+
+        <div className="Box_line01 mtb20">
+          <p className="txt">
+            <span className="font_blue">※ 알아두세요.</span>
+          </p>
+          <div className="login_Btxt">
+            <dl>
+              <dd className="font_gray">라이나손해보험의 해외여행보험 상품입니다.</dd>
+              <dd className="font_gray">해외여햄보험의 주계약은 상해사망 및 후유장해이며 그 외에는 기타특약입니다. 기타특약은 해당특약 가입시에만 보상받으실 수 있습니다.</dd>
+              <dd className="font_gray">배상책임, 휴대품손해는 자기부담금 각 1만원입니다.</dd>
+              <dd className="font_blue">
+                휴대품손해에서 휴대품 1개(1조 또는 1쌍)의 보상한도는 20만원입니다. <span className="font_red">단, 이동통신단말기의 보상한도는 10만입니다. (2020년 1월 약관 개정)</span>
+              </dd>
+              <dd className="font_gray">
+                <span className="font_red">(비례보상)실손의료비, 특별비용, 배상책임, 휴대품손해를 보상하는 상품</span>은 2개 이상의 보험에 가입하더라도 중복 보상되지 않고 <span className="font_red">비례보상됩니다.</span>
+              </dd>
+              <dd className="font_gray">상법 제732조에 따라 15세 미만의 경우 사망에 대해서는 보장하지않습니다.(후유장해)</dd>
+              <dd className="font_gray">가입 전 알아두실 사항 및 보장내용에 관한 자세한 사항은 해당약관을 참조하시기 바랍니다.</dd>
+            </dl>
+          </div>
+        </div>
+
+        <section className="ss_number_w">
+          <div className="ss_number">
+            ※ 본 광고는 광고심의기준을 준수하였으며, 유효기간은 심의일로부터 1년입니다.<br />
+            준법감시필 제2025-광고T-001(2025.01.30-2026-01.29)
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+

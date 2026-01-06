@@ -65,6 +65,16 @@
   border-bottom: 4px solid #2843e5;
 }
 
+/* 버튼 형태의 nav-link (단체여행보험 팝업용) */
+.nav-link-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+  padding-bottom: 0.5rem;
+}
+
 .header-pc-utils {
   display: flex;
   gap: 1.2rem;
@@ -237,6 +247,17 @@ body.mobile-menu-open {
 
 .mobile-menu-item:hover {
   background-color: #f8f9fa;
+}
+
+/* 버튼 형태의 mobile-menu-item (단체여행보험 팝업용) */
+.mobile-menu-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  width: 100%;
+  text-align: left;
 }
 
 .mobile-menu-text-wrapper {

@@ -45,6 +45,30 @@ export default function PCContractPage() {
     pageSize: number;
   }>({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 3 });
   
+  // 행사보험 계약 목록 데이터
+  interface EventContract {
+    id: number;
+    contractNumber: string;
+    insuranceType: string;
+    insuranceCompany: string;
+    eventName: string;
+    eventLocation?: string | null;
+    participants: number;
+    startDate: string;
+    endDate: string;
+    premium: number;
+    status: string;
+    createdAt: string;
+    contractor?: string | null;
+  }
+  const [eventContracts, setEventContracts] = useState<EventContract[]>([]);
+  const [eventContractPagination, setEventContractPagination] = useState<{
+    currentPage: number;
+    totalPages: number;
+    totalCount: number;
+    pageSize: number;
+  }>({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
+  
   // 무사고캐시 데이터
   interface CashHistory {
     id: number;
@@ -405,6 +429,44 @@ export default function PCContractPage() {
     }
   };
 
+  // 로그인한 유저용: 행사보험 계약 목록 조회
+  const getEventContractList = async (page: number = 1) => {
+    if (!isLoggedIn || !member) return;
+
+    try {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${API_BASE_URL}/api/event-contracts/list?member_id=${member.id}&inyear=${inYear}&block_type=C&str_cur_page=${page}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('API 호출 실패');
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setEventContracts(data.contracts || []);
+        setEventContractPagination({
+          currentPage: data.pagination?.currentPage || page,
+          totalPages: data.pagination?.totalPages || 0,
+          totalCount: data.pagination?.totalCount || 0,
+          pageSize: data.pagination?.pageSize || 10
+        });
+      } else {
+        setEventContracts([]);
+        setEventContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
+      }
+    } catch (error) {
+      console.error('행사보험 계약 목록 조회 오류:', error);
+      setEventContracts([]);
+      setEventContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
+    }
+  };
+
   // 로그인한 유저용: 무사고캐시 정보 조회 (금액, 소멸예정 캐시)
   const getCashInfo = async () => {
     if (!isLoggedIn || !member) return;
@@ -533,7 +595,11 @@ export default function PCContractPage() {
   useEffect(() => {
     if (isLoggedIn && member) {
       if (activeTab === 'contract') {
-        getContractList(1);
+        if (searchType === 'contract') {
+          getContractList(1);
+        } else if (searchType === 'event') {
+          getEventContractList(1);
+        }
       } else if (activeTab === 'cash') {
         getCashInfo();
         getCashList();
@@ -542,7 +608,7 @@ export default function PCContractPage() {
         getMileageList();
       }
     }
-  }, [isLoggedIn, member, inYear, activeTab]);
+  }, [isLoggedIn, member, inYear, activeTab, searchType]);
 
   // 무사고캐시 내역 조회 기간 변경 시 리스트 다시 불러오기
   useEffect(() => {
@@ -991,7 +1057,6 @@ export default function PCContractPage() {
                         checked={searchType === 'event'}
                         onChange={(e) => {
                           setSearchType('event');
-                          router.push('/contracts/event');
                         }}
                       />
                       <label htmlFor="one_pgood02">행사보험</label>
@@ -1020,164 +1085,305 @@ export default function PCContractPage() {
 
               {/* 계약 리스트 */}
               <div id="contractList" className="tourG_mat10" style={{ marginTop: 0, paddingTop: 40 }}>
-                {contracts.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '40px' }}>계약 내역이 없습니다.</div>
-                ) : (
-                  <>
-                    {(() => {
-                      // 헬퍼 함수들
-                      const formatDate = (dateStr: string) => {
-                        if (!dateStr) return '-';
-                        const date = new Date(dateStr);
-                        const year = date.getFullYear();
-                        const month = String(date.getMonth() + 1).padStart(2, '0');
-                        const day = String(date.getDate()).padStart(2, '0');
-                        const hour = date.getHours();
-                        return `${year}.${month}.${day} ${hour}시`;
-                      };
+                {searchType === 'contract' ? (
+                  // 여행자보험 목록
+                  contracts.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '40px' }}>계약 내역이 없습니다.</div>
+                  ) : (
+                    <>
+                      {(() => {
+                        // 헬퍼 함수들
+                        const formatDate = (dateStr: string) => {
+                          if (!dateStr) return '-';
+                          const date = new Date(dateStr);
+                          const year = date.getFullYear();
+                          const month = String(date.getMonth() + 1).padStart(2, '0');
+                          const day = String(date.getDate()).padStart(2, '0');
+                          const hour = date.getHours();
+                          return `${year}.${month}.${day} ${hour}시`;
+                        };
 
-                      const calculateDuration = (start: string, end: string) => {
-                        if (!start || !end) return '';
-                        const startDate = new Date(start);
-                        const endDate = new Date(end);
-                        const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                        const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
-                        
-                        if (diffDays >= 1) {
-                          return `(${diffDays}일)`;
-                        } else {
-                          return `(${diffHours}시간)`;
-                        }
-                      };
-
-                      const getInsuranceTypeDisplay = (insuranceType: string) => {
-                        const longTermTypes = ['유학/어학연수', '해외출장/주재원/교환교수', '워킹홀리데이'];
-                        if (longTermTypes.includes(insuranceType)) {
-                          return '해외장기체류보험';
-                        }
-                        return insuranceType;
-                      };
-
-                      const getInsuranceCompany = (insuranceType: string) => {
-                        const longTermTypes = ['유학/어학연수', '해외출장/주재원/교환교수', '워킹홀리데이'];
-                        if (insuranceType === '국내여행') {
-                          return '라이나손해 국내여행보험';
-                        } else if (insuranceType === '해외여행') {
-                          return '라이나손해 해외여행보험';
-                        } else if (longTermTypes.includes(insuranceType)) {
-                          return '메리츠화재 해외장기체류보험';
-                        }
-                        return '라이나손해 해외여행보험';
-                      };
-
-                      return contracts.map((contract, index) => {
-
-                      return (
-                        <div key={contract.id}>
-                          {index === 0 && (
-                            <>
-                              <p className="tour2023_title02">가입/신청내역</p>
-                            </>
-                          )}
+                        const calculateDuration = (start: string, end: string) => {
+                          if (!start || !end) return '';
+                          const startDate = new Date(start);
+                          const endDate = new Date(end);
+                          const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+                          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                          const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
                           
-                          <div className="tourG_line05 tourG_mat07 tourG_mab01"></div>
-                          <ul className="tour2023_conList_Wrap">
-                            <li className="tour2023_conList">
-                              <span className="tour2023_txt09">관리번호</span>
-                              <span className="tour2023_txt10">
-                                {contract.contractNumber}
-                              </span>
-                            </li>
-                            <li className="tour2023_conList">
-                              <span className="tour2023_txt09">가입자</span>
-                              <span className="tour2023_txt10">
-                                {member?.name || '-'}
-                              </span>
-                            </li>
-                            <li className="tour2023_conList">
-                              <span className="tour2023_txt09">보험종목/상품명</span>
-                              <span className="tour2023_txt10">
-                                {getInsuranceTypeDisplay(contract.insuranceType)}<br />
-                                {getInsuranceCompany(contract.insuranceType)}
-                              </span>
-                            </li>
-                            <li className="tour2023_conList">
-                              <span className="tour2023_txt09">보험기간</span>
-                              <span className="tour2023_txt10">
-                                {formatDate(contract.departureDate)} ~ {formatDate(contract.arrivalDate)}<br />
-                                {calculateDuration(contract.departureDate, contract.arrivalDate)}
-                              </span>
-                            </li>
-                            <li className="tour2023_conList">
-                              <span className="tour2023_txt09">여행지/여행목적</span>
-                              <span className="tour2023_txt10">
-                                {(() => {
-                                  const destination = contract.travelCountry || contract.travelRegion || null;
-                                  const purpose = contract.travelPurpose || null;
-                                  
-                                  if (destination && purpose) {
-                                    return `${destination}/${purpose}`;
-                                  } else if (purpose) {
-                                    return purpose;
-                                  } else if (destination) {
-                                    return destination;
-                                  }
-                                  return '-';
-                                })()}
-                              </span>
-                            </li>
-                            <li className="tour2023_conList">
-                              <span className="tour2023_txt09">진행단계</span>
-                              <span className="tour2023_txt10">{contract.status}</span>
-                            </li>
-                          </ul>
-                          <div className="tourG_line05 tourG_mat09 tourG_mab04"></div>
-                          <a 
-                            href="#" 
-                            onClick={(e) => {
-                              e.preventDefault();
-                              // 팝업창으로 상세보기 열기
-                              const popupWidth = 500;
-                              const popupHeight = 700;
-                              const left = (window.screen.width - popupWidth) / 2;
-                              const top = (window.screen.height - popupHeight) / 2;
-                              
-                              window.open(
-                                `/contracts/detail/${contract.id}`,
-                                'contract_detail',
-                                `width=${popupWidth},height=${popupHeight},left=${left},top=${top},scrollbars=yes,resizable=yes`
-                              );
-                            }}
-                          >
-                            <span className="tour2023_txt19">자세히보기&nbsp;&gt;</span>
-                          </a>
-                          <div className="tourG_mat14 tourG_Wrap"></div>
-                        </div>
-                      );
-                    })})()}
+                          if (diffDays >= 1) {
+                            return `(${diffDays}일)`;
+                          } else {
+                            return `(${diffHours}시간)`;
+                          }
+                        };
 
-                    {/* 페이지네이션 */}
-                    <div className="board_foot" style={{ paddingBottom: '12px' }}>
-                      <ul className="paging">
-                        {Array.from({ length: contractPagination.totalPages }, (_, i) => i + 1).map((page) => (
-                          <li key={page} className={page === contractPagination.currentPage ? 'on' : ''}>
+                        const getInsuranceTypeDisplay = (insuranceType: string) => {
+                          const longTermTypes = ['유학/어학연수', '해외출장/주재원/교환교수', '워킹홀리데이'];
+                          if (longTermTypes.includes(insuranceType)) {
+                            return '해외장기체류보험';
+                          }
+                          return insuranceType;
+                        };
+
+                        const getInsuranceCompany = (insuranceType: string) => {
+                          const longTermTypes = ['유학/어학연수', '해외출장/주재원/교환교수', '워킹홀리데이'];
+                          if (insuranceType === '국내여행') {
+                            return '라이나손해 국내여행보험';
+                          } else if (insuranceType === '해외여행') {
+                            return '라이나손해 해외여행보험';
+                          } else if (longTermTypes.includes(insuranceType)) {
+                            return '메리츠화재 해외장기체류보험';
+                          }
+                          return '라이나손해 해외여행보험';
+                        };
+
+                        return contracts.map((contract, index) => {
+
+                        return (
+                          <div key={contract.id}>
+                            {index === 0 && (
+                              <>
+                                <p className="tour2023_title02">가입/신청내역</p>
+                              </>
+                            )}
+                            
+                            <div className="tourG_line05 tourG_mat07 tourG_mab01"></div>
+                            <ul className="tour2023_conList_Wrap">
+                              <li className="tour2023_conList">
+                                <span className="tour2023_txt09">관리번호</span>
+                                <span className="tour2023_txt10">
+                                  {contract.contractNumber}
+                                </span>
+                              </li>
+                              <li className="tour2023_conList">
+                                <span className="tour2023_txt09">가입자</span>
+                                <span className="tour2023_txt10">
+                                  {member?.name || '-'}
+                                </span>
+                              </li>
+                              <li className="tour2023_conList">
+                                <span className="tour2023_txt09">보험종목/상품명</span>
+                                <span className="tour2023_txt10">
+                                  {getInsuranceTypeDisplay(contract.insuranceType)}<br />
+                                  {getInsuranceCompany(contract.insuranceType)}
+                                </span>
+                              </li>
+                              <li className="tour2023_conList">
+                                <span className="tour2023_txt09">보험기간</span>
+                                <span className="tour2023_txt10">
+                                  {formatDate(contract.departureDate)} ~ {formatDate(contract.arrivalDate)}<br />
+                                  {calculateDuration(contract.departureDate, contract.arrivalDate)}
+                                </span>
+                              </li>
+                              <li className="tour2023_conList">
+                                <span className="tour2023_txt09">여행지/여행목적</span>
+                                <span className="tour2023_txt10">
+                                  {(() => {
+                                    const destination = contract.travelCountry || contract.travelRegion || null;
+                                    const purpose = contract.travelPurpose || null;
+                                    
+                                    if (destination && purpose) {
+                                      return `${destination}/${purpose}`;
+                                    } else if (purpose) {
+                                      return purpose;
+                                    } else if (destination) {
+                                      return destination;
+                                    }
+                                    return '-';
+                                  })()}
+                                </span>
+                              </li>
+                              <li className="tour2023_conList">
+                                <span className="tour2023_txt09">진행단계</span>
+                                <span className="tour2023_txt10">{contract.status}</span>
+                              </li>
+                            </ul>
+                            <div className="tourG_line05 tourG_mat09 tourG_mab04"></div>
                             <a 
                               href="#" 
                               onClick={(e) => {
                                 e.preventDefault();
-                                if (page !== contractPagination.currentPage) {
-                                  getContractList(page);
-                                }
+                                // 팝업창으로 상세보기 열기
+                                const popupWidth = 500;
+                                const popupHeight = 700;
+                                const left = (window.screen.width - popupWidth) / 2;
+                                const top = (window.screen.height - popupHeight) / 2;
+                                
+                                window.open(
+                                  `/contracts/detail/${contract.id}`,
+                                  'contract_detail',
+                                  `width=${popupWidth},height=${popupHeight},left=${left},top=${top},scrollbars=yes,resizable=yes`
+                                );
                               }}
                             >
-                              {page}
+                              <span className="tour2023_txt19">자세히보기&nbsp;&gt;</span>
                             </a>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </>
+                            <div className="tourG_mat14 tourG_Wrap"></div>
+                          </div>
+                        );
+                      })})()}
+
+                      {/* 페이지네이션 */}
+                      <div className="board_foot" style={{ paddingBottom: '12px' }}>
+                        <ul className="paging">
+                          {Array.from({ length: contractPagination.totalPages }, (_, i) => i + 1).map((page) => (
+                            <li key={page} className={page === contractPagination.currentPage ? 'on' : ''}>
+                              <a 
+                                href="#" 
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  if (page !== contractPagination.currentPage) {
+                                    getContractList(page);
+                                  }
+                                }}
+                              >
+                                {page}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </>
+                  )
+                ) : (
+                  // 행사보험 목록
+                  eventContracts.length === 0 ? (
+                    <>
+                      <p className="tour2023_title02">가입/신청내역</p>
+                      <div className="tourG_line05 tourG_mat07 tourG_mab01"></div>
+                      <p id="notExist" className="tour2023_mypageBox">
+                        <span className="tour2023_title14">행사보험 가입내역이 없습니다.</span>
+                      </p>
+                      <div className="board_foot" style={{ paddingBottom: '12px' }}>
+                        <ul className="paging"></ul>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {(() => {
+                        // 헬퍼 함수들
+                        const formatEventDate = (dateStr: string) => {
+                          if (!dateStr) return '-';
+                          const date = new Date(dateStr);
+                          const year = date.getFullYear();
+                          const month = String(date.getMonth() + 1).padStart(2, '0');
+                          const day = String(date.getDate()).padStart(2, '0');
+                          const hour = String(date.getHours()).padStart(2, '0');
+                          return `${year}.${month}.${day} ${hour}시`;
+                        };
+
+                        const calculateEventDuration = (start: string, end: string) => {
+                          if (!start || !end) return '';
+                          const startDate = new Date(start);
+                          const endDate = new Date(end);
+                          const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+                          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                          return `(${diffDays}일)`;
+                        };
+
+                        const getStatusDisplay = (status: string) => {
+                          if (status === '등록' || status === '견적신청') {
+                            return <em className="tourGuard_red">{status}</em>;
+                          }
+                          return status;
+                        };
+
+                        return eventContracts.map((contract, index) => {
+                          return (
+                            <div key={contract.id}>
+                              {index === 0 && (
+                                <>
+                                  <p className="tour2023_title02">가입/신청내역</p>
+                                </>
+                              )}
+                              
+                              <div className="tourG_line05 tourG_mat07 tourG_mab01"></div>
+                              <ul className="tour2023_conList_Wrap">
+                                <li className="tour2023_conList">
+                                  <span className="tour2023_txt09">보험종목/상품명</span>
+                                  <span className="tour2023_txt10">
+                                    행사보험<br />
+                                    {contract.insuranceCompany || '행사주최자 배상책임보험'}
+                                  </span>
+                                </li>
+                                <li className="tour2023_conList">
+                                  <span className="tour2023_txt09">가입자</span>
+                                  <span className="tour2023_txt10">
+                                    {contract.contractor || member?.name || '-'}
+                                  </span>
+                                </li>
+                                <li className="tour2023_conList">
+                                  <span className="tour2023_txt09">행사명</span>
+                                  <span className="tour2023_txt10">
+                                    {contract.eventName || '-'}
+                                  </span>
+                                </li>
+                                <li className="tour2023_conList">
+                                  <span className="tour2023_txt09">보험기간</span>
+                                  <span className="tour2023_txt10">
+                                    {formatEventDate(contract.startDate)}~{formatEventDate(contract.endDate)}<br />
+                                    {calculateEventDuration(contract.startDate, contract.endDate)}
+                                  </span>
+                                </li>
+                                <li className="tour2023_conList">
+                                  <span className="tour2023_txt09">인원</span>
+                                  <span className="tour2023_txt10">
+                                    {contract.participants || 0}명
+                                  </span>
+                                </li>
+                                <li className="tour2023_conList">
+                                  <span className="tour2023_txt09">보험료</span>
+                                  <span className="tour2023_txt10">
+                                    {contract.premium ? contract.premium.toLocaleString() : '0'}
+                                  </span>
+                                </li>
+                                <li className="tour2023_conList">
+                                  <span className="tour2023_txt09">진행단계</span>
+                                  <span className="tour2023_txt10">
+                                    {getStatusDisplay(contract.status)}
+                                  </span>
+                                </li>
+                              </ul>
+                              <div className="tourG_line05 tourG_mat09 tourG_mab04"></div>
+                              <div className="tourG_mat14 tourG_Wrap"></div>
+                            </div>
+                          );
+                        });
+                      })()}
+
+                      {/* 페이지네이션 */}
+                      <div className="board_foot" style={{ paddingBottom: '12px' }}>
+                        <ul className="paging">
+                          {Array.from({ length: eventContractPagination.totalPages }, (_, i) => i + 1).map((page) => (
+                            <li key={page} className={page === eventContractPagination.currentPage ? 'on' : ''}>
+                              <a 
+                                href="#" 
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  if (page !== eventContractPagination.currentPage) {
+                                    getEventContractList(page);
+                                  }
+                                }}
+                              >
+                                {page}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* 보험약관보기 */}
+                      <div className="tourG_mat04">
+                        <a 
+                          href="/tour/tourvalley/event_insu/downloadFile.jsp?file_name=N52_eventInsu_stipulation.pdf&file_type=stipulation" 
+                          className="tourGuard_btn_b tour2023_btn06_gray"
+                        >
+                          보험약관보기<span className="tour2023_arr01"></span>
+                        </a>
+                      </div>
+                    </>
+                  )
                 )}
               </div>
             </div>
