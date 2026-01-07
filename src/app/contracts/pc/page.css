@@ -232,11 +232,13 @@
   background: #fff;
   box-sizing: border-box;
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: flex-start;
   margin-bottom: 10px;
   width: 100%;
   min-width: 0; /* flex item이 부모보다 작아질 수 있도록 */
   max-width: 100%; /* 부모 너비를 넘지 않도록 */
+  padding-right: 10px;
 }
 
 /* 보험가입내역 조회 섹션 전용 스타일 */
@@ -414,17 +416,20 @@
 .contract-page-pc .tourGuard_form_tt input[type="tel"] {
   height: 32px;
   padding-left: 10px;
+  padding-right: 5px;
   border: 0;
   color: #000;
   font-size: 18px;
   letter-spacing: 0px;
   caret-color: #222;
   display: inline-block;
-  vertical-align: text-top;
+  vertical-align: middle;
   padding-top: 0px;
-  margin-top: 23px;
+  margin-top: 0;
   margin-left: 10px;
   background: transparent;
+  flex: 1;
+  min-width: 0;
 }
 
 .contract-page-pc .tourGuard_form_tt input::placeholder {
@@ -436,7 +441,9 @@
 }
 
 .contract-page-pc .tourGuard_input_w02 {
-  width: 90%;
+  flex: 1;
+  min-width: 0;
+  max-width: calc(100% - 50px); /* 텍스트 공간 확보 */
 }
 
 .contract-page-pc .tourGuard_input_w03 {
@@ -927,6 +934,8 @@
   font-weight: 700;
   color: #333;
   margin: 0;
+  text-align: center;
+  flex: 1;
 }
 
 .contract-page-pc .modal-close {
@@ -1649,5 +1658,160 @@
 
 .contract-page-pc .ag_left {
   text-align: left;
+}
+
+/* 문화상품권 전환신청 모달 스타일 */
+.contract-page-pc .tour2023_pcBox_Wrap {
+  position: fixed !important;
+  display: none;
+  width: 100vw !important;
+  height: 100vh !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.contract-page-pc .tour2023_pcBox_Wrap[style*="display: block"] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  opacity: 1 !important;
+}
+
+.contract-page-pc .tour2023_pcBox_Layer {
+  position: relative !important;
+  display: block;
+  text-align: center;
+  margin: 0 auto;
+  transform: none;
+  top: auto;
+  left: auto;
+}
+
+.contract-page-pc .tour2023_pc_layer.tour2023_pcBox_plan {
+  position: relative;
+  display: block;
+  background: #fff;
+  width: 490px;
+  max-height: 90vh;
+  border-radius: 30px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.contract-page-pc .tour2023_plan {
+  position: relative;
+  display: block;
+}
+
+.contract-page-pc .scroll_box01 {
+  max-height: calc(90vh - 98px);
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.contract-page-pc .tour2023_plan_prow_01 {
+  padding: 0;
+}
+
+.contract-page-pc .tour2023_pcBox_top .close {
+  position: absolute;
+  top: 25px;
+  right: 33px;
+  width: 24px;
+  height: 24px;
+  background: url(/icons/ico_btn_close_bl.png) no-repeat 50% 50%;
+  background-size: contain;
+  text-indent: -9999px;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  display: block;
+}
+
+.contract-page-pc .tourGuard_Topbg01 {
+  background: #fff;
+}
+
+.contract-page-pc .tourG_mat13 {
+  margin-top: 13px;
+}
+
+.contract-page-pc .tourG_mab04 {
+  margin-bottom: 4px;
+}
+
+.contract-page-pc .tourG_mab05 {
+  margin-bottom: 5px;
+}
+
+.contract-page-pc .tourG_mab15 {
+  margin-bottom: 15px;
+}
+
+.contract-page-pc .tourG_mat12 {
+  margin-top: 12px;
+}
+
+.contract-page-pc .tour2023_title10 {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+}
+
+.contract-page-pc .tourGuard_txt21 {
+  display: inline-block;
+  margin-left: 8px;
+  margin-right: 15px;
+  margin-top: 23px;
+  color: #333;
+  font-size: 14px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  line-height: 32px;
+}
+
+.contract-page-pc .tour2023_mileC_Wrap {
+  margin-top: 15px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.contract-page-pc .tour2023_mileC_tt {
+  font-size: 14px;
+  color: #333;
+}
+
+.contract-page-pc .tour2023_mileC_tt01 {
+  font-size: 16px;
+  font-weight: bold;
+  color: #1b37e1;
+  margin-left: 5px;
+}
+
+.contract-page-pc .tour2023_btn01 {
+  display: inline-block;
+  background: #1b37e1;
+  color: #fff !important;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 12px 40px;
+  border-radius: 6px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+
+.contract-page-pc .tour2023_btn01:hover {
+  background: #0f2bb8;
 }
 

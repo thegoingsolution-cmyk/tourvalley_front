@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { getImagePath } from '@/utils/path';
 import AccidentFreeCashModal from '@/components/travel/AccidentFreeCashModal';
 import ServiceModal from '@/components/ServiceModal';
+import GiftCardExchangeModal from '@/components/mileage/GiftCardExchangeModal';
 import { sendVerificationCode, verifyCode } from '@/services/smsService';
 import './page.css';
 
@@ -95,6 +96,7 @@ export default function PCContractPage() {
   const [mileageInfo, setMileageInfo] = useState<{ totalMileage: number }>({ totalMileage: 0 });
   const [mileageList, setMileageList] = useState<MileageHistory[]>([]);
   const [activeTab, setActiveTab] = useState<'contract' | 'cash' | 'mileage'>('contract');
+  const [showGiftCardModal, setShowGiftCardModal] = useState<boolean>(false);
 
   // 로그인 타입: 'I' (개인) 또는 'C' (단체)
   const [loginType, setLoginType] = useState<'I' | 'C'>('I');
@@ -1533,7 +1535,7 @@ export default function PCContractPage() {
 
                 {/* 문화상품권 전환신청 버튼 */}
                 <div className="tourG_mat06 tourG_mab02">
-                  <a href="javascript:void(0);" onClick={(e) => { e.preventDefault(); /* TODO: 문화상품권 전환신청 모달 */ }} className="tourGuard_btn_b01 tour2023_btn19">
+                  <a href="javascript:void(0);" onClick={(e) => { e.preventDefault(); setShowGiftCardModal(true); }} className="tourGuard_btn_b01 tour2023_btn19">
                     문화상품권 전환신청&nbsp;&gt;
                   </a>
                 </div>
@@ -1667,6 +1669,23 @@ export default function PCContractPage() {
         isOpen={showServiceModal} 
         onClose={() => setShowServiceModal(false)} 
       />
+
+      {/* 문화상품권 전환신청 모달 */}
+      {isLoggedIn && member && (
+        <GiftCardExchangeModal
+          isOpen={showGiftCardModal}
+          onClose={() => setShowGiftCardModal(false)}
+          availableMileage={mileageInfo.totalMileage}
+          memberId={member.id}
+          onSuccess={async () => {
+            // 성공 시 즉시 데이터 새로고침
+            await Promise.all([
+              getMileageInfo(),
+              getMileageList()
+            ]);
+          }}
+        />
+      )}
     </div>
   );
 }
