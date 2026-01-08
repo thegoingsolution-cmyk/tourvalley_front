@@ -1,12 +1,30 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import AccidentFreeCashModal from '@/components/travel/AccidentFreeCashModal';
 import { getImagePath } from '@/utils/path';
 import './page.css';
 
 export default function PCMainPage() {
+  const router = useRouter();
+  const [showCashModal, setShowCashModal] = useState(false);
+
+  const openGroupInsurancePopup = () => {
+    const width = 1200;
+    const height = 800;
+    const left = (window.screen.width - width) / 2;
+    const top = (window.screen.height - height) / 2;
+    
+    window.open(
+      '/group-insurance/domestic/popup',
+      'groupInsurancePopup',
+      `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
+    );
+  };
+
   return (
     <div className="main-page-pc">
       <Header isMobile={false} />
@@ -39,7 +57,7 @@ export default function PCMainPage() {
                       가족여행, 야유회, 등산, 낚시, 캠핑 등..<br />
                       <span className="card-title-bold">국내 어디라도 안전하게~</span>
                     </p>
-                    <button className="card-button">
+                    <button className="card-button" onClick={() => router.push('/domestic')}>
                       국내 여행자보험 <img src={getImagePath('/images/link_more.png')} alt="" className="card-button-arrow" />
                     </button>
                     <div className="card-illustration">
@@ -57,7 +75,7 @@ export default function PCMainPage() {
                       <span className="card-title-bold">3개월 이하</span><br />
                       해외여행, 골프, 배낭여행, 단기출장,<br />어학연수 등
                     </p>
-                    <button className="card-button">
+                    <button className="card-button" onClick={() => router.push('/overseas')}>
                       해외 여행자보험 <img src={getImagePath('/images/link_more.png')} alt="" className="card-button-arrow" />
                     </button>
                     <div className="card-illustration">
@@ -78,7 +96,7 @@ export default function PCMainPage() {
                       <span className="card-title-bold">3개월 초과</span><br />
                       유학, 어학연수, 출장, 주재원,<br />워킹홀리데이 등
                     </p>
-                    <button className="card-button">
+                    <button className="card-button" onClick={() => router.push('/long-term-stay')}>
                       해외장기체류보험 <img src={getImagePath('/images/link_more.png')} alt="" className="card-button-arrow" />
                     </button>
                     <div className="card-illustration">
@@ -96,7 +114,7 @@ export default function PCMainPage() {
                       회사, 학교, 학원, 종교단체, 관공서, 복지센터 등..<br />
                       <span className="card-title-bold-nowrap"><span className="card-title-bold">사업자번호가 있는 모든 단체</span>라면?</span>
                     </p>
-                    <button className="card-button">
+                    <button className="card-button" onClick={openGroupInsurancePopup}>
                       단체/법인 여행자보험 <img src={getImagePath('/images/link_more.png')} alt="" className="card-button-arrow" />
                     </button>
                     <div className="card-illustration">
@@ -118,7 +136,7 @@ export default function PCMainPage() {
                       참가인원이 불특정 다수인가요?<br />
                       이제 행사보험으로 안전을 관리하세요.
                     </p>
-                    <button className="card-button">
+                    <button className="card-button" onClick={() => router.push('/event-insurance')}>
                       행사보험 견적신청 <img src={getImagePath('/images/link_more.png')} alt="" className="card-button-arrow" />
                     </button>
                     <div className="card-illustration">
@@ -136,7 +154,7 @@ export default function PCMainPage() {
                       사고없이 다녀오셨다면?<br />
                       <span className="card-title-bold-nowrap">투어밸리 <span className="card-title-bold">무사고캐시를 적립</span>하세요.</span>
                     </p>
-                    <button className="card-button">
+                    <button className="card-button" onClick={() => setShowCashModal(true)}>
                       무사고캐시 자세히보기 <img src={getImagePath('/images/link_more.png')} alt="" className="card-button-arrow" />
                     </button>
                     <div className="card-illustration">
@@ -157,7 +175,7 @@ export default function PCMainPage() {
                 </div>
                 <div className="tour2023_pc_customer_m">
                   <ul>
-                    <a href="#" className="tour2023_pc_customer_m01">
+                    <a href="#" className="tour2023_pc_customer_m01" onClick={(e) => { e.preventDefault(); router.push('/notice'); }}>
                       <li className="tour2023_pcBox_txt15">공지사항</li>
                       <li><img src={getImagePath('/images/g_more.png')} alt="" className="tour2023PC_arr002" /></li>
                     </a>
@@ -199,7 +217,7 @@ export default function PCMainPage() {
         {/* Bottom Navigation Icons */}
         <section className="bottom-nav">
           <div className="bottom-nav-container">
-            <div className="nav-icon-item">
+            <div className="nav-icon-item" onClick={() => router.push('/domestic')}>
               <img
                 src={getImagePath('/bottom-menu/b_menu01.png')}
                 alt="국내 여행자보험"
@@ -207,7 +225,7 @@ export default function PCMainPage() {
               />
               <span className="nav-icon-label">국내<br />여행자보험</span>
             </div>
-            <div className="nav-icon-item">
+            <div className="nav-icon-item" onClick={() => router.push('/overseas')}>
               <img
                 src={getImagePath('/bottom-menu/b_menu02.png')}
                 alt="해외 여행자보험"
@@ -215,7 +233,7 @@ export default function PCMainPage() {
               />
               <span className="nav-icon-label">해외<br />여행자보험</span>
             </div>
-            <div className="nav-icon-item">
+            <div className="nav-icon-item" onClick={() => router.push('/long-term-stay')}>
               <img
                 src={getImagePath('/bottom-menu/b_menu03.png')}
                 alt="해외 장기체류보험"
@@ -223,7 +241,7 @@ export default function PCMainPage() {
               />
               <span className="nav-icon-label">해외<br />장기체류보험</span>
             </div>
-            <div className="nav-icon-item">
+            <div className="nav-icon-item" onClick={openGroupInsurancePopup}>
               <img
                 src={getImagePath('/bottom-menu/b_menu04.png')}
                 alt="단체 여행자보험"
@@ -231,7 +249,7 @@ export default function PCMainPage() {
               />
               <span className="nav-icon-label">단체<br />여행자보험</span>
             </div>
-            <div className="nav-icon-item">
+            <div className="nav-icon-item" onClick={() => router.push('/event-insurance')}>
               <img
                 src={getImagePath('/bottom-menu/b_menu05.png')}
                 alt="행사주최자 배상책임보험"
@@ -247,7 +265,7 @@ export default function PCMainPage() {
               />
               <span className="nav-icon-label">여행자보험<br />견적신청</span>
             </div>
-            <div className="nav-icon-item">
+            <div className="nav-icon-item" onClick={() => window.open('https://b2b.bzvalley.net/', '_blank')}>
               <img
                 src={getImagePath('/bottom-menu/b_menu07.png')}
                 alt="여행사전용 여행보험센터"
@@ -255,7 +273,7 @@ export default function PCMainPage() {
               />
               <span className="nav-icon-label">여행사전용<br />여행보험센터</span>
             </div>
-            <div className="nav-icon-item">
+            <div className="nav-icon-item" onClick={() => setShowCashModal(true)}>
               <img
                 src={getImagePath('/bottom-menu/b_menu09.png')}
                 alt="무사고 캐시적립"
@@ -268,6 +286,12 @@ export default function PCMainPage() {
       </main>
 
       <Footer isMobile={false} />
+
+      {/* 무사고캐시 모달 */}
+      <AccidentFreeCashModal
+        isOpen={showCashModal}
+        onClose={() => setShowCashModal(false)}
+      />
     </div>
   );
 }

@@ -59,6 +59,7 @@ export default function PCDomesticPage() {
   const [showStep3, setShowStep3] = useState(false); // STEP3 화면 (계약정보, 결제)
   const [showPaymentScreen, setShowPaymentScreen] = useState(false); // 결제 화면
   const [showCompletionScreen, setShowCompletionScreen] = useState(false); // 완료 화면
+  const [completedContractorName, setCompletedContractorName] = useState<string>(''); // 완료 화면에 표시할 계약자 이름
   const [showExcelModal, setShowExcelModal] = useState(false);
   const [showServiceModal, setShowServiceModal] = useState(false);
   const [showCashModal, setShowCashModal] = useState(false);
@@ -172,6 +173,23 @@ export default function PCDomesticPage() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [showParticipantForm]);
+
+  // 결제 완료 후 localStorage에서 계약자 이름 복원
+  useEffect(() => {
+    if (showCompletionScreen && !completedContractorName) {
+      const pendingPayment = localStorage.getItem('pendingPayment');
+      if (pendingPayment) {
+        try {
+          const paymentData = JSON.parse(pendingPayment);
+          if (paymentData.contractor_name) {
+            setCompletedContractorName(paymentData.contractor_name);
+          }
+        } catch (error) {
+          console.error('localStorage 읽기 오류:', error);
+        }
+      }
+    }
+  }, [showCompletionScreen, completedContractorName]);
 
   // 인증번호 타이머
   useEffect(() => {
@@ -610,6 +628,7 @@ export default function PCDomesticPage() {
               contract_id,
               payment_method: paymentMethod,
               amount: receiptPremium,
+              contractor_name: participants[0]?.name || '',
             }));
             try {
               await openNicepayWindow(paymentRequest);
@@ -622,6 +641,12 @@ export default function PCDomesticPage() {
           }
         } else if (paymentMethod === '네이버페이') {
           try {
+            localStorage.setItem('pendingPayment', JSON.stringify({
+              contract_id,
+              payment_method: paymentMethod,
+              amount: receiptPremium,
+              contractor_name: participants[0]?.name || '',
+            }));
             await processNaverPayPayment({
               contractId: contract_id,
               amount: receiptPremium,
@@ -639,6 +664,12 @@ export default function PCDomesticPage() {
           }
         } else if (paymentMethod === '카카오페이') {
           try {
+            localStorage.setItem('pendingPayment', JSON.stringify({
+              contract_id,
+              payment_method: paymentMethod,
+              amount: receiptPremium,
+              contractor_name: participants[0]?.name || '',
+            }));
             await processKakaoPayPayment({
               contractId: contract_id,
               amount: receiptPremium,
@@ -723,6 +754,7 @@ export default function PCDomesticPage() {
         const data = await response.json();
 
         if (data.success) {
+          setCompletedContractorName(participants[0]?.name || '');
           setShowPaymentScreen(false);
           setShowCompletionScreen(true);
           window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1006,7 +1038,7 @@ export default function PCDomesticPage() {
         {/* 결제 완료 화면 */}
         {showCompletionScreen && (
           <CompletionStep
-            participantName={participants[0]?.name || ''}
+            participantName={completedContractorName}
             onViewDetails={() => {
               router.push('/contracts');
             }}

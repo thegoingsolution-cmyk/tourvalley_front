@@ -1,7 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Participant } from './types';
+import AccidentFreeCashModal from './AccidentFreeCashModal';
 
 interface CompletionStepProps {
   participantName: string;
@@ -14,6 +16,8 @@ export default function CompletionStep({
   onViewDetails,
   onGoHome,
 }: CompletionStepProps) {
+  const router = useRouter();
+  const [showCashModal, setShowCashModal] = useState(false);
   return (
     <section className="form-section">
       <div className="form-container">
@@ -26,7 +30,7 @@ export default function CompletionStep({
             <button
               type="button"
               className="view-details-btn"
-              onClick={onViewDetails || (() => alert('가입내역 확인 기능은 추후 구현 예정입니다.'))}
+              onClick={onViewDetails || (() => router.push('/contracts'))}
             >
               가입내역 확인 ›
             </button>
@@ -46,7 +50,7 @@ export default function CompletionStep({
             <button
               type="button"
               className="promo-info-btn"
-              onClick={() => alert('무사고캐시 설명 기능은 추후 구현 예정입니다.')}
+              onClick={() => setShowCashModal(true)}
             >
               ▶ 무사고캐시란?
             </button>
@@ -69,6 +73,12 @@ export default function CompletionStep({
           </button>
         </div>
       </div>
+
+      {/* 무사고캐시 모달 */}
+      <AccidentFreeCashModal
+        isOpen={showCashModal}
+        onClose={() => setShowCashModal(false)}
+      />
     </section>
   );
 }

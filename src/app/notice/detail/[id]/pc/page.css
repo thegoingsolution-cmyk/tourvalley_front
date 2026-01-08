@@ -1,0 +1,417 @@
+/* ========================================
+   PC Notice Detail Page Styles
+   domestic 페이지와 동일한 구조
+   ======================================== */
+
+/* 최상위 컨테이너 */
+.notice-detail-pc #isbwrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f5f7fb;
+  overflow: visible;
+}
+
+/* Main 컨텐츠 영역 - domestic과 완전히 동일 */
+.notice-detail-pc .main_bg01 {
+  flex: 1;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 40px 20px 60px;
+  min-height: auto;
+  background-size: 4800px auto;
+  background-position: 52.2% -800px;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  overflow: visible;
+  max-height: none;
+  height: auto;
+}
+
+.notice-detail-pc .main_bg01_w {
+  /* 배경 이미지가 보이도록 투명 유지 */
+}
+
+/* ========================================
+   Responsive - 반응형 디자인
+   domestic과 완전히 동일한 breakpoints
+   ======================================== */
+
+/* 노트북 화면 (1600px 이하) */
+@media (max-width: 1600px) {
+  .notice-detail-pc .main_bg01 {
+    background-position: 52.2% -600px;
+    background-size: 3600px auto;
+  }
+}
+
+/* 작은 노트북 화면 (1366px 이하) */
+@media (max-width: 1366px) {
+  .notice-detail-pc .main_bg01 {
+    background-position: 52.2% -400px;
+    background-size: 3000px auto;
+  }
+  
+  /* 작은 화면에서 z-index 추가 상향 */
+  .notice-detail-pc .container_w {
+    z-index: 200;
+  }
+  
+  .notice-detail-pc .container_box {
+    z-index: 201;
+  }
+}
+
+/* ========================================
+   Container 구조 - domestic과 동일
+   ======================================== */
+
+/* Form Section - 실제 컨텐츠 영역 */
+.notice-detail-pc .container_w {
+  position: relative;
+  z-index: 100;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  margin-top: 0;
+  overflow: visible;
+}
+
+/* Form Card - 흰색 박스 */
+.notice-detail-pc .container_box {
+  background: #ffffff !important;
+  border-radius: 16px;
+  padding: 32px;
+  padding-bottom: 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: visible;
+  min-height: 0;
+  max-height: none;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 101;
+  isolation: isolate;
+}
+
+/* 오른쪽 고정 버튼 컨테이너 - domestic 페이지와 완전히 동일 */
+.notice-detail-pc .container_box_w {
+  position: relative;
+  width: 605px;
+  margin: 0 auto;
+  min-height: 0;
+  height: 0;
+}
+
+/* ========================================
+   Header Section
+   ======================================== */
+
+.notice-detail-pc #header {
+  margin-bottom: 24px;
+}
+
+.notice-detail-pc .tourG_header_inner {
+  position: relative;
+  height: 56px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.notice-detail-pc .tourG_header_line {
+  border-bottom: 1px solid #dfdfdf;
+}
+
+.notice-detail-pc .tourG_title {
+  position: relative;
+  display: block;
+  font-size: 18px;
+  text-align: center;
+  line-height: 110%;
+  letter-spacing: -0.4px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+/* ========================================
+   Content Wrap
+   ======================================== */
+
+.notice-detail-pc #contentWrap {
+  min-height: 400px;
+  overflow: visible;
+}
+
+/* ========================================
+   Notice Content Area
+   ======================================== */
+
+.notice-detail-pc .bgcolor_white {
+  background-color: transparent;
+}
+
+.notice-detail-pc .ptb20 {
+  padding: 0;
+}
+
+.notice-detail-pc .prow_01 {
+  margin: 0 auto;
+  width: 100%;
+}
+
+.notice-detail-pc .mb_base {
+  margin-bottom: 0;
+}
+
+.notice-detail-pc .B02_Notice_ContBox {
+  padding: 0;
+}
+
+/* ========================================
+   Notice Header
+   ======================================== */
+
+.notice-detail-pc .B02_Notice_Head {
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #1a1a1a;
+  text-align: left;
+}
+
+.notice-detail-pc .B02_Notice_HeadTxt {
+  font-size: 20px;
+  letter-spacing: -0.5px;
+  font-weight: 700;
+  color: #1a1a1a;
+  line-height: 1.4;
+  word-break: keep-all;
+}
+
+.notice-detail-pc .B02_Notice_date {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #999;
+  font-weight: 400;
+}
+
+/* ========================================
+   Notice Content Body
+   ======================================== */
+
+.notice-detail-pc .B02_Notice_contBox {
+  padding: 0;
+  min-height: 300px;
+  margin-bottom: 32px;
+}
+
+.notice-detail-pc .notice-content {
+  font-size: 15px;
+  line-height: 1.8;
+  color: #333;
+  word-break: break-word;
+}
+
+.notice-detail-pc .notice-content p {
+  margin: 16px 0;
+}
+
+.notice-detail-pc .notice-content p:first-child {
+  margin-top: 0;
+}
+
+.notice-detail-pc .notice-content p:last-child {
+  margin-bottom: 0;
+}
+
+.notice-detail-pc .notice-content br {
+  content: "";
+  display: block;
+  margin: 8px 0;
+}
+
+.notice-detail-pc .notice-content a {
+  color: #2843e5;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.notice-detail-pc .notice-content a:hover {
+  color: #1e33c4;
+}
+
+/* ========================================
+   Back to List Button
+   ======================================== */
+
+.notice-detail-pc .B02_Back_ListBtn {
+  text-align: center;
+  padding-top: 24px;
+  margin-top: 24px;
+  border-top: 1px solid #eee;
+}
+
+.notice-detail-pc .B02_Back_ListBtn a {
+  display: inline-block;
+  padding: 14px 48px;
+  background: #fff;
+  border: 2px solid #2843e5;
+  border-radius: 8px;
+  color: #2843e5;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.notice-detail-pc .B02_Back_ListBtn a:hover {
+  background: #2843e5;
+  color: #fff;
+}
+
+/* ========================================
+   Loading & Error States
+   ======================================== */
+
+.notice-detail-pc .loading-message,
+.notice-detail-pc .error-message {
+  text-align: center;
+  padding: 80px 20px;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.notice-detail-pc .loading-message p,
+.notice-detail-pc .error-message p {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.notice-detail-pc .retry-button {
+  padding: 14px 32px;
+  background: #2843e5;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.notice-detail-pc .retry-button:hover {
+  background: #1e33c4;
+}
+
+/* ========================================
+   Fixed Right Buttons - domestic과 완전히 동일
+   ======================================== */
+
+.notice-detail-pc .container_box_w .fixedRight_b01 {
+  position: absolute;
+  top: 0px;
+  left: 562px;
+  width: 107px;
+  height: 90px;
+  background: #fade21;
+  border-radius: 10px;
+  box-shadow: 7px 7px 10px rgb(0 0 0 / 5%);
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  z-index: 100;
+}
+
+.notice-detail-pc .container_box_w .fixedRight_b02 {
+  position: absolute;
+  display: inline-block;
+  text-align: left;
+  top: 100px;
+  left: 562px;
+  width: 107px;
+  height: 58px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 7px 7px 10px rgb(0 0 0 / 5%);
+  cursor: pointer;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.notice-detail-pc .fixedRight_txt01 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 14px;
+  letter-spacing: -1.2px;
+  color: #333;
+  line-height: 100%;
+  box-sizing: border-box;
+  text-decoration: none;
+  text-align: center;
+  display: block;
+  margin-top: 8px;
+}
+
+.notice-detail-pc .fixedRight_txt02 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 13px;
+  letter-spacing: -0.4px;
+  color: #333;
+  line-height: 120%;
+  box-sizing: border-box;
+  text-decoration: none;
+  text-align: left;
+  display: inline-block;
+  margin-left: 4px;
+  margin-top: 14px;
+}
+
+.notice-detail-pc .icon_cash {
+  display: block;
+  width: 44px;
+  height: 43px;
+  background: url(/icons/icon_cash.png) no-repeat 0 0/contain;
+  margin: 13px 0 0 33px;
+}
+
+.notice-detail-pc .icon_cash .icon_cash01 {
+  display: block;
+  box-sizing: border-box;
+  text-align: center;
+  margin: 0 auto;
+  padding: 10px 0 0 0;
+}
+
+.notice-detail-pc .icon_menu {
+  display: inline-block;
+  width: 19px;
+  height: 19px;
+  background: url(/icons/icon_menu.png) no-repeat 0 0/contain;
+  vertical-align: top;
+  margin: 20px 0 0 17px;
+  text-align: left;
+}
+
+.notice-detail-pc .icon_menu .icon_menu01 {
+  display: inline-block;
+  box-sizing: border-box;
+  text-align: center;
+  margin: 0 auto;
+  padding: 10px 0 0 0;
+}
+
+/* ========================================
+   Footer - 심의번호 (삭제됨)
+   ======================================== */
+
+/* 심의번호는 제거되었습니다 */

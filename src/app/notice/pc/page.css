@@ -1,0 +1,479 @@
+/* ========================================
+   PC Notice List Page Styles
+   domestic 페이지와 동일한 구조
+   ======================================== */
+
+/* 최상위 컨테이너 */
+.notice-list-pc #isbwrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f5f7fb;
+  overflow: visible;
+}
+
+/* Main 컨텐츠 영역 - domestic과 완전히 동일 */
+.notice-list-pc .main_bg01 {
+  flex: 1;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 40px 20px 60px;
+  min-height: auto;
+  background-size: 4800px auto;
+  background-position: 52.2% -800px;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  overflow: visible;
+  max-height: none;
+  height: auto;
+}
+
+.notice-list-pc .main_bg01_w {
+  /* 배경 이미지가 보이도록 투명 유지 */
+}
+
+/* ========================================
+   Responsive - 반응형 디자인
+   ======================================== */
+
+/* 노트북 화면 (1600px 이하) */
+@media (max-width: 1600px) {
+  .notice-list-pc .main_bg01 {
+    background-position: 52.2% -600px;
+    background-size: 3600px auto;
+  }
+}
+
+/* 작은 노트북 화면 (1366px 이하) */
+@media (max-width: 1366px) {
+  .notice-list-pc .main_bg01 {
+    background-position: 52.2% -400px;
+    background-size: 3000px auto;
+  }
+  
+  .notice-list-pc .container_w {
+    z-index: 200;
+  }
+  
+  .notice-list-pc .container_box {
+    z-index: 201;
+  }
+}
+
+/* ========================================
+   Container 구조
+   ======================================== */
+
+.notice-list-pc .container_w {
+  position: relative;
+  z-index: 100;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  overflow: visible;
+}
+
+.notice-list-pc .container_box {
+  background: #ffffff !important;
+  border-radius: 16px;
+  padding: 32px;
+  padding-bottom: 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: visible;
+  min-height: 0;
+  max-height: none;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 101;
+  isolation: isolate;
+}
+
+/* 오른쪽 고정 버튼 컨테이너 */
+.notice-list-pc .container_box_w {
+  position: relative;
+  width: 605px;
+  margin: 0 auto;
+  min-height: 0;
+  height: 0;
+}
+
+/* ========================================
+   Header Section
+   ======================================== */
+
+.notice-list-pc #header {
+  margin-bottom: 24px;
+}
+
+.notice-list-pc .tourG_header_inner {
+  position: relative;
+  height: 56px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.notice-list-pc .tourG_header_line {
+  border-bottom: 1px solid #dfdfdf;
+}
+
+.notice-list-pc .tourG_title {
+  position: relative;
+  display: block;
+  font-size: 18px;
+  text-align: center;
+  line-height: 110%;
+  letter-spacing: -0.4px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+/* ========================================
+   Content Wrap
+   ======================================== */
+
+.notice-list-pc #contentWrap {
+  min-height: 400px;
+  overflow: visible;
+}
+
+.notice-list-pc .bgcolor_white {
+  background-color: transparent;
+}
+
+.notice-list-pc .mb_base {
+  margin-bottom: 0;
+}
+
+/* ========================================
+   Notice List
+   ======================================== */
+
+.notice-list-pc .B02_Notice_List {
+  padding: 0;
+}
+
+.notice-list-pc .board_list_item {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px 0;
+}
+
+.notice-list-pc .board_list_item li {
+  border-bottom: 1px solid #eee;
+  padding: 20px 0;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.notice-list-pc .board_list_item li:hover {
+  background: #f9f9f9;
+}
+
+.notice-list-pc .board_list_item .subject {
+  margin-bottom: 12px;
+}
+
+.notice-list-pc .board_list_item .subject a {
+  font-size: 16px;
+  color: #1a1a1a;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
+  line-height: 1.4;
+}
+
+.notice-list-pc .board_list_item .subject a:hover {
+  color: #2843e5;
+}
+
+.notice-list-pc .board_list_item .row {
+  display: flex;
+  gap: 15px;
+  font-size: 13px;
+  color: #999;
+}
+
+.notice-list-pc .board_list_item .row span {
+  display: inline-block;
+}
+
+.notice-list-pc .board_list_item .renum {
+  font-style: normal;
+  margin-left: 5px;
+  color: #666;
+  font-weight: 500;
+}
+
+/* ========================================
+   Pagination
+   ======================================== */
+
+.notice-list-pc .board_foot {
+  margin-top: 32px;
+  margin-bottom: 32px;
+}
+
+.notice-list-pc .paging {
+  display: flex;
+  justify-content: center;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px 0;
+  gap: 8px;
+}
+
+.notice-list-pc .paging li {
+  display: inline-block;
+}
+
+.notice-list-pc .paging li a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 12px;
+  border: 2px solid #eee;
+  color: #666;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.notice-list-pc .paging li a:hover {
+  background: #f5f5f5;
+  border-color: #2843e5;
+  color: #2843e5;
+}
+
+.notice-list-pc .paging li.on a {
+  background: #2843e5;
+  color: #fff;
+  border-color: #2843e5;
+}
+
+.notice-list-pc .paging li.prev a,
+.notice-list-pc .paging li.next a {
+  font-weight: 600;
+  color: #2843e5;
+}
+
+.notice-list-pc .paging li.prev a:hover,
+.notice-list-pc .paging li.next a:hover {
+  background: #f0f4ff;
+}
+
+/* ========================================
+   Search Section
+   ======================================== */
+
+.notice-list-pc .in_wrap {
+  max-width: 100%;
+  margin: 24px 0 0 0;
+}
+
+.notice-list-pc .bg_join {
+  background: transparent;
+}
+
+.notice-list-pc .input_cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.notice-list-pc .phoneArea {
+  flex: 1;
+  position: relative;
+}
+
+.notice-list-pc .lab_g {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.notice-list-pc .tf_g {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #eee;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.2s;
+  background: #fff;
+}
+
+.notice-list-pc .tf_g:focus {
+  border-color: #2843e5;
+  background: #fff;
+}
+
+.notice-list-pc .tf_g::placeholder {
+  color: #999;
+}
+
+.notice-list-pc .btnConfirm {
+  padding: 14px 32px;
+  background: #2843e5;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.notice-list-pc .btnConfirm:hover {
+  background: #1e33c4;
+}
+
+/* ========================================
+   Loading & Error States
+   ======================================== */
+
+.notice-list-pc .loading-message,
+.notice-list-pc .error-message,
+.notice-list-pc .empty-message {
+  text-align: center;
+  padding: 80px 20px;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.notice-list-pc .loading-message p,
+.notice-list-pc .error-message p,
+.notice-list-pc .empty-message p {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.notice-list-pc .retry-button {
+  padding: 14px 32px;
+  background: #2843e5;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.notice-list-pc .retry-button:hover {
+  background: #1e33c4;
+}
+
+/* ========================================
+   Fixed Right Buttons
+   ======================================== */
+
+.notice-list-pc .container_box_w .fixedRight_b01 {
+  position: absolute;
+  top: 0px;
+  left: 562px;
+  width: 107px;
+  height: 90px;
+  background: #fade21;
+  border-radius: 10px;
+  box-shadow: 7px 7px 10px rgb(0 0 0 / 5%);
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  z-index: 100;
+}
+
+.notice-list-pc .container_box_w .fixedRight_b02 {
+  position: absolute;
+  display: inline-block;
+  text-align: left;
+  top: 100px;
+  left: 562px;
+  width: 107px;
+  height: 58px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 7px 7px 10px rgb(0 0 0 / 5%);
+  cursor: pointer;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.notice-list-pc .fixedRight_txt01 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 14px;
+  letter-spacing: -1.2px;
+  color: #333;
+  line-height: 100%;
+  box-sizing: border-box;
+  text-decoration: none;
+  text-align: center;
+  display: block;
+  margin-top: 8px;
+}
+
+.notice-list-pc .fixedRight_txt02 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 13px;
+  letter-spacing: -0.4px;
+  color: #333;
+  line-height: 120%;
+  box-sizing: border-box;
+  text-decoration: none;
+  text-align: left;
+  display: inline-block;
+  margin-left: 4px;
+  margin-top: 14px;
+}
+
+.notice-list-pc .icon_cash {
+  display: block;
+  width: 44px;
+  height: 43px;
+  background: url(/icons/icon_cash.png) no-repeat 0 0/contain;
+  margin: 13px 0 0 33px;
+}
+
+.notice-list-pc .icon_cash .icon_cash01 {
+  display: block;
+  box-sizing: border-box;
+  text-align: center;
+  margin: 0 auto;
+  padding: 10px 0 0 0;
+}
+
+.notice-list-pc .icon_menu {
+  display: inline-block;
+  width: 19px;
+  height: 19px;
+  background: url(/icons/icon_menu.png) no-repeat 0 0/contain;
+  vertical-align: top;
+  margin: 20px 0 0 17px;
+  text-align: left;
+}
+
+.notice-list-pc .icon_menu .icon_menu01 {
+  display: inline-block;
+  box-sizing: border-box;
+  text-align: center;
+  margin: 0 auto;
+  padding: 10px 0 0 0;
+}
