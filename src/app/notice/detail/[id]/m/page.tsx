@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ServiceModal from '@/components/ServiceModal';
@@ -10,12 +10,12 @@ import { getImagePath } from '@/utils/path';
 import { getNoticeDetail, Notice } from '@/utils/api';
 import './page.css';
 
-interface NoticeDetailMobileProps {
-  noticeId: string;
-}
-
-export default function NoticeDetailMobilePage({ noticeId }: NoticeDetailMobileProps) {
+export default function NoticeDetailMobilePage() {
   const router = useRouter();
+  const params = useParams();
+  const searchParams = useSearchParams();
+  const noticeId = params?.id as string;
+  const from = searchParams?.get('from');
 
   const [notice, setNotice] = useState<Notice | null>(null);
   const [loading, setLoading] = useState(true);
@@ -61,7 +61,11 @@ export default function NoticeDetailMobilePage({ noticeId }: NoticeDetailMobileP
   };
 
   const handleGoBack = () => {
-    router.push('/notice');
+    if (from === 'customer-center') {
+      router.push('/customer-center');
+    } else {
+      router.push('/notice');
+    }
   };
 
   return (

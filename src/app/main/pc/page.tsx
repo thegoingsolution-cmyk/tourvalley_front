@@ -181,25 +181,25 @@ export default function PCMainPage() {
                     </a>
                   </ul>
                   <ul>
-                    <a href="#" className="tour2023_pc_customer_m01">
+                    <a href="#" className="tour2023_pc_customer_m01" onClick={(e) => { e.preventDefault(); router.push('/contracts'); }}>
                       <li className="tour2023_pcBox_txt15">가입내역조회</li>
                       <li><img src={getImagePath('/images/g_more.png')} alt="" className="tour2023PC_arr002" /></li>
                     </a>
                   </ul>
                   <ul>
-                    <a href="#" className="tour2023_pc_customer_m01">
+                    <a href="#" className="tour2023_pc_customer_m01" onClick={(e) => { e.preventDefault(); router.push('/customer-center?view=qna'); }}>
                       <li className="tour2023_pcBox_txt15">Q&A 게시판</li>
                       <li><img src={getImagePath('/images/g_more.png')} alt="" className="tour2023PC_arr002" /></li>
                     </a>
                   </ul>
                   <ul>
-                    <a href="#" className="tour2023_pc_customer_m01">
+                    <a href="#" className="tour2023_pc_customer_m01" onClick={(e) => { e.preventDefault(); router.push('/customer-center'); }}>
                       <li className="tour2023_pcBox_txt15">보험금청구안내</li>
                       <li><img src={getImagePath('/images/g_more.png')} alt="" className="tour2023PC_arr002" /></li>
                     </a>
                   </ul>
                   <ul>
-                    <a href="#" className="tour2023_pc_customer_m01">
+                    <a href="#" className="tour2023_pc_customer_m01" onClick={(e) => { e.preventDefault(); setShowCashModal(true); }}>
                       <li className="tour2023_pcBox_txt15">무사고캐시안내</li>
                       <li><img src={getImagePath('/images/g_more.png')} alt="" className="tour2023PC_arr002" /></li>
                     </a>
@@ -257,7 +257,7 @@ export default function PCMainPage() {
               />
               <span className="nav-icon-label">행사주최자<br />배상책임보험</span>
             </div>
-            <div className="nav-icon-item">
+            <div className="nav-icon-item" onClick={() => router.push('/estimate/step1')}>
               <img
                 src={getImagePath('/bottom-menu/b_menu06.png')}
                 alt="여행자보험 견적신청"

@@ -1,13 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useParams } from 'next/navigation';
 import NoticeDetailPCPage from './pc/page';
 import NoticeDetailMobilePage from './m/page';
 
-export default function NoticeDetailPage() {
-  const params = useParams();
-  const noticeId = params.id as string;
+function NoticeDetailContent() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -22,9 +20,17 @@ export default function NoticeDetailPage() {
   }, []);
 
   if (isMobile) {
-    return <NoticeDetailMobilePage noticeId={noticeId} />;
+    return <NoticeDetailMobilePage />;
   }
 
-  return <NoticeDetailPCPage noticeId={noticeId} />;
+  return <NoticeDetailPCPage />;
+}
+
+export default function NoticeDetailPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <NoticeDetailContent />
+    </Suspense>
+  );
 }
 

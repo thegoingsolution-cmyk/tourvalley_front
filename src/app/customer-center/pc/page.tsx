@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ServiceModal from '@/components/ServiceModal';
@@ -30,6 +30,7 @@ interface Notice {
 }
 
 function CustomerCenterContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const view = searchParams?.get('view') || 'main';
   const noticeId = searchParams?.get('id');
@@ -62,11 +63,14 @@ function CustomerCenterContent() {
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/notices?limit=5`);
         const data = await response.json();
-        if (data.success) {
-          setNotices(data.notices);
+        if (data.success && data.data && data.data.notices) {
+          setNotices(data.data.notices || []);
+        } else {
+          setNotices([]);
         }
       } catch (error) {
         console.error('Failed to fetch notices:', error);
+        setNotices([]);
       }
     };
 
@@ -80,8 +84,8 @@ function CustomerCenterContent() {
         try {
           const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/notices/${noticeId}`);
           const data = await response.json();
-          if (data.success) {
-            setNoticeDetail(data.notice);
+          if (data.success && data.data) {
+            setNoticeDetail(data.data.notice || data.data);
           }
         } catch (error) {
           console.error('Failed to fetch notice detail:', error);
@@ -208,10 +212,10 @@ function CustomerCenterContent() {
         <div className="customer-notice-section">
           <h2 className="customer-section-title">공지사항</h2>
           <ul className="customer-notice-list">
-            {notices.length > 0 ? (
+            {notices && notices.length > 0 ? (
               notices.map((notice) => (
                 <li key={notice.id}>
-                  <a href={`/customer-center?view=notice&id=${notice.id}`} className="customer-notice-link">
+                  <a href={`/notice/detail/${notice.id}?from=customer-center`} className="customer-notice-link">
                     • {notice.title}
                   </a>
                 </li>
@@ -468,8 +472,17 @@ function CustomerCenterContent() {
                   <span className="customer-qna-status-badge" data-status={item.status}>
                     [{item.status}]
                   </span>
-                  {item.is_secret === 1 && <span className="customer-qna-secret-icon">🔒</span>}
-                  <a href={`#detail-${item.id}`} className="customer-qna-link">{item.title}</a>
+                  {item.is_secret === 1 && <img src={getImagePath('/images/tg_icon_secret.png')} alt="비밀글" className="customer-qna-secret-icon" />}
+                  <a 
+                    href={`/customer-center/qna/${item.id}`} 
+                    className="customer-qna-link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      router.push(`/customer-center/qna/${item.id}`);
+                    }}
+                  >
+                    {item.title}
+                  </a>
                 </div>
                 <div className="customer-qna-info">
                   <span>{item.author_name}</span>

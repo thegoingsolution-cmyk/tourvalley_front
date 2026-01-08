@@ -1,0 +1,681 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import ServiceModal from '@/components/ServiceModal';
+import AccidentFreeCashModal from '@/components/travel/AccidentFreeCashModal';
+import ExcelUploadModal from '@/components/travel/ExcelUploadModal';
+import EstimateCompletionModal from '@/components/estimate/EstimateCompletionModal';
+import { getImagePath } from '@/utils/path';
+import './page.css';
+
+interface Participant {
+  id: number;
+  gender: '남자' | '여자';
+  birthDate: string;
+}
+
+interface ContractorInfo {
+  name: string;
+  phone: string;
+  email1: string;
+  email2: string;
+}
+
+export default function PCStep2Page() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  // step1에서 전달받은 쿼리 파라미터
+  const [productCd, setProductCd] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [startHour, setStartHour] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [endHour, setEndHour] = useState('');
+  const [tourNum, setTourNum] = useState('');
+  const [tourDay, setTourDay] = useState('');
+  
+  const [agree, setAgree] = useState(false);
+  const [showServiceModal, setShowServiceModal] = useState(false);
+  const [showCashModal, setShowCashModal] = useState(false);
+  const [showParticipantList, setShowParticipantList] = useState(false);
+  const [showExcelModal, setShowExcelModal] = useState(false);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // 신청자 정보
+  const [contractorInfo, setContractorInfo] = useState<ContractorInfo>({
+    name: '',
+    phone: '',
+    email1: '',
+    email2: '',
+  });
+  
+  // 피보험자 리스트
+  const [participants, setParticipants] = useState<Participant[]>([]);
+
+  useEffect(() => {
+    // URL에서 쿼리 파라미터 읽기
+    const product_cd = searchParams.get('product_cd') || '';
+    const start_date = searchParams.get('start_date') || '';
+    const start_hour = searchParams.get('start_hour') || '';
+    const end_date = searchParams.get('end_date') || '';
+    const end_hour = searchParams.get('end_hour') || '';
+    const tour_num = searchParams.get('tour_num') || '';
+    const tour_day = searchParams.get('tour_day') || '';
+
+    setProductCd(product_cd);
+    setStartDate(start_date);
+    setStartHour(start_hour);
+    setEndDate(end_date);
+    setEndHour(end_hour);
+    setTourNum(tour_num);
+    setTourDay(tour_day);
+
+    // 필수 파라미터가 없으면 step1으로 리다이렉트
+    if (!product_cd || !start_date || !end_date || !tour_num) {
+      router.push('/estimate/step1');
+    }
+  }, [searchParams, router]);
+
+  // 피보험자 리스트 초기화 (tour_num만큼)
+  useEffect(() => {
+    if (showParticipantList && tourNum) {
+      const num = parseInt(tourNum, 10);
+      if (num > 0 && participants.length === 0) {
+        const initialParticipants: Participant[] = [];
+        for (let i = 0; i < num; i++) {
+          initialParticipants.push({
+            id: i + 1,
+            gender: '남자',
+            birthDate: '',
+          });
+        }
+        setParticipants(initialParticipants);
+      }
+    }
+  }, [showParticipantList, tourNum, participants.length]);
+
+  const handleNextStep = async () => {
+    if (!showParticipantList) {
+      // 정보동의 화면에서 다음단계 클릭 시
+      if (!agree) {
+        alert('개인정보 수집 및 이용에 관한 동의를 해주세요.');
+        return;
+      }
+      // 피보험자 리스트 입력 화면으로 전환
+      setShowParticipantList(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      // 피보험자 리스트 입력 화면에서 다음단계 클릭 시
+      // 신청자 정보 검증
+      if (!contractorInfo.name) {
+        alert('신청자 이름을 입력해주세요.');
+        return;
+      }
+      if (!contractorInfo.phone || contractorInfo.phone.length < 10) {
+        alert('휴대폰 번호를 정확히 입력해주세요.');
+        return;
+      }
+      if (!contractorInfo.email1 || !contractorInfo.email2) {
+        alert('이메일 주소를 입력해주세요.');
+        return;
+      }
+      
+      // 피보험자 정보 검증
+      for (const participant of participants) {
+        if (!participant.birthDate || participant.birthDate.length !== 8) {
+          alert('모든 피보험자의 생년월일(8자리)을 입력해주세요.');
+          return;
+        }
+      }
+
+      // 견적 신청 API 호출
+      await handleSubmitEstimate();
+    }
+  };
+
+  const handleSubmitEstimate = async () => {
+    setIsSubmitting(true);
+    
+    try {
+      const email = `${contractorInfo.email1}@${contractorInfo.email2}`;
+      
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/estimate/submit`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          product_cd: productCd,
+          start_date: startDate,
+          start_hour: startHour,
+          end_date: endDate,
+          end_hour: endHour,
+          tour_num: tourNum,
+          tour_day: tourDay,
+          contractor_name: contractorInfo.name,
+          contractor_phone: contractorInfo.phone,
+          contractor_email: email,
+          participants: participants.map((p, index) => ({
+            sequence: index + 1,
+            gender: p.gender,
+            birth_date: p.birthDate,
+          })),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setShowCompletionModal(true);
+      } else {
+        alert(data.message || '견적 신청에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('견적 신청 오류:', error);
+      alert('견적 신청 중 오류가 발생했습니다.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleBeforeStep = () => {
+    if (showParticipantList) {
+      // 피보험자 리스트 화면에서 이전 단계 클릭 시 정보동의 화면으로
+      setShowParticipantList(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      // step1로 이동 (쿼리 파라미터로 데이터 전달)
+      const params = new URLSearchParams({
+        product_cd: productCd,
+        start_date: startDate,
+        start_hour: startHour,
+        end_date: endDate,
+        end_hour: endHour,
+        tour_num: tourNum,
+        tour_day: tourDay,
+      });
+
+      router.push(`/estimate/step1?${params.toString()}`);
+    }
+  };
+
+  const handleParticipantChange = (index: number, field: keyof Participant, value: any) => {
+    const updated = [...participants];
+    updated[index] = { ...updated[index], [field]: value };
+    setParticipants(updated);
+  };
+
+  // 날짜 포맷팅 (YYYY-MM-DD -> YYYY년 MM월 DD일)
+  const formatDate = (dateStr: string) => {
+    if (!dateStr) return '';
+    const [year, month, day] = dateStr.split('-');
+    return `${year}년 ${month}월 ${day}일`;
+  };
+
+  return (
+    <div className="estimate-step2-page">
+      <Header isMobile={false} />
+      
+      <section 
+        className="main_bg01 main_bg01_w"
+        style={{ backgroundImage: `url(${getImagePath('/202309_main_bg02.png')})` }}
+      >
+        <div className="container_w">
+          {/* 오른쪽 고정 버튼 */}
+          <div className="container_box_w">
+            <a href="#" onClick={(e) => { e.preventDefault(); setShowCashModal(true); }}>
+              <div className="fixedRight_b01">
+                <p className="icon_cash"><span className="icon_cash01"></span></p>
+                <p className="fixedRight_txt01">무사고캐시란?</p>
+              </div>
+            </a>
+
+            <a href="#" onClick={(e) => { e.preventDefault(); setShowServiceModal(true); }}>
+              <div className="fixedRight_b02" style={{}}>
+                <p className="icon_menu"><span className="icon_menu01"></span></p>
+                <p className="fixedRight_txt02">서비스<br/>전체보기</p>
+              </div>
+            </a>
+          </div>
+
+          <div className="container_box">
+            <form name="inputForm" method="POST">
+              <div className="prow_01">
+                <div className="tour2023_BWrap tourG_mat13 tourG_mab05">
+                  <p className="tour2023_title17">여행자보험 견적신청</p>
+                  <section className="tour2023_step_w">
+                    <div className="tour2023_step_line tour">
+                      <ul className="tour2023_step">
+                        <li className="tour2023_step01">
+                          <div className="tour2023_step_num">
+                            <span className="tour2023_step_num01">1</span>
+                          </div>
+                          <div className="tour2023_step_txt">여행정보</div>
+                        </li>
+                      </ul>
+                      <ul className="tour2023_step on">
+                        <li className="tour2023_step01">
+                          <div className="tour2023_step_num">
+                            <span className="tour2023_step_num01">2</span>
+                          </div>
+                          <div className="tour2023_step_txt">정보동의</div>
+                        </li>
+                      </ul>
+                      <ul className="tour2023_step">
+                        <li className="tour2023_step01">
+                          <div className="tour2023_step_num">
+                            <span className="tour2023_step_num01">3</span>
+                          </div>
+                          <div className="tour2023_step_txt">신청완료</div>
+                        </li>
+                      </ul>
+                    </div>
+                  </section>
+                </div>
+
+                {!showParticipantList ? (
+                  <section className="">
+                    <div className="tour2023_title10">개인(신용)정보의 수집 및 이용에 관한 동의</div>
+                    <div className="content_agree_rdo">
+                      <span className="tour2023_estimate_rdo">
+                        <input 
+                          type="radio" 
+                          id="agree" 
+                          name="agree"
+                          checked={agree}
+                          onChange={(e) => setAgree(e.target.checked)}
+                        />
+                        <label htmlFor="agree">동의합니다.</label>
+                      </span>
+                    </div>
+                    <div className="content_agree_Box">
+                      <p className="content_agree_Box01">
+                        1. 고객정보의 수집 및 이용 목적<br/>저희 회사는 보험회사의 보험대리점으로서 「개인정보보호법」 및 「신용정보의 이용 및 보호에 관한 법률」에 따라 여행자 보험 견적과 관련하여 귀하의 개인(신용)정보를 수집 이용하고자 합니다. <br/><br/>
+                        2. 수집하는 개인정보 항목 및 수집방법<br/>
+                        ① 수집, 이용할 개인정보의 내용<br/>
+                        신청자의 성명, 휴대폰번호, 전자우편주소, 여행자보험 보험료 산출을 위한 가입대상자의 성별, 생년월일<br/>
+                        ② 수집방법 : 인터넷 홈페이지<br/><br/>
+                        3. 개인정보의 보유 및 이용기간<br/>
+                        수집/이용 목적을 달성할 때까지 보유 및 이용합니다.
+                      </p>
+                    </div>
+                  </section>
+                ) : (
+                  <>
+                    {/* 신청자 정보 */}
+                    <div style={{ marginBottom: '30px' }}>
+                      <p className="tour2023_title02" style={{ 
+                        fontSize: '22px', 
+                        fontWeight: 'bold', 
+                        color: '#333',
+                        marginBottom: '20px',
+                      }}>
+                        신청자 정보
+                      </p>
+                      <section className="tourGuard_Info">
+                        <div className="form-fields">
+                          {/* 이름 */}
+                          <div className="field-row">
+                            <div className="field-group">
+                              <label className="field-label">이름</label>
+                              <input
+                                type="text"
+                                className="field-input"
+                                value={contractorInfo.name}
+                                onChange={(e) => setContractorInfo({ ...contractorInfo, name: e.target.value })}
+                                placeholder="이름입력"
+                                maxLength={15}
+                              />
+                            </div>
+                          </div>
+                          
+                          {/* 휴대폰 번호 */}
+                          <div className="field-row">
+                            <div className="field-group">
+                              <label className="field-label">휴대폰 번호</label>
+                              <input
+                                type="text"
+                                className="field-input"
+                                value={contractorInfo.phone}
+                                onChange={(e) => {
+                                  const value = e.target.value.replace(/\D/g, '').slice(0, 11);
+                                  setContractorInfo({ ...contractorInfo, phone: value });
+                                }}
+                                placeholder="숫자만 입력해주세요."
+                                maxLength={11}
+                              />
+                            </div>
+                          </div>
+                          
+                          {/* 이메일 주소 */}
+                          <div className="field-row">
+                            <div className="field-group" style={{ flex: 1 }}>
+                              <label className="field-label">이메일 주소</label>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <input
+                                  type="text"
+                                  className="field-input"
+                                  value={contractorInfo.email1}
+                                  onChange={(e) => setContractorInfo({ ...contractorInfo, email1: e.target.value })}
+                                  placeholder="아이디"
+                                  maxLength={20}
+                                  style={{ flex: 1 }}
+                                />
+                                <span style={{ fontSize: '16px', color: '#999', flexShrink: 0 }}>@</span>
+                                <input
+                                  type="text"
+                                  className="field-input"
+                                  value={contractorInfo.email2}
+                                  onChange={(e) => setContractorInfo({ ...contractorInfo, email2: e.target.value })}
+                                  placeholder=""
+                                  maxLength={20}
+                                  style={{ flex: 1 }}
+                                />
+                                <select
+                                  className="field-input"
+                                  onChange={(e) => {
+                                    if (e.target.value) {
+                                      setContractorInfo({ ...contractorInfo, email2: e.target.value });
+                                    }
+                                  }}
+                                  style={{
+                                    flex: 1,
+                                    minWidth: '120px',
+                                    paddingRight: '24px',
+                                  }}
+                                >
+                                  <option value="">선택</option>
+                                  <option value="gmail.com">gmail.com</option>
+                                  <option value="naver.com">naver.com</option>
+                                  <option value="daum.net">daum.net</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </section>
+                    </div>
+
+                    {/* 피보험자 리스트 */}
+                    <div className="tourG_mat13" style={{ marginTop: '30px' }}>
+                      <p className="tour2023_title02" style={{ 
+                        fontSize: '22px', 
+                        fontWeight: 'bold', 
+                        color: '#333',
+                        marginBottom: '20px',
+                      }}>
+                        피보험자 리스트
+                      </p>
+                      <div>
+                        <table width="100%" cellPadding="0" cellSpacing="0" className="tour2023_estimate_ta" style={{
+                          width: '100%',
+                          borderCollapse: 'collapse',
+                          border: '1px solid #d8d8d8',
+                        }}>
+                          <tbody>
+                            <tr>
+                              <td className="tour2023_estimate_td01 tour2023_estimate_bg tour2023_estimate_w01" style={{
+                                padding: '12px 10px',
+                                border: '1px solid #d8d8d8',
+                                background: '#ecf3f9',
+                                textAlign: 'center',
+                                fontWeight: 'bold',
+                                fontSize: '16px',
+                                color: '#333',
+                                width: '15%',
+                              }}>
+                                순번
+                              </td>
+                              <td className="tour2023_estimate_td01 tour2023_estimate_bg tour2023_estimate_w02" style={{
+                                padding: '12px 10px',
+                                border: '1px solid #d8d8d8',
+                                background: '#ecf3f9',
+                                textAlign: 'center',
+                                fontWeight: 'bold',
+                                fontSize: '16px',
+                                color: '#333',
+                                width: '25%',
+                              }}>
+                                성별
+                              </td>
+                              <td className="tour2023_estimate_bg tour2023_estimate_w03" style={{
+                                padding: '12px 10px',
+                                border: '1px solid #d8d8d8',
+                                background: '#ecf3f9',
+                                textAlign: 'center',
+                                fontWeight: 'bold',
+                                fontSize: '16px',
+                                color: '#333',
+                                width: '60%',
+                              }}>
+                                생년월일(8자리)
+                              </td>
+                            </tr>
+                          </tbody>
+                          <tbody id="insured_list">
+                            {participants.map((participant, index) => (
+                              <tr key={participant.id}>
+                                <td className="tour2023_estimate_td01 tour2023_estimate_w01" style={{
+                                  padding: '12px 10px',
+                                  border: '1px solid #d8d8d8',
+                                  textAlign: 'center',
+                                  fontSize: '15px',
+                                  color: '#333',
+                                }}>
+                                  {index + 1}
+                                </td>
+                                <td className="tour2023_estimate_td01 tour2023_estimate_w02" style={{
+                                  padding: '12px 10px',
+                                  border: '1px solid #d8d8d8',
+                                }}>
+                                  <div className="tour2023_estimate_area" style={{ display: 'flex', justifyContent: 'center' }}>
+                                    <div className="tour2023_estimate_rdo01_w" style={{ display: 'flex', gap: '15px', flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
+                                      <span className="tour2023_estimate_rdo01">
+                                        <input
+                                          type="radio"
+                                          id={`gender_M_${participant.id}`}
+                                          value="남자"
+                                          name={`gender_${participant.id}`}
+                                          checked={participant.gender === '남자'}
+                                          onChange={(e) => handleParticipantChange(index, 'gender', e.target.value)}
+                                        />
+                                        <label htmlFor={`gender_M_${participant.id}`}>
+                                          남자
+                                        </label>
+                                      </span>
+                                      <span className="tour2023_estimate_rdo01">
+                                        <input
+                                          type="radio"
+                                          id={`gender_W_${participant.id}`}
+                                          value="여자"
+                                          name={`gender_${participant.id}`}
+                                          checked={participant.gender === '여자'}
+                                          onChange={(e) => handleParticipantChange(index, 'gender', e.target.value)}
+                                        />
+                                        <label htmlFor={`gender_W_${participant.id}`}>
+                                          여자
+                                        </label>
+                                      </span>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="tour2023_estimate_w03" style={{
+                                  padding: '12px 10px',
+                                  border: '1px solid #d8d8d8',
+                                }}>
+                                  <div className="tour2023_estimate_form_tt" style={{ textAlign: 'center' }}>
+                                    <input
+                                      type="text"
+                                      id={`birth_${participant.id}`}
+                                      name="birth"
+                                      value={participant.birthDate}
+                                      onChange={(e) => {
+                                        const value = e.target.value.replace(/\D/g, '').slice(0, 8);
+                                        handleParticipantChange(index, 'birthDate', value);
+                                      }}
+                                      maxLength={8}
+                                      placeholder="ex)19850505"
+                                      style={{
+                                        width: '100%',
+                                        padding: '8px',
+                                        border: '1px solid #ddd',
+                                        borderRadius: '6px',
+                                        fontSize: '15px',
+                                        textAlign: 'center',
+                                        boxSizing: 'border-box',
+                                      }}
+                                    />
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    
+                    {/* 엑셀로 등록하기 버튼 */}
+                    <div style={{
+                      textAlign: 'right',
+                      marginTop: '20px',
+                      marginBottom: '25px',
+                    }}>
+                      <button
+                        type="button"
+                        className="excel-upload-btn"
+                        onClick={() => setShowExcelModal(true)}
+                      >
+                        <img 
+                          src="/images/excel-icon.png" 
+                          alt="엑셀 아이콘" 
+                          className="excel-icon"
+                        />
+                        엑셀로 등록하기
+                      </button>
+                    </div>
+                    
+                    {/* 안내 문구 */}
+                    <div className="tour2023_txt01 tour2023_grey tourG_mleft04 tourG_mat06" style={{
+                      marginTop: '20px',
+                      marginBottom: '20px',
+                      fontSize: '14px',
+                      color: '#666',
+                      lineHeight: '1.6',
+                    }}>
+                      <ul className="tourGuard_inline" style={{ listStyle: 'none', padding: 0, margin: '10px 0' }}>
+                        <li className="tourGuard_inline_t01" style={{ display: 'inline', marginRight: '5px' }}>※</li>
+                        <li className="tourGuard_inline_t02" style={{ display: 'inline' }}>
+                          여행자보험 견적서는 메일로 발송됩니다.
+                        </li>
+                      </ul>
+                      <ul className="tourGuard_inline tourG_mat22" style={{ listStyle: 'none', padding: 0, margin: '10px 0' }}>
+                        <li className="tourGuard_inline_t01" style={{ display: 'inline', marginRight: '5px' }}>※</li>
+                        <li className="tourGuard_inline_t02" style={{ display: 'inline' }}>
+                          메일에 첨부된<span className="tour2023_blue" style={{ color: '#1b37e1', fontWeight: 'bold' }}>견적서 출력하기</span>를 클릭하시면 견적서를 인쇄하여 사용하실 수 있습니다.
+                        </li>
+                      </ul>
+                    </div>
+                  </>
+                )}
+
+                <section className="tour2023_btn_ww">
+                  <div className={`${showParticipantList ? 'tourG_mat12' : 'tourG_mat04'} tour2023_btn_ww01`}>
+                    <a href="#" onClick={(e) => { e.preventDefault(); handleBeforeStep(); }} className="tourGuard_btn_b tour2023_btn06_gray01">
+                      {showParticipantList ? '이전단계' : '처음으로'}
+                    </a>
+                  </div>
+                  <div className={`${showParticipantList ? 'tourG_mat12' : 'tourG_mat04'} tourG_mab02 tour2023_btn_ww02`}>
+                    <a 
+                      href="#" 
+                      onClick={(e) => { 
+                        e.preventDefault(); 
+                        if (!isSubmitting) {
+                          handleNextStep(); 
+                        }
+                      }} 
+                      className="tourGuard_btn_b tour2023_btn01"
+                      style={isSubmitting ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
+                    >
+                      {isSubmitting ? '처리 중...' : (showParticipantList ? '견적신청' : '다음단계')}
+                    </a>
+                  </div>
+                </section>
+              </div>
+
+              <input type="hidden" name="product_cd" value={productCd} />
+              <input type="hidden" name="start_year" value={startDate.split('-')[0]} />
+              <input type="hidden" name="start_month" value={startDate.split('-')[1]} />
+              <input type="hidden" name="start_day" value={startDate.split('-')[2]} />
+              <input type="hidden" name="start_date" value={startDate} />
+              <input type="hidden" name="start_hour" value={startHour} />
+              <input type="hidden" name="end_year" value={endDate.split('-')[0]} />
+              <input type="hidden" name="end_month" value={endDate.split('-')[1]} />
+              <input type="hidden" name="end_day" value={endDate.split('-')[2]} />
+              <input type="hidden" name="end_date" value={endDate} />
+              <input type="hidden" name="end_hour" value={endHour} />
+              <input type="hidden" name="tour_num" value={tourNum} />
+              <input type="hidden" name="tour_day" value={tourDay} />
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+
+      {/* 서비스 전체보기 모달 */}
+      <ServiceModal 
+        isOpen={showServiceModal} 
+        onClose={() => setShowServiceModal(false)} 
+      />
+      
+      {/* 무사고캐시 모달 */}
+      <AccidentFreeCashModal
+        isOpen={showCashModal}
+        onClose={() => setShowCashModal(false)}
+      />
+
+      {/* 엑셀 등록 모달 */}
+      <ExcelUploadModal
+        isOpen={showExcelModal}
+        onClose={() => setShowExcelModal(false)}
+        onUpload={(newParticipants, startId) => {
+          // 기존 참가자 목록을 새로 파싱된 참가자들로 교체
+          // 엑셀 파일에는 모든 피보험자가 포함되어 있으므로 전체 교체
+          const participantsWithCorrectIds = newParticipants.map((p, index) => ({
+            id: index + 1,
+            gender: p.gender as '남자' | '여자',
+            birthDate: p.birthDate,
+          }));
+          
+          setParticipants(participantsWithCorrectIds);
+          setShowExcelModal(false);
+        }}
+        currentParticipants={participants.map(p => ({
+          id: p.id,
+          name: '', // 피보험자 리스트에는 이름이 없음
+          nationality: '내국인' as const,
+          birthDate: p.birthDate,
+          gender: p.gender,
+          email1: '',
+          email2: '',
+          phone: '',
+          isVerified: false,
+        }))}
+      />
+
+      {/* 견적 신청 완료 모달 */}
+      <EstimateCompletionModal
+        isOpen={showCompletionModal}
+        onClose={() => {
+          setShowCompletionModal(false);
+          router.push('/estimate/step1');
+        }}
+      />
+    </div>
+  );
+}
+
