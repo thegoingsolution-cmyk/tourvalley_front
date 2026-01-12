@@ -1,0 +1,294 @@
+/* 해외여행자보험 스텝 페이지 스타일 - test.css 기반 완전 동일 적용 */
+/* 모든 스타일을 .overseas-step-page-mobile 안에 스코핑하여 CSS 충돌 방지 */
+
+.overseas-step-page-mobile {
+  min-height: 100vh;
+  background-color: #fff;
+}
+
+.overseas-step-page-mobile .main-content-mobile {
+  background-color: #fff;
+}
+
+/* 기본 간격 스타일 */
+.overseas-step-page-mobile .prow_01 {
+  padding: 0 3.5%;
+}
+
+.overseas-step-page-mobile .prow_02 {
+  padding: 0 5%;
+}
+
+.overseas-step-page-mobile .ptb20 {
+  padding: 20px 0;
+}
+
+.overseas-step-page-mobile .bgcolor_white {
+  background-color: #fff;
+}
+
+/* 마진 스타일 */
+.overseas-step-page-mobile .tourG_mat16 {
+  margin-top: 75px;
+}
+
+.overseas-step-page-mobile .tourG_mat17 {
+  margin-top: 160px;
+}
+
+.overseas-step-page-mobile .tourG_mab04 {
+  margin-bottom: 15px !important;
+}
+
+.overseas-step-page-mobile .tourG_mab05 {
+  margin-bottom: 20px;
+}
+
+/* 투어 2023 인트로 - test.css 원본 그대로 */
+.overseas-step-page-mobile .tour2023_intro_Wrap {
+  display: block;
+  background: transparent;
+  position: relative;
+}
+
+.overseas-step-page-mobile .tour2023_intro {
+  position: relative;
+  display: block;
+  text-align: center;
+}
+
+.overseas-step-page-mobile .tour2023_intro_w {
+  position: relative;
+  display: block;
+  width: 305px;
+  border-radius: 15px;
+  box-sizing: border-box;
+  text-align: center;
+  margin: 0 auto;
+  padding-top: 50px;
+  padding-bottom: 40px;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.overseas-step-page-mobile .tour2023_intro_txt05 {
+  font-family: 'NanumSquareNeoTTF-dEb';
+  font-size: 26px;
+  color: #202020;
+  letter-spacing: -1.5px;
+  line-height: 140%;
+  text-align: center;
+  margin-left: 3px;
+}
+
+.overseas-step-page-mobile .tour2023_intro_txt06 {
+  font-family: 'NanumSquareNeoTTF-bRg';
+  font-size: 16px;
+  color: #000;
+  letter-spacing: -1px;
+  line-height: 130%;
+  text-align: center;
+}
+
+.overseas-step-page-mobile .tour2023_intro_txt07 {
+  font-family: 'NanumSquareNeoTTF-dEb';
+  font-size: 25px;
+  color: #fff;
+  letter-spacing: -0.8px;
+  line-height: 125%;
+  text-align: center;
+}
+
+.overseas-step-page-mobile .tour2023_intro_txt08 {
+  font-family: 'NanumSquareNeoTTF-bRg';
+  font-size: 15px;
+  color: #fff;
+  letter-spacing: -0.5px;
+  line-height: 140%;
+  text-align: center;
+}
+
+.overseas-step-page-mobile .tour2023_intro_txt09 {
+  font-family: 'NanumSquareNeoTTF-bRg';
+  font-size: 13px;
+  color: #666666;
+  letter-spacing: -0.2px;
+  line-height: 140%;
+  text-align: center;
+}
+
+.overseas-step-page-mobile .tour2023_intro_txt10 {
+  font-size: 14px;
+  color: #808080;
+  text-align: center;
+  line-height: 135%;
+  letter-spacing: -0.5px;
+}
+
+/* 박스 래퍼 */
+.overseas-step-page-mobile .tour2023_intro_BWrap {
+  position: relative;
+  display: inline-flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.overseas-step-page-mobile .tour2023_intro_BWrap > a {
+  text-decoration: none;
+}
+
+/* 단기여행 박스 - test.css 원본 */
+.overseas-step-page-mobile .tour2023_intro_box02 {
+  position: relative;
+  display: inline-block;
+  width: 147px;
+  height: 175px;
+  border-radius: 18px;
+  box-sizing: border-box;
+  padding: 20px 20px 20px 20px;
+  background-image: linear-gradient(319deg, #ff8e52 30%, #fa7129 85%);
+}
+
+/* 장기여행 박스 - test.css 원본 */
+.overseas-step-page-mobile .tour2023_intro_box03 {
+  position: relative;
+  width: 147px;
+  height: 175px;
+  border-radius: 18px;
+  box-sizing: border-box;
+  padding: 20px 20px 20px 20px;
+  background-image: linear-gradient(319deg, #5b6cd3 30%, #3e50bb 85%);
+}
+
+/* 아이콘 - 실제 프로젝트 경로로 수정 */
+.overseas-step-page-mobile .tour2023_intro_box02 .icon_01 {
+  position: absolute;
+  right: 43px;
+  top: 35px;
+  width: 60px;
+  height: 45px;
+}
+
+.overseas-step-page-mobile .icon_01 {
+  display: block;
+  background: url(/icons/icon_01.png) no-repeat center center;
+  background-size: contain;
+}
+
+.overseas-step-page-mobile .tour2023_intro_box03 .icon_02 {
+  position: absolute;
+  right: 43px;
+  top: 35px;
+  width: 60px;
+  height: 45px;
+}
+
+.overseas-step-page-mobile .icon_02 {
+  display: block;
+  background: url(/icons/icon_02.png) no-repeat center center;
+  background-size: contain;
+}
+
+/* link_more 아이콘 - images 폴더에서 가져오기 */
+.overseas-step-page-mobile .link_more {
+  display: block;
+  background: url(/images/link_more.png) no-repeat center center;
+  background-size: 50%;
+}
+
+/* 말풍선 - test.css 원본 */
+.overseas-step-page-mobile .tour2023_intro_box03 .intro_bubble {
+  position: absolute;
+  display: block;
+  top: 192px;
+  right: 11px;
+}
+
+.overseas-step-page-mobile .intro_bubble01 {
+  position: relative;
+  display: block;
+  background: #ededed;
+  height: 83px;
+  width: 125px;
+  padding: 14px 10px 8px 10px;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.overseas-step-page-mobile .intro_bubble01:after {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform: translate(-50%, -50%);
+  border-bottom: 12px solid #ededed;
+  border-left: 9px solid #ff000000;
+  border-right: 9px solid transparent;
+}
+
+/* 버튼 스타일 - test.css 원본 */
+.overseas-step-page-mobile .tourGuard_btn_b {
+  display: block;
+  text-decoration: none;
+}
+
+.overseas-step-page-mobile .tour2023_btn {
+  font-size: 20px;
+  padding-top: 15px;
+  letter-spacing: -1px;
+  height: 58px;
+  background-color: #fff;
+  border-radius: 9px;
+  box-sizing: border-box;
+  color: #1b37e1 !important;
+  text-align: center;
+  border: 1px solid #4961f0;
+  display: block;
+  width: 100%;
+  cursor: pointer;
+}
+
+/* 화살표 - test.css 기반 */
+.overseas-step-page-mobile .tour2023_arr {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid #1b37e1;
+  border-right: 2px solid #1b37e1;
+  transform: rotate(45deg);
+  margin-left: 5px;
+  position: relative;
+  top: -2px;
+  vertical-align: middle;
+}
+
+/* 블루 텍스트 */
+.overseas-step-page-mobile .tour2023_blue {
+  color: #1b37e1 !important;
+}
+
+/* 그레이 텍스트 */
+.overseas-step-page-mobile .tour2023_grey {
+  color: #a5a5a5;
+}
+
+/* 심의번호 영역 - overseas/m/page.css와 동일 */
+.overseas-step-page-mobile .tour2023_txt02 {
+  font-size: 9px;
+  color: #666;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.overseas-step-page-mobile .essential_Wrap {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.overseas-step-page-mobile .essential_Wrap .tour2023_txt02 {
+  display: block;
+  padding: 0 10px;
+  box-sizing: border-box;
+}

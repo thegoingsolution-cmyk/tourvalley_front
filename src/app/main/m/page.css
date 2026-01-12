@@ -1,234 +1,747 @@
+/* Margin utilities */
+.tourG_mat02 {
+    margin-top: 10px !important;
+}
+
+.tourG_mat03 {
+    margin-top: 25px;
+}
+
+.tourG_mat04 {
+    margin-top: 20px !important;
+}
+
+.tourG_mat05 {
+    margin-top: 25px;
+}
+
+.tourG_mat06 {
+    margin-top: 15px !important;
+}
+
+.tourG_mat07 {
+    margin-top: 10px;
+}
+
+.tourG_mat08 {
+    margin-top: 8px;
+}
+
+.tourG_mat09 {
+    margin-top: 25px;
+}
+
+.tourG_mat10 {
+    margin-top: 35px;
+}
+
+.tourG_mat11 {
+    margin-top: 45px;
+}
+
+.tourG_mat12 {
+    margin-top: 30px;
+}
+
+.tourG_mat13 {
+    margin-top: 40px !important;
+}
+
+.tourG_mat14 {
+    margin-top: 50px !important;
+}
+
+.tourG_mat15 {
+    margin-top: 18px;
+}
+
+.tourG_mat16 {
+    margin-top: 75px;
+}
+
+.tourG_mat17 {
+    margin-top: 160px;
+}
+
+.tourG_mat18 {
+    margin-top: 100px;
+}
+
+.tourG_mat19 {
+    margin-top: 8px;
+}
+
+.tourG_mat20 {
+    margin-top: 120px;
+}
+
+.tourG_mat21 {
+    margin-top: 2px;
+}
+
+.tourG_mat22 {
+    margin-top: 5px;
+}
+
+.tourG_mat23 {
+    margin-top: 160px;
+}
+
+.tourG_mat24 {
+    margin-top: 10px;
+}
+
+.tourG_mat25 {
+    margin-top: 65px;
+}
+
+.tourG_mat26 {
+    margin-top: 40px !important;
+}
+
+.tourG_mat27 {
+    margin-top: 11px;
+}
+
+/* Margin bottom utilities */
+.tourG_mab01 {
+    margin-bottom: 25px;
+}
+
+.tourG_mab02 {
+    margin-bottom: 35px;
+}
+
+.tourG_mab03 {
+    margin-bottom: 10px !important;
+}
+
+.tourG_mab04 {
+    margin-bottom: 15px !important;
+}
+
+.tourG_mab05 {
+    margin-bottom: 20px !important;
+}
+
+/* tour2023_intro_txt01과 함께 사용될 때 적용되도록 */
+.tour2023_intro_txt01.tourG_mab05 {
+    margin-bottom: 20px !important;
+}
+
+.tourG_mab06 {
+    margin-bottom: 80px;
+}
+
+.tourG_mab07 {
+    margin-bottom: 7px;
+}
+
+.tourG_mab08 {
+    margin-bottom: 30px;
+}
+
+.tourG_mab09 {
+    margin-bottom: 5px;
+}
+
+.tourG_mab10 {
+    margin-bottom: 45px;
+}
+
+.tourG_mab11 {
+    margin-bottom: 60px;
+}
+
+.tourG_mab12 {
+    margin-bottom: 50px;
+}
+
+.tourG_mab13 {
+    margin-bottom: 70px;
+}
+
+.tourG_mab14 {
+    margin-bottom: 3px;
+}
+
+.tourG_mab15 {
+    margin-bottom: 40px;
+}
+
+/* Line utilities */
+.tourG_line05 {
+    border-top: 1px solid #dde1e5;
+}
+
+/* Padding utilities */
+.prow_01 {
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+/* 다른 페이지의 전역 CSS 충돌 방지 - 더 구체적인 셀렉터 사용 */
+.main-page-mobile .prow_02 {
+    box-sizing: border-box;
+    padding: 0 !important;
+}
+
+.ptb20 {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.ptb2070 {
+    padding-top: 20px;
+    padding-bottom: 70px;
+}
+
+/* Main page mobile */
 .main-page-mobile {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
 }
 
 .main-content-mobile {
-  flex: 1;
-  width: 100%;
-  padding: 1.5rem 2rem;
+    flex: 1;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
-/* Title Section */
-.title-section {
-  margin-bottom: 2rem;
+/* Intro section */
+.tour2023_intro_Wrap {
+    display: block;
+    background: transparent;
+    z-index: 1000;
+    position: relative;
 }
 
-.main-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #000;
-  line-height: 1.4;
+.tour2023_intro {
+    position: relative;
+    display: block;
+    text-align: center;
 }
 
-.highlight {
-  font-weight: 900;
-  color: #000;
-  font-size: 1.8rem;
+.tour2023_intro_w {
+    position: relative;
+    display: block;
+    width: 305px;
+    max-width: 100%;
+    border-radius: 15px;
+    box-sizing: border-box;
+    text-align: center;
+    margin: 0 auto;
+    padding-top: 50px;
+    padding-bottom: 40px;
 }
 
-/* Primary Cards */
-.primary-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+/* Text styles */
+.tour2023_intro_txt {
+    font-family: 'NanumSquareNeoTTF-bRg', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 22px;
+    color: #f15605;
+    letter-spacing: -1.2px;
+    line-height: 160%;
+    text-align: left;
+    margin-left: 3px;
+    margin: 0;
 }
 
-.primary-card {
-  border-radius: 12px;
-  padding: 1.5rem;
-  min-height: 100px;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+.tour2023_intro_txt01 {
+    font-family: 'NanumSquareNeoTTF-bRg', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 26px;
+    color: #202020;
+    letter-spacing: -2.4px;
+    line-height: 120%;
+    text-align: left;
+    margin-left: 3px;
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
 }
 
-.primary-card:active {
-  transform: scale(0.98);
+.tour2023_intro_txt02 {
+    font-family: 'NanumSquareNeoTTF-eHv', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 26px;
+    color: #202020;
+    letter-spacing: -2px;
 }
 
-.primary-card-content {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.tour2023_intro_txt03 {
+    font-family: 'NanumSquareNeoTTF-dEb', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 28px;
+    color: #fff;
+    letter-spacing: -0.1px;
+    line-height: 125%;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    position: relative;
+    display: inline-block;
 }
 
-.primary-card-text {
-  flex: 1;
-  text-align: center;
-  min-width: 0;
-  overflow: hidden;
+.tour2023_intro_box .tour2023_intro_txt03,
+.tour2023_intro_box01 .tour2023_intro_txt03 {
+    display: block;
+    text-align: center !important;
 }
 
-.primary-card-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 0.5rem;
-  text-align: center;
-  position: relative;
+.tour2023_intro_box06 .tour2023_intro_txt03 {
+    display: block;
+    text-align: center;
 }
 
-.title-arrow {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
+.tour2023_intro_txt04 {
+    font-family: 'NanumSquareNeoTTF-bRg', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    color: #000;
+    letter-spacing: -1px;
+    line-height: 130%;
+    text-align: left;
 }
 
-.primary-card-subtitle {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.9);
-  line-height: 1.4;
+.tour2023_intro_txt12 {
+    font-family: 'NanumSquareNeoTTF-bRg', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 13px;
+    color: #656565;
+    letter-spacing: -1px;
+    line-height: 138%;
+    text-align: left;
+    margin: 0;
 }
 
-.scrolling-text-wrapper .primary-card-subtitle {
-  color: #000;
-  text-align: center;
-  margin: 0;
-  padding: 0.5rem 1rem;
+.tour2023_intro_txt13 {
+    font-family: 'NanumSquareNeoTTF-cBd', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 21px;
+    color: #3c3b3b;
+    letter-spacing: -1.4px;
+    line-height: 100%;
+    text-align: left;
+    margin: 0;
 }
 
-/* Scrolling Text Animation */
-.scrolling-text-wrapper {
-  background: #fff;
-  border-radius: 8px;
-  padding: 1rem 0;
-  margin-top: 2rem;
-  overflow: hidden;
-  white-space: nowrap;
-  position: relative;
-  display: flex;
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
+.tour2023_intro_txt14 {
+    font-family: 'NanumSquareNeoTTF-dEb', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 25px;
+    color: #fff;
+    letter-spacing: -0.8px;
+    line-height: 125%;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    position: relative;
+    display: inline-block;
 }
 
-.scrolling-text {
-  display: inline-block;
-  color: #000;
-  font-size: 0.85rem;
-  white-space: nowrap;
-  padding: 0 2rem;
-  flex-shrink: 0;
-  animation: scroll-left 30s linear infinite;
+.tour2023_intro_box06 .tour2023_intro_txt14 {
+    display: block;
+    text-align: center !important;
 }
 
-.scrolling-text:nth-child(2) {
-  animation: scroll-left 30s linear infinite;
+/* Box styles */
+.tour2023_intro_box {
+    position: relative;
+    width: 100%;
+    height: 175px;
+    border-radius: 18px;
+    box-sizing: border-box;
+    padding: 20px;
+    background-image: linear-gradient(319deg, #ff8e52 30%, #fa7129 85%);
 }
 
-@keyframes scroll-left {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
+.tour2023_intro_box01 {
+    position: relative;
+    width: 100%;
+    height: 175px;
+    border-radius: 18px;
+    box-sizing: border-box;
+    padding: 20px;
+    background-image: linear-gradient(319deg, #5b6cd3 30%, #3e50bb 85%);
 }
 
-.primary-card-arrow {
-  font-size: 1.5rem;
-  color: #fff;
-  font-weight: 300;
+.tour2023_intro_box05 {
+    position: relative;
+    width: 100%;
+    height: 97px;
+    border-radius: 18px;
+    box-sizing: border-box;
+    padding: 21px 17px 20px 21px;
+    border: 1px solid #d0d0d0;
+    background-color: #fff;
 }
 
-/* Overseas Card */
-.overseas-card {
-  background: linear-gradient(135deg, #ff8a50 0%, #ff6b35 100%);
+.tour2023_intro_box06 {
+    position: relative;
+    width: 100%;
+    height: 175px;
+    border-radius: 18px;
+    box-sizing: border-box;
+    padding: 20px;
+    background-image: linear-gradient(319deg, #ffcf10 30%, #ffae13 85%);
 }
 
-/* Domestic Card */
-.domestic-card {
-  background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+.tour2023_intro_box_s {
+    position: relative;
+    width: 100%;
+    height: 40px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    padding: 10px 10px 10px 12px;
+    background-color: #fff;
+    text-align: left;
+    overflow: hidden;
 }
 
-/* Cash Card */
-.cash-card {
-  background: linear-gradient(135deg, #ffd93d 0%, #ffb347 100%);
+/* 텍스트와 아이콘 수직 정렬 조정 */
+.tour2023_intro_box p.tour2023_intro_txt03.tourG_mat09,
+.tour2023_intro_box01 p.tour2023_intro_txt03.tourG_mat09 {
+    margin-top: 25px;
+    margin-bottom: 0;
+    padding: 0;
+    line-height: 125%;
+    height: auto;
 }
 
-/* Secondary Cards */
-.secondary-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  padding-top: 2rem;
-  border-top: 1px solid #e0e0e0;
+.tour2023_intro_box06 p.tour2023_intro_txt14.tourG_mat09 {
+    margin-top: 25px;
+    margin-bottom: 0;
+    padding: 0;
+    line-height: 125%;
+    height: auto;
 }
 
-.secondary-card {
-  background: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  padding: 1.25rem;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+/* Link more styles - 텍스트 중앙과 아이콘 중앙 정렬 */
+.tour2023_intro_box .link_more,
+.tour2023_intro_box01 .link_more {
+    position: absolute;
+    right: 20px;
+    top: 48.5px; /* 텍스트 상단(45px) + 텍스트 높이의 절반(17.5px) - 아이콘 높이의 절반(14px) = 48.5px */
+    width: 26px;
+    height: 28px;
+    display: block;
+    background: url(/images/link_more.png) no-repeat center center;
+    background-size: 50%;
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+    border: 0;
 }
 
-.secondary-card:active {
-  transform: scale(0.98);
+.tour2023_intro_box06 .link_more {
+    position: absolute;
+    right: 20px;
+    top: 48.5px;
+    width: 26px;
+    height: 28px;
+    display: block;
+    background: url(/images/link_more.png) no-repeat center center;
+    background-size: 50%;
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+    border: 0;
 }
 
-.secondary-card-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+.tour2023_intro_box p.link_more,
+.tour2023_intro_box01 p.link_more,
+.tour2023_intro_box06 p.link_more {
+    margin: 0;
+    padding: 0;
+    border: 0;
 }
 
-.secondary-card-text-wrapper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  min-width: 0;
+.tour2023_intro_box05 .link_more01 {
+    position: absolute;
+    right: 11px;
+    top: 40px;
+    width: 16px;
+    height: 16px;
+    display: block;
+    background: url(/images/link_more.png) no-repeat center center;
+    background-size: 50%;
 }
 
-.secondary-card-top-text {
-  font-size: 13px;
-  color: #666;
-  line-height: 1.4;
-  margin: 0;
+.link_more {
+    display: block;
+    background: url(/images/link_more.png) no-repeat center center;
+    background-size: 50%;
 }
 
-.secondary-card-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: #3c3b3b;
-  margin: 0;
+.link_more01 {
+    display: block;
+    background: url(/images/link_more.png) no-repeat center center;
+    background-size: 50%;
 }
 
-.secondary-card-arrow {
-  width: 16px;
-  height: 16px;
-  object-fit: contain;
-  flex-shrink: 0;
-  filter: brightness(0) saturate(100%) invert(50%);
+/* Marquee styles */
+.tour2023_intro_box_s marquee {
+    width: 100%;
+    height: 100%;
+    line-height: 20px;
 }
 
-/* Disclaimer Section */
-.disclaimer-section {
-  margin-top: 2rem;
-  padding: 1rem 0;
-  margin-left: -1.5rem;
-  margin-right: -1.5rem;
+.tour2023_intro_box_s marquee span {
+    display: inline-block;
 }
 
-.disclaimer-text {
-  font-size: 11px;
-  color: #666;
-  line-height: 1.6;
-  margin-bottom: 0.5rem;
-  text-align: center;
+/* Links */
+.tour2023_intro_w > a {
+    display: block;
+    text-decoration: none;
+    color: inherit;
 }
 
+.tour2023_intro_w > a:active {
+    opacity: 0.95;
+}
+
+/* Disclaimer section */
+.bgcolor_white {
+    background-color: #fff;
+}
+
+.essential_Wrap {
+    padding: 20px 0;
+    box-sizing: border-box;
+}
+
+.tour2023_txt02 {
+    font-size: 9px;
+    color: #666;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.essential_Wrap .tour2023_txt02 {
+    display: block;
+    padding: 0 10px;
+    box-sizing: border-box;
+}
+
+.tour2023_grey {
+    color: #808181;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 375px) {
+    .tour2023_intro_w {
+        width: calc(100% - 40px);
+        padding-top: 40px;
+        padding-bottom: 30px;
+    }
+
+    .tour2023_intro_txt {
+        font-size: 20px;
+    }
+
+    .tour2023_intro_txt01 {
+        font-size: 24px;
+    }
+
+    .tour2023_intro_txt02 {
+        font-size: 24px;
+    }
+
+    .tour2023_intro_txt03 {
+        font-size: 26px;
+    }
+
+    .tour2023_intro_txt14 {
+        font-size: 23px;
+    }
+}
+
+/* ======================================== 
+   Accident Free Cash Modal Styles
+   ======================================== */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.modal-content {
+    background: #fff;
+    border-radius: 12px;
+    max-width: 400px;
+    width: 85%;
+    max-height: 75vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+}
+
+.tour2023_pcBox_top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e0e0e0;
+    flex-shrink: 0;
+}
+
+.tour2023_pcBox_top .close {
+    font-size: 24px;
+    color: #999;
+    text-decoration: none;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    background: none;
+    border: none;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.tour2023_pcBox_top .close:hover {
+    color: #333;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 32px;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    color: #333;
+}
+
+.tour2023_pcBox_tit {
+    font-family: 'NanumSquareNeoTTF-cBd';
+    font-size: 15px;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.tour2023_pcBox_txt03 {
+    padding: 18px 16px;
+    text-align: center;
+}
+
+.tour2023_pcBox_txt01 {
+    font-family: 'NanumSquareNeoTTF-cBd';
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 4px 0;
+}
+
+.tour2023_pcBox_txt02 {
+    font-size: 14px;
+    color: #666;
+    margin: 0 0 12px 0;
+}
+
+.tour2023_pcBox_txt03_content {
+    font-size: 13px;
+    color: #333;
+    line-height: 1.5;
+    margin: 12px 0;
+}
+
+.tour2023_pcBox_txt04 {
+    font-size: 12px;
+    color: #999;
+    margin: 6px 0 12px 0;
+}
+
+.tour2023PC_cash_icon {
+    margin: 12px 0;
+}
+
+.cash_icon_pc {
+    max-width: 100px;
+    height: auto;
+}
+
+.btn_b {
+    display: inline-block;
+    text-decoration: none;
+}
+
+.tour2023PC_btn01 {
+    display: inline-block;
+    background: #ffe500;
+    color: #333 !important;
+    font-family: 'NanumSquareNeoTTF-cBd';
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    margin-top: 6px;
+}
+
+.tour2023PC_btn01:hover {
+    background: #ffd700;
+}
+
+.tour2023PC_bg01 {
+    background: #f5f5f5;
+    padding: 16px;
+}
+
+.tour2023PC_txt01 {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.4;
+}
+
+.tour2023PC_cash_info {
+    display: flex;
+    margin-bottom: 8px;
+    list-style: none;
+    padding: 0;
+    line-height: 1.5;
+}
+
+.tour2023PC_cash_info:last-child {
+    margin-bottom: 0;
+}
+
+.tour2023PC_cash_info_w {
+    min-width: 20px;
+    flex-shrink: 0;
+    font-weight: 500;
+    font-size: 12px;
+}
+
+.tour2023PC_cash_info li:last-child {
+    flex: 1;
+    font-size: 12px;
+}

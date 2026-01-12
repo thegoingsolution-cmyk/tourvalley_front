@@ -142,12 +142,12 @@
 
 .estimate-completion-modal-content .tourG_mab12 {
   margin-bottom: 60px;
+  text-align: center;
 }
 
 .estimate-completion-modal-content .tourGuard_btn_b {
   display: inline-block;
-  width: 100%;
-  max-width: 200px;
+  width: 200px;
   padding: 18px;
   background: #1b37e1;
   color: #fff;

@@ -1,0 +1,814 @@
+/* ========================================
+   Payment Success Page Styles - Mobile
+   ======================================== */
+
+/* 최상위 컨테이너 */
+.payment-success-mobile {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  overflow: visible;
+}
+
+/* Main 컨텐츠 영역 */
+.payment-success-mobile .payment-success-content {
+  flex: 1;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
+  min-height: auto;
+  overflow: visible;
+  max-height: none;
+  height: auto;
+  background: #fff;
+}
+
+/* main 태그 직접 스타일 */
+.payment-success-mobile main {
+  flex: 1;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
+  min-height: auto;
+  overflow: visible;
+  max-height: none;
+  height: auto;
+  background: #fff;
+}
+
+/* ========================================
+   Form Section - 폼 컨테이너
+   ======================================== */
+
+.payment-success-mobile .form-section {
+  position: relative;
+  z-index: 100;
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 0;
+  overflow: visible;
+  padding: 0;
+}
+
+.payment-success-mobile .form-container {
+  width: 100%;
+  overflow: visible;
+}
+
+.payment-success-mobile .form-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  padding-bottom: 30px;
+  box-shadow: none;
+  overflow: visible;
+  min-height: 0;
+  max-height: none;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 101;
+  isolation: isolate;
+}
+
+/* ========================================
+   Completion Section - 완료 섹션
+   ======================================== */
+
+.payment-success-mobile .completion-section {
+  text-align: center;
+  padding: 30px 0;
+}
+
+.payment-success-mobile .completion-icon {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 20px;
+  background: #4CAF50;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42px;
+  font-weight: 700;
+}
+
+.payment-success-mobile .completion-message {
+  font-size: 22px;
+  color: #333;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.payment-success-mobile .completion-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.payment-success-mobile .completion-submessage {
+  font-size: 16px;
+  color: #999;
+  margin-bottom: 24px;
+}
+
+.payment-success-mobile .view-details-btn {
+  padding: 12px 24px;
+  background: #fff;
+  border: 2px solid #2843e5;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #2843e5;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.payment-success-mobile .view-details-btn:hover {
+  background: #f0f4ff;
+}
+
+/* ========================================
+   Accident Free Cash Promo - 무사고캐시 프로모션
+   ======================================== */
+
+.payment-success-mobile .accident-free-cash-promo {
+  margin: 30px 0;
+  padding: 28px 20px;
+  background: #fff9e6;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.payment-success-mobile .promo-title {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.payment-success-mobile .promo-subtitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2843e5;
+  margin-bottom: 14px;
+}
+
+.payment-success-mobile .promo-description {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.payment-success-mobile .promo-illustration {
+  margin: 18px 0;
+}
+
+.payment-success-mobile .promo-illustration img {
+  max-width: 100px;
+  height: auto;
+}
+
+.payment-success-mobile .piggy-bank-placeholder {
+  font-size: 44px;
+}
+
+.payment-success-mobile .promo-info-btn {
+  padding: 10px 20px;
+  background: #ffd700;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.payment-success-mobile .promo-info-btn:hover {
+  background: #ffed4e;
+}
+
+/* ========================================
+   Completion Notes - 완료 안내사항
+   ======================================== */
+
+.payment-success-mobile .completion-notes {
+  margin: 30px 0;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  text-align: left;
+}
+
+.payment-success-mobile .completion-notes h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.payment-success-mobile .completion-notes ul {
+  list-style: disc;
+  padding-left: 20px;
+  margin: 0;
+}
+
+.payment-success-mobile .completion-notes li {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+/* ========================================
+   Completion Next Button - 다음 버튼
+   ======================================== */
+
+.payment-success-mobile .completion-next-btn {
+  width: 100%;
+  padding: 16px;
+  background: #2843e5;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background 0.2s;
+}
+
+.payment-success-mobile .completion-next-btn:hover {
+  background: #1e33c4;
+}
+
+/* ========================================
+   Global Styles (클래스 없이도 작동하도록)
+   ======================================== */
+
+.form-section {
+  position: relative;
+  z-index: 100;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  overflow: visible;
+  padding: 0;
+}
+
+.form-container {
+  width: 100%;
+  overflow: visible;
+}
+
+.form-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  padding-bottom: 30px;
+  box-shadow: none;
+  overflow: visible;
+  min-height: 0;
+  max-height: none;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 101;
+  isolation: isolate;
+}
+
+.completion-section {
+  text-align: center;
+  padding: 30px 0;
+}
+
+.completion-icon {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 20px;
+  background: #4CAF50;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42px;
+  font-weight: 700;
+}
+
+.completion-message {
+  font-size: 22px;
+  color: #333;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.completion-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.completion-submessage {
+  font-size: 16px;
+  color: #999;
+  margin-bottom: 24px;
+}
+
+.view-details-btn {
+  padding: 12px 24px;
+  background: #fff;
+  border: 2px solid #2843e5;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #2843e5;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.view-details-btn:hover {
+  background: #f0f4ff;
+}
+
+.accident-free-cash-promo {
+  margin: 30px 0;
+  padding: 28px 20px;
+  background: #fff9e6;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.promo-title {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.promo-subtitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2843e5;
+  margin-bottom: 14px;
+}
+
+.promo-description {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.promo-illustration {
+  margin: 18px 0;
+}
+
+.promo-illustration img {
+  max-width: 100px;
+  height: auto;
+}
+
+.piggy-bank-placeholder {
+  font-size: 44px;
+}
+
+.promo-info-btn {
+  padding: 10px 20px;
+  background: #ffd700;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.promo-info-btn:hover {
+  background: #ffed4e;
+}
+
+.completion-notes {
+  margin: 30px 0;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  text-align: left;
+}
+
+.completion-notes h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.completion-notes ul {
+  list-style: disc;
+  padding-left: 20px;
+  margin: 0;
+}
+
+.completion-notes li {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+.completion-next-btn {
+  width: 100%;
+  padding: 16px;
+  background: #2843e5;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background 0.2s;
+}
+
+.completion-next-btn:hover {
+  background: #1e33c4;
+}
+
+/* ========================================
+   Modal Base Styles - Mobile
+   ======================================== */
+
+.payment-success-mobile .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.payment-success-mobile .modal-content {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 85%;
+  max-height: 75vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* ========================================
+   Accident Free Cash Modal Styles - Mobile
+   ======================================== */
+
+.payment-success-mobile .tour2023_pcBox_top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e0e0e0;
+  flex-shrink: 0;
+}
+
+.payment-success-mobile .tour2023_pcBox_top .close {
+  font-size: 24px;
+  color: #999;
+  text-decoration: none;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  background: none;
+  border: none;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.payment-success-mobile .tour2023_pcBox_top .close:hover {
+  color: #333;
+}
+
+.payment-success-mobile .modal-close {
+  background: none;
+  border: none;
+  font-size: 32px;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+  line-height: 1;
+}
+
+.payment-success-mobile .modal-close:hover {
+  color: #333;
+}
+
+.payment-success-mobile .tour2023_pcBox_tit {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 15px;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.payment-success-mobile .tour2023_pcBox_txt03 {
+  padding: 18px 16px;
+  text-align: center;
+}
+
+.payment-success-mobile .tour2023_pcBox_txt01 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 4px 0;
+}
+
+.payment-success-mobile .tour2023_pcBox_txt02 {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 12px 0;
+}
+
+.payment-success-mobile .tour2023_pcBox_txt03_content {
+  font-size: 13px;
+  color: #333;
+  line-height: 1.5;
+  margin: 12px 0;
+}
+
+.payment-success-mobile .tour2023_pcBox_txt04 {
+  font-size: 12px;
+  color: #999;
+  margin: 6px 0 12px 0;
+}
+
+.payment-success-mobile .tour2023PC_cash_icon {
+  margin: 12px 0;
+}
+
+.payment-success-mobile .cash_icon_pc {
+  max-width: 100px;
+  height: auto;
+}
+
+.payment-success-mobile .tour2023PC_btn01 {
+  display: inline-block;
+  background: #ffe500;
+  color: #333 !important;
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 24px;
+  border-radius: 6px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  margin-top: 6px;
+}
+
+.payment-success-mobile .tour2023PC_btn01:hover {
+  background: #ffd700;
+}
+
+.payment-success-mobile .tour2023PC_bg01 {
+  background: #f5f5f5;
+  padding: 16px;
+}
+
+.payment-success-mobile .tour2023PC_txt01 {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.payment-success-mobile .tour2023PC_cash_info {
+  display: flex;
+  margin-bottom: 8px;
+  list-style: none;
+  padding: 0;
+  line-height: 1.5;
+}
+
+.payment-success-mobile .tour2023PC_cash_info:last-child {
+  margin-bottom: 0;
+}
+
+.payment-success-mobile .tour2023PC_cash_info_w {
+  min-width: 20px;
+  flex-shrink: 0;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.payment-success-mobile .tour2023PC_cash_info li:last-child {
+  flex: 1;
+  font-size: 12px;
+}
+
+/* Global modal styles (클래스 없이도 작동하도록) */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 85%;
+  max-height: 75vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.tour2023_pcBox_top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e0e0e0;
+  flex-shrink: 0;
+}
+
+.tour2023_pcBox_top .close {
+  font-size: 24px;
+  color: #999;
+  text-decoration: none;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  background: none;
+  border: none;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.tour2023_pcBox_top .close:hover {
+  color: #333;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 32px;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: #333;
+}
+
+.tour2023_pcBox_tit {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 17px;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+.tour2023_pcBox_txt03 {
+  padding: 24px 20px;
+  text-align: center;
+}
+
+.tour2023_pcBox_txt01 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 22px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 6px 0;
+}
+
+.tour2023_pcBox_txt02 {
+  font-size: 16px;
+  color: #666;
+  margin: 0 0 16px 0;
+}
+
+.tour2023_pcBox_txt03_content {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.6;
+  margin: 16px 0;
+}
+
+.tour2023_pcBox_txt04 {
+  font-size: 13px;
+  color: #999;
+  margin: 8px 0 16px 0;
+}
+
+.tour2023PC_cash_icon {
+  margin: 16px 0;
+}
+
+.cash_icon_pc {
+  max-width: 150px;
+  height: auto;
+}
+
+.tour2023PC_btn01 {
+  display: inline-block;
+  background: #ffe500;
+  color: #333 !important;
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 16px;
+  font-weight: 700;
+  padding: 12px 30px;
+  border-radius: 6px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.tour2023PC_btn01:hover {
+  background: #ffd700;
+}
+
+.tour2023PC_bg01 {
+  background: #f5f5f5;
+  padding: 20px;
+}
+
+.tour2023PC_txt01 {
+  font-size: 13px;
+  color: #666;
+}
+
+.tour2023PC_cash_info {
+  display: flex;
+  margin-bottom: 10px;
+  list-style: none;
+  padding: 0;
+  line-height: 1.6;
+}
+
+.tour2023PC_cash_info:last-child {
+  margin-bottom: 0;
+}
+
+.tour2023PC_cash_info_w {
+  min-width: 22px;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.tour2023PC_cash_info li:last-child {
+  flex: 1;
+}
+

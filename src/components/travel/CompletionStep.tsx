@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Participant } from './types';
 import AccidentFreeCashModal from './AccidentFreeCashModal';
+import { getImagePath } from '@/utils/path';
 
 interface CompletionStepProps {
   participantName: string;
@@ -45,7 +46,7 @@ export default function CompletionStep({
               재가입할 때 그만큼 보험료를 아낄 수 있습니다.
             </div>
             <div className="promo-illustration">
-              <div className="piggy-bank-placeholder">🐷</div>
+              <img src={getImagePath('/icons/icon_cash.png')} alt="무사고캐시" />
             </div>
             <button
               type="button"

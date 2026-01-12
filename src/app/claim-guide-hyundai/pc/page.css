@@ -1,0 +1,377 @@
+/* 보험금 청구안내 현대해상 PC 스타일 */
+
+.claim-guide-hyundai-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+.claim-guide-hyundai-page .main_bg01 {
+  flex: 1;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 40px 20px 60px;
+  min-height: auto;
+  background-size: 4800px auto;
+  background-position: 52.2% -800px;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  overflow: visible;
+  max-height: none;
+  height: auto;
+}
+
+.claim-guide-hyundai-page .container_w {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* 고정 버튼용 container_box_w */
+.claim-guide-hyundai-page .container_w > .container_box_w {
+  position: relative;
+  width: 605px;
+  margin: 0 auto;
+  min-height: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.claim-guide-hyundai-page .container_w > .container_box_w a {
+  pointer-events: auto;
+}
+
+/* 컨텐츠용 container_box */
+.claim-guide-hyundai-page .container_box {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 100;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: visible;
+}
+
+/* 백그라운드 */
+.claim-guide-hyundai-page .bgcolor_white {
+  background-color: #fff;
+}
+
+/* 패딩 */
+.claim-guide-hyundai-page .pt30 {
+  padding-top: 30px;
+}
+
+.claim-guide-hyundai-page .pt15 {
+  padding-top: 15px;
+}
+
+.claim-guide-hyundai-page .pb20 {
+  padding-bottom: 20px;
+}
+
+.claim-guide-hyundai-page .pb30 {
+  padding-bottom: 30px;
+}
+
+.claim-guide-hyundai-page .pb40 {
+  padding-bottom: 40px;
+}
+
+.claim-guide-hyundai-page .prow_01 {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* 정렬 */
+.claim-guide-hyundai-page .ag_left {
+  text-align: left !important;
+}
+
+/* 폰트 컬러 */
+.claim-guide-hyundai-page .font_blue {
+  color: #15aefd;
+}
+
+.claim-guide-hyundai-page .t_red {
+  color: #fa2828;
+}
+
+.claim-guide-hyundai-page .t_blue {
+  color: #15aefd;
+}
+
+/* 제목 */
+.claim-guide-hyundai-page .sub_title {
+  font-size: 18px;
+  font-weight: 600;
+  padding-bottom: 10px;
+  letter-spacing: -1.5px;
+}
+
+.claim-guide-hyundai-page .sub_title_03 {
+  color: #2380f0;
+  font-size: 20px;
+  line-height: 1.25em;
+  letter-spacing: -1px;
+  font-weight: bold;
+}
+
+/* 테이블 */
+.claim-guide-hyundai-page .claim-notice-box {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.claim-guide-hyundai-page .join01_box,
+.claim-guide-hyundai-page .join02_box {
+  width: 100%;
+  border: 1px solid #dfdfdf;
+  margin: 0 auto;
+  border-radius: 8px;
+}
+
+.claim-guide-hyundai-page .join01_box .txt,
+.claim-guide-hyundai-page .join02_box .txt {
+  padding: 20px;
+  font-size: 11px;
+  line-height: 1.8;
+  text-align: left;
+  color: #333;
+}
+
+.claim-guide-hyundai-page .join02_box .txt strong {
+  font-weight: 600;
+  color: #000;
+}
+
+.claim-guide-hyundai-page .join02_box .txt .pad02 {
+  padding-left: 13px;
+  display: block;
+}
+
+/* 리스트 */
+.claim-guide-hyundai-page .con01 ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.claim-guide-hyundai-page .con01 ul li {
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* 탭 메뉴 */
+.claim-guide-hyundai-page .claim-tabs-container {
+  text-align: center;
+}
+
+.claim-guide-hyundai-page .subNaviWrap02.level2 {
+  margin-bottom: 0;
+}
+
+.claim-guide-hyundai-page .naviLev2 {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.claim-guide-hyundai-page .naviLev2 tr {
+  display: flex;
+}
+
+.claim-guide-hyundai-page .naviLev2 td {
+  flex: 1;
+  background-color: #f5f5f5;
+  border: 1px solid #dfdfdf;
+  border-bottom: none;
+  text-align: center;
+}
+
+.claim-guide-hyundai-page .naviLev2 td.on {
+  background-color: #fff;
+  border-bottom: 3px solid #15aefd;
+  position: relative;
+  z-index: 1;
+}
+
+.claim-guide-hyundai-page .naviLev2 td a {
+  display: block;
+  padding: 15px 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.claim-guide-hyundai-page .naviLev2 td.on a {
+  color: #15aefd;
+  font-weight: 600;
+}
+
+/* 탭 내용 */
+.claim-guide-hyundai-page .tab-content {
+  text-align: center;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 오른쪽 고정 버튼 */
+.claim-guide-hyundai-page .container_box_w .fixedRight_b01 {
+  position: absolute;
+  top: 0px;
+  left: 562px;
+  width: 107px;
+  height: 90px;
+  background: #fade21;
+  border-radius: 10px;
+  box-shadow: 7px 7px 10px rgb(0 0 0 / 5%);
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  z-index: 100;
+}
+
+.claim-guide-hyundai-page .container_box_w .fixedRight_b02 {
+  position: absolute;
+  display: inline-block;
+  text-align: left;
+  top: 100px;
+  left: 562px;
+  width: 107px;
+  height: 58px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 7px 7px 10px rgb(0 0 0 / 5%);
+  cursor: pointer;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.claim-guide-hyundai-page .fixedRight_txt01 {
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
+  font-size: 14px;
+  letter-spacing: -1.2px;
+  color: #333;
+  line-height: 100%;
+  box-sizing: border-box;
+  text-decoration: none;
+  text-align: center;
+  display: block;
+  margin-top: 8px;
+}
+
+.claim-guide-hyundai-page .fixedRight_txt02 {
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
+  font-size: 13px;
+  letter-spacing: -0.4px;
+  color: #333;
+  line-height: 120%;
+  box-sizing: border-box;
+  text-decoration: none;
+  text-align: left;
+  display: inline-block;
+  margin-left: 4px;
+  margin-top: 14px;
+}
+
+.claim-guide-hyundai-page .icon_cash {
+  display: block;
+  width: 44px;
+  height: 43px;
+  background: url(/icons/icon_cash.png) no-repeat 0 0/contain;
+  margin: 13px 0 0 33px;
+}
+
+.claim-guide-hyundai-page .icon_cash .icon_cash01 {
+  display: block;
+  box-sizing: border-box;
+  text-align: center;
+  margin: 0 auto;
+  padding: 10px 0 0 0;
+}
+
+.claim-guide-hyundai-page .icon_menu {
+  display: inline-block;
+  width: 19px;
+  height: 19px;
+  background: url(/icons/icon_menu.png) no-repeat 0 0/contain;
+  vertical-align: top;
+  margin: 20px 0 0 17px;
+  text-align: left;
+}
+
+.claim-guide-hyundai-page .icon_menu .icon_menu01 {
+  display: inline-block;
+  box-sizing: border-box;
+  text-align: center;
+  margin: 0 auto;
+  padding: 10px 0 0 0;
+}
+
+/* 반응형 */
+@media (max-width: 1024px) {
+  .claim-guide-hyundai-page .container_w {
+    max-width: 100%;
+    padding: 0 20px;
+  }
+
+  .claim-guide-hyundai-page .container_box {
+    max-width: 100%;
+    padding: 30px 20px;
+  }
+
+  .claim-guide-hyundai-page .naviLev2 td a {
+    padding: 12px 8px;
+    font-size: 13px;
+  }
+
+  /* 태블릿에서 고정 버튼 숨김 */
+  .claim-guide-hyundai-page .container_box_w .fixedRight_b01,
+  .claim-guide-hyundai-page .container_box_w .fixedRight_b02 {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  /* 모바일에서는 고정 버튼 숨김 */
+  .claim-guide-hyundai-page .container_box_w .fixedRight_b01,
+  .claim-guide-hyundai-page .container_box_w .fixedRight_b02 {
+    display: none;
+  }
+
+  .claim-guide-hyundai-page .container_box {
+    padding: 20px 15px;
+  }
+
+  .claim-guide-hyundai-page .naviLev2 td a {
+    padding: 10px 5px;
+    font-size: 12px;
+  }
+
+  .claim-guide-hyundai-page .join01_box .txt,
+  .claim-guide-hyundai-page .join02_box .txt {
+    padding: 15px;
+    font-size: 10px;
+  }
+}
+

@@ -27,7 +27,7 @@ export default function PCMainPage() {
 
   return (
     <div className="main-page-pc">
-      <Header isMobile={false} />
+      <Header isMobile={false} onOpenAccidentFreeCashModal={() => setShowCashModal(true)} />
       
       <main className="main-content-pc">
         {/* Hero Section */}

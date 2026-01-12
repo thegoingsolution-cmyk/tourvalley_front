@@ -312,15 +312,32 @@ export default function ParticipantInfoStep({
                           placeholder="아이디"
                         />
                         <span>@</span>
-                        <select
-                          value={participant.email2}
-                          onChange={(e) => handleParticipantChange(index, 'email2', e.target.value)}
-                        >
-                          <option value="">선택</option>
-                          <option value="gmail.com">gmail.com</option>
-                          <option value="naver.com">naver.com</option>
-                          <option value="daum.net">daum.net</option>
-                        </select>
+                        {participant.email2 === '직접입력' ? (
+                          <input
+                            type="text"
+                            value={participant.customEmail || ''}
+                            onChange={(e) => handleParticipantChange(index, 'customEmail', e.target.value)}
+                            placeholder="도메인 직접입력"
+                          />
+                        ) : (
+                          <select
+                            value={participant.email2}
+                            onChange={(e) => {
+                              handleParticipantChange(index, 'email2', e.target.value);
+                              if (e.target.value !== '직접입력') {
+                                handleParticipantChange(index, 'customEmail', '');
+                              }
+                            }}
+                          >
+                            <option value="">선택</option>
+                            <option value="gmail.com">gmail.com</option>
+                            <option value="naver.com">naver.com</option>
+                            <option value="daum.net">daum.net</option>
+                            <option value="nate.com">nate.com</option>
+                            <option value="hotmail.com">hotmail.com</option>
+                            <option value="직접입력">직접입력</option>
+                          </select>
+                        )}
                       </div>
                     </div>
                   </div>

@@ -148,6 +148,13 @@ export default function PCLongTermStayPage() {
     },
   ]);
 
+  // 이메일 주소 조합 헬퍼 함수
+  const getFullEmail = (participant: Participant): string => {
+    if (!participant.email1) return '';
+    const domain = participant.email2 === '직접입력' ? participant.customEmail : participant.email2;
+    return domain ? `${participant.email1}@${domain}` : '';
+  };
+
   // 시간 옵션: 1시부터 24시까지 (0시 제외, 24시 포함)
   const timeOptions = Array.from({ length: 24 }, (_, i) => i + 1);
 
@@ -784,7 +791,7 @@ export default function PCLongTermStayPage() {
               productName: '장기체류보험',
               productCount: participants.length,
               customerName: participants[0]?.name || '',
-              customerEmail: participants[0]?.email1 && participants[0]?.email2 ? `${participants[0].email1}@${participants[0].email2}` : '',
+              customerEmail: getFullEmail(participants[0]),
               customerPhone: participants[0]?.phone || '',
               checkOutDate: arrivalDate,
             });
@@ -801,7 +808,7 @@ export default function PCLongTermStayPage() {
               itemName: '해외장기체류보험',
               quantity: participants.length,
               customerName: participants[0]?.name || '',
-              customerEmail: participants[0]?.email1 && participants[0]?.email2 ? `${participants[0].email1}@${participants[0].email2}` : '',
+              customerEmail: getFullEmail(participants[0]),
               customerPhone: participants[0]?.phone || '',
             });
             // 카카오페이 결제 페이지로 리다이렉트됨

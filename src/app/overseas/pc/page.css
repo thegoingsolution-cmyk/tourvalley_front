@@ -2709,6 +2709,11 @@
   margin: 24px 0;
 }
 
+.overseas-page-pc .promo-illustration img {
+  max-width: 120px;
+  height: auto;
+}
+
 .overseas-page-pc .piggy-bank-placeholder {
   font-size: 64px;
 }
@@ -2801,14 +2806,6 @@
 }
 
 /* Accident Free Cash Modal */
-.overseas-page-pc .accident-free-cash-modal {
-  width: 30%;
-  max-width: 600px;
-  min-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
 .overseas-page-pc .tour2023_pcBox_top {
   display: flex;
   justify-content: space-between;

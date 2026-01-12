@@ -1,0 +1,215 @@
+/* Container Styles - domestic/m/page.css 기반 */
+.group-insurance-mobile {
+    padding-bottom: 60px;
+}
+
+/* 탭 메뉴 스타일 - test.css 9872-9914 라인 */
+.menu_wrap_tab {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    vertical-align: top;
+}
+
+.menu_wrap_tab .menu_tab {
+    display: inline-block;
+    box-sizing: border-box;
+    width: 33.333%;
+    position: relative;
+}
+
+.menu_wrap_tab .menu_tab a {
+    height: 35px;
+    font-size: 20px;
+    color: #d4d5d9;
+    border-bottom: 5px solid #e0e3eb;
+    margin-bottom: 1px;
+    display: block;
+    text-decoration: none;
+    text-align: center;
+}
+
+.menu_wrap_tab .menu_tab.on a {
+    height: 35px;
+    border-bottom: 5px solid #1b37e1;
+    color: #1b37e1;
+    font-family: 'NanumSquareNeoTTF-dEb';
+}
+
+/* Step Indicator Styles */
+.tour2023_step_w {
+    position: absolute;
+    text-align: right;
+    right: 0;
+    top: 0;
+    height: 40px;
+}
+
+.tour2023_step {
+    position: relative;
+    display: inline-flex;
+    justify-content: flex-end;
+    width: 54px;
+    height: 40px;
+    text-align: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tour2023_step ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tour2023_step01 {
+    position: relative;
+    text-align: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tour2023_step .tour2023_step_num {
+    width: 20px;
+    height: 20px;
+    background: #d1d1d1;
+    border-radius: 100px;
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.tour2023_step .tour2023_step_txt {
+    font-size: 13px;
+    color: #c1c1c1;
+    text-align: center;
+    line-height: 135%;
+    letter-spacing: -2px;
+    margin-top: 3px;
+    z-index: 2;
+}
+
+.tour2023_step.on .tour2023_step_num {
+    width: 20px;
+    height: 20px;
+    background: #2c3fb3;
+    border-radius: 100px;
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.tour2023_step.on .tour2023_step_txt {
+    font-size: 13px;
+    color: #2c3fb3;
+    text-align: center;
+    line-height: 135%;
+    letter-spacing: -1.4px;
+    margin-top: 3px;
+    z-index: 2;
+}
+
+.tour2023_step_num01 {
+    color: #fff;
+    font-size: 15px;
+    font-weight: 900;
+    display: inline-block;
+    text-align: center;
+    vertical-align: top;
+    margin-top: 0px;
+    z-index: 2;
+    line-height: 20px;
+}
+
+/* 여백 유틸리티 */
+.tourG_mat02 { margin-top: 10px!important; }
+.tourG_mat04 { margin-top: 20px!important; }
+.tourG_mat06 { margin-top: 15px!important; }
+.tourG_mat10 { margin-top: 35px; }
+.tourG_mat13 { margin-top: 35px; }
+.tourG_mat19 { margin-top: 52px; }
+.tourG_mat22 { margin-top: 60px; }
+.tourG_mab01 { margin-bottom: 1px; }
+.tourG_mab02 { margin-bottom: 2px; }
+.tourG_mab03 { margin-bottom: 10px; }
+.tourG_mab04 { margin-bottom: 15px; }
+.tourG_mab05 { margin-bottom: 20px; }
+.tourG_mab08 { margin-bottom: 30px; }
+.tourG_mleft04 { margin-left: 15px; }
+.tourG_line { 
+    border-bottom: 1px solid #eee; 
+    padding-bottom: 15px; 
+}
+.tourG_line05 { 
+    border-top: 1px solid #dde1e5; 
+}
+
+.mag5 { margin: 5px 0; }
+
+/* prow_01 */
+.prow_01 {
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+/* 배경 색상 */
+.bgcolor_white {
+    background-color: #fff;
+}
+
+/* tour2023_BWrap 스타일 */
+.tour2023_BWrap {
+    background: #fff;
+    padding: 20px;
+    margin: 35px 0 20px 0;
+    position: relative;
+}
+
+.tour2023_title01 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    line-height: 1.4;
+    font-family: 'NanumSquareNeoTTF-dEb';
+}
+
+.tour2023_title09 {
+    font-size: 16px;
+    color: #666;
+    font-weight: normal;
+    font-family: 'NanumSquareNeoTTF-bRg';
+}
+
+/* 심의번호 영역 */
+.essential_Wrap {
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.ptb20 {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.tour2023_txt02 {
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.tour2023_grey {
+    color: #808181;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .menu_wrap_tab .menu_tab a {
+        font-size: 16px;
+    }
+    
+    .prow_01 {
+        padding: 0 15px;
+    }
+}

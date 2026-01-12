@@ -10,9 +10,10 @@ import './Header.css';
 
 interface HeaderProps {
   isMobile?: boolean;
+  onOpenAccidentFreeCashModal?: () => void;
 }
 
-export default function Header({ isMobile = false }: HeaderProps) {
+export default function Header({ isMobile = false, onOpenAccidentFreeCashModal }: HeaderProps) {
   const [logoError, setLogoError] = useState<boolean>(false);
   const [isServiceModalOpen, setIsServiceModalOpen] = useState<boolean>(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
@@ -316,7 +317,8 @@ export default function Header({ isMobile = false }: HeaderProps) {
       </div>
       <ServiceModal 
         isOpen={isServiceModalOpen} 
-        onClose={() => setIsServiceModalOpen(false)} 
+        onClose={() => setIsServiceModalOpen(false)}
+        onOpenAccidentFreeCashModal={onOpenAccidentFreeCashModal}
       />
     </header>
   );

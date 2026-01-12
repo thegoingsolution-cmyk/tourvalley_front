@@ -235,11 +235,6 @@ export default function ContractInfoStep({
                       onChange={(e) => handleContractConfirm(e.target.checked)}
                       className="checkbox-input"
                     />
-                    <img 
-                      src="/icons/checkbox-icon.png" 
-                      alt="체크박스" 
-                      className="checkbox-icon"
-                    />
                     위 내용을 확인하셨습니까?
                   </label>
                 </div>

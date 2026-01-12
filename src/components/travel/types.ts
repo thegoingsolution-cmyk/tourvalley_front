@@ -22,6 +22,7 @@ export interface Participant {
   gender: '남자' | '여자';
   email1: string;
   email2: string;
+  customEmail?: string; // 직접입력 이메일 도메인
   phone: string;
   isVerified: boolean;
   premium?: number;

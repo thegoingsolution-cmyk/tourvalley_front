@@ -1,312 +1,3080 @@
-.overseas-page-mobile {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: #f5f7fb;
+/* Container Styles */
+.overseas-step1-mobile {
+    padding-bottom: 60px; /* 하단 고정 버튼 높이(60px) + 여백(20px) */
 }
 
-.overseas-content-mobile {
-  flex: 1;
-  width: 100%;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 20px 16px 0;
-  min-height: calc(100vh - 120px);
+/* 공통 유틸리티 클래스들 - overseas/m/page.css에서 복사 */
+
+/* Step Indicator Styles - test.css 참고 */
+.tour2023_step_w {
+    position: absolute;
+    text-align: right;
+    right: 0;
+    top: 0;
+    height: 40px;
 }
 
-/* Background Image */
-.overseas-background-mobile {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  height: 150px;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
+.tour2023_step {
+    position: relative;
+    display: inline-flex;
+    justify-content: flex-end;
+    width: 54px;
+    height: 40px;
+    text-align: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-.background-image-mobile {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center bottom;
+.tour2023_step ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
+
+.tour2023_step01 {
+    position: relative;
+    text-align: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tour2023_step .tour2023_step_num {
+    width: 20px;
+    height: 20px;
+    background: #d1d1d1;
+    border-radius: 100px;
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.tour2023_step .tour2023_step_txt {
+    font-size: 13px;
+    color: #c1c1c1;
+    text-align: center;
+    line-height: 135%;
+    letter-spacing: -2px;
+    margin-top: 3px;
+    z-index: 2;
+}
+
+.tour2023_step.on .tour2023_step_num {
+    width: 20px;
+    height: 20px;
+    background: #2c3fb3;
+    border-radius: 100px;
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.tour2023_step.on .tour2023_step_txt {
+    font-size: 13px;
+    color: #2c3fb3;
+    text-align: center;
+    line-height: 135%;
+    letter-spacing: -1.4px;
+    margin-top: 3px;
+    z-index: 2;
+}
+
+.tour2023_step_num01 {
+    color: #fff;
+    font-size: 15px;
+    font-weight: 900;
+    display: inline-block;
+    text-align: center;
+    vertical-align: top;
+    margin-top: 0px;
+    z-index: 2;
+    line-height: 20px;
+}
+
+.tour2023_step_line:before {
+    content: '';
+    position: absolute;
+    display: inline-block;
+    width: 120px;
+    height: 1px;
+    top: 10px;
+    right: 19px;
+    margin: 0px 0 0px 0px;
+    border-bottom: 1px solid #d5d5d5;
+    vertical-align: middle;
+    transform: rotate(0deg);
+    z-index: 0;
+}
+
+.tour2023_step_line.tour {
+    position: relative;
+}
+
+/* BWrap Styles */
+.tour2023_BWrap {
+    position: relative;
+    display: inline-flex;
+    justify-content: space-between;
+    width: 100%;
+    vertical-align: top;
+    height: 33px;
+}
+
+.tour2023_title01 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #000;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Form Styles */
+.tourGuard_form_tt {
+    position: relative;
+    height: 65px;
+    border: 1px solid #c3c6ce;
+    border-radius: 15px;
+    background: #fff;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+}
+
+.tourGuard_form_tt input[type="text"] {
+    height: 32px;
+    padding-left: 10px;
+    border: 0;
+    color: #000;
+    font-size: 18px;
+    letter-spacing: 0px;
+    caret-color: #222;
+    display: inline-block;
+    vertical-align: text-top;
+    padding-top: 0px;
+    margin-top: 23px;
+    margin-left: 10px;
+    background: transparent;
+}
+
+.tourGuard_form_tt input[type="text"]::placeholder {
+    color: #dddddd;
+    text-shadow: initial;
+}
+
+.tourGuard_form_tt input[type="text"]:-ms-input-placeholder {
+    color: #dddddd;
+    text-shadow: initial;
+}
+
+.tourGuard_form_tt input[type="tel"] {
+    height: 32px;
+    padding-left: 10px;
+    border: 0;
+    color: #000;
+    font-size: 18px;
+    letter-spacing: 0px;
+    caret-color: #222;
+    display: inline-block;
+    vertical-align: text-top;
+    padding-top: 0px;
+    margin-top: 23px;
+    margin-left: 10px;
+    background: transparent;
+}
+
+.tourGuard_form_tt input[type="tel"]::placeholder {
+    color: #dddddd;
+    text-shadow: initial;
+}
+
+.tourGuard_form_tt input[type="tel"]:-ms-input-placeholder {
+    color: #dddddd;
+    text-shadow: initial;
+}
+
+.tourGuard_form_tt label {
+    position: absolute;
+    top: 6px;
+    left: 20px;
+    color: #9797a3;
+    font-size: 12px;
+    font-family: 'Malgun Gothic','맑은고딕',dotum,'돋움',AppleGothic,sans-serif;
+    letter-spacing: -0.8px;
+}
+
+.tourGuard_input_w01 {
+    width: 38%;
+}
+
+.tourGuard_bg_join {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: transparent;
+    height: 32px;
+    padding-left: 10px;
+    font-size: 18px;
+    vertical-align: top;
+    margin: 23px 0 0 10px;
+    margin-right: 0;
+}
+
+.tourGuard_input_cell {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: transparent;
+    height: 32px;
+    padding-left: 10px;
+    font-size: 18px;
+    vertical-align: top;
+    margin: 23px 0 0 10px;
+}
+
+.tourGuard_input_cell02 {
+    width: 38%;
+}
+
+.tourGuard_input_cell01 {
+    width: 98%;
+}
+
+.tourGuard_ps_box {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.tourGuard_sel {
+    width: 100%;
+    height: 32px;
+    padding: 0 10px;
+    border: 0;
+    color: #000;
+    font-size: 18px;
+    background: transparent;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.tourGuard_sel::-ms-expand {
+    display: none;
+}
+
+.tourGuard_sel07 {
+    width: 100%;
+    height: 32px;
+    padding: 0 10px;
+    border: 0;
+    color: #000;
+    font-size: 18px;
+    background: transparent;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.tourGuard_sel07::-ms-expand {
+    display: none;
+}
+
+/* Radio Button Styles */
+.tourG_rdo_area {
+    font-size: 0px;
+    width: 42%;
+    margin-right: 0;
+    vertical-align: middle;
+    text-align: center;
+    position: relative;
+    display: inline-flex;
+}
+
+.tourG_inp_rdo {
+    position: relative;
+    width: 40%;
+    display: inline-block;
+    overflow-wrap: normal;
+    word-break: normal;
+    vertical-align: middle;
+    align-items: center;
+    text-align: center;
+    background: transparent;
+}
+
+.tourG_inp_rdo input {
+    position: absolute;
+    display: block;
+    width: 1px;
+    height: 1px;
+    margin: 0px;
+    padding: 0px;
+    border: 0px;
+    background: none;
+    background: transparent;
+}
+
+.tourG_inp_rdo input:checked + label {
+    background: transparent;
+    border: none;
+    z-index: 1;
+}
+
+.tourG_inp_rdo input + label {
+    width: 100%;
+    height: 32px;
+    display: inline-block;
+    text-align: left;
+    font-size: 17px;
+    vertical-align: middle;
+    letter-spacing: -0.8px;
+    color: #dddddd;
+    box-sizing: border-box;
+    margin: 22px 0 0 0;
+}
+
+.tourG_inp_rdo input:checked + label {
+    color: #0000ff;
+    font-weight: 500;
+}
+
+.one_line0 {
+    border-left: 0px !important;
+}
+
+.tourG_inp_rdo input:checked + label.one_line0 {
+    color: #0000ff;
+    border: none;
+}
+
+/* Button Styles */
+.tourGuard_btn_b {
+    position: relative;
+    display: block;
+    width: 100%;
+}
+
+.tour2023_btn01 {
+    font-size: 21px;
+    height: 60px;
+    background-color: #2c3fb3;
+    border-radius: 10px;
+    box-sizing: border-box;
+    color: #fff !important;
+    text-align: center;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0;
+    line-height: 1;
+    text-decoration: none;
+}
+
+.tour2023_btn01:hover {
+    background-color: #1d2fa0;
+}
+
+/* Text Styles */
+.tour2023_txt01 {
+    font-size: 13px;
+    text-align: left;
+    line-height: 130%;
+    letter-spacing: -1px;
+    display: inline-block;
+    width: 100%;
+}
+
+.tour2023_blue {
+    color: #1b37e1 !important;
+}
+
+.tourGuard_inline {
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tourGuard_inline li {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tourGuard_inline_t01 {
+    margin-right: 5px;
+}
+
+.tourGuard_inline_t02 {
+    flex: 1;
+}
+
+/* Line Styles */
+.tourG_line:after {
+    content: '';
+    position: absolute;
+    display: inline-block;
+    width: 47px;
+    height: 50px;
+    top: -4px;
+    left: 40%;
+    margin: 0px 0 0px 0px;
+    border-bottom: 1px solid #d5d7dd;
+    vertical-align: middle;
+    transform: rotate(297deg);
+    z-index: 1;
+}
+
+/* Utility Classes */
+.mag5 {
+    margin: 5px 0;
+}
+
+.prow_01 {
+    padding: 0 20px;
+}
+
+.prow_02 {
+    padding: 0 20px;
+}
+
+.ptb20 {
+    padding: 20px 0;
+}
+
+.essential_Wrap {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.tour2023_txt02 {
+    font-size: 9px;
+    color: #666;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.essential_Wrap .tour2023_txt02 {
+    display: block;
+    padding: 0 10px;
+    box-sizing: border-box;
+}
+
+.bgcolor_white {
+    background-color: #fff;
+}
+
+/* Date Input Styles */
+.tourGuard_form_tt input[type="date"] {
+    height: 32px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border: 0;
+    color: #000;
+    font-size: 13px;
+    letter-spacing: 0px;
+    caret-color: #222;
+    display: inline-block;
+    vertical-align: text-top;
+    padding-top: 0px;
+    margin-top: 23px;
+    margin-left: 10px;
+    background: transparent;
+    width: calc(38% - 20px);
+    min-width: 155px;
+    box-sizing: border-box;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+}
+
+.tourGuard_form_tt input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.tourGuard_form_tt input[type="date"]::-webkit-inner-spin-button,
+.tourGuard_form_tt input[type="date"]::-webkit-clear-button {
+    display: none;
+}
+
+/* Fixed Bottom Button Styles */
+#tour2023_fixedBanner {
+    position: fixed;
+    display: block;
+    width: 100%;
+    z-index: 999;
+    bottom: 0;
+    background-color: #fff;
+    border-top: 1px solid #e0e0e0;
+}
+
+.tour2023_bottom_btn {
+    left: 0;
+    bottom: 0;
+    color: #fff;
+    width: 100%;
+    display: inline-flex;
+    justify-content: space-between;
+}
+
+.tour2023_btn_b {
+    position: relative;
+    display: block;
+    width: 50%;
+    box-sizing: border-box;
+    text-decoration: none;
+}
+
+/* 비활성화 버튼 스타일 */
+.tour2023_btn02 {
+    width: 50%;
+    font-size: 22px;
+    padding-top: 15px;
+    height: 60px;
+    color: #b8b9bb !important;
+    background-color: #fff;
+    box-sizing: border-box;
+    text-align: center;
+    border-right: 1px solid #e0e0e0;
+    display: block;
+    text-decoration: none;
+}
+
+.tour2023_btn03 {
+    width: 50%;
+    font-size: 22px;
+    color: #fff !important;
+    padding-top: 15px;
+    height: 60px;
+    box-sizing: border-box;
+    text-align: center;
+    letter-spacing: -1.5px;
+    background-color: #b8b9bb;
+    display: block;
+    text-decoration: none;
+}
+
+/* 활성화 버튼 스타일 (플랜 선택 후) */
+.tour2023_btn02_ov {
+    width: 50%;
+    font-size: 22px;
+    padding-top: 15px;
+    height: 60px;
+    color: #fe5700 !important;
+    background-color: #fff;
+    box-sizing: border-box;
+    text-align: center;
+    letter-spacing: -1.5px;
+    border: 1px solid #fe5700;
+    display: block;
+    text-decoration: none;
+}
+
+.tour2023_btn03_ov {
+    width: 50%;
+    font-size: 22px;
+    color: #fff !important;
+    padding-top: 15px;
+    height: 60px;
+    box-sizing: border-box;
+    text-align: center;
+    letter-spacing: -1.5px;
+    background-color: #fe5700;
+    display: block;
+    text-decoration: none;
+}
+
+/* Plan Selection Styles - Mobile */
+.plan-selection-card {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #eee;
+    overflow: visible;
+}
+
+.medical-expense-option {
+    margin-bottom: 20px;
+    padding: 16px;
+    background: #f9f9f9;
+    border-radius: 8px;
+}
+
+.medical-expense-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.question-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: #999;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.medical-expense-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.medical-expense-toggle {
+    display: flex;
+    gap: 8px;
+}
+
+.toggle-btn {
+    flex: 1;
+    padding: 10px 16px;
+    background: #fff;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.toggle-btn.active {
+    background: #2843e5;
+    border-color: #2843e5;
+    color: #fff;
+}
+
+.plans-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+    overflow: visible;
+}
+
+.plan-card {
+    padding: 20px;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+}
+
+.plan-card.selected {
+    border-color: #2843e5;
+    background: #f0f4ff;
+}
+
+.plan-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.plan-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.plan-badge-economy {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.plan-badge-high {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.plan-price {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    text-align: right;
+}
+
+.plan-coverages {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.coverage-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: #666;
+    width: 100%;
+}
+
+.coverage-label {
+    color: #999;
+    text-align: left;
+    flex: 0 0 auto;
+}
+
+.coverage-amount {
+    color: #333;
+    font-weight: 500;
+    text-align: right;
+    flex: 0 0 auto;
+}
+
+.coverage-detail-link {
+    display: inline-block;
+    font-size: 13px;
+    color: #2843e5;
+    text-decoration: none;
+}
+
+.coverage-detail-link:hover {
+    text-decoration: underline;
+}
+
+/* Plan Selection Guide (해외장기체류보험용) */
+.plan-selection-guide {
+    margin-bottom: 20px;
+    padding: 16px;
+    background: #f9f9f9;
+    border-radius: 8px;
+}
+
+.guide-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.guide-text {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+.currency-plan-tabs {
+    display: flex;
+    gap: 8px;
+}
+
+.currency-tab {
+    flex: 1;
+    padding: 10px 16px;
+    background: #fff;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.currency-tab.active {
+    background: #2843e5;
+    border-color: #2843e5;
+    color: #fff;
+}
+
+/* Exchange Rate Info */
+.exchange-rate-info {
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    background: #f0f4ff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rate-icon {
+    color: #2843e5;
+    font-size: 12px;
+}
+
+.rate-text {
+    font-size: 12px;
+    color: #333;
+    line-height: 1.5;
+}
+
+/* ========================================
+   ParticipantInfoStep Styles - Mobile
+   ======================================== */
 
 /* Form Section */
-.form-section-mobile {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  max-width: 100%;
+.form-section {
+    position: relative;
+    width: 100%;
+    margin-bottom: 0;
+    overflow: visible;
+    padding: 0 20px;
 }
 
-.form-container-mobile {
-  width: 100%;
+.form-container {
+    width: 100%;
+    overflow: visible;
 }
 
-.form-card-mobile {
-  background: #fff;
-  border-radius: 12px;
-  padding: 24px 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+.form-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow: visible;
+    min-height: 0;
+    max-height: none;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    position: relative;
 }
 
 /* Form Header */
-.form-header-mobile {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 24px;
+.form-header {
+    display: none; /* 모바일에서는 숨김 */
 }
 
-.form-title-mobile {
-  font-size: 22px;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin: 0;
+.form-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
 }
 
-/* Step Indicator */
-.step-indicator-mobile {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
+/* Participant Form Group */
+.participant-form-group {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #eee;
 }
 
-.step-mobile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
+.participant-form-group:last-child {
+    border-bottom: none;
 }
 
-.step-number-mobile {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #e0e0e0;
-  color: #999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: 600;
+.participant-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
 }
 
-.step-mobile.active .step-number-mobile {
-  background: #3b5998;
-  color: #fff;
+.participant-form-subtitle {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
 }
 
-.step-label-mobile {
-  font-size: 9px;
-  color: #999;
+.participant-delete-btn {
+    padding: 6px 12px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #666;
+    cursor: pointer;
 }
 
-.step-mobile.active .step-label-mobile {
-  color: #3b5998;
-  font-weight: 500;
+.participant-delete-btn:hover {
+    background: #f5f5f5;
+    border-color: #999;
 }
 
-.step-line-mobile {
-  width: 20px;
-  height: 1px;
-  background: #e0e0e0;
-  margin-bottom: 12px;
+.participant-form-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
 }
 
-/* Form Fields */
-.form-fields-mobile {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
+.participant-form-row {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid #c3c6ce;
+    border-radius: 15px;
+    overflow: hidden;
+    margin-bottom: 12px;
 }
 
-.field-row-mobile {
-  display: flex;
-  align-items: stretch;
-  border: 1px solid #e8e8e8;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 10px;
+.participant-form-group-item {
+    flex: 1;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0; /* flex item이 내용에 맞춰 축소될 수 있도록 */
 }
 
-.field-group-mobile {
-  flex: 1;
-  padding: 10px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
+.participant-form-group-item.full-width {
+    flex: 1;
 }
 
-.date-field-mobile {
-  flex: 2;
+.participant-form-group-item label {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.time-field-mobile {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.participant-form-group-item input,
+.participant-form-group-item select {
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #333;
+    padding: 0;
+    background: transparent;
+    width: 100%;
 }
 
-.birth-field-mobile {
-  flex: 2;
+.participant-form-separator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    color: #d0d0d0;
+    font-size: 18px;
+    font-weight: 300;
+    background: #fff;
+    flex-shrink: 0;
+    width: 20px;
+    min-width: 20px;
 }
 
-.gender-field-mobile {
-  flex: 1;
+.radio-group {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 12px;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    background: #fff;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.field-separator-mobile {
-  display: flex;
-  align-items: center;
-  padding: 0 6px;
-  color: #d0d0d0;
-  font-size: 18px;
-  font-weight: 300;
-  background: #fff;
+.radio-group label {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 4px;
+    font-size: 9px;
+    color: #333;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
-.field-label-mobile {
-  font-size: 10px;
-  color: #999;
-  margin-bottom: 1px;
+.radio-group input[type="radio"] {
+    width: 12px;
+    height: 12px;
+    margin: 0;
+    cursor: pointer;
+    flex-shrink: 0;
 }
 
-.field-input-mobile {
-  border: none;
-  outline: none;
-  font-size: 14px;
-  color: #333;
-  padding: 0;
-  background: transparent;
-  width: 100%;
+/* Email Inputs */
+.email-inputs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
 }
 
-.date-input-mobile {
-  font-size: 13px;
-  color: #999;
+.email-inputs input {
+    flex: 1;
+    padding: 10px 12px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    background: transparent;
 }
 
-.date-input-mobile::-webkit-calendar-picker-indicator {
-  opacity: 0;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
+.email-inputs span {
+    color: #333;
+    font-size: 16px;
+    flex-shrink: 0;
 }
 
-.time-select-mobile {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1a1a1a;
-  cursor: pointer;
-  text-align: center;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
+.email-inputs select {
+    flex: 1;
+    padding: 10px 12px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    background: transparent;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
 }
 
-.birth-input-mobile::placeholder {
-  color: #ccc;
-  font-size: 13px;
+/* Phone Inputs */
+.phone-inputs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
 }
 
-/* Gender Options */
-.gender-options-mobile {
-  display: flex;
-  gap: 12px;
+.phone-inputs input {
+    flex: 1;
+    padding: 10px 12px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    background: transparent;
 }
 
-.gender-option-mobile {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  cursor: pointer;
+.verify-btn {
+    padding: 10px 16px;
+    background-color: #eef0fc;
+    color: #4d60d6;
+    border: 1px solid #4d60d6;
+    border-radius: 5px;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
-.gender-radio-mobile {
-  display: none;
+.verify-btn:hover {
+    background-color: #e0e4f8;
 }
 
-.gender-text-mobile {
-  font-size: 14px;
-  color: #999;
-  transition: color 0.2s;
+/* Verification Inputs */
+.verification-inputs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
 }
 
-.gender-option-mobile.selected .gender-text-mobile {
-  color: #3b5998;
-  font-weight: 600;
+.verification-inputs input {
+    flex: 1;
+    padding: 10px 12px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    background: transparent;
 }
 
-/* Calculate Button */
-.calculate-btn-mobile {
-  width: 100%;
-  padding: 16px;
-  background: #3b5998;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-  margin-top: 16px;
-  margin-bottom: 32px;
+.verification-timer {
+    font-size: 13px;
+    font-weight: 600;
+    color: #f15a24;
+    min-width: 50px;
+    text-align: center;
 }
 
-.calculate-btn-mobile:hover {
-  background: #2d4373;
+.verify-confirm-btn {
+    padding: 10px 16px;
+    background-color: #2c3fb3;
+    color: #fff;
+    border: 1px solid #2c3fb3;
+    border-radius: 5px;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
-/* Group Insurance Section */
-.group-insurance-section-mobile {
-  text-align: center;
-  padding-top: 16px;
+.verify-confirm-btn:hover {
+    background-color: #1e2d8f;
+    border-color: #1e2d8f;
 }
 
-.group-insurance-link-mobile {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 14px 32px;
-  border: 1px solid #e0e0e0;
-  border-radius: 25px;
-  color: #3b5998;
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.2s;
-  margin-bottom: 12px;
+/* Participant Form Actions */
+.participant-form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
 }
 
-.group-insurance-link-mobile:active {
-  background: #f8f9fc;
-  border-color: #3b5998;
+.add-participant-btn {
+    width: 100%;
+    padding: 12px 20px;
+    background: #fff;
+    border: 2px solid #2843e5;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #2843e5;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-.link-arrow-mobile {
-  font-size: 16px;
-  color: #f15a24;
+.add-participant-btn:hover {
+    background: #f0f4ff;
 }
 
-.group-insurance-desc-mobile {
-  font-size: 12px;
-  color: #999;
-  line-height: 1.5;
-  margin: 0;
+.excel-upload-btn {
+    align-self: flex-end;
+    padding: 12px 20px;
+    background: #fff;
+    border: 2px solid #28a745;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #28a745;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
 }
 
-.highlight-text-mobile {
-  color: #f15a24;
+.excel-upload-btn:hover {
+    background: #f0fff4;
 }
 
+.excel-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* Calculate Final Button */
+.calculate-final-btn {
+    width: 100%;
+    padding: 16px;
+    background: #2843e5;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background 0.2s;
+}
+
+.calculate-final-btn:hover:not(:disabled) {
+    background: #1e33c4;
+}
+
+.calculate-final-btn:disabled,
+.calculate-final-btn.calculated {
+    background: #ccc;
+    cursor: not-allowed;
+    color: #999;
+}
+
+/* Premium Summary */
+.premium-summary {
+    margin-top: 20px;
+    padding: 16px;
+    background: #eef2fc;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.premium-detail-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.premium-participant-count {
+    font-size: 14px;
+    color: #333;
+}
+
+.premium-detail-link {
+    display: inline-block;
+    text-align: center;
+    padding: 8px 14px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #2843e5;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.premium-detail-link:hover {
+    background: #f0f4ff;
+    border-color: #2843e5;
+}
+
+.premium-total {
+    text-align: right;
+    font-size: 16px;
+    color: #333;
+    flex: 1;
+    min-width: 100%;
+    margin-top: 8px;
+}
+
+.premium-amount {
+    font-size: 22px;
+    font-weight: 700;
+    color: #2843e5;
+}
+
+/* Apply Button */
+.apply-btn {
+    width: 100%;
+    padding: 16px;
+    background: #f15a24;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background 0.2s;
+}
+
+.apply-btn:hover {
+    background: #d94a1a;
+}
+
+/* ========================================
+   ExcelUploadModal Styles - Mobile
+   ======================================== */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000; /* 하단 고정 버튼(z-index: 1000)보다 위에 표시 */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.modal-content {
+    background: #fff;
+    border-radius: 12px;
+    max-width: 400px;
+    width: 85%;
+    max-height: 75vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e0e0e0;
+    flex-shrink: 0;
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #3e3e3e;
+    margin: 0;
+    flex: 1;
+    text-align: center;
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.modal-close-btn:hover {
+    color: #333;
+}
+
+.modal-body {
+    padding: 0;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.modal-description {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 16px;
+}
+
+.excel-download-btn {
+    width: 100%;
+    padding: 12px 20px;
+    background: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: background 0.2s;
+}
+
+.excel-download-btn:hover {
+    background: #218838;
+}
+
+.excel-example-table {
+    margin: 20px 0;
+    overflow-x: auto;
+}
+
+.excel-example-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.excel-example-table th,
+.excel-example-table td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.excel-example-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #333;
+}
+
+.excel-notes {
+    margin: 20px 0;
+    padding: 16px;
+    background: #f9f9f9;
+    border-radius: 8px;
+}
+
+.excel-notes ul {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 13px;
+    color: #666;
+    line-height: 1.6;
+}
+
+.excel-notes li {
+    margin-bottom: 8px;
+}
+
+.file-upload-section {
+    margin-top: 24px;
+}
+
+.file-upload-section h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.file-upload-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.file-select-btn {
+    width: 100%;
+    padding: 12px 20px;
+    background: #fff;
+    border: 2px solid #2843e5;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #2843e5;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.file-select-btn:hover {
+    background: #f0f4ff;
+}
+
+.file-selected-info {
+    padding: 12px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+}
+
+.file-upload-submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: #2843e5;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.file-upload-submit-btn:hover:not(:disabled) {
+    background: #1e33c4;
+}
+
+.file-upload-submit-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    color: #999;
+}
+
+/* ========================================
+   RiskActivityStep Styles - Mobile
+   ======================================== */
+
+.step2-1-section {
+    margin-bottom: 24px;
+}
+
+.step2-1-question {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.question-number {
+    font-weight: 600;
+    color: #333;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.question-text {
+    flex: 1;
+    font-size: 15px;
+    color: #333;
+    line-height: 1.5;
+    min-width: 0;
+}
+
+.dangerous-activity-check-btn {
+    padding: 8px 14px;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #666;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    width: 100%;
+    margin-top: 4px;
+}
+
+.dangerous-activity-check-btn:hover {
+    background: #e9e9e9;
+}
+
+.step2-1-options {
+    display: flex;
+    gap: 12px;
+}
+
+.step2-1-option-btn {
+    flex: 1;
+    padding: 14px 20px;
+    background: #fff;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.step2-1-option-btn:hover {
+    border-color: #2843e5;
+    color: #2843e5;
+}
+
+.step2-1-option-btn.active {
+    background: #2843e5;
+    border-color: #2843e5;
+    color: #fff;
+}
+
+.step2-1-select-wrapper {
+    margin-top: 16px;
+    width: 100%;
+}
+
+.step2-1-select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    background: #fff;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.step2-1-select:focus {
+    outline: none;
+    border-color: #2843e5;
+}
+
+.step2-1-next-btn {
+    width: 100%;
+    padding: 16px;
+    background: #2843e5;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: background 0.2s;
+}
+
+.step2-1-next-btn:hover:not(:disabled) {
+    background: #1e33c4;
+}
+
+.step2-1-next-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    color: #999;
+}
+
+/* ========================================
+   Consent Modal Styles - Mobile
+   ======================================== */
+
+/* ConsentModal의 modal-title은 제목이 더 길어서 다른 스타일 적용 */
+.overseas-step1-mobile .modal-content:has(.tour2023_limit_state) .modal-title {
+    font-family: 'NanumSquareNeoTTF-cBd';
+    font-size: 14px;
+    color: #3e3e3e;
+    letter-spacing: -0.5px;
+    line-height: 1.3;
+    text-align: center;
+    padding-top: 0;
+    margin: 0;
+    flex: 1;
+    word-break: keep-all;
+}
+
+/* ConsentModal의 modal-header 간격 조정 */
+.overseas-step1-mobile .modal-content:has(.tour2023_limit_state) .modal-header {
+    padding: 10px 16px;
+    min-height: auto;
+}
+
+/* ConsentModal의 modal-body 간격 조정 */
+.overseas-step1-mobile .modal-content:has(.tour2023_limit_state) .modal-body {
+    padding: 0;
+}
+
+/* tour2023_limit_state 컨테이너 */
+.overseas-step1-mobile .tour2023_limit_state {
+    padding: 12px 16px;
+}
+
+.overseas-step1-mobile .tourG_mat06 {
+    margin-top: 0;
+}
+
+.overseas-step1-mobile .tourG_mat07 {
+    margin-top: 12px;
+}
+
+.overseas-step1-mobile .tourG_mat12 {
+    margin-top: 16px;
+}
+
+.overseas-step1-mobile .tourG_mab02 {
+    margin-bottom: 12px;
+}
+
+.overseas-step1-mobile .tourG_mab03 {
+    margin-bottom: 0;
+}
+
+.overseas-step1-mobile .tourG_mab04 {
+    margin-bottom: 0;
+}
+
+.overseas-step1-mobile .tourG_mab05 {
+    margin-bottom: 5px;
+}
+
+.overseas-step1-mobile .tourG_mleft05 {
+    margin-left: 5px;
+}
+
+.overseas-step1-mobile .in_wrap {
+    padding: 0;
+}
+
+.overseas-step1-mobile .pb5 {
+    padding-bottom: 0;
+}
+
+/* tourG_agree 리스트 */
+.overseas-step1-mobile .tourG_agree {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.overseas-step1-mobile .tourG_agree li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 0;
+}
+
+.overseas-step1-mobile .tourG_cir.tourG_chk {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.overseas-step1-mobile .tourG_cir.tourG_chk input[type="checkbox"] {
+    display: none;
+}
+
+.overseas-step1-mobile .tourG_cir.tourG_chk label {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 15px;
+    color: #333;
+}
+
+/* 전체동의 체크박스만 커스텀 이미지 적용 */
+.overseas-step1-mobile .tourG_cir.tourG_chk label[for="all_agree"] {
+    position: relative;
+    padding-left: 28px;
+}
+
+.overseas-step1-mobile .tourG_cir.tourG_chk label[for="all_agree"]::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    background-image: url('/icons/checkbox-icon.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.3;
+    transition: all 0.2s;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+.overseas-step1-mobile .tourG_cir.tourG_chk input[type="checkbox"]:checked + label[for="all_agree"]::before {
+    background-image: url('/icons/chk_ov.png');
+    background-size: 65%;
+    border: 1px solid #2c3fb3;
+    background-color: #2c3fb3;
+    opacity: 1;
+}
+
+.overseas-step1-mobile .tourGuard_txt06 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+}
+
+.overseas-step1-mobile .tourGuard_txt04 {
+    font-size: 14px;
+    color: #666;
+    font-weight: 400;
+}
+
+/* tourG_line02 구분선 */
+.overseas-step1-mobile .tourG_line02 {
+    height: 1px;
+    background-color: #e0e0e0;
+    margin: 10px 0;
+}
+
+/* tourG_more 더보기 화살표 */
+.overseas-step1-mobile .tourG_more {
+    width: 18px;
+    height: 18px;
+    margin-left: 8px;
+    display: inline-block;
+    cursor: pointer;
+    background-image: url('/images/g_more.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    flex-shrink: 0;
+}
+
+/* tourGuard_btn_b 버튼 기본 (tour2023_btn01과 함께 사용되지 않는 경우에만 적용) */
+.overseas-step1-mobile .tourGuard_btn_b:not(.tour2023_btn01) {
+    width: 100%;
+    display: inline-block;
+    text-align: center;
+    padding: 14px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    box-sizing: border-box;
+    border: none;
+}
+
+/* tour2023_btn06_gray 약관보기 버튼 (회색) */
+.overseas-step1-mobile .tour2023_btn06_gray {
+    color: #666 !important;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 14px;
+    font-size: 15px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.overseas-step1-mobile .tour2023_btn06_gray:hover {
+    background-color: #ebebeb;
+}
+
+.overseas-step1-mobile .tour2023_arr01 {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-left: 5px solid #666;
+    border-top: 3px solid transparent;
+    border-bottom: 3px solid transparent;
+    margin-left: 6px;
+}
+
+/* tourGuard_btn01 확인 버튼 (파란색) */
+.overseas-step1-mobile .tourGuard_btn01 {
+    font-family: 'NanumSquareNeoTTF-bRg';
+    background-color: #2843e5;
+    color: #fff !important;
+    font-size: 18px;
+    letter-spacing: -0.5px;
+    padding-top: 15px;
+    height: 56px;
+    border-radius: 7px;
+    box-sizing: border-box;
+    width: 100%;
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+}
+
+.overseas-step1-mobile .tourGuard_btn01:hover {
+    background-color: #1e33c4;
+}
+
+/* ========================================
+   Dangerous Activity & Restricted Country Modal Styles - Mobile
+   ======================================== */
+
+/* tour2023_pcBox_txt10 텍스트 스타일 */
+.overseas-step1-mobile .tour2023_pcBox_txt10 {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #333;
+    margin: 0 0 16px 0;
+}
+
+.overseas-step1-mobile .tourG_mat13 {
+    margin-top: 20px;
+}
+
+.overseas-step1-mobile .tourG_mab01 {
+    margin-bottom: 10px;
+}
+
+/* btn_b.tour2023PC_btn04 확인 버튼 (주황색) */
+.overseas-step1-mobile .btn_b.tour2023PC_btn04 {
+    font-family: 'NanumSquareNeoTTF-bRg';
+    width: 100%;
+    font-size: 18px;
+    letter-spacing: -0.5px;
+    padding-top: 15px;
+    height: 56px;
+    background-color: #fe5700;
+    border-radius: 7px;
+    box-sizing: border-box;
+    color: #fff !important;
+    text-align: center;
+    position: relative;
+    display: inline-block;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+}
+
+.overseas-step1-mobile .btn_b.tour2023PC_btn04:hover {
+    background-color: #e54e00;
+}
+
+/* ========================================
+   STEP 3: Contract Info & Payment - Mobile
+   ======================================== */
+
+.overseas-step1-mobile .step3-section {
+    margin-top: 24px;
+}
+
+.overseas-step1-mobile .step3-header-divider {
+    height: 1px;
+    background: #e0e0e0;
+    margin: 12px 0;
+}
+
+.overseas-step1-mobile .step3-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.overseas-step1-mobile .step3-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+}
+
+.overseas-step1-mobile .print-btn {
+    padding: 8px 12px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #666;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.overseas-step1-mobile .contract-info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: transparent;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.overseas-step1-mobile .contract-info-grid-divider {
+    height: 1px;
+    background: #e0e0e0;
+    margin: 6px 0 4px 0;
+}
+
+.overseas-step1-mobile .contract-info-item {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.overseas-step1-mobile .contract-info-item label {
+    font-size: 14px;
+    color: #999999;
+    font-weight: 700;
+    min-width: 100px;
+    flex-shrink: 0;
+}
+
+.overseas-step1-mobile .contract-info-item > div {
+    font-size: 14px;
+    color: #333;
+    font-weight: 400;
+    flex: 1;
+    text-align: right;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 4px;
+}
+
+.overseas-step1-mobile .contract-info-item-divider {
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+}
+
+.overseas-step1-mobile .participant-detail-link {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #666;
+    cursor: pointer;
+    background: transparent;
+    text-decoration: none;
+}
+
+.overseas-step1-mobile .contract-info-item > div.participant-info-details {
+    display: block;
+    gap: 0;
+}
+
+.overseas-step1-mobile .participant-info-details > div {
+    font-size: 14px;
+    color: #333;
+    text-align: right;
+    line-height: 1.6;
+}
+
+.overseas-step1-mobile .premium-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+}
+
+.overseas-step1-mobile .premium-label {
+    font-size: 14px;
+    color: #666;
+}
+
+.overseas-step1-mobile .premium-value {
+    font-size: 24px;
+    color: #999;
+}
+
+.overseas-step1-mobile .accident-free-cash-section {
+    padding: 12px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.overseas-step1-mobile .accident-free-cash-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.overseas-step1-mobile .question-icon-small {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    background: #999;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.overseas-step1-mobile .accident-free-cash-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.overseas-step1-mobile .input-with-unit {
+    position: relative;
+    flex: 1;
+}
+
+.overseas-step1-mobile .input-with-unit input {
+    width: 100%;
+    padding: 12px 35px 12px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: right;
+    box-sizing: border-box;
+}
+
+.overseas-step1-mobile .input-with-unit .unit-text {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: #666;
+    pointer-events: none;
+}
+
+.overseas-step1-mobile .use-cash-btn {
+    padding: 12px 20px;
+    background: #2843e5;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.overseas-step1-mobile .use-cash-btn:hover {
+    background: #1e33c4;
+}
+
+.overseas-step1-mobile .payment-amount-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+}
+
+.overseas-step1-mobile .payment-amount-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.overseas-step1-mobile .payment-amount-value {
+    font-size: 26px;
+    font-weight: 700;
+    color: #2843e5;
+}
+
+.overseas-step1-mobile .mobile-phone-warning {
+    padding: 10px 0;
+    background: transparent;
+    border: none;
+    font-size: 13px;
+    color: #ff0000;
+    font-weight: 400;
+    margin: 12px 0;
+}
+
+.overseas-step1-mobile .contract-confirm-checkbox {
+    padding: 12px 0;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+}
+
+.overseas-step1-mobile .contract-confirm-checkbox label {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    position: relative;
+    padding-left: 28px;
+}
+
+.overseas-step1-mobile .contract-confirm-checkbox .checkbox-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+.overseas-step1-mobile .contract-confirm-checkbox label::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    background-image: url('/icons/checkbox-icon.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.3;
+    transition: all 0.2s;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+.overseas-step1-mobile .contract-confirm-checkbox label:has(input[type="checkbox"]:checked)::before {
+    background-image: url('/icons/chk_ov.png');
+    background-size: 65%;
+    border: 1px solid #2c3fb3;
+    background-color: #2c3fb3;
+    opacity: 1;
+}
+
+/* ========================================
+   Payment Step Styles - Mobile
+   ======================================== */
+
+.overseas-step1-mobile .payment-methods-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 24px;
+}
+
+.overseas-step1-mobile .payment-method-option {
+    display: flex;
+    align-items: center;
+}
+
+.overseas-step1-mobile .payment-method-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex: 1;
+    padding: 14px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+}
+
+.overseas-step1-mobile .payment-method-label input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.overseas-step1-mobile .payment-method-label:has(input[type="radio"]:checked) {
+    border-color: #2843e5;
+    background: #f0f4ff;
+}
+
+.overseas-step1-mobile .payment-method-icon {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    flex-shrink: 0;
+    margin-right: 12px;
+}
+
+.overseas-step1-mobile .payment-sub-methods-section {
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.overseas-step1-mobile .payment-sub-method-btn {
+    width: 100%;
+    padding: 14px 16px;
+    background: #fff;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+}
+
+.overseas-step1-mobile .payment-sub-method-btn:hover {
+    border-color: #999;
+}
+
+.overseas-step1-mobile .payment-sub-method-btn.selected {
+    border-color: #3b5998;
+    background: #fff;
+}
+
+.overseas-step1-mobile .payment-sub-method-btn-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.overseas-step1-mobile .payment-sub-method-btn-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #666;
+    transition: color 0.2s;
+}
+
+.overseas-step1-mobile .payment-sub-method-btn.selected .payment-sub-method-btn-title {
+    color: #2843e5;
+}
+
+.overseas-step1-mobile .payment-sub-method-btn-subtitle {
+    font-size: 12px;
+    color: #999;
+    transition: color 0.2s;
+}
+
+.overseas-step1-mobile .payment-sub-method-btn.selected .payment-sub-method-btn-subtitle {
+    color: #2843e5;
+}
+
+.overseas-step1-mobile .bank-transfer-details,
+.overseas-step1-mobile .manual-card-details {
+    margin-top: 20px;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    border: none;
+}
+
+.overseas-step1-mobile .bank-option {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    transition: all 0.2s;
+}
+
+.overseas-step1-mobile .bank-option:hover {
+    border-color: #999;
+}
+
+.overseas-step1-mobile .bank-option:has(input[type="radio"]:checked) {
+    border-color: #3b5998;
+    background: #f0f4ff;
+}
+
+.overseas-step1-mobile .bank-option input[type="radio"] {
+    margin-right: 10px;
+    margin-top: 2px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    flex-shrink: 0;
+    accent-color: #3b5998;
+}
+
+.overseas-step1-mobile .bank-option-label {
+    flex: 1;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.overseas-step1-mobile .bank-option-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    line-height: 1.4;
+}
+
+.overseas-step1-mobile .bank-option-details {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.4;
+}
+
+.overseas-step1-mobile .bank-transfer-details .form-group,
+.overseas-step1-mobile .manual-card-details .form-group {
+    margin-bottom: 12px;
+}
+
+.overseas-step1-mobile .bank-transfer-details .form-group:last-child,
+.overseas-step1-mobile .manual-card-details .form-group:last-child {
+    margin-bottom: 0;
+}
+
+.overseas-step1-mobile .bank-transfer-details .form-group.form-group-vertical,
+.overseas-step1-mobile .manual-card-details .form-group.form-group-vertical {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 0;
+    background: #fff;
+}
+
+.overseas-step1-mobile .bank-transfer-details .form-group.form-group-vertical label,
+.overseas-step1-mobile .manual-card-details .form-group.form-group-vertical label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    color: #333;
+    margin: 0;
+    padding: 8px 12px;
+    padding-bottom: 4px;
+    line-height: 1.4;
+    background: transparent;
+    border-bottom: none;
+}
+
+.overseas-step1-mobile .bank-transfer-details .form-group.form-group-vertical input[type="text"],
+.overseas-step1-mobile .manual-card-details .form-group.form-group-vertical input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    min-height: 40px;
+    border: none;
+    border-top: none;
+    border-radius: 0;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    font-size: 15px;
+    box-sizing: border-box;
+    outline: none;
+    background: #fff;
+}
+
+.overseas-step1-mobile .bank-transfer-details .form-group.form-group-vertical select,
+.overseas-step1-mobile .manual-card-details .form-group.form-group-vertical select {
+    width: 100%;
+    padding: 10px;
+    padding-right: 32px;
+    min-height: 40px;
+    border: none;
+    border-top: none;
+    border-radius: 0;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    font-size: 15px;
+    box-sizing: border-box;
+    outline: none;
+    background: #fff;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+}
+
+.overseas-step1-mobile .manual-card-details .form-group.form-group-vertical .card-type-buttons {
+    width: 100%;
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    border: none;
+    border-top: none;
+    border-radius: 0;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    background: #fff;
+}
+
+.overseas-step1-mobile .manual-card-details .form-group.form-group-vertical .card-type-btn {
+    flex: 1;
+    padding: 10px 12px;
+    background: #fff;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+}
+
+.overseas-step1-mobile .manual-card-details .form-group.form-group-vertical .card-type-btn:hover {
+    border-color: #999;
+}
+
+.overseas-step1-mobile .manual-card-details .form-group.form-group-vertical .card-type-btn.selected {
+    border-color: #3b5998;
+    background: #fff;
+    color: #2843e5;
+}
+
+.overseas-step1-mobile .bank-transfer-details .form-group.form-group-vertical .date-inputs,
+.overseas-step1-mobile .manual-card-details .form-group.form-group-vertical .card-number-inputs,
+.overseas-step1-mobile .manual-card-details .form-group.form-group-vertical .date-inputs {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-top: none;
+    border-radius: 0;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.overseas-step1-mobile .manual-card-details .form-group.form-group-vertical .card-number-inputs input {
+    flex: 1;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    box-sizing: border-box;
+    outline: none;
+    background: #fff;
+    text-align: center;
+    padding: 8px 10px;
+}
+
+.overseas-step1-mobile .bank-transfer-details .form-group.form-group-vertical .date-inputs select,
+.overseas-step1-mobile .manual-card-details .form-group.form-group-vertical .date-inputs select {
+    flex: 1;
+    border-radius: 8px;
+    font-size: 15px;
+    box-sizing: border-box;
+    outline: none;
+    background: #fff;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding: 8px 10px;
+    padding-right: 32px;
+}
+
+.overseas-step1-mobile .manual-card-details .form-group.form-group-vertical .card-number-inputs span {
+    color: #666;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.overseas-step1-mobile .bank-transfer-details .form-group label,
+.overseas-step1-mobile .manual-card-details .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.overseas-step1-mobile .bank-transfer-details .form-group input[type="text"],
+.overseas-step1-mobile .manual-card-details .form-group input[type="text"],
+.overseas-step1-mobile .manual-card-details .form-group input[type="number"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    box-sizing: border-box;
+    outline: none;
+    background: #fff;
+}
+
+.overseas-step1-mobile .bank-transfer-details .form-group input[type="text"]::placeholder,
+.overseas-step1-mobile .manual-card-details .form-group input[type="text"]::placeholder,
+.overseas-step1-mobile .manual-card-details .form-group input[type="number"]::placeholder {
+    color: #999;
+}
+
+.overseas-step1-mobile .payment-naver-pay-notice {
+    margin: 24px 0;
+    padding: 20px;
+    background: transparent;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+}
+
+.overseas-step1-mobile .payment-naver-pay-notice h3 {
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.overseas-step1-mobile .payment-naver-pay-notice ul {
+    list-style: disc;
+    padding-left: 18px;
+    line-height: 1.6;
+    color: #666;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.overseas-step1-mobile .payment-naver-pay-notice li {
+    margin-bottom: 6px;
+}
+
+.overseas-step1-mobile .payment-notes-section {
+    margin: 24px 0;
+    padding: 20px;
+    background: transparent;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+}
+
+.overseas-step1-mobile .payment-notes-section h3 {
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.overseas-step1-mobile .payment-notes-section ul {
+    list-style: disc;
+    padding-left: 18px;
+    line-height: 1.6;
+    color: #666;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.overseas-step1-mobile .payment-notes-section li {
+    margin-bottom: 6px;
+}
+
+.overseas-step1-mobile .payment-submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: #f15a24;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 24px;
+}
+
+.overseas-step1-mobile .payment-submit-btn:hover {
+    background: #e04a14;
+}
+
+/* ========================================
+   Completion Step Styles - Mobile
+   ======================================== */
+
+.overseas-step1-mobile .completion-section {
+    text-align: center;
+    padding: 40px 20px;
+    background: #fff;
+    border-radius: 12px;
+    margin: 20px 0;
+}
+
+.overseas-step1-mobile .completion-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    background: #4CAF50;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: #fff;
+    font-weight: bold;
+}
+
+.overseas-step1-mobile .completion-message {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.overseas-step1-mobile .completion-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.overseas-step1-mobile .completion-submessage {
+    font-size: 16px;
+    color: #999;
+    margin-bottom: 24px;
+}
+
+.overseas-step1-mobile .view-details-btn {
+    padding: 12px 24px;
+    background: #fff;
+    border: 2px solid #2843e5;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #2843e5;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.overseas-step1-mobile .view-details-btn:hover {
+    background: #f0f4ff;
+}
+
+.overseas-step1-mobile .accident-free-cash-promo {
+    background: #fff9e6;
+    padding: 32px 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.overseas-step1-mobile .promo-title {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.overseas-step1-mobile .promo-subtitle {
+    font-size: 20px;
+    font-weight: 700;
+    color: #2843e5;
+    margin-bottom: 16px;
+}
+
+.overseas-step1-mobile .promo-description {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.overseas-step1-mobile .promo-illustration {
+    margin: 20px 0;
+}
+
+.overseas-step1-mobile .promo-illustration img {
+    max-width: 100px;
+    height: auto;
+}
+
+.overseas-step1-mobile .piggy-bank-placeholder {
+    font-size: 48px;
+}
+
+.overseas-step1-mobile .promo-info-btn {
+    padding: 10px 20px;
+    background: #ffd700;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.overseas-step1-mobile .promo-info-btn:hover {
+    background: #ffed4e;
+}
+
+.overseas-step1-mobile .completion-notes {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    text-align: left;
+}
+
+.overseas-step1-mobile .completion-notes h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.overseas-step1-mobile .completion-notes ul {
+    list-style: disc;
+    padding-left: 20px;
+    margin: 0;
+}
+
+.overseas-step1-mobile .completion-notes li {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.overseas-step1-mobile .completion-next-btn {
+    width: 100%;
+    padding: 16px;
+    background: #2843e5;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background 0.2s;
+}
+
+.overseas-step1-mobile .completion-next-btn:hover {
+    background: #1e33c4;
+}
+
+/* ========================================
+   Accident Free Cash Modal Styles - Mobile
+   ======================================== */
+
+.overseas-step1-mobile .tour2023_pcBox_top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e0e0e0;
+    flex-shrink: 0;
+}
+
+.overseas-step1-mobile .tour2023_pcBox_top .close {
+    font-size: 24px;
+    color: #999;
+    text-decoration: none;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    background: none;
+    border: none;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.overseas-step1-mobile .tour2023_pcBox_top .close:hover {
+    color: #333;
+}
+
+.overseas-step1-mobile .modal-close {
+    background: none;
+    border: none;
+    font-size: 32px;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+    line-height: 1;
+}
+
+.overseas-step1-mobile .modal-close:hover {
+    color: #333;
+}
+
+.overseas-step1-mobile .tour2023_pcBox_tit {
+    font-family: 'NanumSquareNeoTTF-cBd';
+    font-size: 15px;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.overseas-step1-mobile .tour2023_pcBox_txt03 {
+    padding: 18px 16px;
+    text-align: center;
+}
+
+.overseas-step1-mobile .tour2023_pcBox_txt01 {
+    font-family: 'NanumSquareNeoTTF-cBd';
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 4px 0;
+}
+
+.overseas-step1-mobile .tour2023_pcBox_txt02 {
+    font-size: 14px;
+    color: #666;
+    margin: 0 0 12px 0;
+}
+
+.overseas-step1-mobile .tour2023_pcBox_txt03_content {
+    font-size: 13px;
+    color: #333;
+    line-height: 1.5;
+    margin: 12px 0;
+}
+
+.overseas-step1-mobile .tour2023_pcBox_txt04 {
+    font-size: 12px;
+    color: #999;
+    margin: 6px 0 12px 0;
+}
+
+.overseas-step1-mobile .tour2023PC_cash_icon {
+    margin: 12px 0;
+}
+
+.overseas-step1-mobile .cash_icon_pc {
+    max-width: 100px;
+    height: auto;
+}
+
+.overseas-step1-mobile .tour2023PC_btn01 {
+    display: inline-block;
+    background: #ffe500;
+    color: #333 !important;
+    font-family: 'NanumSquareNeoTTF-cBd';
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    margin-top: 6px;
+}
+
+.overseas-step1-mobile .tour2023PC_btn01:hover {
+    background: #ffd700;
+}
+
+.overseas-step1-mobile .tour2023PC_bg01 {
+    background: #f5f5f5;
+    padding: 16px;
+}
+
+.overseas-step1-mobile .tour2023PC_txt01 {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.4;
+}
+
+.overseas-step1-mobile .tour2023PC_cash_info {
+    display: flex;
+    margin-bottom: 8px;
+    list-style: none;
+    padding: 0;
+    line-height: 1.5;
+}
+
+.overseas-step1-mobile .tour2023PC_cash_info:last-child {
+    margin-bottom: 0;
+}
+
+.overseas-step1-mobile .tour2023PC_cash_info_w {
+    min-width: 20px;
+    flex-shrink: 0;
+    font-weight: 500;
+    font-size: 12px;
+}
+
+.overseas-step1-mobile .tour2023PC_cash_info li:last-child {
+    flex: 1;
+    font-size: 12px;
+}
+
+/* Global modal styles (클래스 없이도 작동하도록) */
+.tour2023_pcBox_top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e0e0e0;
+    flex-shrink: 0;
+}
+
+.tour2023_pcBox_top .close {
+    font-size: 24px;
+    color: #999;
+    text-decoration: none;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    background: none;
+    border: none;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.tour2023_pcBox_top .close:hover {
+    color: #333;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 32px;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    color: #333;
+}
+
+.tour2023_pcBox_tit {
+    font-family: 'NanumSquareNeoTTF-cBd';
+    font-size: 15px;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.tour2023_pcBox_txt03 {
+    padding: 18px 16px;
+    text-align: center;
+}
+
+.tour2023_pcBox_txt01 {
+    font-family: 'NanumSquareNeoTTF-cBd';
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 4px 0;
+}
+
+.tour2023_pcBox_txt02 {
+    font-size: 14px;
+    color: #666;
+    margin: 0 0 12px 0;
+}
+
+.tour2023_pcBox_txt03_content {
+    font-size: 13px;
+    color: #333;
+    line-height: 1.5;
+    margin: 12px 0;
+}
+
+.tour2023_pcBox_txt04 {
+    font-size: 12px;
+    color: #999;
+    margin: 6px 0 12px 0;
+}
+
+.tour2023PC_cash_icon {
+    margin: 12px 0;
+}
+
+.cash_icon_pc {
+    max-width: 100px;
+    height: auto;
+}
+
+.tour2023PC_btn01 {
+    display: inline-block;
+    background: #ffe500;
+    color: #333 !important;
+    font-family: 'NanumSquareNeoTTF-cBd';
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    margin-top: 6px;
+}
+
+.tour2023PC_btn01:hover {
+    background: #ffd700;
+}
+
+.tour2023PC_bg01 {
+    background: #f5f5f5;
+    padding: 16px;
+}
+
+.tour2023PC_txt01 {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.4;
+}
+
+.tour2023PC_cash_info {
+    display: flex;
+    margin-bottom: 8px;
+    list-style: none;
+    padding: 0;
+    line-height: 1.5;
+}
+
+.tour2023PC_cash_info:last-child {
+    margin-bottom: 0;
+}
+
+.tour2023PC_cash_info_w {
+    min-width: 20px;
+    flex-shrink: 0;
+    font-weight: 500;
+    font-size: 12px;
+}
+
+.tour2023PC_cash_info li:last-child {
+    flex: 1;
+    font-size: 12px;
+}

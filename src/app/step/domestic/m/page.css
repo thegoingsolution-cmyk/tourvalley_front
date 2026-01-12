@@ -1,0 +1,196 @@
+/* ======================================== 
+   Domestic Step Page - Mobile Only Styles
+   Scoped under .domestic-step-page-mobile
+   ======================================== */
+
+.domestic-step-page-mobile .tour2023_intro_Wrap {
+  display: block;
+  background: transparent;
+  position: relative;
+}
+
+.domestic-step-page-mobile .tour2023_intro {
+  position: relative;
+  display: block;
+  text-align: center;
+}
+
+.domestic-step-page-mobile .tour2023_intro_w {
+  position: relative;
+  display: block;
+  width: 305px;
+  border-radius: 15px;
+  box-sizing: border-box;
+  text-align: center;
+  margin: 0 auto;
+  padding-top: 50px;
+  padding-bottom: 40px;
+}
+
+.domestic-step-page-mobile .prow_02 {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.domestic-step-page-mobile .tour2023_intro_txt05 {
+  font-family: 'NanumSquareNeoTTF-dEb';
+  font-size: 26px;
+  color: #202020;
+  letter-spacing: -1.5px;
+  line-height: 140%;
+  text-align: center;
+  margin-left: 3px;
+}
+
+.domestic-step-page-mobile .tour2023_intro_txt06 {
+  font-family: 'NanumSquareNeoTTF-bRg';
+  font-size: 16px;
+  color: #000;
+  letter-spacing: -1px;
+  line-height: 130%;
+  text-align: center;
+}
+
+.domestic-step-page-mobile .tourG_mab05 {
+  margin-bottom: 20px;
+}
+
+.domestic-step-page-mobile .tour2023_intro_box04 {
+  position: relative;
+  text-align: left;
+  display: inline-block;
+  width: 100%;
+  height: 123px;
+  border-radius: 18px;
+  box-sizing: border-box;
+  padding: 20px 20px 20px 20px;
+  background-image: linear-gradient(319deg, #5b6cd3 30%, #3e50bb 85%);
+}
+
+.domestic-step-page-mobile .tour2023_intro_txt11 {
+  font-family: 'NanumSquareNeoTTF-dEb';
+  font-size: 22px;
+  color: #fff;
+  letter-spacing: -1.4px;
+  line-height: 125%;
+  text-align: left;
+  position: absolute;
+  display: inline-block;
+  top: 49px;
+  left: 88px;
+}
+
+.domestic-step-page-mobile .tour2023_intro_box04 .icon_03 {
+  position: absolute;
+  left: 34px;
+  top: 36px;
+  width: 50px;
+  height: 50px;
+}
+
+.domestic-step-page-mobile .icon_03 {
+  display: block;
+  background: url(/icons/icon_03.png) no-repeat center center;
+  background-size: contain;
+}
+
+.domestic-step-page-mobile .tourG_mat17 {
+  margin-top: 160px;
+}
+
+.domestic-step-page-mobile .tourG_mab04 {
+  margin-bottom: 15px !important;
+}
+
+.domestic-step-page-mobile .tourGuard_btn_b {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.domestic-step-page-mobile .tour2023_btn {
+  font-size: 20px;
+  padding-top: 15px;
+  letter-spacing: -1px;
+  height: 58px;
+  background-color: #fff;
+  border-radius: 9px;
+  box-sizing: border-box;
+  color: #1b37e1 !important;
+  text-align: center;
+  border: 1px solid #4961f0;
+  display: block;
+  width: 100%;
+  text-decoration: none;
+  position: relative;
+}
+
+.domestic-step-page-mobile .tour2023_arr {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin: 9px 0 0 8px;
+  border-bottom: 1px solid #1b37e1;
+  border-right: 1px solid #1b37e1;
+  vertical-align: top;
+  -ms-transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+  position: absolute;
+  right: 20px;
+  top: 17px;
+}
+
+.domestic-step-page-mobile .tour2023_intro_txt10 {
+  font-size: 14px;
+  color: #808080;
+  text-align: center;
+  line-height: 135%;
+  letter-spacing: -0.5px;
+}
+
+.domestic-step-page-mobile .tour2023_blue {
+  color: #1b37e1 !important;
+}
+
+/* 심의번호 섹션 */
+.domestic-step-page-mobile .bgcolor_white {
+  background-color: #fff;
+}
+
+.domestic-step-page-mobile .prow_01 {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.domestic-step-page-mobile .ptb20 {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.domestic-step-page-mobile .essential_Wrap {
+  text-align: center;
+}
+
+.domestic-step-page-mobile .essential_Wrap .tour2023_txt02 {
+  font-family: 'NanumSquareNeoTTF-aLt';
+  font-size: 12px;
+  line-height: 18px;
+  color: #a5a5a5;
+  letter-spacing: -0.24px;
+  display: block;
+  word-break: keep-all;
+}
+
+.domestic-step-page-mobile .tour2023_grey {
+  color: #a5a5a5;
+}
+
+/* Utility classes */
+.domestic-step-page-mobile .tourG_mat09 {
+  margin-top: 25px;
+}
+
+.domestic-step-page-mobile .tourG_mat10 {
+  margin-top: 35px;
+}
