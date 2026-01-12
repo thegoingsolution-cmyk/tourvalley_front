@@ -43,7 +43,7 @@
     margin-top: 30px;
 }
 
-.tourG_mat13 {
+.main-page-mobile .tourG_mat13 {
     margin-top: 40px !important;
 }
 
@@ -79,98 +79,99 @@
     margin-top: 2px;
 }
 
-.tourG_mat22 {
+/* 메인 페이지 전용 스타일 - CSS 충돌 방지를 위해 .main-page-mobile로 스코프화 */
+.main-page-mobile .tourG_mat22 {
     margin-top: 5px;
 }
 
-.tourG_mat23 {
+.main-page-mobile .tourG_mat23 {
     margin-top: 160px;
 }
 
-.tourG_mat24 {
+.main-page-mobile .tourG_mat24 {
     margin-top: 10px;
 }
 
-.tourG_mat25 {
+.main-page-mobile .tourG_mat25 {
     margin-top: 65px;
 }
 
-.tourG_mat26 {
+.main-page-mobile .tourG_mat26 {
     margin-top: 40px !important;
 }
 
-.tourG_mat27 {
+.main-page-mobile .tourG_mat27 {
     margin-top: 11px;
 }
 
 /* Margin bottom utilities */
-.tourG_mab01 {
+.main-page-mobile .tourG_mab01 {
     margin-bottom: 25px;
 }
 
-.tourG_mab02 {
+.main-page-mobile .tourG_mab02 {
     margin-bottom: 35px;
 }
 
-.tourG_mab03 {
+.main-page-mobile .tourG_mab03 {
     margin-bottom: 10px !important;
 }
 
-.tourG_mab04 {
+.main-page-mobile .tourG_mab04 {
     margin-bottom: 15px !important;
 }
 
-.tourG_mab05 {
+.main-page-mobile .tourG_mab05 {
     margin-bottom: 20px !important;
 }
 
 /* tour2023_intro_txt01과 함께 사용될 때 적용되도록 */
-.tour2023_intro_txt01.tourG_mab05 {
+.main-page-mobile .tour2023_intro_txt01.tourG_mab05 {
     margin-bottom: 20px !important;
 }
 
-.tourG_mab06 {
+.main-page-mobile .tourG_mab06 {
     margin-bottom: 80px;
 }
 
-.tourG_mab07 {
+.main-page-mobile .tourG_mab07 {
     margin-bottom: 7px;
 }
 
-.tourG_mab08 {
+.main-page-mobile .tourG_mab08 {
     margin-bottom: 30px;
 }
 
-.tourG_mab09 {
+.main-page-mobile .tourG_mab09 {
     margin-bottom: 5px;
 }
 
-.tourG_mab10 {
+.main-page-mobile .tourG_mab10 {
     margin-bottom: 45px;
 }
 
-.tourG_mab11 {
+.main-page-mobile .tourG_mab11 {
     margin-bottom: 60px;
 }
 
-.tourG_mab12 {
+.main-page-mobile .tourG_mab12 {
     margin-bottom: 50px;
 }
 
-.tourG_mab13 {
+.main-page-mobile .tourG_mab13 {
     margin-bottom: 70px;
 }
 
-.tourG_mab14 {
+.main-page-mobile .tourG_mab14 {
     margin-bottom: 3px;
 }
 
-.tourG_mab15 {
+.main-page-mobile .tourG_mab15 {
     margin-bottom: 40px;
 }
 
 /* Line utilities */
-.tourG_line05 {
+.main-page-mobile .tourG_line05 {
     border-top: 1px solid #dde1e5;
 }
 
@@ -304,7 +305,7 @@
     text-align: left;
 }
 
-.tour2023_intro_txt12 {
+.main-page-mobile .tour2023_intro_txt12 {
     font-family: 'NanumSquareNeoTTF-bRg', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size: 13px;
     color: #656565;
@@ -314,7 +315,7 @@
     margin: 0;
 }
 
-.tour2023_intro_txt13 {
+.main-page-mobile .tour2023_intro_txt13 {
     font-family: 'NanumSquareNeoTTF-cBd', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size: 21px;
     color: #3c3b3b;
@@ -363,7 +364,7 @@
     background-image: linear-gradient(319deg, #5b6cd3 30%, #3e50bb 85%);
 }
 
-.tour2023_intro_box05 {
+.main-page-mobile .tour2023_intro_box05 {
     position: relative;
     width: 100%;
     height: 97px;
@@ -372,6 +373,7 @@
     padding: 21px 17px 20px 21px;
     border: 1px solid #d0d0d0;
     background-color: #fff;
+    display: block;
 }
 
 .tour2023_intro_box06 {
@@ -454,14 +456,14 @@
     border: 0;
 }
 
-.tour2023_intro_box05 .link_more01 {
+.main-page-mobile .tour2023_intro_box05 .link_more01 {
     position: absolute;
     right: 11px;
     top: 40px;
     width: 16px;
     height: 16px;
     display: block;
-    background: url(/images/link_more.png) no-repeat center center;
+    background: url(/images/g_more.png) no-repeat center center;
     background-size: 50%;
 }
 
@@ -489,14 +491,23 @@
 }
 
 /* Links */
-.tour2023_intro_w > a {
+.tour2023_intro_w > a,
+.tour2023_intro_w a {
     display: block;
     text-decoration: none;
     color: inherit;
+    width: 100%;
 }
 
-.tour2023_intro_w > a:active {
+.tour2023_intro_w > a:active,
+.tour2023_intro_w a:active {
     opacity: 0.95;
+}
+
+.main-page-mobile .tour2023_intro_w a .tour2023_intro_box05 {
+    display: block;
+    width: 100%;
+    position: relative;
 }
 
 /* Disclaimer section */

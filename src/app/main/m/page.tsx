@@ -72,7 +72,7 @@ export default function MobileMainPage() {
 
               {/* 단체(법인)보험 */}
               <div className="tourG_line05 tourG_mat13 tourG_mab08"></div>
-              <Link href="/group-insurance/m">
+              <Link href="/group-insurance">
                 <div className="tour2023_intro_box05">
                   <p className="tour2023_intro_txt12 tourG_mat22">회사, 학교 종교단체 등 단체 전문 플랜</p>
                   <p className="link_more01"></p>

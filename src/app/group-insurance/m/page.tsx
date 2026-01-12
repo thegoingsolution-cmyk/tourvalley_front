@@ -7,10 +7,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import MobileStepIndicator from '@/components/mobiletravel/StepIndicator';
-import MobileTravelInfoStep from '@/components/mobiletravel/TravelInfoStep';
+import MobileGroupTravelInfoStep from '@/components/mobiletravel/GroupTravelInfoStep';
 import MobilePlanSelection from '@/components/mobiletravel/PlanSelection';
-import FixedBottomButtons from '@/components/mobiletravel/FixedBottomButtons';
 import ParticipantInfoStep from '@/components/travel/ParticipantInfoStep';
+import GroupParticipantInfoStep from '@/components/mobiletravel/GroupParticipantInfoStep';
 import RiskActivityStep from '@/components/travel/RiskActivityStep';
 import ContractInfoStep from '@/components/travel/ContractInfoStep';
 import PaymentStep from '@/components/travel/PaymentStep';
@@ -49,6 +49,11 @@ function MobileGroupInsuranceContent() {
   const [travelPurpose, setTravelPurpose] = useState('');
   const [travelPurposeLong, setTravelPurposeLong] = useState('N010001');
   const [travelCountries, setTravelCountries] = useState<Array<{ code: string; name: string }>>([]);
+  const [groupParticipantCount, setGroupParticipantCount] = useState('');
+  const [hasGroupParticipants, setHasGroupParticipants] = useState(false);
+  const [groupParticipantsData, setGroupParticipantsData] = useState<Participant[]>([]);
+  const [groupInsuredData, setGroupInsuredData] = useState<any[]>([]); // InsuredData 형식으로 저장
+  const [participantPremiumsByPlan, setParticipantPremiumsByPlan] = useState<Record<string, Array<{ id: number; name: string; gender: string; birthDate: string; planType: string; premium: number }>>>({});
   
   // 보험료 계산 관련 상태
   const [showPlanSelection, setShowPlanSelection] = useState(false);
@@ -145,6 +150,46 @@ function MobileGroupInsuranceContent() {
       ]);
     }
   }, [activeTab]);
+
+  // 새 창에서 가입자 입력 데이터 받기
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      // 보안을 위해 origin 확인
+      if (event.origin !== window.location.origin) {
+        return;
+      }
+
+      if (event.data && event.data.type === 'PARTICIPANT_INPUT_CONFIRM') {
+        const { participants: newParticipants, participantCount: newCount, insuredData } = event.data;
+        
+        // 그룹 가입자 데이터 저장
+        setGroupParticipantsData(newParticipants);
+        setGroupParticipantCount(String(newCount));
+        setHasGroupParticipants(true);
+        if (insuredData) {
+          setGroupInsuredData(insuredData);
+        }
+        
+        // 기존 participants에 추가
+        const startId = participants.length > 0
+          ? Math.max(...participants.map(p => p.id)) + 1
+          : 1;
+        
+        const participantsWithCorrectIds = newParticipants.map((p: Participant, index: number) => ({
+          ...p,
+          id: startId + index,
+        }));
+
+        const updatedParticipants = [...participants, ...participantsWithCorrectIds];
+        setParticipants(updatedParticipants);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, [participants]);
 
   // 탭 변경 핸들러
   const handleTabChange = (tab: 'DS' | 'FS' | 'FL') => {
@@ -300,15 +345,308 @@ function MobileGroupInsuranceContent() {
     }
   };
 
+  // 그룹 가입자용 보험료 재계산 함수
+  const recalculateGroupPremiums = async () => {
+    if (!hasGroupParticipants || groupInsuredData.length === 0 || !showPlanSelection) {
+      return;
+    }
+
+    if (!departureDate || !arrivalDate) {
+      return;
+    }
+
+    if (activeTab !== 'DS' && !travelCountry) {
+      return;
+    }
+
+    const durationValidation = validateDuration();
+    if (!durationValidation.valid) {
+      return;
+    }
+
+    setIsCalculating(true);
+
+    try {
+      const availablePlans: PlanType[] = activeTab === 'DS' 
+        ? ['실속플랜', '표준플랜']
+        : ['실속플랜', '표준플랜', '고급플랜'];
+
+      const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
+      const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
+
+      const baseCoverages = [
+        { label: '상해사망/후유장해', amount: '3,000만원' },
+        { label: '상해의료비', amount: '100만원' },
+        { label: '질병사망', amount: '100만원' },
+        { label: '배상책임', amount: '1,000만원' },
+      ];
+
+      const plans: Record<string, PlanInfo> = {};
+      const newParticipantPremiumsByPlan: Record<string, Array<{ id: number; name: string; gender: string; birthDate: string; planType: string; premium: number }>> = {};
+
+      for (const planType of availablePlans) {
+        let totalPremium = 0;
+        let hasError = false;
+        const participantPremiums: Array<{ id: number; name: string; gender: string; birthDate: string; planType: string; premium: number }> = [];
+
+        for (let index = 0; index < groupInsuredData.length; index++) {
+          const insured = groupInsuredData[index];
+          const age = calculateAgeFromBirthDate(insured.birthDate);
+          if (age === null) {
+            hasError = true;
+            break;
+          }
+
+          const genderValue = insured.gender === 'W' ? '여자' : '남자';
+
+          try {
+            const response = await fetch('/api/travel/calculate-premium', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                insurance_type: getInsuranceType(),
+                age: age,
+                gender: genderValue,
+                plan_type: planType,
+                has_medical_expense: hasMedicalExpense ? 1 : 0,
+                departure_date: departureDateTime,
+                arrival_date: arrivalDateTime,
+                currency_plan: activeTab === 'FL' ? currencyPlan : '원화',
+                travel_country: activeTab !== 'DS' ? travelCountry : null,
+              }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+              totalPremium += data.premium;
+              participantPremiums.push({
+                id: index + 1,
+                name: insured.name,
+                gender: genderValue,
+                birthDate: insured.birthDate,
+                planType: planType,
+                premium: data.premium,
+              });
+            } else {
+              hasError = true;
+              console.error(`보험료 계산 실패 (${insured.name}, ${planType}):`, data.message);
+            }
+          } catch (error) {
+            hasError = true;
+            console.error(`보험료 계산 오류 (${insured.name}, ${planType}):`, error);
+          }
+        }
+
+        if (!hasError && totalPremium > 0) {
+          plans[planType] = {
+            type: planType,
+            premium: totalPremium,
+            coverages: baseCoverages,
+          };
+          newParticipantPremiumsByPlan[planType] = participantPremiums;
+        }
+      }
+
+      if (Object.keys(plans).length > 0) {
+        setPlanInfo(plans);
+        setParticipantPremiumsByPlan(newParticipantPremiumsByPlan);
+        // 현재 선택된 플랜이 새로운 plans에 있으면 유지, 없으면 첫 번째 플랜 선택
+        const currentPlan = selectedPlan && plans[selectedPlan] ? selectedPlan : (Object.keys(plans)[0] as PlanType);
+        if (!selectedPlan || !plans[selectedPlan]) {
+          setSelectedPlan(currentPlan);
+        }
+        
+        // calculatedPremiums 업데이트
+        if (plans[currentPlan] && newParticipantPremiumsByPlan[currentPlan]) {
+          const roundedTotalPremium = Math.floor(plans[currentPlan].premium / 10) * 10;
+          setCalculatedPremiums({
+            participants: newParticipantPremiumsByPlan[currentPlan],
+            totalPremium: roundedTotalPremium,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('보험료 재계산 오류:', error);
+    } finally {
+      setIsCalculating(false);
+    }
+  };
+
   useEffect(() => {
     if (showPlanSelection && planInfo && selectedPlan) {
-      calculatePremiums();
+      if (hasGroupParticipants && groupInsuredData.length > 0) {
+        // 그룹 가입자용 재계산
+        recalculateGroupPremiums();
+      } else {
+        // 개인 가입자용 재계산
+        calculatePremiums();
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasMedicalExpense, currencyPlan]);
 
   const handleCalculate = async () => {
-    // 입력 검증
+    // 그룹 가입자 데이터가 있는 경우
+    if (hasGroupParticipants && groupParticipantsData.length > 0) {
+      // 그룹 가입자용 검증
+      if (!departureDate || !arrivalDate) {
+        alert('출발일과 도착일을 입력해주세요.');
+        return;
+      }
+
+      // 해외여행은 여행국가 필수
+      if (activeTab !== 'DS' && !travelCountry) {
+        alert('여행국가를 선택해주세요.');
+        return;
+      }
+
+      // 기간 검증
+      const durationValidation = validateDuration();
+      if (!durationValidation.valid) {
+        alert(durationValidation.message);
+        return;
+      }
+
+      // 그룹 가입자 데이터가 있으면 바로 플랜 선택 화면으로 이동
+      setIsCalculating(true);
+      
+      try {
+        // 그룹 가입자는 모든 플랜 사용 가능 (나이 제한 없음)
+        const availablePlans: PlanType[] = activeTab === 'DS' 
+          ? ['실속플랜', '표준플랜']
+          : ['실속플랜', '표준플랜', '고급플랜'];
+
+        const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
+        const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
+
+        const baseCoverages = [
+          { label: '상해사망/후유장해', amount: '3,000만원' },
+          { label: '상해의료비', amount: '100만원' },
+          { label: '질병사망', amount: '100만원' },
+          { label: '배상책임', amount: '1,000만원' },
+        ];
+
+        const plans: Record<string, PlanInfo> = {};
+
+        // 그룹 가입자의 경우 각 가입자별로 보험료 계산 후 합산
+        // groupInsuredData를 사용 (gender가 'M' | 'W' 형식)
+        // 각 플랜별로 가입자별 보험료를 저장
+        const newParticipantPremiumsByPlan: Record<string, Array<{ id: number; name: string; gender: string; birthDate: string; planType: string; premium: number }>> = {};
+        
+        for (const planType of availablePlans) {
+          let totalPremium = 0;
+          let hasError = false;
+          const participantPremiums: Array<{ id: number; name: string; gender: string; birthDate: string; planType: string; premium: number }> = [];
+
+          // 각 가입자에 대해 API 호출
+          for (let index = 0; index < groupInsuredData.length; index++) {
+            const insured = groupInsuredData[index];
+            const age = calculateAgeFromBirthDate(insured.birthDate);
+            if (age === null) {
+              alert(`${insured.name}의 생년월일을 올바르게 입력해주세요.`);
+              setIsCalculating(false);
+              return;
+            }
+
+            // InsuredData의 gender는 'M' | 'W' 형식, API는 '남자' | '여자' 형식 필요
+            const genderValue = insured.gender === 'W' ? '여자' : '남자';
+
+            try {
+              const response = await fetch('/api/travel/calculate-premium', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  insurance_type: getInsuranceType(),
+                  age: age,
+                  gender: genderValue,
+                  plan_type: planType,
+                  has_medical_expense: hasMedicalExpense ? 1 : 0,
+                  departure_date: departureDateTime,
+                  arrival_date: arrivalDateTime,
+                  currency_plan: activeTab === 'FL' ? currencyPlan : '원화',
+                  travel_country: activeTab !== 'DS' ? travelCountry : null,
+                }),
+              });
+
+              const data = await response.json();
+
+              if (data.success) {
+                totalPremium += data.premium;
+                participantPremiums.push({
+                  id: index + 1,
+                  name: insured.name,
+                  gender: genderValue,
+                  birthDate: insured.birthDate,
+                  planType: planType,
+                  premium: data.premium,
+                });
+              } else {
+                hasError = true;
+                console.error(`보험료 계산 실패 (${insured.name}, ${planType}):`, data.message);
+              }
+            } catch (error) {
+              hasError = true;
+              console.error(`보험료 계산 오류 (${insured.name}, ${planType}):`, error);
+            }
+          }
+
+          if (!hasError && totalPremium > 0) {
+            plans[planType] = {
+              type: planType,
+              premium: totalPremium, // 모든 가입자의 보험료 합산
+              coverages: baseCoverages,
+            };
+            newParticipantPremiumsByPlan[planType] = participantPremiums;
+          }
+        }
+
+        if (Object.keys(plans).length === 0) {
+          alert('보험료 계산에 실패했습니다.');
+          setIsCalculating(false);
+          return;
+        }
+
+        setPlanInfo(plans);
+        setParticipantPremiumsByPlan(newParticipantPremiumsByPlan);
+        const firstPlan = availablePlans[0];
+        setSelectedPlan(firstPlan);
+        
+        // calculatedPremiums 설정 (첫 번째 플랜의 보험료로 초기화)
+        if (plans[firstPlan] && newParticipantPremiumsByPlan[firstPlan]) {
+          const roundedTotalPremium = Math.floor(plans[firstPlan].premium / 10) * 10;
+          setCalculatedPremiums({
+            participants: newParticipantPremiumsByPlan[firstPlan],
+            totalPremium: roundedTotalPremium,
+          });
+        }
+        
+        setShowPlanSelection(true);
+
+        setTimeout(() => {
+          if (planSelectionRef.current) {
+            const elementPosition = planSelectionRef.current.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.scrollY - 80;
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: 'smooth'
+            });
+          }
+        }, 100);
+      } catch (error) {
+        console.error('보험료 계산 오류:', error);
+        alert('보험료 계산에 실패했습니다.');
+      } finally {
+        setIsCalculating(false);
+      }
+      return;
+    }
+
+    // 개인 가입자용 검증 (기존 로직)
     if (!departureDate || !arrivalDate || !birthDate || birthDate.length !== 8) {
       alert('모든 정보를 입력해주세요.');
       return;
@@ -609,13 +947,24 @@ function MobileGroupInsuranceContent() {
   const getInsuranceType = () => {
     switch (activeTab) {
       case 'DS':
-        return '국내여행자보험';
+        return '국내여행보험';
       case 'FS':
-        return '해외여행자보험';
+        return '해외여행보험';
       case 'FL':
-        return '해외장기체류보험';
+        // 해외장기체류보험은 여행목적에 따라 결정
+        switch (travelPurposeLong) {
+          case 'N010001':
+            return '유학/어학연수';
+          case 'N010002':
+            return '워킹홀리데이';
+          case 'N010003_1':
+          case 'N010003_2':
+            return '해외출장/주재원/교환교수';
+          default:
+            return '유학/어학연수';
+        }
       default:
-        return '국내여행자보험';
+        return '국내여행보험';
     }
   };
 
@@ -644,7 +993,9 @@ function MobileGroupInsuranceContent() {
               단체여행자보험<br />
               <span className="tour2023_title09">(사업자/법인)</span>
             </p>
-            <MobileStepIndicator currentStep={getCurrentStep()} />
+            <div style={{ flexShrink: 0 }}>
+              <MobileStepIndicator currentStep={getCurrentStep()} />
+            </div>
           </div>
 
           {/* 탭 메뉴 */}
@@ -685,7 +1036,7 @@ function MobileGroupInsuranceContent() {
           </div>
 
           {/* input 정보입력 */}
-          <MobileTravelInfoStep
+          <MobileGroupTravelInfoStep
             departureDate={departureDate}
             departureTime={departureTime}
             arrivalDate={arrivalDate}
@@ -694,6 +1045,7 @@ function MobileGroupInsuranceContent() {
             gender={gender}
             travelCountry={travelCountry}
             travelPurpose={activeTab === 'FL' ? travelPurposeLong : ''}
+            participantCount={groupParticipantCount}
             onDepartureDateChange={setDepartureDate}
             onDepartureTimeChange={setDepartureTime}
             onArrivalDateChange={setArrivalDate}
@@ -702,6 +1054,50 @@ function MobileGroupInsuranceContent() {
             onGenderChange={setGender}
             onTravelCountryChange={setTravelCountry}
             onTravelPurposeChange={activeTab === 'FL' ? setTravelPurposeLong : () => {}}
+            onParticipantCountChange={setGroupParticipantCount}
+            hasGroupParticipants={hasGroupParticipants}
+            onInputButtonClick={() => {
+              const width = 500;
+              const height = 700;
+              const left = (window.screen.width - width) / 2;
+              const top = (window.screen.height - height) / 2;
+              
+              const popup = window.open(
+                `/group-insurance/participant-input?tab=${activeTab}`,
+                'participantInput',
+                `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+              );
+              
+              // 팝업이 준비되면 기존 데이터 전달
+              if (popup && hasGroupParticipants && groupInsuredData.length > 0) {
+                const sendData = () => {
+                  popup.postMessage({
+                    type: 'LOAD_INSURED_DATA',
+                    insuredData: groupInsuredData,
+                    participantCount: groupParticipantCount,
+                  }, window.location.origin);
+                };
+                
+                // 팝업에서 준비 완료 신호를 받으면 데이터 전달
+                const handleReady = (event: MessageEvent) => {
+                  if (event.origin !== window.location.origin) {
+                    return;
+                  }
+                  
+                  if (event.data && event.data.type === 'PARTICIPANT_INPUT_READY') {
+                    window.removeEventListener('message', handleReady);
+                    setTimeout(sendData, 100); // 약간의 지연을 두어 React가 마운트될 시간을 줌
+                  }
+                };
+                
+                window.addEventListener('message', handleReady);
+                
+                // 최대 5초 대기 후 리스너 제거
+                setTimeout(() => {
+                  window.removeEventListener('message', handleReady);
+                }, 5000);
+              }
+            }}
             travelCountries={travelCountries}
             type={getTypeForComponents()}
           />
@@ -727,7 +1123,17 @@ function MobileGroupInsuranceContent() {
               <MobilePlanSelection
                 planInfo={planInfo}
                 selectedPlan={selectedPlan}
-                onPlanSelect={setSelectedPlan}
+                onPlanSelect={(plan) => {
+                  setSelectedPlan(plan);
+                  // 플랜 변경 시 calculatedPremiums 업데이트
+                  if (planInfo && planInfo[plan] && participantPremiumsByPlan[plan]) {
+                    const roundedTotalPremium = Math.floor(planInfo[plan].premium / 10) * 10;
+                    setCalculatedPremiums({
+                      participants: participantPremiumsByPlan[plan],
+                      totalPremium: roundedTotalPremium,
+                    });
+                  }
+                }}
                 hasMedicalExpense={hasMedicalExpense}
                 onMedicalExpenseChange={setHasMedicalExpense}
                 insuranceType={getTitle()}
@@ -736,11 +1142,25 @@ function MobileGroupInsuranceContent() {
               />
             )}
           </div>
+
         </div>
       )}
 
-      {/* STEP 2: 가입자 정보 입력 화면 */}
-      {showParticipantForm && !showStep2_1 && !showStep3 && !showCompletionScreen && (
+      {/* STEP 2: 가입자 정보 입력 화면 - 그룹 보험용 */}
+      {showParticipantForm && !showStep2_1 && !showStep3 && !showCompletionScreen && hasGroupParticipants && (
+        <GroupParticipantInfoStep
+          insuranceType={getTitle()}
+          onApply={() => {
+            // TODO: 그룹 가입 정보 검증 및 다음 단계로 이동
+            setShowParticipantForm(false);
+            setShowStep2_1(true);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+        />
+      )}
+
+      {/* STEP 2: 가입자 정보 입력 화면 - 개인 가입용 */}
+      {showParticipantForm && !showStep2_1 && !showStep3 && !showCompletionScreen && !hasGroupParticipants && (
         <div className="prow_01">
           <div className="tour2023_BWrap tourG_mat13 tourG_mab05">
             <p className="tour2023_title01">{getTitle()}</p>
@@ -777,14 +1197,6 @@ function MobileGroupInsuranceContent() {
         </div>
       )}
 
-      {/* 하단 고정버튼 (STEP 2-1, STEP 3, 완료 화면에서는 숨김) */}
-      {!showStep2_1 && !showStep3 && !showCompletionScreen && (
-        <FixedBottomButtons 
-          canProceed={showPlanSelection && selectedPlan !== null}
-          onTwoOrMoreClick={handleTwoOrMoreClick}
-          onSingleClick={handleSingleClick}
-        />
-      )}
 
       {/* STEP 2-1: 위험활동 확인 및 여행목적 선택 화면 */}
       {showStep2_1 && !showStep3 && !showCompletionScreen && (
@@ -852,17 +1264,158 @@ function MobileGroupInsuranceContent() {
         currentParticipants={participants}
       />
 
+      {/* STEP 3: 계약정보 및 결제 화면 */}
+      {showStep3 && !showCompletionScreen && (
+        <>
+          {/* 상단 타이틀 가입단계 */}
+          <div className="prow_01">
+            <div className="tour2023_BWrap tourG_mat13 tourG_mab05">
+              <p className="tour2023_title01">단체여행자보험</p>
+              {/* 가입 단계 */}
+              <MobileStepIndicator currentStep={getCurrentStep()} />
+            </div>
+          </div>
+          
+          <ContractInfoStep
+            insuranceType={getTitle()}
+            insuranceCompany="메리츠화재"
+            departureDate={departureDate}
+            departureTime={departureTime}
+            arrivalDate={arrivalDate}
+            arrivalTime={arrivalTime}
+            travelPurpose={travelPurpose}
+            travelCountry={travelCountry}
+            participants={hasGroupParticipants ? groupParticipantsData : participants}
+            calculatedPremiums={calculatedPremiums}
+            hasMedicalExpense={hasMedicalExpense}
+            receiptPremium={receiptPremium}
+            useAccidentFreeCash={useAccidentFreeCash}
+            accidentFreeCash={accidentFreeCash}
+            contractConfirmed={contractConfirmed}
+            onUseAccidentFreeCashChange={setUseAccidentFreeCash}
+            onReceiptPremiumChange={setReceiptPremium}
+            onContractConfirmedChange={(confirmed) => {
+              setContractConfirmed(confirmed);
+              if (confirmed) {
+                setTimeout(() => {
+                  setShowPaymentScreen(true);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 100);
+              }
+            }}
+            onShowPayment={() => setShowPaymentScreen(true)}
+          />
+          
+          {/* 결제 화면 */}
+          {showPaymentScreen && (
+            <PaymentStep
+              className="payment-step-connected"
+              paymentMethod={paymentMethod}
+              paymentSubMethod={paymentSubMethod}
+              depositBank={depositBank}
+              depositorName={depositorName}
+              expectedDepositYear={expectedDepositYear}
+              expectedDepositMonth={expectedDepositMonth}
+              expectedDepositDay={expectedDepositDay}
+              cardType={cardType}
+              cardCategory={cardCategory}
+              cardNumber1={cardNumber1}
+              cardNumber2={cardNumber2}
+              cardNumber3={cardNumber3}
+              cardNumber4={cardNumber4}
+              cardExpiryMonth={cardExpiryMonth}
+              cardExpiryYear={cardExpiryYear}
+              cardholderName={cardholderName}
+              cardholderResidentNumber={cardholderResidentNumber}
+              approvalYear={approvalYear}
+              approvalMonth={approvalMonth}
+              approvalDay={approvalDay}
+              normalPremium={normalPremium}
+              receiptPremium={receiptPremium}
+              isSamePremium={isSamePremium}
+              onPaymentMethodChange={setPaymentMethod}
+              onPaymentSubMethodChange={setPaymentSubMethod}
+              onDepositBankChange={setDepositBank}
+              onDepositorNameChange={setDepositorName}
+              onExpectedDepositDateChange={(year, month, day) => {
+                setExpectedDepositYear(year);
+                setExpectedDepositMonth(month);
+                setExpectedDepositDay(day);
+              }}
+              onCardTypeChange={setCardType}
+              onCardCategoryChange={setCardCategory}
+              onCardNumberChange={(part, value) => {
+                if (part === 1) setCardNumber1(value);
+                else if (part === 2) setCardNumber2(value);
+                else if (part === 3) setCardNumber3(value);
+                else setCardNumber4(value);
+              }}
+              onCardExpiryChange={(month, year) => {
+                setCardExpiryMonth(String(month));
+                setCardExpiryYear(String(year));
+              }}
+              onCardholderNameChange={setCardholderName}
+              onCardholderResidentNumberChange={setCardholderResidentNumber}
+              onApprovalDateChange={(year, month, day) => {
+                setApprovalYear(year);
+                setApprovalMonth(month);
+                setApprovalDay(day);
+              }}
+              onNormalPremiumChange={setNormalPremium}
+              onReceiptPremiumChange={setReceiptPremium}
+              onIsSamePremiumChange={setIsSamePremium}
+              onSubmit={handlePaymentSubmit}
+            />
+          )}
+        </>
+      )}
+
+      {/* 결제 완료 화면 */}
+      {showCompletionScreen && (
+        <CompletionStep
+          participantName={hasGroupParticipants 
+            ? (groupParticipantsData[0]?.name || '') 
+            : (participants[0]?.name || '')}
+          onViewDetails={() => {
+            router.push('/contracts');
+          }}
+          onGoHome={() => {
+            router.push('/');
+          }}
+        />
+      )}
+
       {/* 심의번호 */}
       <div className="bgcolor_white prow_01 ptb20 essential_Wrap" style={{ textAlign: 'center' }}>
         <span className="tour2023_txt02 tour2023_grey">
-          <span>
-            ※ 본 광고는 광고심의기준을 준수하였으며, 유효기간은 심의일로부터 1년입니다.<br />
-            준법감시필 제2025-광고T-002(2025.04.07-2026-04.06)
+          <span style={{ whiteSpace: 'nowrap' }}>
+            ※ 본 광고는 광고심의기준을 준수하였으며, 유효기간은 심의일로부터 1년입니다.
           </span>
+          <br />
+          준법감시필 제2025-광고T-002(2025.04.07-2026-04.06)
         </span>
       </div>
 
       <Footer isMobile={true} />
+
+      {/* 가입하기 버튼 - 푸터 아래에 배치 */}
+      {showPlanSelection && planInfo && selectedPlan !== null && !showParticipantForm && !showStep2_1 && !showStep3 && !showCompletionScreen && (
+        <section className="join-button-section">
+          <div className="tour2023_bottom_btn">
+            <a
+              href="javascript:void(0);"
+              onClick={(e) => {
+                e.preventDefault();
+                setShowParticipantForm(true);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="tour2023_btn_b tour2023_btn_join"
+            >
+              가입하기
+            </a>
+          </div>
+        </section>
+      )}
     </div>
   );
 }

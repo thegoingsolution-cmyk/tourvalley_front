@@ -18,8 +18,16 @@ export default function ConsentModal({
   insuranceType = '국내여행보험',
 }: ConsentModalProps) {
   // 보험 타입에 따라 PDF 경로와 텍스트 결정
-  const isOverseas = insuranceType === '해외여행보험' || insuranceType === '해외여행자보험';
-  const isLongTermStay = insuranceType === '해외장기체류보험';
+  // 단체여행자보험 케이스 처리
+  const isGroupInsurance = insuranceType?.includes('단체여행자보험');
+  const isGroupOverseas = isGroupInsurance && insuranceType?.includes('해외여행');
+  const isGroupLongTermStay = isGroupInsurance && insuranceType?.includes('해외장기체류');
+  const isGroupDomestic = isGroupInsurance && insuranceType?.includes('국내여행');
+  
+  // 일반 보험 타입 체크
+  const isOverseas = insuranceType === '해외여행보험' || insuranceType === '해외여행자보험' || isGroupOverseas;
+  const isLongTermStay = insuranceType === '해외장기체류보험' || isGroupLongTermStay;
+  
   const defaultPdfPath = isLongTermStay
     ? '/pdf/해외장기체류보험_약관.pdf'
     : isOverseas
