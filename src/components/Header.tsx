@@ -115,13 +115,23 @@ export default function Header({ isMobile = false, onOpenAccidentFreeCashModal }
                     </button>
                   </div>
                 ) : (
-                  <Link 
-                    href="/login" 
-                    className="mobile-menu-header-text"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    로그인/회원가입
-                  </Link>
+                  <div className="mobile-menu-header-auth">
+                    <Link 
+                      href="/login" 
+                      className="mobile-menu-header-text"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      로그인
+                    </Link>
+                    <span className="mobile-menu-header-separator">/</span>
+                    <Link 
+                      href="/signup" 
+                      className="mobile-menu-header-text"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      회원가입
+                    </Link>
+                  </div>
                 )
               )}
               <button 
@@ -137,9 +147,9 @@ export default function Header({ isMobile = false, onOpenAccidentFreeCashModal }
                 <span className="mobile-menu-text">해외여행자보험</span>
                 <span className="mobile-menu-arrow">›</span>
               </Link>
-              <Link href="/main" className="mobile-menu-item" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link href="/long-term-stay" className="mobile-menu-item" onClick={() => setIsMobileMenuOpen(false)}>
                 <div className="mobile-menu-text-wrapper">
-                  <span className="mobile-menu-text">해외장기체류보험 (4개월초과)</span>
+                  <span className="mobile-menu-text">해외장기체류보험 (3개월초과)</span>
                   <span className="mobile-menu-subtext">(유학,주재원,워킹홀리데이)</span>
                 </div>
                 <span className="mobile-menu-arrow">›</span>
@@ -149,28 +159,24 @@ export default function Header({ isMobile = false, onOpenAccidentFreeCashModal }
                 <span className="mobile-menu-arrow">›</span>
               </Link>
               <Link 
-                href="#"
+                href="/group-insurance"
                 className="mobile-menu-item" 
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsMobileMenuOpen(false);
-                  openGroupInsurancePopup();
-                }}
+                onClick={() => setIsMobileMenuOpen(false)}
               >
                 <span className="mobile-menu-text">단체여행자보험</span>
                 <span className="mobile-menu-arrow">›</span>
               </Link>
-              <Link href="/main" className="mobile-menu-item" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link href="/event-insurance" className="mobile-menu-item" onClick={() => setIsMobileMenuOpen(false)}>
                 <span className="mobile-menu-text">
                   여행자보험 견적신청 <span className="mobile-menu-new">new</span>
                 </span>
                 <span className="mobile-menu-arrow">›</span>
               </Link>
-              <Link href="/main" className="mobile-menu-item" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link href="/event-insurance/m" className="mobile-menu-item" onClick={() => setIsMobileMenuOpen(false)}>
                 <span className="mobile-menu-text">행사주최자 배상책임보험</span>
                 <span className="mobile-menu-arrow">›</span>
               </Link>
-              <Link href="/main" className="mobile-menu-item" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link href="/accident-free-cash" className="mobile-menu-item" onClick={() => setIsMobileMenuOpen(false)}>
                 <span className="mobile-menu-text">무사고캐시</span>
                 <span className="mobile-menu-arrow">›</span>
               </Link>

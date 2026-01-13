@@ -1,2 +1,1223 @@
-/* 모바일 스타일은 PC와 동일하게 처리 (반응형) */
+/* 모바일 계약/캐시 조회 페이지 스타일 */
 
+/* 기본 레이아웃 */
+.prow_01 {
+  padding: 0 5%;
+}
+
+.bgcolor_white {
+  background-color: #fff;
+}
+
+.ptb20 {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.essential_Wrap {
+  padding: 20px 5%;
+}
+
+/* 헤더 */
+.tour2023_header_line {
+  border-bottom: 1px solid #eaebef;
+}
+
+.tour2023_header_inner {
+  position: relative;
+  padding: 15px 5%;
+}
+
+.tour2023_header_inner .tourTop_title {
+  display: block;
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 18px;
+  font-weight: 700;
+  color: #000;
+  line-height: 25px;
+  text-align: center;
+}
+
+/* 타이틀 */
+.tour2023_title04 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 17px;
+  font-weight: 700;
+  color: #333333;
+  line-height: 24px;
+  padding-top: 30px;
+}
+
+/* 라디오 버튼 영역 */
+.tour2023_ra_Wrap {
+  position: relative;
+}
+
+.tour2023_ra_Wrap01 {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+}
+
+.tour2023_rdo_area {
+  margin-top: 30px;
+  width: 100%;
+  text-align: right;
+  position: relative;
+  display: inline-flex;
+  justify-content: space-between;
+}
+
+.tour2023_inp_rdo {
+  position: relative;
+  min-width: 49.6%;
+  display: inline-block;
+  min-height: 40px;
+  overflow-wrap: normal;
+  word-break: normal;
+  vertical-align: top;
+  box-sizing: border-box;
+}
+
+.tour2023_inp_rdo input {
+  position: absolute;
+  display: block;
+  width: 1px;
+  height: 1px;
+  margin: 0px;
+  padding: 0px;
+  border: 0px;
+  background: none;
+  border-radius: 0px;
+  appearance: none !important;
+}
+
+.tour2023_inp_rdo input + label::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: 9px;
+  left: 20px;
+  width: 24px;
+  height: 24px;
+  background: url(/icons/icon_rdo.png) center center no-repeat;
+  background-size: contain;
+}
+
+.tour2023_inp_rdo input:checked + label::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: 9px;
+  left: 20px;
+  width: 24px;
+  height: 24px;
+  background: url(/icons/icon_rdo_ov.png) center center no-repeat;
+  background-size: contain;
+}
+
+.tour2023_inp_rdo input + label {
+  display: inline-block;
+  height: 42px;
+  line-height: 20px;
+  font-size: 16px;
+  color: #b8b9bb !important;
+  padding: 11px 5px 0px 48px;
+  vertical-align: top;
+  letter-spacing: -0.8px;
+  border-radius: 100px;
+  border: 1px solid #b8b9bb;
+  background: #fff;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tour2023_inp_rdo input:checked + label {
+  color: #4d60d6 !important;
+  border-radius: 100px;
+  border: 1px solid #4d60d6;
+  background: #eef0fc;
+  padding: 10px 5px 0px 48px;
+}
+
+/* 폼 영역 */
+.tourGuard_Info {
+  position: relative;
+  margin: 11px 0 15px 0;
+}
+
+.tourGuard_form_tt {
+  position: relative;
+  height: 65px;
+  border: 1px solid #c3c6ce;
+  border-radius: 15px;
+  background: #fff;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.tourGuard_form_tt label {
+  position: absolute;
+  top: 6px;
+  left: 20px;
+  color: #9797a3;
+  font-size: 12px;
+  font-family: 'Malgun Gothic', '맑은고딕', dotum, '돋움', AppleGothic, sans-serif;
+  letter-spacing: -0.8px;
+}
+
+.tourGuard_form_tt input[type="text"],
+.tourGuard_form_tt input[type="tel"] {
+  height: 32px;
+  padding-left: 10px;
+  border: 0;
+  color: #000;
+  font-size: 18px;
+  letter-spacing: 0px;
+  caret-color: #222;
+  display: inline-block;
+  vertical-align: text-top;
+  padding-top: 0px;
+  margin-top: 23px;
+  margin-left: 10px;
+  background: transparent;
+}
+
+.tourGuard_form_tt input[type="text"]::placeholder,
+.tourGuard_form_tt input[type="tel"]::placeholder {
+  color: #dddddd;
+  text-shadow: initial;
+}
+
+.tourGuard_form_tt input[type="text"]:-ms-input-placeholder,
+.tourGuard_form_tt input[type="tel"]:-ms-input-placeholder {
+  color: #dddddd;
+  text-shadow: initial;
+}
+
+.tourGuard_input_w01 {
+  width: 38%;
+}
+
+.tourGuard_input_w02 {
+  flex: 1;
+  min-width: 0;
+}
+
+.tourGuard_input_w03 {
+  width: 20%;
+  margin-right: 10px;
+}
+
+.tourGuard_input_w04 {
+  width: 13%;
+  margin-right: 10px;
+}
+
+.tourGuard_input_w05 {
+  width: 60%;
+}
+
+.tourGuard_input_w06 {
+  width: 47%;
+}
+
+/* 입력 배경 조인 */
+.tourGuard_bg_join {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  height: 32px;
+  padding-left: 10px;
+  font-size: 18px;
+  vertical-align: top;
+  margin: 23px 0 0 10px;
+  margin-right: 0;
+}
+
+.tourGuard_ps_box {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.tourGuard .tourGuard_ps_box {
+  width: 96%;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.tourGuard .tourGuard_ps_box01 {
+  width: 100%;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.tourGuard .tourGuard_ps_box02 {
+  width: 100%;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.tourGuard_sel {
+  width: 100%;
+  height: 32px;
+  border: 0;
+  color: #000;
+  font-size: 18px;
+  background: transparent;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.tourGuard_sel::-ms-expand {
+  display: none;
+}
+
+.tourGuard_sel07 {
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  border: 0;
+  color: #000;
+  font-size: 18px;
+  background: transparent;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.tourGuard_sel07::-ms-expand {
+  display: none;
+}
+
+/* 입력 셀 */
+.tourGuard_input_cell {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  height: 32px;
+  padding-left: 10px;
+  font-size: 18px;
+  vertical-align: top;
+  margin: 23px 0 0 10px;
+}
+
+.tourGuard_input_cell00 {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  height: 32px;
+  padding-left: 10px;
+  font-size: 18px;
+  color: #000;
+  margin: 24px 20px 0 10px;
+}
+
+.tourGuard_input_cell01 {
+  width: 98%;
+}
+
+.tourGuard_input_cell02 {
+  width: 38%;
+}
+
+.tourGuard_input_cell02_1 {
+  width: 32%;
+}
+
+.tourGuard_input_cell07 {
+  width: 22%;
+}
+
+.tourGuard_input_cell08 {
+  width: 44%;
+}
+
+.tourGuard_input_cell03 {
+  align-items: center;
+  background: transparent;
+  font-size: 18px;
+  line-height: 120%;
+  margin-top: 2px;
+}
+
+.tourGuard_input_cell04 {
+  align-items: center;
+  background: #fff;
+  font-size: 15px;
+  line-height: 110%;
+  width: 100%;
+  padding-right: 6px;
+  box-sizing: border-box;
+  border-radius: 5px;
+}
+
+.tourGuard_input_cell05 {
+  align-items: center;
+  background: transparent;
+  font-size: 15px;
+  line-height: 110%;
+  width: 45%;
+  padding-right: 6px;
+  box-sizing: border-box;
+  border-radius: 5px;
+  margin: 20px 0 0 10px;
+}
+
+.tourGuard_input_cell06 {
+  align-items: center;
+  background: transparent;
+  font-size: 16px;
+  line-height: 110%;
+  width: 40%;
+  padding-right: 6px;
+  box-sizing: border-box;
+  border-radius: 5px;
+  margin: 17px 13px 0 10px;
+}
+
+.tourGuard_input_cell09 {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  height: 32px;
+  padding-right: 10px;
+  font-size: 18px;
+  vertical-align: top;
+  margin: 23px 0 0 10px;
+}
+
+.tourGuard_input_cell10 {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  height: 32px;
+  padding-left: 10px;
+  font-size: 18px;
+  vertical-align: top;
+  margin: 16px 0 0 10px;
+}
+
+/* 성별 라디오 */
+.tourG_rdo_area {
+  font-size: 0px;
+  width: 42%;
+  margin-right: 0;
+  vertical-align: middle;
+  text-align: center;
+  position: relative;
+  display: inline-flex;
+}
+
+.tourG_inp_rdo {
+  position: relative;
+  width: 40%;
+  display: inline-block;
+  overflow-wrap: normal;
+  word-break: normal;
+  vertical-align: middle;
+  align-items: center;
+  text-align: center;
+  background: transparent;
+}
+
+.tourG_inp_rdo input {
+  position: absolute;
+  display: block;
+  width: 1px;
+  height: 1px;
+  margin: 0px;
+  padding: 0px;
+  border: 0px;
+  background: none;
+  background: transparent;
+}
+
+.tourG_inp_rdo input:checked + label {
+  background: transparent;
+  border: none;
+  z-index: 1;
+}
+
+.tourG_inp_rdo input + label {
+  width: 100%;
+  height: 32px;
+  display: inline-block;
+  text-align: left;
+  font-size: 17px;
+  vertical-align: middle;
+  letter-spacing: -0.8px;
+  color: #dddddd;
+  box-sizing: border-box;
+  margin: 22px 0 0 0;
+  cursor: pointer;
+}
+
+.tourG_inp_rdo input:checked + label {
+  color: #0000ff;
+  font-weight: 500;
+}
+
+.one_line0 {
+  border-left: 0px !important;
+}
+
+.tourG_inp_rdo input:checked + label.one_line0 {
+  color: #0000ff;
+  border: none;
+}
+
+/* 라인 */
+.tourG_line:after {
+  content: '';
+  position: absolute;
+  display: inline-block;
+  width: 47px;
+  height: 50px;
+  top: -4px;
+  left: 40%;
+  margin: 0px 0 0px 0px;
+  border-bottom: 1px solid #d5d7dd;
+  vertical-align: middle;
+  transform: rotate(297deg);
+  z-index: 1;
+}
+
+.tourG_line03:before {
+  content: '';
+  position: absolute;
+  display: inline-block;
+  width: 18px;
+  height: 1px;
+  top: 38px;
+  left: 21%;
+  margin: 0px 0 0px 0px;
+  border-bottom: 1px solid #bcbcbc;
+  vertical-align: middle;
+  transform: rotate(359deg);
+  z-index: 1;
+}
+
+.tourG_line03:after {
+  content: '';
+  position: absolute;
+  display: inline-block;
+  width: 18px;
+  height: 1px;
+  top: 38px;
+  left: 48%;
+  margin: 0px 0 0px 0px;
+  border-bottom: 1px solid #bcbcbc;
+  vertical-align: middle;
+  transform: rotate(359deg);
+  z-index: 1;
+}
+
+/* 인증 버튼 영역 */
+.tour2023_event_file {
+  position: relative;
+  padding: 13px 17px 0 0;
+  flex-shrink: 0;
+}
+
+.tour2023_event_file01 {
+  position: relative;
+  padding: 13px 17px 0 0;
+}
+
+.tour2023_btn_b01 {
+  display: inline-block;
+  text-decoration: none;
+}
+
+.tour2023_btn11 {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #1b37e1;
+  color: #fff !important;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+/* 타이머 */
+.tour2023_timer {
+  position: relative;
+  padding: 31px 25px 0 0;
+  flex-shrink: 0;
+}
+
+.tour2023_timeLimit {
+  color: #0000ff;
+  font-size: 14px;
+  letter-spacing: 0px;
+}
+
+.tour2023_timer01 {
+  position: relative;
+  padding: 31px 10px 0 0;
+}
+
+/* 무사고캐시 버튼 */
+.btnWrap {
+  margin-top: 20px;
+}
+
+.ag_right {
+  text-align: right;
+}
+
+.btn {
+  display: inline-block;
+  text-decoration: none;
+}
+
+.tourG_btn_cash01 {
+  color: #333 !important;
+  background-color: #fee600;
+  height: 40px;
+  border-radius: 5px;
+  font-size: 16px;
+  letter-spacing: -1.2px;
+  font-weight: 500;
+  padding-top: 10px;
+  padding-left: 4px;
+  width: 140px;
+  text-align: center;
+  box-sizing: border-box;
+  display: inline-block;
+  line-height: 135%;
+  cursor: pointer;
+  border: none;
+}
+
+.btn .cash01_ico {
+  display: inline-block;
+  border-width: 9px 7px 0;
+  border-style: solid;
+  border-color: #222 transparent transparent;
+  vertical-align: baseline;
+  -ms-transform: rotate(270deg);
+  -webkit-transform: rotate(270deg);
+  transform: rotate(270deg);
+  margin-left: 4px;
+  margin-bottom: 1px;
+}
+
+.cash01_ico {
+  display: inline-block;
+  border-width: 9px 7px 0;
+  border-style: solid;
+  border-color: #222 transparent transparent;
+  vertical-align: baseline;
+  -ms-transform: rotate(270deg);
+  -webkit-transform: rotate(270deg);
+  transform: rotate(270deg);
+  margin-left: 4px;
+  margin-bottom: 1px;
+}
+
+/* 조회 버튼 */
+.tourGuard_btn_b {
+  position: relative;
+  display: block;
+  width: 100%;
+  text-decoration: none;
+}
+
+.tour2023_btn01 {
+  font-size: 21px;
+  padding-top: 15px;
+  height: 60px;
+  background-color: #2c3fb3;
+  border-radius: 10px;
+  box-sizing: border-box;
+  color: #fff !important;
+  text-align: center;
+  border: none;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+}
+
+/* 안내 문구 */
+.tour2023_txt01 {
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.tour2023_txt02 {
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.tour2023_grey {
+  color: #a5a5a5;
+}
+
+.tour2023_blue {
+  color: #1b37e1 !important;
+}
+
+.tourGuard_inline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+}
+
+.tourGuard_inline li {
+  display: inline-block;
+}
+
+.tourGuard_inline_t01 {
+  margin-right: 5px;
+}
+
+.tourGuard_inline_t02 {
+  flex: 1;
+}
+
+/* 마진/패딩 유틸리티 */
+.tourG_mat02 {
+  margin-top: 10px !important;
+}
+
+.tourG_mat04 {
+  margin-top: 20px !important;
+}
+
+.tourG_mat06 {
+  margin-top: 15px !important;
+}
+
+.tourG_mab02 {
+  margin-bottom: 35px;
+}
+
+.tourG_mab03 {
+  margin-bottom: 10px !important;
+}
+
+.tourG_mab04 {
+  margin-bottom: 15px !important;
+}
+
+.tourG_mab08 {
+  margin-bottom: 30px;
+}
+
+.tourG_mleft04 {
+  margin-left: 5px;
+}
+
+.mag5 {
+  margin-right: 5%;
+}
+
+/* 푸터 메뉴 */
+.footer_menu {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px 0;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.footer_menu li {
+  display: inline-block;
+}
+
+.footer_menu a {
+  font-size: 13px;
+  color: #666;
+  text-decoration: none;
+}
+
+.per_info {
+  font-size: 12px;
+  color: #666;
+  text-decoration: none;
+}
+
+address {
+  font-style: normal;
+  font-size: 12px;
+  color: #999;
+  line-height: 18px;
+  margin-top: 10px;
+}
+
+#footer {
+  padding: 20px 5%;
+  background-color: #f5f5f5;
+  text-align: center;
+}
+
+.ptb2070 {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+/* ===================================================
+   모바일 계약 조회 - 상단 탭 메뉴 스타일
+   =================================================== */
+
+/* 탭 메뉴 컨테이너 */
+#tour2023_mypageTop {
+  position: relative;
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.tour2023_mypageTop_menu {
+  position: relative;
+  color: #fff;
+  width: 100%;
+  display: inline-flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #dae1e6;
+  border-top: 1px solid #dae1e6;
+}
+
+/* 탭 메뉴 구분선 (2개 탭이므로 중앙에 하나만) */
+.tour2023_mypageTop_menu:before {
+  content: '';
+  position: absolute;
+  display: inline-block;
+  width: 1px;
+  height: 25px;
+  top: 18px;
+  left: 50%;
+  z-index: 1;
+  background-color: #dae1e6;
+}
+
+/* 탭 버튼 기본 스타일 */
+.tour2023_mypageTop_w {
+  display: inline-block;
+  text-decoration: none;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.tour2023_mypageTop_m01 {
+  font-size: 18px;
+  padding-top: 19px;
+  height: 58px;
+  color: #b8b9bb!important;
+  background-color: #fff;
+  box-sizing: border-box;
+  text-align: center;
+  letter-spacing: -1px;
+  font-family: 'NanumSquareNeoTTF-cBd';
+}
+
+/* 활성화된 탭 스타일 */
+.tour2023_mypageTop_m01.on {
+  font-size: 18px;
+  padding-top: 19px;
+  height: 60px;
+  color: #fff!important;
+  background-color: #1b37e1;
+  box-sizing: border-box;
+  text-align: center;
+  letter-spacing: -1px;
+  font-family: 'NanumSquareNeoTTF-dEb';
+}
+
+/* 탭 버튼 너비 (2개 탭 - 50:50) */
+.tour2023_mypageTop_m01_w02 {
+  width: 49.9%;
+}
+
+/* 마일리지 목록 스타일 */
+.tour2023_mileList_Wrap {
+  position: relative;
+  width: 100%;
+  display: block;
+  margin: 0px 0 11px 0px;
+  list-style: none;
+  padding: 0;
+}
+
+.tour2023_mileList {
+  position: relative;
+  width: 97%;
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.tour2023_mileList_Wrap li {
+  margin: 17px 0 0 0;
+}
+
+.tour2023_mileList_Wrap li:first-child {
+  margin-top: 0;
+}
+
+.tour2023_mileList_txt01 {
+  font-size: 16px;
+  color: #999999;
+  text-align: left;
+  line-height: 130%;
+  letter-spacing: -1.5px;
+  vertical-align: top;
+  font-family: 'NanumSquareNeoTTF-bRg';
+}
+
+.tour2023_mileList_txt02 {
+  font-size: 16px;
+  color: #333;
+  text-align: right;
+  line-height: 130%;
+  letter-spacing: -0.8px;
+  vertical-align: top;
+  font-family: 'NanumSquareNeoTTF-cBd';
+}
+
+.tour2023_mileList_txt03 {
+  font-size: 12px;
+  color: #999;
+  text-align: left;
+  display: block;
+  margin-top: 3px;
+  letter-spacing: -0.2px;
+  line-height: 110%;
+  font-family: 'NanumSquareNeoTTF-bRg';
+}
+
+/* 마일리지 BOX */
+.tour2023_mileBOX {
+  position: relative;
+  display: inline-flex;
+  justify-content: space-between;
+  border-radius: 25px;
+  background-color: #eef2fc;
+  width: 100%;
+  height: 110px;
+  box-sizing: border-box;
+  margin: 43px 0 20px 0;
+  padding: 32px 30px 30px 30px;
+}
+
+.tour2023_mileBOX_txt01 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 15px;
+  line-height: 142%;
+  letter-spacing: -1px;
+  display: inline-block;
+  vertical-align: top;
+  text-align: center;
+  color: #2c3fb3;
+}
+
+.tour2023_mileBOX_txt02 {
+  font-family: 'NanumSquareNeoTTF-dEb';
+  display: block;
+  color: #2c3fb3;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.4px;
+  line-height: 110%;
+  margin-top: 5px;
+}
+
+.tour2023_mileBOX_line:after {
+  content: '';
+  display: inline-block;
+  width: 80px;
+  margin: 0px 0 0px 0px;
+  border-bottom: 1px solid #2c3fb3;
+  opacity: 0.4;
+  margin-top: 25px;
+  border-right: 1px solid #fff;
+  -ms-transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+  transform: rotate(-60deg);
+}
+
+/* 마일리지 상단 정보 */
+.tour2023_mileageTop_menu {
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  text-align: center;
+}
+
+/* 텍스트 스타일 추가 */
+.tour2023_txt04 {
+  font-size: 17px;
+  color: #999999;
+  text-align: left;
+  line-height: 130%;
+  letter-spacing: -1px;
+  vertical-align: top;
+  font-family: 'NanumSquareNeoTTF-bRg';
+}
+
+.tour2023_mileageTop_menu .tour2023_txt04 {
+  font-size: 18px;
+  color: #333;
+  text-align: center;
+  margin-bottom: 10px;
+  display: block;
+}
+
+/* 버튼 스타일 */
+.tour2023_btn06 {
+  font-size: 20px;
+  padding: 15px 0;
+  height: 58px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-sizing: border-box;
+  border: 1px solid #2843e5;
+  color: #223ee9!important;
+  text-align: center;
+  cursor: pointer;
+  font-family: 'NanumSquareNeoTTF-cBd';
+  transition: all 0.3s;
+}
+
+.tour2023_btn06:active {
+  background-color: #f0f0f0;
+}
+
+/* 마이페이지 박스 (내역 없음 표시) */
+.tour2023_mypageBox {
+  text-align: center;
+  padding: 60px 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.tour2023_title14 {
+  font-size: 16px;
+  color: #666;
+  font-family: 'NanumSquareNeoTTF-bRg';
+}
+
+/* 페이지네이션 스타일 */
+.board_foot {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.board_foot .paging {
+  display: inline-flex;
+  gap: 5px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.board_foot .paging li {
+  display: inline-block;
+}
+
+.board_foot .paging li a {
+  display: inline-block;
+  padding: 8px 12px;
+  text-decoration: none;
+  color: #666;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  transition: all 0.2s;
+  font-family: 'NanumSquareNeoTTF-bRg';
+}
+
+.board_foot .paging li.on a {
+  background: #1b37e1;
+  color: #fff;
+  border-color: #1b37e1;
+  font-weight: bold;
+}
+
+.board_foot .paging li a:active {
+  background: #f5f5f5;
+  border-color: #999;
+}
+
+.board_foot .paging li.on a:active {
+  background: #1b37e1;
+  border-color: #1b37e1;
+}
+
+/* 계약 목록 스타일 */
+.tour2023_conList_Wrap {
+  position: relative;
+  width: 100%;
+  display: block;
+  margin: 0px 0 11px 0px;
+  list-style: none;
+  padding: 0;
+}
+
+.tour2023_conList {
+  position: relative;
+  width: 97%;
+  display: inline-flex;
+  justify-content: space-between;
+}
+
+.tour2023_conList_Wrap li {
+  margin: 17px 0 0 0;
+}
+
+.tour2023_conList_Wrap li:first-child {
+  margin-top: 0;
+}
+
+.tour2023_conList_txt {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 16px;
+  letter-spacing: -1.2px;
+  color: #989898;
+  line-height: 205%;
+  display: inline-block;
+  box-sizing: border-box;
+  text-decoration: none;
+}
+
+.tour2023_conList_txt01 {
+  font-family: 'NanumSquareNeoTTF-dEb';
+  font-size: 29px;
+  letter-spacing: -1.8px;
+  color: #989898;
+  line-height: 100%;
+  display: inline-block;
+  box-sizing: border-box;
+}
+
+.tour2023_conList_txt02 {
+  font-family: 'NanumSquareNeoTTF-bRg';
+  font-size: 23px;
+  color: #989898;
+  line-height: 130%;
+  display: inline-block;
+  box-sizing: border-box;
+  vertical-align: top;
+}
+
+.tour2023_conList_txt03 {
+  font-family: 'NanumSquareNeoTTF-dEb';
+  font-size: 24px;
+  letter-spacing: -1.4px;
+  color: #242424;
+  line-height: 100%;
+  display: inline-block;
+  box-sizing: border-box;
+  margin: 0px 2px 0px 4px;
+}
+
+.tour2023_conList_bg {
+  background-color: #f1faff;
+}
+
+/* 텍스트 스타일 */
+.tour2023_title02 {
+  font-family: 'NanumSquareNeoTTF-dEb';
+  font-size: 24px;
+  color: #202020;
+  letter-spacing: -1.2px;
+  text-align: left;
+  display: inline-block;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.tour2023_txt09 {
+  font-size: 16px;
+  color: #999999;
+  text-align: left;
+  line-height: 130%;
+  letter-spacing: -1.5px;
+  vertical-align: top;
+  font-family: 'NanumSquareNeoTTF-bRg';
+}
+
+.tour2023_txt10 {
+  font-size: 16px;
+  color: #333;
+  text-align: right;
+  line-height: 130%;
+  letter-spacing: -0.8px;
+  vertical-align: top;
+  font-family: 'NanumSquareNeoTTF-bRg';
+}
+
+.tour2023_txt19 {
+  font-size: 15px;
+  color: #1b37e1;
+  text-align: right;
+  line-height: 130%;
+  letter-spacing: -1px;
+  vertical-align: top;
+  text-decoration: underline;
+  display: inline-block;
+  width: 95%;
+  font-family: 'NanumSquareNeoTTF-bRg';
+}
+
+/* 구분선 */
+.tourG_line05 {
+  border-top: 1px solid #dde1e5;
+}
+
+.tourG_Wrap {
+  clear: both;
+  overflow: hidden;
+}
+
+/* 마진 유틸리티 */
+.tourG_mat07 {
+  margin-top: 10px;
+}
+
+.tourG_mat09 {
+  margin-top: 25px;
+}
+
+.tourG_mat10 {
+  margin-top: 35px;
+}
+
+.tourG_mat14 {
+  margin-top: 50px;
+}
+
+.tourG_mab01 {
+  margin-bottom: 25px;
+}
+
+.tourG_mab04 {
+  margin-bottom: 15px;
+}

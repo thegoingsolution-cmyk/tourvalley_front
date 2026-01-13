@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import './page.css';
 
 export default function MobileEventInsurancePage() {
   const today = new Date();
-  const formattedDate = today.toISOString().split('T')[0];
+  const todayString = today.toISOString().split('T')[0]; // YYYY-MM-DD 형식
 
   // 현재 시간 + 2시간 계산 (00~23시 형식)
   const getDefaultHour = () => {
@@ -17,178 +17,184 @@ export default function MobileEventInsurancePage() {
     return String(nextHour).padStart(2, '0');
   };
 
-  // 행사주최자 정보
-  const [contractorName, setContractorName] = useState('');
-  const [resno1, setResno1] = useState('');
-  const [resno2, setResno2] = useState('');
-  const [resno3, setResno3] = useState('');
-  const [incharge, setIncharge] = useState('');
-  const [ctelNo, setCtelNo] = useState('');
-  const [telNo, setTelNo] = useState('');
-  const [email1, setEmail1] = useState('');
-  const [email2, setEmail2] = useState('');
+  const [formData, setFormData] = useState({
+    contractor_name: '',
+    resno1: '',
+    resno2: '',
+    resno3: '',
+    incharge: '',
+    ctel_no: '',
+    tel_no: '',
+    email1: '',
+    email2: '',
+    select_email: '',
+    event_name: '',
+    start_date: todayString,
+    start_hour: getDefaultHour(),
+    end_date: todayString,
+    end_hour: getDefaultHour(),
+    insured_cnt: '',
+    action_info_1: '',
+    action_info_2: '',
+    action_info_3: '',
+    action_info_4: '',
+    action_info_5: '',
+    action_info_6: '',
+    input_yn: false,
+    me_check: true,
+    bi_cover1: '10000',
+    bi_cover2: '20000',
+    pi_cover1: '1000',
+    me_cover1: '100',
+    me_cover2: '1000',
+    dt_cover1: '10',
+    agree: false,
+  });
 
-  // 행사내용
-  const [eventName, setEventName] = useState('');
-  const [startDate, setStartDate] = useState(formattedDate);
-  const [startHour, setStartHour] = useState(getDefaultHour());
-  const [endDate, setEndDate] = useState(formattedDate);
-  const [endHour, setEndHour] = useState(getDefaultHour());
-  const [insuredCnt, setInsuredCnt] = useState('');
-  const [actionInfo1, setActionInfo1] = useState<string | null>(null);
-  const [actionInfo2, setActionInfo2] = useState<string | null>(null);
-  const [actionInfo3, setActionInfo3] = useState<string | null>(null);
-  const [actionInfo4, setActionInfo4] = useState<string | null>(null);
-  const [actionInfo5, setActionInfo5] = useState<string | null>(null);
-  const [actionInfo6, setActionInfo6] = useState<string | null>(null);
-
-  // 보험가입조건
-  const [inputYn, setInputYn] = useState(false);
-  const [meCheck, setMeCheck] = useState(true);
-
-  // 첨부서류
+  const [coverInputMode, setCoverInputMode] = useState(false);
   const [licenseName, setLicenseName] = useState('');
   const [overviewName, setOverviewName] = useState('');
+  const [licenseFile, setLicenseFile] = useState<File | null>(null);
+  const [overviewFile, setOverviewFile] = useState<File | null>(null);
 
-  // 동의
-  const [agree, setAgree] = useState(false);
+  const emailDomains = [
+    'naver.com',
+    'gmail.com',
+    'daum.net',
+    'hanmail.net',
+    'nate.com',
+    'hotmail.com',
+    'yahoo.co.kr',
+  ];
 
-  // 시간 옵션 (00~23시)
-  const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
-
-  // 휴대폰 번호 포맷팅 (010-1234-5678)
-  const formatPhoneNumber = (value: string) => {
-    const numbers = value.replace(/[^0-9]/g, '');
-    if (value.includes('-') && value === ctelNo) {
-      return value;
-    }
-    if (numbers.length <= 3) {
-      return numbers;
-    } else if (numbers.length <= 7) {
-      return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
-    } else if (numbers.length <= 11) {
-      return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7)}`;
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      if (name === 'input_yn') {
+        setCoverInputMode(checked);
+      }
+      setFormData(prev => ({ ...prev, [name]: checked }));
+    } else if (type === 'radio') {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    } else if (name === 'select_email') {
+      setFormData(prev => ({ ...prev, email2: value, select_email: value }));
+    } else if (['resno1', 'resno2', 'resno3', 'insured_cnt'].includes(name)) {
+      const numericValue = value.replace(/[^0-9]/g, '');
+      setFormData(prev => ({ ...prev, [name]: numericValue }));
     } else {
-      return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
+      setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
-  // 사무실 전화번호 포맷팅
-  const formatTelNumber = (value: string) => {
-    const numbers = value.replace(/[^0-9]/g, '');
-    if (value.includes('-') && value === telNo) {
-      return value;
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: string) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (type === 'license') {
+        setLicenseName(file.name);
+        setLicenseFile(file);
+      } else if (type === 'overview') {
+        setOverviewName(file.name);
+        setOverviewFile(file);
+      }
     }
-    if (numbers.startsWith('02')) {
-      if (numbers.length <= 2) {
-        return numbers;
-      } else if (numbers.length <= 5) {
-        return `${numbers.slice(0, 2)}-${numbers.slice(2)}`;
-      } else if (numbers.length <= 9) {
-        return `${numbers.slice(0, 2)}-${numbers.slice(2, 5)}-${numbers.slice(5)}`;
-      } else {
-        return `${numbers.slice(0, 2)}-${numbers.slice(2, 6)}-${numbers.slice(6, 10)}`;
-      }
-    } else {
-      if (numbers.length <= 3) {
-        return numbers;
-      } else if (numbers.length <= 6) {
-        return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
-      } else if (numbers.length <= 10) {
-        return `${numbers.slice(0, 3)}-${numbers.slice(3, 6)}-${numbers.slice(6)}`;
-      } else {
-        return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
-      }
+  };
+
+  const handleFileChoose = (type: string) => {
+    const fileInput = document.getElementById(type) as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
     }
   };
 
   const handleSubmit = async () => {
     // 유효성 검사
-    if (!contractorName.trim()) {
+    if (!formData.contractor_name.trim()) {
       alert('법인/단체명을 입력해 주세요.');
       return;
     }
-
-    if (resno1.length < 3 || resno2.length < 2 || resno3.length < 5) {
+    
+    if (formData.resno1.length < 3 || formData.resno2.length < 2 || formData.resno3.length < 5) {
       alert('사업자 등록번호를 정확히 입력하여 주십시오');
       return;
     }
 
-    if (!incharge) {
+    if (!formData.incharge) {
       alert('담당자명을 입력해 주세요.');
       return;
     }
 
     // 휴대폰 번호 체크 (하이픈 제외하고 10~11자리)
-    const ctelNoNumbers = ctelNo.replace(/[^0-9]/g, '');
-    if (!ctelNo || ctelNoNumbers.length < 10) {
+    const ctelNoNumbers = formData.ctel_no.replace(/[^0-9]/g, '');
+    if (!formData.ctel_no || ctelNoNumbers.length < 10) {
       alert('휴대폰 번호를 정확히 입력해 주세요. (10~11자리)');
       return;
     }
 
     // 사무실 전화번호 체크 (하이픈 제외하고 9~11자리)
-    const telNoNumbers = telNo.replace(/[^0-9]/g, '');
-    if (!telNo || telNoNumbers.length < 9) {
+    const telNoNumbers = formData.tel_no.replace(/[^0-9]/g, '');
+    if (!formData.tel_no || telNoNumbers.length < 9) {
       alert('사무실 전화번호를 정확히 입력해 주세요. (9~11자리)');
       return;
     }
 
-    if (!email1 || !email2) {
+    if (!formData.email1 || !formData.email2) {
       alert('이메일 주소를 입력해 주세요.');
       return;
     }
 
-    if (!eventName) {
+    if (!formData.event_name) {
       alert('행사명을 입력해 주세요.');
       return;
     }
 
-    if (!startDate) {
+    if (!formData.start_date) {
       alert('시작일을 입력해 주세요.');
       return;
     }
 
-    if (!endDate) {
+    if (!formData.end_date) {
       alert('종료일을 입력해 주세요.');
       return;
     }
 
-    if (!insuredCnt) {
+    if (!formData.insured_cnt) {
       alert('참여인원 수를 입력해 주세요.');
       return;
     }
 
-    if (actionInfo1 === null) {
+    if (!formData.action_info_1) {
       alert('운동경기 유무를 체크해 주세요.');
       return;
     }
 
-    if (actionInfo2 === null) {
+    if (!formData.action_info_2) {
       alert('불꽃놀이 유무를 체크해 주세요.');
       return;
     }
 
-    if (actionInfo3 === null) {
+    if (!formData.action_info_3) {
       alert('수상위험 활동 유무를 체크해 주세요.');
       return;
     }
 
-    if (actionInfo4 === null) {
+    if (!formData.action_info_4) {
       alert('놀이시설 유무를 체크해 주세요.');
       return;
     }
 
-    if (actionInfo5 === null) {
+    if (!formData.action_info_5) {
       alert('드론 유무를 체크해 주세요.');
       return;
     }
 
-    if (actionInfo6 === null) {
+    if (!formData.action_info_6) {
       alert('기타 위험활동 유무를 체크해 주세요.');
       return;
     }
 
-    if (!agree) {
+    if (!formData.agree) {
       alert('개인정보 수집 및 이용에 동의해 주세요.');
       return;
     }
@@ -199,60 +205,81 @@ export default function MobileEventInsurancePage() {
       const memberInfo = localStorage.getItem('member');
       const memberId = memberInfo ? JSON.parse(memberInfo).id : null;
 
-      const formData = new FormData();
-      formData.append('contractor_name', contractorName);
-      formData.append('registration_no', `${resno1}${resno2}${resno3}`);
-      formData.append('incharge', incharge);
-      formData.append('ctel_no', ctelNo);
-      formData.append('tel_no', telNo);
-      formData.append('email', `${email1}@${email2}`);
-      formData.append('event_name', eventName);
-      formData.append('start_date', `${startDate} ${startHour}:00:00`);
-      formData.append('end_date', `${endDate} ${endHour}:00:00`);
-      formData.append('insured_cnt', insuredCnt);
-      formData.append('device', '모바일');
+      const apiFormData = new FormData();
+      apiFormData.append('contractor_name', formData.contractor_name);
+      apiFormData.append('registration_no', `${formData.resno1}${formData.resno2}${formData.resno3}`);
+      apiFormData.append('incharge', formData.incharge);
+      apiFormData.append('ctel_no', formData.ctel_no);
+      apiFormData.append('tel_no', formData.tel_no);
+      apiFormData.append('email', `${formData.email1}@${formData.email2}`);
+      apiFormData.append('event_name', formData.event_name);
+      apiFormData.append('start_date', `${formData.start_date} ${formData.start_hour}:00:00`);
+      apiFormData.append('end_date', `${formData.end_date} ${formData.end_hour}:00:00`);
+      apiFormData.append('insured_cnt', formData.insured_cnt);
       
       // 회원 ID 추가 (로그인한 경우)
       if (memberId) {
-        formData.append('member_id', memberId);
+        apiFormData.append('member_id', memberId);
       }
       
       // 위험활동 정보 (유인 것만 포함)
-      const actionInfoList = [actionInfo1, actionInfo2, actionInfo3, actionInfo4, actionInfo5, actionInfo6]
-        .filter(info => info && info !== 'N')
+      const actionInfoList = [
+        formData.action_info_1,
+        formData.action_info_2,
+        formData.action_info_3,
+        formData.action_info_4,
+        formData.action_info_5,
+        formData.action_info_6
+      ]
+        .filter(info => info && info !== 'N' && info !== '')
         .join('/');
-      formData.append('action_info', actionInfoList);
+      apiFormData.append('action_info', actionInfoList);
 
-      // 보험가입조건 - 모바일은 기본값만 사용
-      console.log('=== 보험가입조건 전송 데이터 (모바일) ===');
-      console.log('  - bi_person: 10000');
-      console.log('  - bi_occurence: 20000');
-      console.log('  - pi_occurence: 1000');
-      console.log('  - dt_occurence: 10');
-      console.log('  - meCheck:', meCheck);
-      
-      formData.append('bi_person', '10000');
-      formData.append('bi_occurence', '20000');
-      formData.append('pi_occurence', '1000');
-      formData.append('dt_occurence', '10');
-      
-      // 참가자치료비 - 체크박스 상태에 따라 값 전송
-      if (meCheck) {
-        formData.append('me_person', '100');
-        formData.append('me_occurence', '1000');
-        console.log('  - me_person: 100');
-        console.log('  - me_occurence: 1000');
+      // 보험가입조건
+      if (formData.input_yn) {
+        // 직접입력 모드
+        apiFormData.append('bi_person', formData.bi_cover1);
+        apiFormData.append('bi_occurence', formData.bi_cover2);
+        apiFormData.append('pi_occurence', formData.pi_cover1);
+        apiFormData.append('dt_occurence', formData.dt_cover1);
+        
+        // 참가자치료비 - 체크박스 상태에 따라 값 전송
+        if (formData.me_check && formData.me_cover1 !== '0' && formData.me_cover2 !== '0') {
+          apiFormData.append('me_person', formData.me_cover1);
+          apiFormData.append('me_occurence', formData.me_cover2);
+        } else {
+          apiFormData.append('me_person', '0');
+          apiFormData.append('me_occurence', '0');
+        }
       } else {
-        formData.append('me_person', '0');
-        formData.append('me_occurence', '0');
-        console.log('  - me_person: 0 (미가입)');
-        console.log('  - me_occurence: 0 (미가입)');
+        // 기본값 모드
+        apiFormData.append('bi_person', '10000');
+        apiFormData.append('bi_occurence', '20000');
+        apiFormData.append('pi_occurence', '1000');
+        apiFormData.append('dt_occurence', '10');
+        
+        // 참가자치료비 - 체크박스 상태에 따라 값 전송
+        if (formData.me_check) {
+          apiFormData.append('me_person', '100');
+          apiFormData.append('me_occurence', '1000');
+        } else {
+          apiFormData.append('me_person', '0');
+          apiFormData.append('me_occurence', '0');
+        }
+      }
+
+      // 첨부파일
+      if (licenseFile) {
+        apiFormData.append('license', licenseFile);
+      }
+      if (overviewFile) {
+        apiFormData.append('overview', overviewFile);
       }
 
       // API 호출
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/event-insurance/estimate`, {
         method: 'POST',
-        body: formData,
+        body: apiFormData,
       });
 
       const data = await response.json();
@@ -260,412 +287,879 @@ export default function MobileEventInsurancePage() {
       if (data.success) {
         alert('견적 신청이 완료되었습니다.\n담당자가 확인 후 연락드리겠습니다.');
         // 폼 초기화
-        window.location.reload();
+        setFormData({
+          contractor_name: '',
+          resno1: '',
+          resno2: '',
+          resno3: '',
+          incharge: '',
+          ctel_no: '',
+          tel_no: '',
+          email1: '',
+          email2: '',
+          select_email: '',
+          event_name: '',
+          start_date: todayString,
+          start_hour: getDefaultHour(),
+          end_date: todayString,
+          end_hour: getDefaultHour(),
+          insured_cnt: '',
+          action_info_1: '',
+          action_info_2: '',
+          action_info_3: '',
+          action_info_4: '',
+          action_info_5: '',
+          action_info_6: '',
+          input_yn: false,
+          me_check: true,
+          bi_cover1: '10000',
+          bi_cover2: '20000',
+          pi_cover1: '1000',
+          me_cover1: '100',
+          me_cover2: '1000',
+          dt_cover1: '10',
+          agree: false,
+        });
+        setLicenseName('');
+        setOverviewName('');
+        setLicenseFile(null);
+        setOverviewFile(null);
+        setCoverInputMode(false);
       } else {
-        alert(data.message || '견적 신청에 실패했습니다.');
+        alert(data.message || '견적 신청에 실패했습니다. 다시 시도해 주세요.');
       }
     } catch (error) {
-      console.error('견적 신청 오류:', error);
-      alert('견적 신청 중 오류가 발생했습니다.');
+      console.error('Error submitting form:', error);
+      alert('견적 신청 중 오류가 발생했습니다. 다시 시도해 주세요.');
     }
   };
 
   return (
-    <div className="event-insurance-page-mobile">
+    <div className="bgcolor_white event-insurance-mobile">
       <Header isMobile={true} />
-
-      <main className="event-content-mobile">
-        <div className="event-form-container-mobile">
-          <h1 className="event-title-mobile">행사주최자 배상책임보험 견적신청</h1>
-          <p className="event-subtitle-mobile">
-            지역축제, 공연, 콘서트, 박람회, 체육행사 등 안전한 행사 진행을 위해 행사보험을 준비하세요.
-          </p>
-
-          {/* 행사주최자 */}
-          <section className="event-section-mobile">
-            <h2 className="section-title-mobile">행사주최자</h2>
-            <div className="form-group-mobile">
-              <label>법인단체명</label>
-              <input
-                type="text"
-                placeholder="행사를 주최하는 법인단체명을 입력해 주세요"
-                value={contractorName}
-                onChange={(e) => setContractorName(e.target.value)}
-              />
-            </div>
-            <div className="form-group-mobile">
-              <label>사업자번호</label>
-              <div className="business-number-inputs">
-                <input
-                  type="tel"
-                  maxLength={3}
-                  value={resno1}
-                  onChange={(e) => setResno1(e.target.value.replace(/[^0-9]/g, ''))}
-                />
-                <span>-</span>
-                <input
-                  type="tel"
-                  maxLength={2}
-                  value={resno2}
-                  onChange={(e) => setResno2(e.target.value.replace(/[^0-9]/g, ''))}
-                />
-                <span>-</span>
-                <input
-                  type="tel"
-                  maxLength={5}
-                  value={resno3}
-                  onChange={(e) => setResno3(e.target.value.replace(/[^0-9]/g, ''))}
-                />
+      
+      <div id="isbwrapper">
+        <div className="prow_01">
+          <form name="inputForm" id="inputForm">
+            <div>
+              <p className="tour2023_title02" style={{ marginTop: '35px' }}>행사주최자 배상책임보험 견적신청</p>
+              <div className="tour2023_txt40 tourG_mat22 tourG_mab07">
+                <p>지역축제, 공연, 콘서트, 박람회, 체육행사 등 안전한 행사 진행을 위해 행사보험을 준비하세요.</p>
               </div>
-            </div>
-            <div className="form-group-mobile">
-              <label>담당자명</label>
-              <input
-                type="text"
-                placeholder="담당자명을 입력해 주세요"
-                value={incharge}
-                onChange={(e) => setIncharge(e.target.value)}
-              />
-            </div>
-            <div className="form-group-mobile">
-              <label>휴대폰 번호</label>
-              <input
-                type="tel"
-                placeholder="숫자만 입력해주세요"
-                maxLength={13}
-                value={ctelNo}
-                onChange={(e) => setCtelNo(formatPhoneNumber(e.target.value))}
-              />
-            </div>
-            <div className="form-group-mobile">
-              <label>사무실 전화번호</label>
-              <input
-                type="tel"
-                placeholder="숫자만 입력해주세요 (지역번호 포함)"
-                maxLength={13}
-                value={telNo}
-                onChange={(e) => setTelNo(formatTelNumber(e.target.value))}
-              />
-            </div>
-            <div className="form-group-mobile">
-              <label>이메일 주소</label>
-              <div className="email-inputs">
-                <input
-                  type="text"
-                  placeholder="이메일"
-                  value={email1}
-                  onChange={(e) => setEmail1(e.target.value)}
-                />
-                <span>@</span>
-                <input
-                  type="text"
-                  placeholder="도메인"
-                  value={email2}
-                  onChange={(e) => setEmail2(e.target.value)}
-                />
-              </div>
-            </div>
-          </section>
 
-          {/* 행사내용 */}
-          <section className="event-section-mobile">
-            <h2 className="section-title-mobile">행사내용</h2>
-            <div className="form-group-mobile">
-              <label>행사명</label>
-              <input
-                type="text"
-                placeholder="행사명을 입력해 주세요"
-                value={eventName}
-                onChange={(e) => setEventName(e.target.value)}
-              />
-            </div>
-            <div className="form-group-mobile">
-              <label>행사시작일</label>
-              <div className="datetime-inputs">
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                />
-                <select value={startHour} onChange={(e) => setStartHour(e.target.value)}>
-                  {hours.map((hour) => (
-                    <option key={hour} value={hour}>
-                      {hour}시
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="form-group-mobile">
-              <label>행사종료일</label>
-              <div className="datetime-inputs">
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                />
-                <select value={endHour} onChange={(e) => setEndHour(e.target.value)}>
-                  {hours.map((hour) => (
-                    <option key={hour} value={hour}>
-                      {hour}시
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="form-group-mobile">
-              <label>예상참여인원</label>
-              <input
-                type="tel"
-                placeholder="숫자만 입력해주세요"
-                value={insuredCnt}
-                onChange={(e) => setInsuredCnt(e.target.value.replace(/[^0-9]/g, ''))}
-              />
-            </div>
+              {/* 행사주최자 */}
+              <div className="tourG_mat04">
+                <p className="tour2023_title05">행사주최자</p>
+                <div className="tourG_mat27 tourG_mab05">
+                  <section className="tourGuard_Info">
+                    <div className="tourGuard_form_tt mag5 tourG_mab03">
+                      <label htmlFor="contract_name">법인단체명</label>
+                      <input 
+                        type="text" 
+                        id="contract_name" 
+                        name="contractor_name"
+                        value={formData.contractor_name}
+                        onChange={handleInputChange}
+                        maxLength={20}
+                        placeholder="행사를 주최하는 법인단체명을 입력해 주세요"
+                        className="tourGuard_input_w02"
+                      />
+                    </div>
 
-            {/* 위험활동 체크 */}
-            <div className="risk-activities-mobile">
-              <div className="risk-item-mobile">
-                <label>운동경기/체육활동 유무</label>
-                <div className="radio-group-mobile">
-                  <label>
-                    <input
-                      type="radio"
-                      name="action_info_1"
-                      value="AT"
-                      checked={actionInfo1 === 'AT'}
-                      onChange={(e) => setActionInfo1(e.target.value)}
-                    />
-                    유
-                  </label>
-                  <label>
-                    <input
-                      type="radio"
-                      name="action_info_1"
-                      value="N"
-                      checked={actionInfo1 === 'N'}
-                      onChange={(e) => setActionInfo1(e.target.value)}
-                    />
-                    무
-                  </label>
+                    <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line03">
+                      <label htmlFor="resno1">사업자번호</label>
+                      <input 
+                        type="tel" 
+                        id="resno1" 
+                        name="resno1"
+                        value={formData.resno1}
+                        onChange={handleInputChange}
+                        maxLength={3}
+                        className="tourGuard_input_w03"
+                      />
+                      <input 
+                        type="tel" 
+                        id="resno2" 
+                        name="resno2"
+                        value={formData.resno2}
+                        onChange={handleInputChange}
+                        maxLength={2}
+                        className="tourGuard_input_w03"
+                      />
+                      <input 
+                        type="tel" 
+                        id="resno3" 
+                        name="resno3"
+                        value={formData.resno3}
+                        onChange={handleInputChange}
+                        maxLength={5}
+                        className="tourGuard_input_w03"
+                      />
+                    </div>
+
+                    <div className="tourGuard_form_tt mag5 tourG_mab03">
+                      <label htmlFor="incharge">담당자명</label>
+                      <input 
+                        type="text" 
+                        id="incharge" 
+                        name="incharge"
+                        value={formData.incharge}
+                        onChange={handleInputChange}
+                        maxLength={15}
+                        placeholder="담당자명을 입력해 주세요"
+                        className="tourGuard_input_w02"
+                      />
+                    </div>
+
+                    <div className="tourGuard_form_tt mag5 tourG_mab03">
+                      <label htmlFor="ctel_no">휴대폰 번호</label>
+                      <input 
+                        type="tel" 
+                        id="ctel_no" 
+                        name="ctel_no"
+                        value={formData.ctel_no}
+                        onChange={handleInputChange}
+                        maxLength={12}
+                        placeholder="숫자만 입력해주세요."
+                        className="tourGuard_input_w02"
+                      />
+                    </div>
+
+                    <div className="tourGuard_form_tt mag5 tourG_mab03">
+                      <label htmlFor="tel_no">사무실 전화번호</label>
+                      <input 
+                        type="text" 
+                        id="tel_no" 
+                        name="tel_no"
+                        value={formData.tel_no}
+                        onChange={handleInputChange}
+                        maxLength={12}
+                        placeholder="숫자만 입력해주세요.(지역번호 포함)"
+                        className="tourGuard_input_w02"
+                      />
+                    </div>
+
+                    <div className="tourGuard_form_tt mag5 tourG_mab03">
+                      <label htmlFor="email1">이메일 주소</label>
+                      <input 
+                        type="text" 
+                        id="email1" 
+                        name="email1"
+                        value={formData.email1}
+                        onChange={handleInputChange}
+                        maxLength={20}
+                        className="tourGuard_input_w01"
+                      />
+                      <div className="tourGuard_txt03" style={{ left: '32%' }}>@</div>
+                      <input 
+                        type="text" 
+                        id="email2" 
+                        name="email2"
+                        value={formData.email2}
+                        onChange={handleInputChange}
+                        maxLength={20}
+                        className="tourGuard_input_w01"
+                      />
+                      <div className="tourGuard_input_cell08 tourGuard_input_cell09 tourGuard">
+                        <span className="tourGuard_ps_box">
+                          <select 
+                            className="tourGuard_sel" 
+                            id="select_email" 
+                            name="select_email"
+                            value={formData.select_email}
+                            onChange={handleInputChange}
+                          >
+                            <option value="" disabled>선택</option>
+                            {emailDomains.map(domain => (
+                              <option key={domain} value={domain}>{domain}</option>
+                            ))}
+                          </select>
+                        </span>
+                      </div>
+                    </div>
+                  </section>
                 </div>
               </div>
-              <div className="risk-item-mobile">
-                <label>불꽃놀이 유무</label>
-                <div className="radio-group-mobile">
-                  <label>
-                    <input
-                      type="radio"
-                      name="action_info_2"
-                      value="FW"
-                      checked={actionInfo2 === 'FW'}
-                      onChange={(e) => setActionInfo2(e.target.value)}
-                    />
-                    유
-                  </label>
-                  <label>
-                    <input
-                      type="radio"
-                      name="action_info_2"
-                      value="N"
-                      checked={actionInfo2 === 'N'}
-                      onChange={(e) => setActionInfo2(e.target.value)}
-                    />
-                    무
-                  </label>
-                </div>
-              </div>
-              <div className="risk-item-mobile">
-                <label>수상위험 유무</label>
-                <div className="radio-group-mobile">
-                  <label>
-                    <input
-                      type="radio"
-                      name="action_info_3"
-                      value="WR"
-                      checked={actionInfo3 === 'WR'}
-                      onChange={(e) => setActionInfo3(e.target.value)}
-                    />
-                    유
-                  </label>
-                  <label>
-                    <input
-                      type="radio"
-                      name="action_info_3"
-                      value="N"
-                      checked={actionInfo3 === 'N'}
-                      onChange={(e) => setActionInfo3(e.target.value)}
-                    />
-                    무
-                  </label>
-                </div>
-              </div>
-              <div className="risk-item-mobile">
-                <label>놀이시설(에어바운스) 유무</label>
-                <div className="radio-group-mobile">
-                  <label>
-                    <input
-                      type="radio"
-                      name="action_info_4"
-                      value="PF"
-                      checked={actionInfo4 === 'PF'}
-                      onChange={(e) => setActionInfo4(e.target.value)}
-                    />
-                    유
-                  </label>
-                  <label>
-                    <input
-                      type="radio"
-                      name="action_info_4"
-                      value="N"
-                      checked={actionInfo4 === 'N'}
-                      onChange={(e) => setActionInfo4(e.target.value)}
-                    />
-                    무
-                  </label>
-                </div>
-              </div>
-              <div className="risk-item-mobile">
-                <label>드론 유무</label>
-                <div className="radio-group-mobile">
-                  <label>
-                    <input
-                      type="radio"
-                      name="action_info_5"
-                      value="DR"
-                      checked={actionInfo5 === 'DR'}
-                      onChange={(e) => setActionInfo5(e.target.value)}
-                    />
-                    유
-                  </label>
-                  <label>
-                    <input
-                      type="radio"
-                      name="action_info_5"
-                      value="N"
-                      checked={actionInfo5 === 'N'}
-                      onChange={(e) => setActionInfo5(e.target.value)}
-                    />
-                    무
-                  </label>
-                </div>
-              </div>
-              <div className="risk-item-mobile">
-                <label>기타 위험활동 유무</label>
-                <div className="radio-group-mobile">
-                  <label>
-                    <input
-                      type="radio"
-                      name="action_info_6"
-                      value="ET"
-                      checked={actionInfo6 === 'ET'}
-                      onChange={(e) => setActionInfo6(e.target.value)}
-                    />
-                    유
-                  </label>
-                  <label>
-                    <input
-                      type="radio"
-                      name="action_info_6"
-                      value="N"
-                      checked={actionInfo6 === 'N'}
-                      onChange={(e) => setActionInfo6(e.target.value)}
-                    />
-                    무
-                  </label>
-                </div>
-              </div>
-            </div>
-          </section>
 
-          {/* 보험가입조건 */}
-          <section className="event-section-mobile">
-            <h2 className="section-title-mobile">보험가입조건</h2>
-            <div className="insurance-info-mobile">
-              <p>대인배상: 1인당 1억원 / 1사고당 2억원</p>
-              <p>대물배상: 1사고당 1,000만원</p>
-              <p>참가자치료비: 1인당 100만원 / 1사고당 1,000만원</p>
-              <p>자기부담금: 1사고당 10만원</p>
-            </div>
-            <div className="form-group-mobile">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={inputYn}
-                  onChange={(e) => setInputYn(e.target.checked)}
-                />
-                직접입력
-              </label>
-            </div>
-          </section>
+              {/* 행사내용 */}
+              <div className="tourG_mat10">
+                <p className="tour2023_title05">행사내용</p>
+                <div className="tourG_mat27 tourG_mab05">
+                  <section className="tourGuard_Info">
+                    <div className="tourGuard_form_tt mag5 tourG_mab03">
+                      <label htmlFor="event_name">행사명</label>
+                      <input 
+                        type="text" 
+                        id="event_name" 
+                        name="event_name"
+                        value={formData.event_name}
+                        onChange={handleInputChange}
+                        maxLength={30}
+                        placeholder="행사명을 입력해 주세요"
+                        className="tourGuard_input_w02"
+                      />
+                    </div>
 
-          {/* 첨부서류 */}
-          <section className="event-section-mobile">
-            <h2 className="section-title-mobile">첨부서류</h2>
-            <div className="form-group-mobile">
-              <label>사업자등록증(고유번호증)</label>
-              <input
-                type="text"
-                placeholder="업로드해 주세요"
-                value={licenseName}
-                readOnly
-                onClick={() => document.getElementById('license')?.click()}
-              />
-              <input
-                type="file"
-                id="license"
-                style={{ display: 'none' }}
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) setLicenseName(file.name);
-                }}
-              />
-            </div>
-            <div className="form-group-mobile">
-              <label>행사개요</label>
-              <input
-                type="text"
-                placeholder="업로드해 주세요"
-                value={overviewName}
-                readOnly
-                onClick={() => document.getElementById('overview')?.click()}
-              />
-              <input
-                type="file"
-                id="overview"
-                style={{ display: 'none' }}
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) setOverviewName(file.name);
-                }}
-              />
-            </div>
-            <p className="notice-text-mobile">
-              ※ 행사주최자 배상책임보험 견적서 발송은 견적신청 후 2시간 정도 걸립니다. (영업시간 기준)
-            </p>
-          </section>
+                    <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line">
+                      <label htmlFor="start_date">행사시작일</label>
+                      <input 
+                        type="date" 
+                        id="start_date" 
+                        name="start_date"
+                        value={formData.start_date}
+                        onChange={handleInputChange}
+                        className="tourGuard_input_w01"
+                      />
+                      <div className="tourGuard_bg_join tourGuard_input_cell tourGuard_input_cell02 tourGuard" style={{ marginRight: 0 }}>
+                        <span className="tourGuard_ps_box">
+                          <select 
+                            className="tourGuard_sel07" 
+                            id="start_hour" 
+                            name="start_hour"
+                            value={formData.start_hour}
+                            onChange={handleInputChange}
+                          >
+                            {Array.from({ length: 24 }, (_, i) => i + 1).map(hour => (
+                              <option key={hour} value={hour.toString().padStart(2, '0')}>
+                                {hour.toString().padStart(2, '0')}시
+                              </option>
+                            ))}
+                          </select>
+                        </span>
+                      </div>
+                    </div>
 
-          {/* 개인정보 동의 */}
-          <div className="agree-section-mobile">
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                checked={agree}
-                onChange={(e) => setAgree(e.target.checked)}
-              />
-              개인정보 수집 및 이용 동의(필수)
-            </label>
-          </div>
+                    <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line">
+                      <label htmlFor="end_date">행사종료일</label>
+                      <input 
+                        type="date" 
+                        id="end_date" 
+                        name="end_date"
+                        value={formData.end_date}
+                        onChange={handleInputChange}
+                        className="tourGuard_input_w01"
+                      />
+                      <div className="tourGuard_bg_join tourGuard_input_cell tourGuard_input_cell02 tourGuard" style={{ marginRight: 0 }}>
+                        <span className="tourGuard_ps_box">
+                          <select 
+                            className="tourGuard_sel07" 
+                            id="end_hour" 
+                            name="end_hour"
+                            value={formData.end_hour}
+                            onChange={handleInputChange}
+                          >
+                            {Array.from({ length: 24 }, (_, i) => i + 1).map(hour => (
+                              <option key={hour} value={hour.toString().padStart(2, '0')}>
+                                {hour.toString().padStart(2, '0')}시
+                              </option>
+                            ))}
+                          </select>
+                        </span>
+                      </div>
+                    </div>
 
-          {/* 제출 버튼 */}
-          <button className="submit-button-mobile" onClick={handleSubmit}>
-            견적신청하기
-          </button>
+                    <div className="tourGuard_form_tt mag5 tourG_mab03">
+                      <label htmlFor="insured_cnt">예상참여인원</label>
+                      <input 
+                        type="tel" 
+                        id="insured_cnt" 
+                        name="insured_cnt"
+                        value={formData.insured_cnt}
+                        onChange={handleInputChange}
+                        maxLength={5}
+                        placeholder="숫자만 입력해주세요."
+                        className="tourGuard_input_w02"
+                      />
+                      <div className="tourGuard_txt21">명</div>
+                    </div>
+
+                    <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line">
+                      <div className="tourG_rdo_area">
+                        <label htmlFor="action_info_1_Y">운동경기/체육활동 유무</label>
+                        <span className="tourG_inp_rdo">
+                          <input 
+                            type="radio" 
+                            id="action_info_1_Y" 
+                            value="AT" 
+                            name="action_info_1"
+                            checked={formData.action_info_1 === 'AT'}
+                            onChange={handleInputChange}
+                          />
+                          <label htmlFor="action_info_1_Y">유</label>
+                        </span>
+                        <span className="tourG_inp_rdo">
+                          <input 
+                            type="radio" 
+                            id="action_info_1_N" 
+                            value="" 
+                            name="action_info_1"
+                            checked={formData.action_info_1 === ''}
+                            onChange={handleInputChange}
+                          />
+                          <label htmlFor="action_info_1_N" className="one_line0">무</label>
+                        </span>
+                      </div>
+
+                      <div className="tourG_rdo_area">
+                        <label htmlFor="action_info_2_Y">불꽃놀이 유무</label>
+                        <span className="tourG_inp_rdo">
+                          <input 
+                            type="radio" 
+                            id="action_info_2_Y" 
+                            value="FW" 
+                            name="action_info_2"
+                            checked={formData.action_info_2 === 'FW'}
+                            onChange={handleInputChange}
+                          />
+                          <label htmlFor="action_info_2_Y">유</label>
+                        </span>
+                        <span className="tourG_inp_rdo">
+                          <input 
+                            type="radio" 
+                            id="action_info_2_N" 
+                            value="" 
+                            name="action_info_2"
+                            checked={formData.action_info_2 === ''}
+                            onChange={handleInputChange}
+                          />
+                          <label htmlFor="action_info_2_N" className="one_line0">무</label>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line">
+                      <div className="tourG_rdo_area">
+                        <label htmlFor="action_info_3_Y">수상위험 유무</label>
+                        <span className="tourG_inp_rdo">
+                          <input 
+                            type="radio" 
+                            id="action_info_3_Y" 
+                            value="WR" 
+                            name="action_info_3"
+                            checked={formData.action_info_3 === 'WR'}
+                            onChange={handleInputChange}
+                          />
+                          <label htmlFor="action_info_3_Y">유</label>
+                        </span>
+                        <span className="tourG_inp_rdo">
+                          <input 
+                            type="radio" 
+                            id="action_info_3_N" 
+                            value="" 
+                            name="action_info_3"
+                            checked={formData.action_info_3 === ''}
+                            onChange={handleInputChange}
+                          />
+                          <label htmlFor="action_info_3_N" className="one_line0">무</label>
+                        </span>
+                      </div>
+
+                      <div className="tourG_rdo_area">
+                        <label htmlFor="action_info_4_Y">놀이시설(에어바운스) 유무</label>
+                        <span className="tourG_inp_rdo">
+                          <input 
+                            type="radio" 
+                            id="action_info_4_Y" 
+                            value="PF" 
+                            name="action_info_4"
+                            checked={formData.action_info_4 === 'PF'}
+                            onChange={handleInputChange}
+                          />
+                          <label htmlFor="action_info_4_Y">유</label>
+                        </span>
+                        <span className="tourG_inp_rdo">
+                          <input 
+                            type="radio" 
+                            id="action_info_4_N" 
+                            value="" 
+                            name="action_info_4"
+                            checked={formData.action_info_4 === ''}
+                            onChange={handleInputChange}
+                          />
+                          <label htmlFor="action_info_4_N" className="one_line0">무</label>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line">
+                      <div className="tourG_rdo_area">
+                        <label htmlFor="action_info_5_Y">드론 유무</label>
+                        <span className="tourG_inp_rdo">
+                          <input 
+                            type="radio" 
+                            id="action_info_5_Y" 
+                            value="DR" 
+                            name="action_info_5"
+                            checked={formData.action_info_5 === 'DR'}
+                            onChange={handleInputChange}
+                          />
+                          <label htmlFor="action_info_5_Y">유</label>
+                        </span>
+                        <span className="tourG_inp_rdo">
+                          <input 
+                            type="radio" 
+                            id="action_info_5_N" 
+                            value="" 
+                            name="action_info_5"
+                            checked={formData.action_info_5 === ''}
+                            onChange={handleInputChange}
+                          />
+                          <label htmlFor="action_info_5_N" className="one_line0">무</label>
+                        </span>
+                      </div>
+
+                      <div className="tourG_rdo_area">
+                        <label htmlFor="action_info_6_Y">기타 위험활동 유무</label>
+                        <span className="tourG_inp_rdo">
+                          <input 
+                            type="radio" 
+                            id="action_info_6_Y" 
+                            value="ET" 
+                            name="action_info_6"
+                            checked={formData.action_info_6 === 'ET'}
+                            onChange={handleInputChange}
+                          />
+                          <label htmlFor="action_info_6_Y">유</label>
+                        </span>
+                        <span className="tourG_inp_rdo">
+                          <input 
+                            type="radio" 
+                            id="action_info_6_N" 
+                            value="" 
+                            name="action_info_6"
+                            checked={formData.action_info_6 === ''}
+                            onChange={handleInputChange}
+                          />
+                          <label htmlFor="action_info_6_N" className="one_line0">무</label>
+                        </span>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+              </div>
+
+              {/* 보험가입조건 */}
+              <div className="tour2023_flex tourG_mat04">
+                <p className="tour2023_title18">보험가입조건</p>
+                <ul className="tour2023_agree tourG_mat06 tourG_mRight02">
+                  <li className="tour2023_cir tour2023_chk tourG_mat02">
+                    <input 
+                      type="checkbox" 
+                      name="input_yn" 
+                      id="input_yn"
+                      checked={formData.input_yn}
+                      onChange={handleInputChange}
+                    />
+                    <label htmlFor="input_yn"><span className="tourGuard_txt24"> 직접입력</span></label>
+                  </li>
+                </ul>
+              </div>
+
+              <section className="tourGuard_Info">
+                <div className="tourG_mab03">
+                  <table className="tour2024_ListB" border={1} cellSpacing="0">
+                    <colgroup>
+                      <col width="" />
+                      <col width="" />
+                      <col width="" />
+                      <col width="" />
+                    </colgroup>
+                    <tbody id="generalCover" style={{ display: coverInputMode ? 'none' : '' }}>
+                      <tr>
+                        <td rowSpan={2} className="sName tour2024_ListB_bg tour2024_ListB_wd">선택</td>
+                        <td rowSpan={2} className="sName tour2024_ListB_bg tour2024_ListB_wd01">구분</td>
+                        <td colSpan={2} className="sName tour2024_ListB_bg tour2024_ListB_wd02 Bline">보상한도</td>
+                      </tr>
+                      <tr>
+                        <td className="sName tour2024_ListB_bg no01">1인당</td>
+                        <td className="sName tour2024_ListB_bg no01">1사고당</td>
+                      </tr>
+                      <tr>
+                        <td className="ag_center tour2024_ListB_bg02">필수</td>
+                        <td className="ag_center tour2024_ListB_bg02">
+                          <div className="tour2023_insuBox01">대인배상</div>
+                        </td>
+                        <td className="ag_center">1억원</td>
+                        <td className="ag_center">2억원</td>
+                      </tr>
+                      <tr>
+                        <td className="ag_center tour2024_ListB_bg02">필수</td>
+                        <td className="ag_center tour2024_ListB_bg02">
+                          <div className="tour2023_insuBox01">대물배상</div>
+                        </td>
+                        <td className="ag_center">-</td>
+                        <td className="ag_center">1,000만원</td>
+                      </tr>
+                      <tr>
+                        <td className="ag_center tour2024_ListB_bg02">
+                          (선택)&nbsp;
+                          <ul className="tour2023_check">
+                            <li className="tour2023_cir03 tour2023_chk03 tourG_mat02">
+                              <input 
+                                type="checkbox" 
+                                name="me_check"
+                                checked={formData.me_check}
+                                onChange={handleInputChange}
+                              />
+                            </li>
+                          </ul>
+                        </td>
+                        <td className="ag_center tour2024_ListB_bg02">
+                          <div className="tour2023_insuBox01">참가자치료비<br />(구내치료비)</div>
+                        </td>
+                        <td className="ag_center"><span className="tourGuard_blue">100만원</span></td>
+                        <td className="ag_center"><span className="tourGuard_blue">1,000만원</span></td>
+                      </tr>
+                      <tr>
+                        <td className="ag_center tour2024_ListB_bg02">필수</td>
+                        <td className="ag_center tour2024_ListB_bg02">
+                          <div className="tour2023_insuBox01">자기부담금</div>
+                        </td>
+                        <td className="ag_center">-</td>
+                        <td className="ag_center">10만원</td>
+                      </tr>
+                    </tbody>
+
+                    <tbody id="inputCover" style={{ display: coverInputMode ? '' : 'none' }}>
+                      <tr>
+                        <td rowSpan={2} className="sName tour2024_ListB_bg tour2024_ListB_wd">선택</td>
+                        <td rowSpan={2} className="sName tour2024_ListB_bg tour2024_ListB_wd01">구분</td>
+                        <td colSpan={2} className="sName tour2024_ListB_bg tour2024_ListB_wd02 Bline">보상한도</td>
+                      </tr>
+                      <tr>
+                        <td className="sName tour2024_ListB_bg no01">1인당</td>
+                        <td className="sName tour2024_ListB_bg no01">1사고당</td>
+                      </tr>
+                      <tr>
+                        <td className="ag_center tour2024_ListB_bg02">필수</td>
+                        <td className="ag_center tour2024_ListB_bg02">
+                          <div className="tour2023_insuBox01">대인배상</div>
+                        </td>
+                        <td className="ag_center">
+                          <div className="tour2023_sel">
+                            <div className="tour2023_estimate_form_tt tourGuard styled-select">
+                              <span className="tourGuard_ps_box_event">
+                                <select 
+                                  className="tourGuard_sel01" 
+                                  id="bi_cover1" 
+                                  name="bi_cover1"
+                                  value={formData.bi_cover1}
+                                  onChange={handleInputChange}
+                                >
+                                  <option value="5000">5천만</option>
+                                  <option value="10000">1억</option>
+                                  <option value="20000">2억</option>
+                                  <option value="30000">3억</option>
+                                </select>
+                              </span>
+                            </div>
+                            <span className="tourGuard_txt33">원</span>
+                          </div>
+                        </td>
+                        <td className="ag_center">
+                          <div className="tour2023_sel">
+                            <div className="tour2023_estimate_form_tt tourGuard styled-select">
+                              <span className="tourGuard_ps_box_event">
+                                <select 
+                                  className="tourGuard_sel01" 
+                                  id="bi_cover2" 
+                                  name="bi_cover2"
+                                  value={formData.bi_cover2}
+                                  onChange={handleInputChange}
+                                >
+                                  <option value="5000">5천만</option>
+                                  <option value="10000">1억</option>
+                                  <option value="20000">2억</option>
+                                  <option value="30000">3억</option>
+                                  <option value="50000">5억</option>
+                                  <option value="100000">10억</option>
+                                </select>
+                              </span>
+                            </div>
+                            <span className="tourGuard_txt33">원</span>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="ag_center tour2024_ListB_bg02">필수</td>
+                        <td className="ag_center tour2024_ListB_bg02">
+                          <div className="tour2023_insuBox01">대물배상</div>
+                        </td>
+                        <td className="ag_center">-</td>
+                        <td className="ag_center">
+                          <div className="tour2023_sel">
+                            <div className="tour2023_estimate_form_tt tourGuard styled-select">
+                              <span className="tourGuard_ps_box_event">
+                                <select 
+                                  className="tourGuard_sel01" 
+                                  id="pi_cover1" 
+                                  name="pi_cover1"
+                                  value={formData.pi_cover1}
+                                  onChange={handleInputChange}
+                                >
+                                  <option value="1000">1천만</option>
+                                  <option value="3000">3천만</option>
+                                  <option value="5000">5천만</option>
+                                  <option value="10000">1억</option>
+                                  <option value="30000">3억</option>
+                                  <option value="50000">5억</option>
+                                </select>
+                              </span>
+                            </div>
+                            <span className="tourGuard_txt33">원</span>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="ag_center tour2024_ListB_bg02">
+                          (선택)&nbsp;
+                          <ul className="tour2023_check">
+                            <li className="tour2023_cir03 tour2023_chk03 tourG_mat02">
+                              <input 
+                                type="checkbox" 
+                                name="me_check"
+                                checked={formData.me_check}
+                                onChange={handleInputChange}
+                              />
+                            </li>
+                          </ul>
+                        </td>
+                        <td className="ag_center tour2024_ListB_bg02">
+                          <div className="tour2023_insuBox01">참가자치료비<br />(구내치료비)</div>
+                        </td>
+                        <td className="ag_center">
+                          <div className="tour2023_sel">
+                            <div className="tour2023_estimate_form_tt tourGuard styled-select">
+                              <span className="tourGuard_ps_box_event">
+                                <select 
+                                  className="tourGuard_sel01" 
+                                  id="me_cover1" 
+                                  name="me_cover1"
+                                  value={formData.me_cover1}
+                                  onChange={handleInputChange}
+                                >
+                                  <option value="0">가입안함</option>
+                                  <option value="50">50만</option>
+                                  <option value="100">100만</option>
+                                  <option value="500">500만</option>
+                                </select>
+                              </span>
+                            </div>
+                            <span className="tourGuard_txt33">원</span>
+                          </div>
+                        </td>
+                        <td className="ag_center">
+                          <div className="tour2023_sel">
+                            <div className="tour2023_estimate_form_tt tourGuard styled-select">
+                              <span className="tourGuard_ps_box_event">
+                                <select 
+                                  className="tourGuard_sel01" 
+                                  id="me_cover2" 
+                                  name="me_cover2"
+                                  value={formData.me_cover2}
+                                  onChange={handleInputChange}
+                                >
+                                  <option value="0">가입안함</option>
+                                  <option value="1000">1천만</option>
+                                  <option value="2000">2천만</option>
+                                  <option value="4000">4천만</option>
+                                </select>
+                              </span>
+                            </div>
+                            <span className="tourGuard_txt33">원</span>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="ag_center tour2024_ListB_bg02">필수</td>
+                        <td className="ag_center tour2024_ListB_bg02">
+                          <div className="tour2023_insuBox01">자기부담금</div>
+                        </td>
+                        <td className="ag_center">-</td>
+                        <td className="ag_center">
+                          <div className="tour2023_sel">
+                            <div className="tour2023_estimate_form_tt tourGuard styled-select">
+                              <span className="tourGuard_ps_box_event">
+                                <select 
+                                  className="tourGuard_sel01" 
+                                  id="dt_cover1" 
+                                  name="dt_cover1"
+                                  value={formData.dt_cover1}
+                                  onChange={handleInputChange}
+                                >
+                                  <option value="10">10만</option>
+                                  <option value="50">50만</option>
+                                  <option value="100">100만</option>
+                                </select>
+                              </span>
+                            </div>
+                            <span className="tourGuard_txt33">원</span>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
+              <div className="tour2023_txt01 tour2023_grey tourG_mleft04 tourG_mab01">
+                <ul className="tourGuard_inline">
+                  <li className="tourGuard_inline_t01">※</li>
+                  <li className="tourGuard_inline_t02">보험가입조건은 직접 설정하실 수 있습니다.</li>
+                </ul>
+                <ul className="tourGuard_inline tourG_mat22">
+                  <li className="tourGuard_inline_t01">※</li>
+                  <li className="tourGuard_inline_t02">제시된 조건은 일반적으로 가장 많이 선택하는 조건입니다.</li>
+                </ul>
+                <ul className="tourGuard_inline tourG_mat22">
+                  <li className="tourGuard_inline_t01">※</li>
+                  <li className="tourGuard_inline_t02">구내치료비는 선택사항입니다. <span className="tour2023_blue">(단, 체육활동이 포함되어 있으면 가입할 수 없습니다.)</span></li>
+                </ul>
+              </div>
+
+              {/* 첨부서류 */}
+              <div className="tourG_mat10">
+                <p className="tour2023_title05">첨부서류</p>
+                <section className="tourGuard_Info">
+                  {/* 사업자등록증(고유번호증) */}
+                  <div className="tourGuard_form_tt mag5 tourG_mab03">
+                    <label htmlFor="license_name">사업자등록증(고유번호증)</label>
+                    <input
+                      type="text"
+                      id="license_name"
+                      name="license_name"
+                      maxLength={50}
+                      placeholder="업로드해 주세요"
+                      className="tourGuard_input_w02"
+                      value={licenseName}
+                      onClick={() => handleFileChoose('license')}
+                      readOnly
+                    />
+                    <div className="tour2023_event_file">
+                      <a
+                        href="#"
+                        className="tour2023_btn_b01 tour2023_btn11"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleFileChoose('license');
+                        }}
+                      >
+                        파일찾기
+                      </a>
+                    </div>
+                    <input
+                      type="file"
+                      id="license"
+                      name="license"
+                      style={{ display: 'none' }}
+                      onChange={(e) => handleFileChange(e, 'license')}
+                    />
+                  </div>
+                  {/* 행사개요 문서 */}
+                  <div className="tourGuard_form_tt mag5 tourG_mab03">
+                    <label htmlFor="overview_name">행사개요</label>
+                    <input
+                      type="text"
+                      id="overview_name"
+                      name="overview_name"
+                      maxLength={50}
+                      placeholder="업로드해 주세요"
+                      className="tourGuard_input_w02"
+                      value={overviewName}
+                      onClick={() => handleFileChoose('overview')}
+                      readOnly
+                    />
+                    <div className="tour2023_event_file">
+                      <a
+                        href="#"
+                        className="tour2023_btn_b01 tour2023_btn11"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleFileChoose('overview');
+                        }}
+                      >
+                        파일찾기
+                      </a>
+                    </div>
+                    <input
+                      type="file"
+                      id="overview"
+                      name="overview"
+                      style={{ display: 'none' }}
+                      onChange={(e) => handleFileChange(e, 'overview')}
+                    />
+                  </div>
+                </section>
+                <div className="tour2023_txt01 tour2023_grey tourG_mleft04 tourG_mab01">
+                  <ul className="tourGuard_inline">
+                    <li className="tourGuard_inline_t01">※</li>
+                    <li className="tourGuard_inline_t02">
+                      행사주최자 배상책임보험 견적서 발송은 견적신청 후 2시간 정도 걸립니다.
+                      <br />
+                      (영업시간 기준)
+                    </li>
+                  </ul>
+                  <ul className="tourGuard_inline tourG_mat22">
+                    <li className="tourGuard_inline_t01">※</li>
+                    <li className="tourGuard_inline_t02">
+                      첨부파일(
+                      <span className="tour2023_blue">hwp, hwpx, pdf, jpg, gif, png, doc파일 가능</span>
+                      )이 10메가 초과되거나 파일 업로드가 안되는 경우 팩스로 보내주시기 바랍니다.{' '}
+                      <span className="tour2023_blue"></span>
+                      <br />
+                      <span className="tour2023_blue">
+                        (팩스번호 : 02-2261-0098, 이메일: han4566@hanmail.net)
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* 개인정보 동의 */}
+              <div className="in_wrap">
+                <div className="in_wrap pb5">
+                  <ul className="tourG_agree">
+                    <li className="tourG_cir tourG_chk">
+                      <input 
+                        type="checkbox" 
+                        name="agree" 
+                        id="agree"
+                        checked={formData.agree}
+                        onChange={handleInputChange}
+                      />
+                      <label htmlFor="agree">
+                        <span className="tourGuard_txt24">개인정보 수집 및 이용 동의(필수)</span>
+                      </label>
+                      <a
+                        href="#"
+                        className="tourG_more"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          // 개인정보 동의서 팝업
+                          window.open('/event-insurance/privacy-agree', 'privacy_agree', 'width=500,height=700');
+                        }}
+                      ></a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div className="tourG_mat20 tourG_Wrap"></div>
+            
+            {/* 하단 고정버튼 */}
+            <section id="tour2023_fixedBanner" style={{ position: 'relative' }}>
+              <div className="tour2023_bottom_btn">
+                <a href="javascript:void(0);" className="tour2023_btn_b tour2023_btn07" onClick={handleSubmit}>
+                  견적신청하기
+                </a>
+              </div>
+            </section>
+          </form>
         </div>
-      </main>
+      </div>
 
       <Footer isMobile={true} />
     </div>
   );
 }
-

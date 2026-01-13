@@ -779,7 +779,6 @@
     right: 0;
     background: #fff;
     border-top: 1px solid #e0e0e0;
-    padding: 15px 20px;
     z-index: 1000;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
 }
@@ -1875,6 +1874,7 @@
 
 .group-insurance-mobile .tourG_mab05 {
     margin-bottom: 5px;
+    margin-top: 25px;
 }
 
 .group-insurance-mobile .tourG_mleft05 {

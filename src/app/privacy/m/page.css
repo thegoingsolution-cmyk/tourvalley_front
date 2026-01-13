@@ -1,0 +1,213 @@
+.privacy-mobile-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+}
+
+.privacy-container {
+  flex: 1;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  background-color: #fff;
+}
+
+.privacy-header {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 1rem 1.5rem;
+  z-index: 100;
+}
+
+.privacy-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.privacy-content {
+  padding: 1.5rem 1.5rem 2rem;
+  text-align: left;
+}
+
+.privacy-intro {
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  margin-bottom: 2rem;
+}
+
+.privacy-intro p {
+  font-size: 0.8125rem;
+  color: #666;
+  line-height: 1.7;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.privacy-intro strong {
+  color: #333;
+  font-weight: 600;
+}
+
+.privacy-section {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.privacy-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2380f0;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+  letter-spacing: -0.5px;
+}
+
+.subsection-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #333;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+  letter-spacing: -0.3px;
+}
+
+.section-text {
+  font-size: 0.875rem;
+  color: #555;
+  line-height: 1.7;
+  margin: 0;
+  word-break: keep-all;
+  letter-spacing: -0.3px;
+}
+
+.section-text br {
+  display: block;
+  content: "";
+  margin-top: 0.25rem;
+}
+
+.info-box {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-left: 3px solid #2380f0;
+  border-radius: 4px;
+}
+
+.info-box p {
+  font-size: 0.8125rem;
+  color: #555;
+  line-height: 1.7;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.contact-box {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+}
+
+.contact-box p {
+  font-size: 0.875rem;
+  color: #555;
+  line-height: 1.7;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+/* 모바일 최적화 */
+@media (max-width: 480px) {
+  .privacy-header {
+    padding: 0.875rem 1rem;
+  }
+
+  .privacy-title {
+    font-size: 1.125rem;
+  }
+
+  .privacy-content {
+    padding: 1rem 1rem 1.5rem;
+  }
+
+  .privacy-intro {
+    padding: 0.875rem;
+  }
+
+  .privacy-intro p {
+    font-size: 0.75rem;
+  }
+
+  .privacy-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+  }
+
+  .section-title {
+    font-size: 0.9375rem;
+  }
+
+  .subsection-title {
+    font-size: 0.875rem;
+  }
+
+  .section-text {
+    font-size: 0.8125rem;
+    line-height: 1.65;
+  }
+
+  .info-box {
+    padding: 0.875rem;
+  }
+
+  .info-box p {
+    font-size: 0.75rem;
+  }
+
+  .contact-box {
+    padding: 0.875rem;
+  }
+
+  .contact-box p {
+    font-size: 0.8125rem;
+  }
+}
+
+/* 스크롤바 스타일링 (선택사항) */
+.privacy-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.privacy-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.privacy-content::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.privacy-content::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+

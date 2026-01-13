@@ -1,0 +1,122 @@
+.terms-mobile-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+}
+
+.terms-container {
+  flex: 1;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  background-color: #fff;
+}
+
+.terms-header {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 1rem 1.5rem;
+  z-index: 100;
+}
+
+.terms-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.terms-content {
+  padding: 1.5rem 1.5rem 2rem;
+  text-align: left;
+}
+
+.terms-section {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.terms-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2380f0;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+  letter-spacing: -0.5px;
+}
+
+.section-text {
+  font-size: 0.875rem;
+  color: #555;
+  line-height: 1.7;
+  margin: 0;
+  word-break: keep-all;
+  letter-spacing: -0.3px;
+}
+
+.section-text br {
+  display: block;
+  content: "";
+  margin-top: 0.5rem;
+}
+
+/* 모바일 최적화 */
+@media (max-width: 480px) {
+  .terms-header {
+    padding: 0.875rem 1rem;
+  }
+
+  .terms-title {
+    font-size: 1.125rem;
+  }
+
+  .terms-content {
+    padding: 1rem 1rem 1.5rem;
+  }
+
+  .terms-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+  }
+
+  .section-title {
+    font-size: 0.9375rem;
+  }
+
+  .section-text {
+    font-size: 0.8125rem;
+    line-height: 1.65;
+  }
+}
+
+/* 스크롤바 스타일링 (선택사항) */
+.terms-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.terms-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.terms-content::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.terms-content::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+

@@ -82,13 +82,13 @@ export default function MobileMainPage() {
               <div className="tourG_mab05"></div>
               
               {/* 행사보험 */}
-              <a href="javascript:void(0);" onClick={(e) => { e.preventDefault(); }}>
+              <Link href="/event-insurance">
                 <div className="tour2023_intro_box05">
                   <p className="tour2023_intro_txt12 tourG_mat22">축제, 문화재 등 참가인원이 불특정 다수 일 때</p>
                   <p className="link_more01"></p>
                   <div className="tour2023_intro_txt13 tourG_mat22">행사주최자 배상책임보험</div>
                 </div>
-              </a>
+              </Link>
               <div className="tourG_mab13"></div>
             </div>
           </div>

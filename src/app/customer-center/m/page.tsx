@@ -8,6 +8,15 @@ import { getImagePath } from '@/utils/path';
 import { useAuth } from '@/contexts/AuthContext';
 import './page.css';
 
+interface Notice {
+  id: number;
+  title: string;
+  content?: string;
+  author_name: string;
+  view_count: number;
+  created_at: string;
+}
+
 interface QnaItem {
   id: number;
   title: string;
@@ -18,24 +27,12 @@ interface QnaItem {
   created_at: string;
 }
 
-interface Notice {
-  id: number;
-  title: string;
-  content?: string;
-  author_name: string;
-  view_count: number;
-  created_at: string;
-}
-
 function MobileCustomerCenterContent() {
   const searchParams = useSearchParams();
   const view = searchParams?.get('view') || 'main';
-  const noticeId = searchParams?.get('id');
   const { isLoggedIn, member } = useAuth();
-  const [activeTab, setActiveTab] = useState('일반');
-  const [searchKeyword, setSearchKeyword] = useState('');
+  
   const [notices, setNotices] = useState<Notice[]>([]);
-  const [noticeDetail, setNoticeDetail] = useState<Notice | null>(null);
   const [qnaList, setQnaList] = useState<QnaItem[]>([]);
   const [qnaPagination, setQnaPagination] = useState({
     page: 1,
@@ -51,42 +48,28 @@ function MobileCustomerCenterContent() {
     is_secret: false,
     secret_password: '',
   });
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [activeTab, setActiveTab] = useState('일반');
 
   // 공지사항 목록 로드
   useEffect(() => {
     const fetchNotices = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/notices?limit=5`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/notices?limit=4`);
         const data = await response.json();
-        if (data.success) {
-          setNotices(data.notices);
+        if (data.success && data.data && data.data.notices) {
+          setNotices(data.data.notices || []);
+        } else {
+          setNotices([]);
         }
       } catch (error) {
         console.error('Failed to fetch notices:', error);
+        setNotices([]);
       }
     };
 
     fetchNotices();
   }, []);
-
-  // 공지사항 상세 로드
-  useEffect(() => {
-    if (view === 'notice' && noticeId) {
-      const fetchNoticeDetail = async () => {
-        try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/notices/${noticeId}`);
-          const data = await response.json();
-          if (data.success) {
-            setNoticeDetail(data.notice);
-          }
-        } catch (error) {
-          console.error('Failed to fetch notice detail:', error);
-        }
-      };
-
-      fetchNoticeDetail();
-    }
-  }, [view, noticeId]);
 
   // Q&A 목록 로드
   useEffect(() => {
@@ -100,8 +83,8 @@ function MobileCustomerCenterContent() {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/customer-inquiries?page=${page}&limit=10`);
       const data = await response.json();
       if (data.success) {
-        setQnaList(data.inquiries);
-        setQnaPagination(data.pagination);
+        setQnaList(data.inquiries || []);
+        setQnaPagination(data.pagination || { page: 1, limit: 10, total: 0, totalPages: 0 });
       }
     } catch (error) {
       console.error('Failed to fetch inquiries:', error);
@@ -157,162 +140,91 @@ function MobileCustomerCenterContent() {
   };
 
   const renderMainView = () => (
-    <div className="customer-main-container-mobile">
-      <div className="customer-hero-mobile">
-        <h1 className="customer-hero-title-mobile">고객센터</h1>
-        <div className="customer-hero-image-mobile">
-          <img src={getImagePath('/images/customer_c_main.png')} alt="고객센터" />
-        </div>
-        <div className="customer-hero-description-mobile">
-          <p>출국교안하신 여행은?</p>
-          <p>20년 노하우의 여행자보험 전문</p>
-          <p className="customer-hero-highlight-mobile">투어밸리의 함께 하세요!</p>
-        </div>
-        <div className="customer-hero-buttons-mobile">
-          <button className="customer-hero-button-mobile" onClick={() => window.location.href = '/customer-center?view=main'}>가입/신청내역 조회</button>
-          <button className="customer-hero-button-mobile" onClick={() => window.location.href = '/customer-center?view=qna'}>Q&A게시판</button>
-        </div>
+    <>
+      {/* 타이틀 */}
+      <div className="B02_Top_title_Line">
+        <span>고객센터</span>
       </div>
 
-      <div className="customer-insurance-section-mobile">
-        <h2 className="customer-section-title-mobile">보험금 청구안내</h2>
-        <a href="?view=chubb" className="customer-insurance-card-mobile">
-          <img src={getImagePath('/images/logo_L77.png')} alt="CHUBB" />
-          <span>CHUBB에이스손해보험 ›</span>
-        </a>
-        <a href="?view=hyundai" className="customer-insurance-card-mobile customer-insurance-card-highlight-mobile">
-          <img src={getImagePath('/images/logo_N09.png')} alt="현대해상" />
-          <span>현대해상 ›</span>
-        </a>
-      </div>
-
-      <div className="customer-notice-section-mobile">
-        <h2 className="customer-section-title-mobile">공지사항</h2>
-        <ul className="customer-notice-list-mobile">
-          {notices.length > 0 ? (
-            notices.map((notice) => (
-              <li key={notice.id}>
-                <a href={`/customer-center?view=notice&id=${notice.id}`} className="customer-notice-link-mobile">
-                  • {notice.title}
-                </a>
-              </li>
-            ))
-          ) : (
-            <li>• 등록된 공지사항이 없습니다.</li>
-          )}
-        </ul>
-      </div>
-    </div>
-  );
-
-  const renderDetailView = (title: string, phone: string) => (
-    <div className="customer-detail-container-mobile">
-      <div className="customer-detail-header-mobile">
-        <h1 className="customer-detail-title-mobile">{title}</h1>
-        <a href="?view=main" className="customer-detail-back-mobile">← 뒤로</a>
-      </div>
-      
-      <div className="customer-detail-notice-mobile">
-        <p>해외에서 보험사고가 발생하여 영문 증빙서류를 관련회사로 제출한 경우 보험사에 사고 내역만 별도로 우선 전달합니다.</p>
-        <p>보험금 청구기간은 사고발생대지 3년입니다.</p>
-      </div>
-
-      <div className="customer-detail-contacts-mobile">
-        <p>{phone}</p>
-      </div>
-
-      <div className="customer-detail-tabs-mobile">
-        <button 
-          className={`customer-tab-mobile ${activeTab === '일반' ? 'active' : ''}`}
-          onClick={() => setActiveTab('일반')}
-        >
-          일반
-        </button>
-        <button 
-          className={`customer-tab-mobile ${activeTab === '주대응' ? 'active' : ''}`}
-          onClick={() => setActiveTab('주대응')}
-        >
-          주대응
-        </button>
-        <button 
-          className={`customer-tab-mobile ${activeTab === '배상책임' ? 'active' : ''}`}
-          onClick={() => setActiveTab('배상책임')}
-        >
-          배상책임
-        </button>
-        <button 
-          className={`customer-tab-mobile ${activeTab === '한정된 자산에 대한 추가보장' ? 'active' : ''}`}
-          onClick={() => setActiveTab('한정된 자산에 대한 추가보장')}
-        >
-          한정된 자산에<br/>대한 추가보장
-        </button>
-      </div>
-
-      <div className="customer-detail-content-mobile">
-        {activeTab === '일반' && (
-          <div className="customer-procedure-mobile">
-            <ol>
-              <li>1. 보험금청구서 개인(심돌부상)차변제외서 / 제반비용 포함</li>
-              <li>2. 여권사본</li>
-              <li>3. 청구인 신분증사본</li>
-              <li>4. 가족관계 확인 가족관계제공력서, 주민등록등본 등</li>
-            </ol>
+      {/* 히어로 섹션 */}
+      <section className="tourGuard_bg ag_center mb_base">
+        <div className="B02_tourG_pab50 B02_tourG_pat30">
+          <div className="B02_Top_Title_pic"></div>
+          <div className="prow_01">
+            <p className="B02_Top_Title_Txt01">
+              즐겁고 안전한 여행은?<br />
+              20년 노하우의 여행자보험 전문
+            </p>
+            <p className="B02_Top_Title_Txt02">투어밸리와 함께 하세요!</p>
+            <div className="B02_Btn_BoxWrap">
+              <span className="B02_Btn_Notice">
+                <a href="/contracts">가입/신청내역 조회</a>
+              </span>
+              <span className="B02_Btn_Faq">
+                <a href="/customer-center/m?view=qna">Q&A게시판</a>
+              </span>
+            </div>
           </div>
-        )}
-      </div>
-    </div>
+        </div>
+      </section>
+
+      {/* 보험금 청구안내 */}
+      <section className="bgcolor_white ptb20 prow_01 mb_base">
+        <div className="B02_tourG_pab30">
+          <div className="B02_tourG_pab15 B02_tourG_pat10">
+            <span className="tour2023_title02">보험금 청구안내</span>
+          </div>
+          <a href="/customer-center/m?view=chubb">
+            <div className="B02_insu_List01">
+              <span className="B02_insu_Logo l77"></span>
+              <span className="B02_insu_Rcompany">CHUBB에이스손해보험</span>
+              <span className="B02_insu_Ricon">
+                <img src={getImagePath('/images/g_more.png')} alt="더보기" />
+              </span>
+            </div>
+          </a>
+          
+          <a href="/customer-center/m?view=hyundai">
+            <div className="B02_insu_List03">
+              <span className="B02_insu_Logo n09"></span>
+              <span className="B02_insu_Rcompany">현대해상</span>
+              <span className="B02_insu_Ricon">
+                <img src={getImagePath('/images/g_more.png')} alt="더보기" />
+              </span>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      {/* 공지사항 */}
+      <section className="bgcolor_white ptb20 prow_01 mb_base">
+        <a href="/notice/m" className="main_title">
+          공지사항<span className="link_more"></span>
+        </a>
+        <ul className="counselList">
+          {notices.map((notice) => (
+            <li key={notice.id}>
+              <a href={`/notice/detail/${notice.id}`}>
+                {notice.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </>
   );
-
-  const renderNoticeDetailView = () => {
-    if (!noticeDetail) {
-      return (
-        <div className="customer-notice-detail-container-mobile">
-          <div className="customer-notice-loading-mobile">로딩 중...</div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="customer-notice-detail-container-mobile">
-        <div className="customer-notice-detail-header-mobile">
-          <h1 className="customer-notice-detail-title-mobile">Q&A 게시판</h1>
-        </div>
-
-        <div className="customer-notice-detail-content-mobile">
-          <h2 className="customer-notice-detail-subject-mobile">{noticeDetail.title}</h2>
-          <div className="customer-notice-detail-date-mobile">{formatNoticeDate(noticeDetail.created_at)}</div>
-          
-          <div className="customer-notice-detail-divider-mobile"></div>
-          
-          <div 
-            className="customer-notice-detail-body-mobile"
-            dangerouslySetInnerHTML={{ __html: noticeDetail.content || '' }}
-          />
-        </div>
-
-        <div className="customer-notice-detail-footer-mobile">
-          <button 
-            className="customer-notice-detail-list-btn-mobile"
-            onClick={() => window.location.href = '/customer-center?view=main'}
-          >
-            목록
-          </button>
-        </div>
-      </div>
-    );
-  };
 
   const renderQnaView = () => (
     <div className="customer-qna-container-mobile">
       <div className="customer-qna-header-mobile">
         <h1 className="customer-qna-title-mobile">Q&A 게시판</h1>
-        <button onClick={() => window.history.back()} className="customer-qna-close-mobile">
+        <button onClick={() => window.location.href = '/customer-center/m'} className="customer-qna-close-mobile">
           나가기
         </button>
       </div>
 
       <div className="customer-qna-list-mobile">
-        {qnaList.length === 0 ? (
+        {!qnaList || qnaList.length === 0 ? (
           <div className="customer-qna-no-data-mobile">등록된 질의가 없습니다.</div>
         ) : (
           qnaList.map((item) => (
@@ -361,7 +273,136 @@ function MobileCustomerCenterContent() {
           <button onClick={handleSearch}>검색</button>
         </div>
 
-        <button className="customer-qna-register-btn-mobile" onClick={() => setShowQnaWriteModal(true)}>등록하기</button>
+        <button className="customer-qna-register-btn-mobile" onClick={() => {
+          setQnaWriteForm({
+            title: '',
+            content: '',
+            author_name: isLoggedIn && member ? member.name : '',
+            is_secret: false,
+            secret_password: '',
+          });
+          setShowQnaWriteModal(true);
+        }}>등록하기</button>
+      </div>
+    </div>
+  );
+
+  const renderChubbView = () => (
+    <div className="customer-detail-container-mobile">
+      <div className="customer-detail-header-mobile">
+        <h1 className="customer-detail-title-mobile">CHUBB 에이스손해보험</h1>
+        <button onClick={() => window.location.href = '/customer-center/m'} className="customer-detail-back-mobile">
+          ← 뒤로
+        </button>
+      </div>
+      
+      <div className="customer-detail-notice-mobile">
+        <p>해외에서 보험사고가 발생하여 영문 증빙서류를 관련회사로 제출한 경우 보험사에 사고 내역만 별도로 우선 전달합니다.</p>
+        <p>보험금 청구기간은 사고발생대지 3년입니다.</p>
+      </div>
+
+      <div className="customer-detail-contacts-mobile">
+        <p>• 에이스 손해보험: 1666-5075</p>
+      </div>
+
+      <div className="customer-detail-tabs-mobile">
+        <button 
+          className={`customer-tab-mobile ${activeTab === '일반' ? 'active' : ''}`}
+          onClick={() => setActiveTab('일반')}
+        >
+          일반
+        </button>
+        <button 
+          className={`customer-tab-mobile ${activeTab === '주대응' ? 'active' : ''}`}
+          onClick={() => setActiveTab('주대응')}
+        >
+          주대응
+        </button>
+        <button 
+          className={`customer-tab-mobile ${activeTab === '배상책임' ? 'active' : ''}`}
+          onClick={() => setActiveTab('배상책임')}
+        >
+          배상책임
+        </button>
+        <button 
+          className={`customer-tab-mobile ${activeTab === '한정된 자산에 대한 추가보장' ? 'active' : ''}`}
+          onClick={() => setActiveTab('한정된 자산에 대한 추가보장')}
+        >
+          한정된 자산에<br/>대한 추가보장
+        </button>
+      </div>
+
+      <div className="customer-detail-content-mobile">
+        {activeTab === '일반' && (
+          <div className="customer-procedure-mobile">
+            <ol>
+              <li>1. 보험금청구서 개인(심돌부상)차변제외서 / 제반비용 포함</li>
+              <li>2. 여권사본</li>
+              <li>3. 청구인 신분증사본</li>
+              <li>4. 가족관계 확인 가족관계제공력서, 주민등록등본 등</li>
+            </ol>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const renderHyundaiView = () => (
+    <div className="customer-detail-container-mobile">
+      <div className="customer-detail-header-mobile">
+        <h1 className="customer-detail-title-mobile">현대해상</h1>
+        <button onClick={() => window.location.href = '/customer-center/m'} className="customer-detail-back-mobile">
+          ← 뒤로
+        </button>
+      </div>
+      
+      <div className="customer-detail-notice-mobile">
+        <p>해외에서 보험사고가 발생하여 영문 증빙서류를 관련회사로 제출한 경우 보험사에 사고 내역만 별도로 우선 전달합니다.</p>
+        <p>보험금 청구기간은 사고발생대지 3년입니다.</p>
+      </div>
+
+      <div className="customer-detail-contacts-mobile">
+        <p>• 현대해상: 1899-6782</p>
+      </div>
+
+      <div className="customer-detail-tabs-mobile">
+        <button 
+          className={`customer-tab-mobile ${activeTab === '일반' ? 'active' : ''}`}
+          onClick={() => setActiveTab('일반')}
+        >
+          일반
+        </button>
+        <button 
+          className={`customer-tab-mobile ${activeTab === '주대응' ? 'active' : ''}`}
+          onClick={() => setActiveTab('주대응')}
+        >
+          주대응
+        </button>
+        <button 
+          className={`customer-tab-mobile ${activeTab === '배상책임' ? 'active' : ''}`}
+          onClick={() => setActiveTab('배상책임')}
+        >
+          배상책임
+        </button>
+        <button 
+          className={`customer-tab-mobile ${activeTab === '한정된 자산에 대한 추가보장' ? 'active' : ''}`}
+          onClick={() => setActiveTab('한정된 자산에 대한 추가보장')}
+        >
+          한정된 자산에<br/>대한 추가보장
+        </button>
+      </div>
+
+      <div className="customer-detail-content-mobile">
+        {activeTab === '일반' && (
+          <div className="customer-procedure-mobile">
+            <ol>
+              <li>1. 보험금청구서 개인(심돌부상)차변제외서 / 제반비용 포함</li>
+              <li>2. 여권사본</li>
+              <li>3. 청구인 신분증사본</li>
+              <li>4. 가족관계 확인 가족관계제공력서, 주민등록등본 등</li>
+            </ol>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -369,13 +410,14 @@ function MobileCustomerCenterContent() {
   return (
     <>
       <Header isMobile={true} />
+      
       <main className="customer-center-page-mobile">
         {view === 'main' && renderMainView()}
-        {view === 'chubb' && renderDetailView('라이나손해보험', '• 에이스 손해보험: 1666-5075')}
-        {view === 'hyundai' && renderDetailView('현대해상', '• 현대해상: 1899-6782')}
         {view === 'qna' && renderQnaView()}
-        {view === 'notice' && renderNoticeDetailView()}
+        {view === 'chubb' && renderChubbView()}
+        {view === 'hyundai' && renderHyundaiView()}
       </main>
+
       <Footer isMobile={true} />
 
       {/* Q&A 질문 등록 모달 */}
@@ -395,6 +437,8 @@ function MobileCustomerCenterContent() {
                   onChange={(e) => setQnaWriteForm({ ...qnaWriteForm, author_name: e.target.value })}
                   className="form-input-mobile"
                   placeholder="이름을 입력하세요"
+                  readOnly={isLoggedIn && member !== null}
+                  style={isLoggedIn && member !== null ? { backgroundColor: '#f5f5f5', cursor: 'not-allowed' } : {}}
                 />
               </div>
               <div className="form-group-mobile">
@@ -459,4 +503,3 @@ export default function MobileCustomerCenterPage() {
     </Suspense>
   );
 }
-

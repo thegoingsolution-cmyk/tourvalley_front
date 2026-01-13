@@ -216,19 +216,25 @@ export default function MobileSignupPage() {
                   className={`member-type-option-mobile ${memberType === 'personal' ? 'selected' : ''}`}
                   onClick={() => setMemberType('personal')}
                 >
-                  <span className="radio-circle-mobile">
-                    {memberType === 'personal' && <span className="radio-dot-mobile"></span>}
-                  </span>
-                  <span className="option-text-mobile">개인회원</span>
+                  <img 
+                    src={memberType === 'personal' ? '/icons/icon_rdo_ov.png' : '/icons/icon_rdo.png'}
+                    alt="radio"
+                    className="radio-icon-mobile"
+                  />
+                  <div className="option-text-wrapper-mobile">
+                    <span className="option-text-mobile">개인회원</span>
+                  </div>
                 </label>
 
                 <label 
                   className={`member-type-option-mobile ${memberType === 'corporate' ? 'selected' : ''}`}
                   onClick={() => setMemberType('corporate')}
                 >
-                  <span className="radio-circle-mobile">
-                    {memberType === 'corporate' && <span className="radio-dot-mobile"></span>}
-                  </span>
+                  <img 
+                    src={memberType === 'corporate' ? '/icons/icon_rdo_ov.png' : '/icons/icon_rdo.png'}
+                    alt="radio"
+                    className="radio-icon-mobile"
+                  />
                   <div className="option-text-wrapper-mobile">
                     <span className="option-text-mobile">법인단체회원</span>
                     <span className="option-subtext-mobile">사업자등록증(고유번호증)이 있는 개인/법인사업자, 각종 단체</span>
@@ -258,33 +264,41 @@ export default function MobileSignupPage() {
 
               <div className="terms-section-mobile">
                 <label className="terms-item-mobile all-agree" onClick={handleAllAgree}>
-                  <span className={`checkbox-mobile ${allAgreed ? 'checked' : ''}`}>
-                    {allAgreed && <span className="check-icon-mobile">✓</span>}
-                  </span>
+                  <img 
+                    src={allAgreed ? '/icons/chk_ov.png' : '/icons/checkbox-icon.png'}
+                    alt="checkbox"
+                    className={`checkbox-icon-mobile ${allAgreed ? 'checked' : ''}`}
+                  />
                   <span className="terms-text-mobile bold">전체동의</span>
                 </label>
 
                 <div className="terms-list-mobile">
                   <label className="terms-item-mobile" onClick={() => handleIndividualTerm('terms', !termsAgreed)}>
-                    <span className={`checkbox-mobile ${termsAgreed ? 'checked' : ''}`}>
-                      {termsAgreed && <span className="check-icon-mobile">✓</span>}
-                    </span>
+                    <img 
+                      src={termsAgreed ? '/icons/chk_ov.png' : '/icons/checkbox-icon.png'}
+                      alt="checkbox"
+                      className={`checkbox-icon-mobile ${termsAgreed ? 'checked' : ''}`}
+                    />
                     <span className="terms-text-mobile">(필수) 투어밸리 사이트 이용약관 동의</span>
                     <span className="terms-arrow-mobile">›</span>
                   </label>
 
                   <label className="terms-item-mobile" onClick={() => handleIndividualTerm('privacy', !privacyAgreed)}>
-                    <span className={`checkbox-mobile ${privacyAgreed ? 'checked' : ''}`}>
-                      {privacyAgreed && <span className="check-icon-mobile">✓</span>}
-                    </span>
+                    <img 
+                      src={privacyAgreed ? '/icons/chk_ov.png' : '/icons/checkbox-icon.png'}
+                      alt="checkbox"
+                      className={`checkbox-icon-mobile ${privacyAgreed ? 'checked' : ''}`}
+                    />
                     <span className="terms-text-mobile">(필수) 개인정보 수집, 이용, 조회 제공 동의</span>
                     <span className="terms-arrow-mobile">›</span>
                   </label>
 
                   <label className="terms-item-mobile" onClick={() => handleIndividualTerm('marketing', !marketingAgreed)}>
-                    <span className={`checkbox-mobile ${marketingAgreed ? 'checked' : ''}`}>
-                      {marketingAgreed && <span className="check-icon-mobile">✓</span>}
-                    </span>
+                    <img 
+                      src={marketingAgreed ? '/icons/chk_ov.png' : '/icons/checkbox-icon.png'}
+                      alt="checkbox"
+                      className={`checkbox-icon-mobile ${marketingAgreed ? 'checked' : ''}`}
+                    />
                     <span className="terms-text-mobile">(선택) 혜택알림 이메일, 문자 동의</span>
                     <span className="terms-arrow-mobile">›</span>
                   </label>

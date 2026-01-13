@@ -637,12 +637,12 @@
 
 .event-insurance-page-pc .tourG_line03::before,
 .event-insurance-page-pc .tourG_line03::after {
-  content: '';
+  content: '-';
   position: absolute;
-  width: 1px;
-  height: 40px;
-  background: #ddd;
-  top: 12px;
+  color: #333;
+  font-size: 16px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .event-insurance-page-pc .tourG_line03::before {

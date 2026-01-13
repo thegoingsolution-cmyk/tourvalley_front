@@ -1,241 +1,443 @@
+/* 고객센터 모바일 페이지 스타일 */
 .customer-center-page-mobile {
+  background-color: #fff;
   min-height: 100vh;
-  background-color: #f5f5f5;
 }
 
-/* Main View Mobile */
-.customer-main-container-mobile {
-  padding: 20px 16px;
+/* 타이틀 라인 */
+.B02_Top_title_Line {
+  font-family: 'NanumSquareNeoTTF-dEb';
+  font-size: 18px;
+  text-align: center;
+  color: #000;
+  padding: 15px 0;
+  border-bottom: 1px solid #eee;
+  background-color: #fff;
 }
 
-.customer-hero-mobile {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 15px;
-  padding: 30px 20px;
-  margin-bottom: 30px;
-  color: white;
+.B02_Top_title_Line span {
+  display: inline-block;
+}
+
+/* 히어로 섹션 */
+.tourGuard_bg {
+  background-color: #fff;
+}
+
+.ag_center {
   text-align: center;
 }
 
-.customer-hero-title-mobile {
-  font-size: 28px;
-  font-weight: bold;
-  margin-bottom: 20px;
+.mb_base {
+  margin-bottom: 15px;
 }
 
-.customer-hero-image-mobile {
-  margin-bottom: 20px;
+.B02_tourG_pab50 {
+  padding-bottom: 40px;
 }
 
-.customer-hero-image-mobile img {
+.B02_tourG_pat30 {
+  padding-top: 30px;
+}
+
+.B02_Top_Title_pic {
+  background: url('/images/customer_c_main.png') no-repeat top center;
+  background-size: contain;
   width: 100%;
-  max-width: 300px;
-  height: auto;
+  height: 100px;
+}
+
+.prow_01 {
+  padding: 0 16px;
+}
+
+.B02_Top_Title_Txt01 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 17px;
+  color: #333;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  letter-spacing: -0.5px;
+}
+
+.B02_Top_Title_Txt02 {
+  font-family: 'NanumSquareNeoTTF-eHv';
+  font-size: 20px;
+  color: #1b37e1;
+  margin-bottom: 5px;
+  letter-spacing: -0.5px;
+}
+
+.B02_Btn_BoxWrap {
+  margin-top: 40px;
+  border: 1px solid #d9d9d9;
+  border-radius: 15px;
+  font-size: 20px;
+  height: 65px;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.B02_Btn_Notice {
+  display: inline-block;
+  border-right: 1px solid #d9d9d9;
+  height: 100%;
+  width: 50%;
+  float: left;
+  text-align: center;
+}
+
+.B02_Btn_Faq {
+  display: inline-block;
+  height: 100%;
+  width: 50%;
+  float: left;
+  text-align: center;
+}
+
+.B02_Btn_Notice a {
+  display: block;
+  line-height: 65px;
+  font-family: 'NanumSquareNeoTTF-cBd';
+  color: #000;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.B02_Btn_Faq a {
+  display: block;
+  line-height: 65px;
+  font-family: 'NanumSquareNeoTTF-cBd';
+  color: #000;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.B02_Btn_Notice a:hover,
+.B02_Btn_Faq a:hover {
+  background-color: #f8f9fa;
+}
+
+/* 보험금 청구안내 섹션 */
+.bgcolor_white {
+  background-color: #fff;
+}
+
+.ptb20 {
+  padding: 30px 0 20px;
+}
+
+.B02_tourG_pab30 {
+  padding: 0 16px 20px;
+}
+
+.B02_tourG_pab15 {
+  padding-bottom: 15px;
+}
+
+.B02_tourG_pat10 {
+  padding-top: 10px;
+}
+
+.tour2023_title02 {
+  font-family: 'NanumSquareNeoTTF-dEb';
+  font-size: 17px;
+  color: #000;
+  display: inline-block;
+  margin-bottom: 15px;
+  letter-spacing: -0.5px;
+  font-weight: 800;
+}
+
+.B02_insu_List01 {
+  position: relative;
+  margin-top: 15px;
+  padding: 5px 13px 5px 3px;
   border-radius: 10px;
+  background-color: #e7f8f8;
+  height: 55px;
+  border: 1px solid #caf2f2;
 }
 
-.customer-hero-description-mobile {
-  font-size: 16px;
-  line-height: 1.6;
-  margin-bottom: 20px;
+.B02_insu_List03 {
+  position: relative;
+  margin-top: 15px;
+  padding: 5px 13px 5px 3px;
+  border-radius: 10px;
+  background-color: #fffedc;
+  height: 55px;
+  border: 1px solid #fbefc4;
 }
 
-.customer-hero-highlight-mobile {
-  color: #ffd700;
-  font-weight: bold;
-  font-size: 18px;
+.B02_insu_Logo {
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin-top: 7px;
+  height: 30px;
+  width: 100px;
+  display: inline-block;
 }
 
-.customer-hero-buttons-mobile {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.B02_insu_Logo.l77 {
+  background-image: url('/images/logo_L77.png');
 }
 
-.customer-hero-button-mobile {
-  padding: 12px 20px;
-  background: white;
-  color: #667eea;
-  border: none;
-  border-radius: 20px;
-  font-size: 15px;
-  font-weight: bold;
-  cursor: pointer;
-  width: 100%;
+.B02_insu_Logo.n09 {
+  background-image: url('/images/logo_N09.png');
 }
 
-/* Insurance Section Mobile */
-.customer-insurance-section-mobile {
-  margin-bottom: 30px;
-}
-
-.customer-section-title-mobile {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 20px;
+.B02_insu_Rcompany {
+  display: inline-block;
+  float: right;
+  font-size: 14px;
+  padding-top: 14px;
+  padding-right: 15px;
+  letter-spacing: -1.2px;
+  font-family: 'NanumSquareNeoTTF-cBd';
   color: #333;
 }
 
-.customer-insurance-card-mobile {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: white;
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 15px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-  text-decoration: none;
+.B02_insu_Ricon {
+  display: inline-block;
+  position: absolute;
+  right: 10px;
+  top: 20px;
 }
 
-.customer-insurance-card-mobile img {
-  max-width: 120px;
+.B02_insu_Ricon img {
+  width: 10px;
   height: auto;
 }
 
-.customer-insurance-card-mobile span {
-  color: #667eea;
-  font-weight: 600;
-  font-size: 15px;
+/* 공지사항 섹션 */
+.main_title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px 15px;
+  font-family: 'NanumSquareNeoTTF-dEb';
+  font-size: 17px;
+  color: #000;
+  text-decoration: none;
+  letter-spacing: -0.5px;
 }
 
-.customer-insurance-card-highlight-mobile {
-  background: linear-gradient(135deg, #fff7e6 0%, #fffaf0 100%);
+.link_more {
+  width: 20px;
+  height: 20px;
+  background: url('/images/g_more.png') no-repeat center center;
+  background-size: contain;
+  display: inline-block;
 }
 
-/* Notice Section Mobile */
-.customer-notice-section-mobile {
-  background: white;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+.counselList {
+  list-style: none;
+  padding: 10px 16px 20px;
+  margin: 0;
 }
 
-.customer-notice-list-mobile {
+.counselList li {
+  padding: 3px 0 3px 8px;
+  background: url(/img/smart/minsvalley/bl_dot.png) no-repeat 0 6px;
+  background-size: 3px;
+}
+
+.counselList li a {
+  font-family: 'NanumSquareNeoTTF-bRg';
+  font-size: 14px;
+  color: #555;
+  text-decoration: none;
+  display: block;
+  line-height: 1.6;
+}
+
+.counselList li a:hover {
+  color: #1b37e1;
+}
+
+/* Q&A 섹션 */
+.customer-qna-container-mobile {
+  padding: 20px 16px;
+}
+
+.customer-qna-header-mobile {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #000;
+}
+
+.customer-qna-title-mobile {
+  font-family: 'NanumSquareNeoTTF-dEb';
+  font-size: 18px;
+  color: #000;
+  margin: 0;
+}
+
+.customer-qna-close-mobile {
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+}
+
+.customer-qna-list-mobile {
+  margin-bottom: 30px;
+}
+
+.customer-qna-no-data-mobile {
+  text-align: center;
+  padding: 40px 0;
+  color: #999;
+  font-size: 14px;
+}
+
+.customer-qna-item-mobile {
+  padding: 15px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.customer-qna-subject-mobile {
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.customer-qna-status-badge-mobile {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 12px;
+  margin-right: 5px;
+}
+
+.customer-qna-status-badge-mobile[data-status="완료"] {
+  color: #28a745;
+}
+
+.customer-qna-status-badge-mobile[data-status="미완료"] {
+  color: #dc3545;
+}
+
+.customer-qna-secret-icon-mobile {
+  font-size: 14px;
+  margin-right: 5px;
+}
+
+.customer-qna-subject-mobile a {
+  color: #333;
+  text-decoration: none;
+}
+
+.customer-qna-subject-mobile a:hover {
+  color: #1b37e1;
+}
+
+.customer-qna-info-mobile {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+  color: #999;
+}
+
+.customer-qna-info-mobile em {
+  font-style: normal;
+  color: #1b37e1;
+}
+
+.customer-qna-footer-mobile {
+  margin-top: 30px;
+}
+
+.customer-qna-pagination-mobile {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-bottom: 20px;
   list-style: none;
   padding: 0;
 }
 
-.customer-notice-list-mobile li {
-  padding: 12px 0;
-  border-bottom: 1px solid #eee;
-  color: #666;
-  font-size: 14px;
+.customer-qna-pagination-mobile li {
+  display: inline-block;
 }
 
-.customer-notice-list-mobile li:last-child {
-  border-bottom: none;
-}
-
-.customer-notice-link-mobile {
-  color: #666;
+.customer-qna-pagination-mobile a {
+  display: block;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #333;
   text-decoration: none;
-  transition: color 0.2s;
-}
-
-.customer-notice-link-mobile:hover {
-  color: #4a90e2;
-}
-
-/* Notice Detail View Mobile */
-.customer-notice-detail-container-mobile {
-  padding: 16px;
-  background: white;
-  min-height: 100vh;
-}
-
-.customer-notice-detail-header-mobile {
-  text-align: center;
-  padding-bottom: 16px;
-  border-bottom: 2px solid #333;
-  margin-bottom: 24px;
-}
-
-.customer-notice-detail-title-mobile {
-  font-size: 20px;
-  font-weight: 600;
-  color: #333;
-  margin: 0;
-}
-
-.customer-notice-detail-content-mobile {
-  padding: 0;
-}
-
-.customer-notice-detail-subject-mobile {
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-  margin: 0 0 8px 0;
-  line-height: 1.5;
-}
-
-.customer-notice-detail-date-mobile {
-  font-size: 13px;
-  color: #999;
-  margin-bottom: 16px;
-}
-
-.customer-notice-detail-divider-mobile {
-  height: 1px;
-  background: #e0e0e0;
-  margin: 16px 0 24px 0;
-}
-
-.customer-notice-detail-body-mobile {
   font-size: 14px;
-  line-height: 1.8;
-  color: #555;
-  min-height: 200px;
-  padding: 8px 0;
-  white-space: pre-wrap;
 }
 
-.customer-notice-detail-body-mobile p {
-  margin: 0 0 12px 0;
+.customer-qna-pagination-mobile li.active a {
+  background: #1b37e1;
+  color: #fff;
+  border-color: #1b37e1;
 }
 
-.customer-notice-detail-footer-mobile {
-  margin-top: 32px;
-  padding-top: 16px;
-  border-top: 1px solid #e0e0e0;
-  text-align: center;
+.customer-qna-search-mobile {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 15px;
 }
 
-.customer-notice-detail-list-btn-mobile {
-  padding: 10px 50px;
-  background: white;
-  color: #333;
+.customer-qna-search-mobile input {
+  flex: 1;
+  padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
-  font-weight: 500;
+}
+
+.customer-qna-search-mobile button {
+  padding: 10px 20px;
+  background: #1b37e1;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 14px;
   cursor: pointer;
 }
 
-.customer-notice-loading-mobile {
-  text-align: center;
-  padding: 60px 20px;
+.customer-qna-register-btn-mobile {
+  width: 100%;
+  padding: 12px;
+  background: #1b37e1;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-family: 'NanumSquareNeoTTF-dEb';
   font-size: 15px;
-  color: #999;
+  cursor: pointer;
 }
 
-/* Q&A 질문 등록 모달 Mobile */
+/* 모달 스타일 */
 .modal-overlay-mobile {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 1000;
 }
 
 .modal-content-mobile {
-  background: white;
+  background: #fff;
   border-radius: 8px;
   width: 90%;
   max-width: 500px;
@@ -251,25 +453,27 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
+  padding: 20px;
   border-bottom: 1px solid #eee;
 }
 
 .modal-header-mobile h2 {
+  font-family: 'NanumSquareNeoTTF-dEb';
   font-size: 18px;
-  font-weight: 600;
-  color: #333;
+  color: #000;
   margin: 0;
 }
 
 .modal-close-mobile {
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: 28px;
   color: #999;
   cursor: pointer;
-  padding: 0;
   line-height: 1;
+  padding: 0;
+  width: 30px;
+  height: 30px;
 }
 
 .modal-body-mobile {
@@ -282,9 +486,9 @@
 
 .form-group-mobile label {
   display: block;
-  margin-bottom: 6px;
-  font-weight: 500;
-  font-size: 13px;
+  margin-bottom: 8px;
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 14px;
   color: #333;
 }
 
@@ -294,7 +498,7 @@
 
 .form-input-mobile {
   width: 100%;
-  padding: 10px 12px;
+  padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
@@ -303,50 +507,53 @@
 
 .form-input-mobile:focus {
   outline: none;
-  border-color: #4a90d9;
+  border-color: #1b37e1;
 }
 
 .form-textarea-mobile {
   width: 100%;
-  padding: 10px 12px;
+  padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
+  resize: vertical;
   font-family: inherit;
   box-sizing: border-box;
-  resize: vertical;
 }
 
 .form-textarea-mobile:focus {
   outline: none;
-  border-color: #4a90d9;
+  border-color: #1b37e1;
 }
 
 .modal-footer-mobile {
   display: flex;
-  justify-content: center;
   gap: 10px;
-  padding: 16px 20px;
+  padding: 20px;
   border-top: 1px solid #eee;
 }
 
 .save-btn-mobile {
-  padding: 10px 30px;
-  background: #4a90e2;
-  color: white;
+  flex: 1;
+  padding: 12px;
+  background: #1b37e1;
+  color: #fff;
   border: none;
   border-radius: 4px;
-  font-size: 14px;
+  font-family: 'NanumSquareNeoTTF-dEb';
+  font-size: 15px;
   cursor: pointer;
 }
 
 .cancel-btn-mobile {
-  padding: 10px 30px;
-  background: #e9ecef;
+  flex: 1;
+  padding: 12px;
+  background: #fff;
   color: #333;
-  border: none;
+  border: 1px solid #ddd;
   border-radius: 4px;
-  font-size: 14px;
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 15px;
   cursor: pointer;
 }
 
@@ -355,7 +562,6 @@
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  font-weight: normal;
 }
 
 .form-checkbox-mobile {
@@ -364,16 +570,9 @@
   cursor: pointer;
 }
 
-.customer-qna-secret-icon-mobile {
-  margin-right: 5px;
-  font-size: 13px;
-}
-
-/* Detail View Mobile */
+/* 보험사 상세 페이지 */
 .customer-detail-container-mobile {
   padding: 20px 16px;
-  background: white;
-  min-height: 100vh;
 }
 
 .customer-detail-header-mobile {
@@ -382,253 +581,151 @@
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 15px;
-  border-bottom: 2px solid #667eea;
+  border-bottom: 2px solid #000;
 }
 
 .customer-detail-title-mobile {
-  font-size: 24px;
-  font-weight: bold;
-  color: #667eea;
+  font-family: 'NanumSquareNeoTTF-dEb';
+  font-size: 18px;
+  color: #000;
+  margin: 0;
 }
 
 .customer-detail-back-mobile {
-  padding: 8px 15px;
-  background: #f5f5f5;
-  color: #333;
-  text-decoration: none;
-  border-radius: 5px;
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  text-decoration: none;
 }
 
 .customer-detail-notice-mobile {
   background: #f8f9fa;
-  padding: 20px;
+  padding: 15px;
   border-radius: 8px;
   margin-bottom: 20px;
-  line-height: 1.6;
-  font-size: 14px;
+}
+
+.customer-detail-notice-mobile p {
+  font-size: 13px;
   color: #666;
+  line-height: 1.6;
+  margin: 0 0 8px 0;
+}
+
+.customer-detail-notice-mobile p:last-child {
+  margin-bottom: 0;
 }
 
 .customer-detail-contacts-mobile {
-  margin-bottom: 20px;
+  background: #fff;
   padding: 15px;
-  background: #fff9e6;
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
-  border-left: 3px solid #ffd700;
+  margin-bottom: 20px;
 }
 
 .customer-detail-contacts-mobile p {
-  margin: 0;
-  color: #333;
-  font-weight: 500;
   font-size: 14px;
+  color: #333;
+  line-height: 1.8;
+  margin: 0 0 5px 0;
+  font-family: 'NanumSquareNeoTTF-cBd';
+}
+
+.customer-detail-contacts-mobile p:last-child {
+  margin-bottom: 0;
 }
 
 .customer-detail-tabs-mobile {
-  display: flex;
-  overflow-x: auto;
-  gap: 5px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
   margin-bottom: 20px;
-  border-bottom: 2px solid #eee;
-  -webkit-overflow-scrolling: touch;
 }
 
 .customer-tab-mobile {
-  padding: 12px 15px;
-  background: none;
-  border: none;
-  border-bottom: 3px solid transparent;
-  color: #999;
-  font-size: 14px;
+  padding: 12px 10px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 13px;
+  color: #666;
   cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
+  transition: all 0.3s;
+  line-height: 1.3;
 }
 
 .customer-tab-mobile.active {
-  color: #667eea;
-  border-bottom-color: #667eea;
-  font-weight: bold;
+  background: #1b37e1;
+  color: #fff;
+  border-color: #1b37e1;
 }
 
 .customer-detail-content-mobile {
-  padding: 20px 0;
+  background: #fff;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
 }
 
 .customer-procedure-mobile {
-  line-height: 1.8;
-  color: #333;
   font-size: 14px;
+  color: #333;
+  line-height: 1.8;
 }
 
 .customer-procedure-mobile ol {
-  padding-left: 15px;
+  padding-left: 0;
+  list-style: none;
+  margin: 0;
 }
 
 .customer-procedure-mobile li {
   margin-bottom: 10px;
+  padding-left: 0;
 }
 
-/* QnA View Mobile */
-.customer-qna-container-mobile {
-  padding: 20px 16px;
-  background: white;
-  min-height: 100vh;
+/* 반응형 */
+@media (max-width: 768px) {
+  .B02_Btn_BoxWrap {
+    height: 55px;
+    font-size: 16px;
+  }
+  
+  .B02_Btn_Notice a,
+  .B02_Btn_Faq a {
+    line-height: 55px;
+    font-size: 13px;
+  }
 }
 
-.customer-qna-header-mobile {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 15px;
-  border-bottom: 2px solid #667eea;
-  margin-bottom: 20px;
+/* 기본 폰트 설정 */
+@font-face {
+  font-family: 'NanumSquareNeoTTF-bRg';
+  src: local('NanumSquareNeo'), local('NanumSquare');
+  font-weight: 400;
 }
 
-.customer-qna-title-mobile {
-  font-size: 24px;
-  font-weight: bold;
-  color: #333;
+@font-face {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  src: local('NanumSquareNeo'), local('NanumSquare');
+  font-weight: 700;
 }
 
-.customer-qna-close-mobile {
-  padding: 8px 15px;
-  background: #667eea;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
+@font-face {
+  font-family: 'NanumSquareNeoTTF-dEb';
+  src: local('NanumSquareNeo'), local('NanumSquare');
+  font-weight: 800;
 }
 
-.customer-qna-list-mobile {
-  margin-bottom: 30px;
+@font-face {
+  font-family: 'NanumSquareNeoTTF-eHv';
+  src: local('NanumSquareNeo'), local('NanumSquare');
+  font-weight: 900;
 }
-
-.customer-qna-no-data-mobile {
-  text-align: center;
-  padding: 50px 20px;
-  color: #999;
-  font-size: 14px;
-}
-
-.customer-qna-item-mobile {
-  padding: 15px 0;
-  border-bottom: 1px solid #eee;
-}
-
-.customer-qna-subject-mobile {
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.customer-qna-status-badge-mobile {
-  font-size: 12px;
-  font-weight: 500;
-  padding: 2px 0;
-}
-
-.customer-qna-status-badge-mobile[data-status="완료"] {
-  color: #28a745;
-}
-
-.customer-qna-status-badge-mobile[data-status="미완료"] {
-  color: #dc3545;
-}
-
-.customer-qna-secret-icon-mobile {
-  font-size: 16px;
-}
-
-.customer-qna-subject-mobile a {
-  color: #333;
-  text-decoration: none;
-  font-size: 15px;
-  font-weight: 500;
-}
-
-.customer-qna-info-mobile {
-  display: flex;
-  gap: 12px;
-  color: #999;
-  font-size: 13px;
-}
-
-.customer-qna-info-mobile em {
-  color: #667eea;
-  font-style: normal;
-}
-
-.customer-qna-footer-mobile {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  align-items: center;
-}
-
-.customer-qna-pagination-mobile {
-  display: flex;
-  gap: 8px;
-  list-style: none;
-  padding: 0;
-}
-
-.customer-qna-pagination-mobile li {
-  display: inline-block;
-}
-
-.customer-qna-pagination-mobile a {
-  display: block;
-  padding: 6px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  color: #666;
-  text-decoration: none;
-  font-size: 14px;
-}
-
-.customer-qna-pagination-mobile li.active a {
-  background: #667eea;
-  color: white;
-  border-color: #667eea;
-}
-
-.customer-qna-search-mobile {
-  width: 100%;
-  display: flex;
-  gap: 8px;
-}
-
-.customer-qna-search-mobile input {
-  flex: 1;
-  padding: 10px 15px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 14px;
-}
-
-.customer-qna-search-mobile button {
-  padding: 10px 20px;
-  background: #667eea;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.customer-qna-register-btn-mobile {
-  width: 100%;
-  padding: 12px 20px;
-  background: #667eea;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: bold;
-}
-

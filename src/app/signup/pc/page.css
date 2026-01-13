@@ -92,12 +92,14 @@
 
 .member-type-option {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  height: 75px;
   padding: 20px 24px;
   border: 1px solid #e0e0e0;
-  border-radius: 12px;
+  border-radius: 100px;
   cursor: pointer;
   transition: all 0.2s;
+  box-sizing: border-box;
 }
 
 .member-type-option:hover {
@@ -119,7 +121,6 @@
   justify-content: center;
   margin-right: 12px;
   flex-shrink: 0;
-  margin-top: 2px;
 }
 
 .member-type-option.selected .radio-circle {
@@ -131,6 +132,31 @@
   height: 10px;
   background: #3b5998;
   border-radius: 50%;
+}
+
+.radio-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.checkbox-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 12px;
+  flex-shrink: 0;
+  border: 1px solid #dfdfdf;
+  border-radius: 12px;
+  padding: 2px;
+  box-sizing: border-box;
+  background-color: #fff;
+  vertical-align: middle;
+}
+
+.checkbox-icon.checked {
+  border: 1px solid #2c3fb3;
+  background-color: #2c3fb3;
 }
 
 .option-text-wrapper {
@@ -221,8 +247,8 @@
 
 /* Benefits Box */
 .benefits-box {
-  background: #e8f4f8;
-  border-radius: 12px;
+  background: #f1faff;
+  border-radius: 15px;
   padding: 24px;
 }
 

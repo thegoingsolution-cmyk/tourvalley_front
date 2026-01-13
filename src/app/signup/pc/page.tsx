@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import AccidentFreeCashModal from '@/components/travel/AccidentFreeCashModal';
+import ServiceModal from '@/components/ServiceModal';
 import { getImagePath } from '@/utils/path';
 import { sendVerificationCode, verifyCode as verifyPhoneCode } from '@/services/smsService';
 import { checkUsername, registerPersonalMember, registerCorporateMember } from '@/services/authService';
@@ -25,6 +27,10 @@ interface CorporateContact {
 export default function PCSignupPage() {
   const [step, setStep] = useState<Step>('select');
   const [memberType, setMemberType] = useState<MemberType>(null);
+  
+  // Modal states
+  const [showCashModal, setShowCashModal] = useState(false);
+  const [showServiceModal, setShowServiceModal] = useState(false);
   
   // Terms agreement states
   const [allAgreed, setAllAgreed] = useState(false);
@@ -370,19 +376,25 @@ export default function PCSignupPage() {
                     className={`member-type-option ${memberType === 'personal' ? 'selected' : ''}`}
                     onClick={() => setMemberType('personal')}
                   >
-                    <span className="radio-circle">
-                      {memberType === 'personal' && <span className="radio-dot"></span>}
-                    </span>
-                    <span className="option-text">개인회원</span>
+                    <img 
+                      src={memberType === 'personal' ? '/icons/icon_rdo_ov.png' : '/icons/icon_rdo.png'}
+                      alt="radio"
+                      className="radio-icon"
+                    />
+                    <div className="option-text-wrapper">
+                      <span className="option-text">개인회원</span>
+                    </div>
                   </label>
 
                   <label 
                     className={`member-type-option ${memberType === 'corporate' ? 'selected' : ''}`}
                     onClick={() => setMemberType('corporate')}
                   >
-                    <span className="radio-circle">
-                      {memberType === 'corporate' && <span className="radio-dot"></span>}
-                    </span>
+                    <img 
+                      src={memberType === 'corporate' ? '/icons/icon_rdo_ov.png' : '/icons/icon_rdo.png'}
+                      alt="radio"
+                      className="radio-icon"
+                    />
                     <div className="option-text-wrapper">
                       <span className="option-text">법인단체회원</span>
                       <span className="option-subtext">사업자등록증(고유번호증)이 있는 개인/법인사업자, 각종 단체</span>
@@ -412,33 +424,41 @@ export default function PCSignupPage() {
 
                 <div className="terms-section">
                   <label className="terms-item all-agree" onClick={handleAllAgree}>
-                    <span className={`checkbox ${allAgreed ? 'checked' : ''}`}>
-                      {allAgreed && <span className="check-icon">✓</span>}
-                    </span>
+                    <img 
+                      src={allAgreed ? '/icons/chk_ov.png' : '/icons/checkbox-icon.png'}
+                      alt="checkbox"
+                      className={`checkbox-icon ${allAgreed ? 'checked' : ''}`}
+                    />
                     <span className="terms-text bold">전체동의</span>
                   </label>
 
                   <div className="terms-list">
                     <label className="terms-item" onClick={() => handleIndividualTerm('terms', !termsAgreed)}>
-                      <span className={`checkbox ${termsAgreed ? 'checked' : ''}`}>
-                        {termsAgreed && <span className="check-icon">✓</span>}
-                      </span>
+                      <img 
+                        src={termsAgreed ? '/icons/chk_ov.png' : '/icons/checkbox-icon.png'}
+                        alt="checkbox"
+                        className={`checkbox-icon ${termsAgreed ? 'checked' : ''}`}
+                      />
                       <span className="terms-text">(필수) 투어밸리 사이트 이용약관 동의</span>
                       <span className="terms-arrow">›</span>
                     </label>
 
                     <label className="terms-item" onClick={() => handleIndividualTerm('privacy', !privacyAgreed)}>
-                      <span className={`checkbox ${privacyAgreed ? 'checked' : ''}`}>
-                        {privacyAgreed && <span className="check-icon">✓</span>}
-                      </span>
+                      <img 
+                        src={privacyAgreed ? '/icons/chk_ov.png' : '/icons/checkbox-icon.png'}
+                        alt="checkbox"
+                        className={`checkbox-icon ${privacyAgreed ? 'checked' : ''}`}
+                      />
                       <span className="terms-text">(필수) 개인정보 수집, 이용, 조회 제공 동의</span>
                       <span className="terms-arrow">›</span>
                     </label>
 
                     <label className="terms-item" onClick={() => handleIndividualTerm('marketing', !marketingAgreed)}>
-                      <span className={`checkbox ${marketingAgreed ? 'checked' : ''}`}>
-                        {marketingAgreed && <span className="check-icon">✓</span>}
-                      </span>
+                      <img 
+                        src={marketingAgreed ? '/icons/chk_ov.png' : '/icons/checkbox-icon.png'}
+                        alt="checkbox"
+                        className={`checkbox-icon ${marketingAgreed ? 'checked' : ''}`}
+                      />
                       <span className="terms-text">(선택) 혜택알림 이메일, 문자 동의</span>
                       <span className="terms-arrow">›</span>
                     </label>
@@ -999,11 +1019,11 @@ export default function PCSignupPage() {
 
         {/* Floating Buttons */}
         <div className="floating-buttons">
-          <button className="floating-btn cash-btn">
+          <button className="floating-btn cash-btn" onClick={() => setShowCashModal(true)}>
             <img src={getImagePath('/icons/icon_cash.png')} alt="무사고캐시" className="floating-icon-img" />
             <span className="floating-text">무사고캐시란?</span>
           </button>
-          <button className="floating-btn service-btn">
+          <button className="floating-btn service-btn" onClick={() => setShowServiceModal(true)}>
             <img src={getImagePath('/icons/icon_menu.png')} alt="서비스 전체보기" className="floating-icon-img" />
             <span className="floating-text">서비스<br/>전체보기</span>
           </button>
@@ -1011,6 +1031,22 @@ export default function PCSignupPage() {
       </main>
 
       <Footer isMobile={false} />
+
+      {/* 무사고캐시 모달 */}
+      <AccidentFreeCashModal
+        isOpen={showCashModal}
+        onClose={() => setShowCashModal(false)}
+      />
+
+      {/* 서비스 전체보기 모달 */}
+      <ServiceModal
+        isOpen={showServiceModal}
+        onClose={() => setShowServiceModal(false)}
+        onOpenAccidentFreeCashModal={() => {
+          setShowServiceModal(false);
+          setShowCashModal(true);
+        }}
+      />
     </div>
   );
 }

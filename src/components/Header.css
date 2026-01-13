@@ -393,6 +393,18 @@ body.mobile-menu-open {
   background: rgba(255, 255, 255, 0.3);
 }
 
+.mobile-menu-header-auth {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.mobile-menu-header-separator {
+  color: #fff;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
 a.mobile-menu-header-text {
   text-decoration: none;
   cursor: pointer;

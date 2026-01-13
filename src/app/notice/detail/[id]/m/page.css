@@ -1,400 +1,185 @@
-/* ========================================
-   Mobile Notice Detail Page Styles
-   domestic 모바일 페이지와 동일한 구조
-   ======================================== */
-
-/* 최상위 컨테이너 */
-.notice-detail-mobile #isbwrapper {
+/* 공지사항 상세 모바일 페이지 */
+.notice-detail-mobile-page {
+  background-color: #fff;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: #f5f7fb;
 }
 
-/* Main 컨텐츠 영역 */
-.notice-detail-mobile .main_bg01 {
-  flex: 1;
-  width: 100%;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 20px 16px 40px;
-  min-height: calc(100vh - 120px);
-  background-size: 150% auto;
-  background-position: center bottom -50px;
-  background-repeat: no-repeat;
-  overflow: visible;
-}
-
-.notice-detail-mobile .main_bg01_w {
-  /* 배경 이미지가 보이도록 투명 유지 */
-}
-
-/* ========================================
-   Container 구조
-   ======================================== */
-
-.notice-detail-mobile .mobile-detail .container_w {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 0 16px;
-  overflow: visible;
-}
-
-.notice-detail-mobile .container_box_w {
-  position: relative;
-  width: 100%;
-}
-
-.notice-detail-mobile .container_box {
-  background: #ffffff !important;
-  border-radius: 12px;
-  padding: 24px 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  overflow: visible;
-  min-height: 0;
-  max-height: none;
-  height: auto;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-}
-
-/* ========================================
-   Header Section
-   ======================================== */
-
-.notice-detail-mobile #header {
-  margin-bottom: 20px;
-}
-
-.notice-detail-mobile .tourG_header_inner {
-  position: relative;
-  height: 56px;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.notice-detail-mobile .tourG_header_line {
-  border-bottom: 1px solid #dfdfdf;
-}
-
-.notice-detail-mobile .tourG_title {
-  position: relative;
-  display: block;
+/* 타이틀 라인 */
+.B02_Top_title_Line {
+  font-family: 'NanumSquareNeoTTF-dEb';
   font-size: 18px;
   text-align: center;
-  line-height: 110%;
-  letter-spacing: -0.4px;
-  font-weight: 700;
-  color: #1a1a1a;
+  color: #000;
+  padding: 15px 0;
+  border-bottom: 1px solid #eee;
+  background-color: #fff;
+  position: relative;
 }
 
-/* 모바일 닫기 버튼 */
-.notice-detail-mobile .B02_close_mobile {
+.B02_Top_title_Line span {
+  display: inline-block;
+}
+
+.notice-close-btn {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
   padding: 8px;
-  position: absolute;
-  right: 0;
-  top: -4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.2s;
-  z-index: 10;
 }
 
-.notice-detail-mobile .B02_close_mobile img {
+.notice-close-btn img {
   width: 20px;
   height: 20px;
   display: block;
   opacity: 0.7;
 }
 
-.notice-detail-mobile .B02_close_mobile:active {
+.notice-close-btn:active img {
   opacity: 1;
 }
 
-/* ========================================
-   Content Wrap
-   ======================================== */
-
-.notice-detail-mobile #contentWrap {
-  min-height: 300px;
-  overflow: visible;
+/* 상세 섹션 */
+.notice-detail-section {
+  padding: 20px 16px;
 }
 
-/* ========================================
-   Notice Content Area
-   ======================================== */
-
-.notice-detail-mobile .bgcolor_white {
-  background-color: transparent;
+.notice-loading,
+.notice-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+  font-size: 14px;
 }
 
-.notice-detail-mobile .ptb20 {
-  padding: 0;
+.notice-back-btn {
+  margin-top: 20px;
+  padding: 12px 30px;
+  background: #1b37e1;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-family: 'NanumSquareNeoTTF-dEb';
+  font-size: 14px;
+  cursor: pointer;
 }
 
-.notice-detail-mobile .prow_01 {
-  margin: 0 auto;
-  width: 100%;
+/* 공지사항 상세 컨텐츠 */
+.notice-detail-content {
+  background: #fff;
 }
 
-.notice-detail-mobile .mb_base {
-  margin-bottom: 0;
-}
-
-.notice-detail-mobile .B02_Notice_ContBox {
-  padding: 0;
-}
-
-/* ========================================
-   Notice Header
-   ======================================== */
-
-.notice-detail-mobile .B02_Notice_Head {
+.notice-detail-header {
   padding-bottom: 16px;
   margin-bottom: 20px;
-  border-bottom: 2px solid #1a1a1a;
-  text-align: left;
+  border-bottom: 2px solid #000;
 }
 
-.notice-detail-mobile .B02_Notice_HeadTxt {
+.notice-detail-title {
+  font-family: 'NanumSquareNeoTTF-dEb';
   font-size: 18px;
-  letter-spacing: -0.5px;
-  font-weight: 700;
-  color: #1a1a1a;
-  line-height: 1.4;
+  color: #000;
+  line-height: 1.5;
+  margin: 0 0 12px 0;
   word-break: keep-all;
 }
 
-.notice-detail-mobile .B02_Notice_date {
-  margin-top: 8px;
+.notice-detail-meta {
+  display: flex;
+  gap: 10px;
   font-size: 12px;
   color: #999;
-  font-weight: 400;
+  font-family: 'NanumSquareNeoTTF-bRg';
 }
 
-/* ========================================
-   Notice Content Body
-   ======================================== */
-
-.notice-detail-mobile .B02_Notice_contBox {
-  padding: 0;
-  min-height: 250px;
-  margin-bottom: 28px;
+.notice-detail-meta span {
+  display: inline-block;
 }
 
-.notice-detail-mobile .notice-content {
+.notice-detail-divider {
+  height: 1px;
+  background: #eee;
+  margin: 20px 0;
+}
+
+.notice-detail-body {
+  font-family: 'NanumSquareNeoTTF-bRg';
   font-size: 14px;
   line-height: 1.8;
   color: #333;
   word-break: break-word;
+  min-height: 200px;
 }
 
-.notice-detail-mobile .notice-content p {
+.notice-detail-body p {
   margin: 14px 0;
 }
 
-.notice-detail-mobile .notice-content p:first-child {
+.notice-detail-body p:first-child {
   margin-top: 0;
 }
 
-.notice-detail-mobile .notice-content p:last-child {
+.notice-detail-body p:last-child {
   margin-bottom: 0;
 }
 
-.notice-detail-mobile .notice-content br {
-  content: "";
-  display: block;
-  margin: 6px 0;
-}
-
-.notice-detail-mobile .notice-content a {
-  color: #2843e5;
+.notice-detail-body a {
+  color: #1b37e1;
   text-decoration: underline;
-  transition: color 0.2s;
 }
 
-.notice-detail-mobile .notice-content a:active {
-  color: #1e33c4;
+.notice-detail-body a:hover {
+  color: #0f2bb0;
 }
 
-/* ========================================
-   Back to List Button
-   ======================================== */
+.notice-detail-body img {
+  max-width: 100%;
+  height: auto;
+}
 
-.notice-detail-mobile .B02_Back_ListBtn {
+.notice-detail-footer {
   text-align: center;
-  padding-top: 20px;
-  margin-top: 20px;
+  padding-top: 30px;
+  margin-top: 30px;
   border-top: 1px solid #eee;
 }
 
-.notice-detail-mobile .B02_Back_ListBtn a {
+.notice-list-btn {
   display: inline-block;
   padding: 12px 40px;
   background: #fff;
-  border: 2px solid #2843e5;
-  border-radius: 8px;
-  color: #2843e5;
+  border: 2px solid #1b37e1;
+  border-radius: 4px;
+  color: #1b37e1;
+  font-family: 'NanumSquareNeoTTF-dEb';
   font-size: 15px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.2s;
+  cursor: pointer;
+  transition: all 0.3s;
 }
 
-.notice-detail-mobile .B02_Back_ListBtn a:active {
-  background: #2843e5;
+.notice-list-btn:active {
+  background: #1b37e1;
   color: #fff;
 }
 
-/* ========================================
-   Loading & Error States
-   ======================================== */
-
-.notice-detail-mobile .loading-message,
-.notice-detail-mobile .error-message {
-  text-align: center;
-  padding: 60px 20px;
-  min-height: 250px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+/* 폰트 설정 */
+@font-face {
+  font-family: 'NanumSquareNeoTTF-bRg';
+  src: local('NanumSquareNeo'), local('NanumSquare');
+  font-weight: 400;
 }
 
-.notice-detail-mobile .loading-message p,
-.notice-detail-mobile .error-message p {
-  font-size: 15px;
-  color: #666;
-  margin-bottom: 20px;
-  line-height: 1.6;
+@font-face {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  src: local('NanumSquareNeo'), local('NanumSquare');
+  font-weight: 700;
 }
 
-.notice-detail-mobile .retry-button {
-  padding: 12px 28px;
-  background: #2843e5;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.notice-detail-mobile .retry-button:active {
-  background: #1e33c4;
-}
-
-/* ========================================
-   Fixed Right Buttons (모바일 - 하단 고정)
-   ======================================== */
-
-.notice-detail-mobile .mobile-detail .fixedRight_b01 {
-  position: fixed;
-  bottom: 80px;
-  right: 16px;
-  width: 90px;
-  height: 76px;
-  background: #fade21;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  cursor: pointer;
-  text-decoration: none;
-  display: block;
-  z-index: 999;
-  transition: all 0.2s;
-}
-
-.notice-detail-mobile .mobile-detail .fixedRight_b01:active {
-  transform: scale(0.95);
-}
-
-.notice-detail-mobile .mobile-detail .fixedRight_b02 {
-  position: fixed;
-  bottom: 12px;
-  right: 16px;
-  width: 90px;
-  height: 60px;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  cursor: pointer;
-  text-decoration: none;
-  display: block;
-  z-index: 999;
-  transition: all 0.2s;
-}
-
-.notice-detail-mobile .mobile-detail .fixedRight_b02:active {
-  transform: scale(0.95);
-}
-
-.notice-detail-mobile .fixedRight_txt01 {
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
-  font-size: 12px;
-  letter-spacing: -0.8px;
-  color: #333;
-  line-height: 100%;
-  text-decoration: none;
-  text-align: center;
-  display: block;
-  margin-top: 6px;
-}
-
-.notice-detail-mobile .fixedRight_txt02 {
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
-  font-size: 11px;
-  letter-spacing: -0.3px;
-  color: #333;
-  line-height: 120%;
-  text-decoration: none;
-  text-align: left;
-  display: inline-block;
-  margin-left: 4px;
-  margin-top: 12px;
-}
-
-.notice-detail-mobile .icon_cash {
-  display: block;
-  width: 38px;
-  height: 37px;
-  background: url(/icons/icon_cash.png) no-repeat 0 0/contain;
-  margin: 11px 0 0 26px;
-}
-
-.notice-detail-mobile .icon_cash .icon_cash01 {
-  display: block;
-  text-align: center;
-  margin: 0 auto;
-  padding: 8px 0 0 0;
-}
-
-.notice-detail-mobile .icon_menu {
-  display: inline-block;
-  width: 17px;
-  height: 17px;
-  background: url(/icons/icon_menu.png) no-repeat 0 0/contain;
-  vertical-align: top;
-  margin: 16px 0 0 14px;
-  text-align: left;
-}
-
-.notice-detail-mobile .icon_menu .icon_menu01 {
-  display: inline-block;
-  text-align: center;
-  margin: 0 auto;
-  padding: 8px 0 0 0;
+@font-face {
+  font-family: 'NanumSquareNeoTTF-dEb';
+  src: local('NanumSquareNeo'), local('NanumSquare');
+  font-weight: 800;
 }

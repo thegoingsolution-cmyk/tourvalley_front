@@ -8,7 +8,6 @@
 .signup-content-mobile {
   flex: 1;
   width: 100%;
-  padding: 20px 16px 40px;
 }
 
 .signup-container-mobile {
@@ -74,12 +73,14 @@
 
 .member-type-option-mobile {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  height: 75px;
   padding: 16px;
   border: 1px solid #e0e0e0;
-  border-radius: 10px;
+  border-radius: 100px;
   cursor: pointer;
   transition: all 0.2s;
+  box-sizing: border-box;
 }
 
 .member-type-option-mobile.selected {
@@ -97,7 +98,6 @@
   justify-content: center;
   margin-right: 10px;
   flex-shrink: 0;
-  margin-top: 2px;
 }
 
 .member-type-option-mobile.selected .radio-circle-mobile {
@@ -109,6 +109,13 @@
   height: 8px;
   background: #3b5998;
   border-radius: 50%;
+}
+
+.radio-icon-mobile {
+  width: 22px;
+  height: 22px;
+  margin-right: 10px;
+  flex-shrink: 0;
 }
 
 .option-text-wrapper-mobile {
@@ -171,6 +178,24 @@
   font-weight: 700;
 }
 
+.checkbox-icon-mobile {
+  width: 22px;
+  height: 22px;
+  margin-right: 10px;
+  flex-shrink: 0;
+  border: 1px solid #dfdfdf;
+  border-radius: 12px;
+  padding: 2px;
+  box-sizing: border-box;
+  background-color: #fff;
+  vertical-align: middle;
+}
+
+.checkbox-icon-mobile.checked {
+  border: 1px solid #2c3fb3;
+  background-color: #2c3fb3;
+}
+
 .terms-text-mobile {
   flex: 1;
   font-size: 13px;
@@ -200,8 +225,8 @@
 
 /* Benefits Box */
 .benefits-box-mobile {
-  background: #e8f4f8;
-  border-radius: 10px;
+  background: #f1faff;
+  border-radius: 15px;
   padding: 20px;
 }
 
@@ -540,7 +565,7 @@
 }
 
 .submit-btn-mobile {
-  flex: 1.5;
+  width: 100%;
   padding: 16px;
   border: none;
   border-radius: 8px;
@@ -549,6 +574,11 @@
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
+}
+
+.button-group-mobile .submit-btn-mobile {
+  width: auto;
+  flex: 1.5;
 }
 
 .submit-btn-mobile:disabled {

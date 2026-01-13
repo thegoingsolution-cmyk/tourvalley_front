@@ -1143,6 +1143,15 @@ function MobileDomesticStep1Content() {
         }}
       />
 
+      {/* 하단 고정버튼 (STEP 2-1, STEP 3, 완료 화면에서는 숨김) */}
+      {!showStep2_1 && !showStep3 && !showCompletionScreen && (
+        <FixedBottomButtons 
+          canProceed={showPlanSelection && selectedPlan !== null}
+          onTwoOrMoreClick={handleTwoOrMoreClick}
+          onSingleClick={handleSingleClick}
+        />
+      )}
+
       <Footer isMobile={true} />
     </div>
   );
