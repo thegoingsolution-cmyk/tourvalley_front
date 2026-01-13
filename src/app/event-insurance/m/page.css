@@ -3,10 +3,18 @@
   min-height: 100vh;
   background-color: #fff;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* 다른 페이지의 전역 스타일과 격리 */
+  isolation: isolate;
 }
 
 .event-insurance-mobile * {
   box-sizing: border-box;
+}
+
+/* CSS 격리 강화 - 다른 페이지의 스타일이 영향을 주지 않도록 */
+.event-insurance-mobile .tourGuard_form_tt.tourG_line {
+  /* 스타일 격리 및 강제 적용 */
+  contain: layout style;
 }
 
 /* 모바일 줌인 방지 - input, select, textarea font-size 16px 이상 필수 */
@@ -133,11 +141,7 @@
   padding: 0 20px;
 }
 
-/* 라디오 버튼이 있는 경우만 align-items와 padding 제거 */
-.event-insurance-mobile .tourGuard_form_tt.tourG_line:has(.tourG_rdo_area) {
-  align-items: flex-start !important;
-  padding: 0 !important;
-}
+/* 라디오 버튼이 있는 경우만 align-items와 padding 제거 - tourG_line-with-radio 클래스로 처리 */
 
 .event-insurance-mobile .tourGuard_form_tt > label {
   position: absolute;
@@ -158,10 +162,15 @@
   font-size: 16px;
   letter-spacing: 0px;
   display: inline-block;
-  margin-top: 23px;
+  margin-top: 15px;
   margin-left: 10px;
   background: transparent;
   outline: none;
+}
+
+/* 날짜 입력 필드 글자 크기 줄이기 */
+.event-insurance-mobile .tourGuard_form_tt input[type="date"] {
+  font-size: 10px !important;
 }
 
 .event-insurance-mobile .tourGuard_form_tt input::placeholder {
@@ -287,6 +296,7 @@
 .event-insurance-mobile .tourGuard_input_cell02 {
   width: 38%;
   margin-left: 10px;
+  margin-top: 15px;
 }
 
 .event-insurance-mobile .tourGuard_sel07 {
@@ -313,12 +323,12 @@
 
 /* 라디오 버튼 영역 - 모바일용 세로 배치 */
 .event-insurance-mobile .tourG_rdo_area {
-  width: 48%;
-  margin-right: 0;
-  vertical-align: top;
-  text-align: left;
-  position: relative;
-  display: block;
+  width: 48% !important;
+  margin-right: 0 !important;
+  text-align: left !important;
+  position: relative !important;
+  display: block !important;
+  box-sizing: border-box !important;
 }
 
 .event-insurance-mobile .tourG_rdo_area > label:first-child {
@@ -339,21 +349,27 @@
 .event-insurance-mobile .tourG_rdo_area > .tourG_inp_rdo {
   display: inline-block !important;
   width: 40% !important;
-  vertical-align: top;
-  margin-left: 15px;
+  vertical-align: top !important;
+  margin-left: 15px !important;
+  box-sizing: border-box !important;
+  position: relative !important;
 }
 
 .event-insurance-mobile .tourGuard_form_tt.tourG_line {
-  display: flex;
-  justify-content: space-between;
+  display: flex !important;
+  justify-content: space-between !important;
   align-items: center !important;
-  padding: 12px 15px !important;
-  min-height: 80px;
+  min-height: 65px !important;
+  box-sizing: border-box !important;
 }
 
-/* 라디오 버튼이 있는 경우만 flex-start */
-.event-insurance-mobile .tourGuard_form_tt.tourG_line:has(.tourG_rdo_area) {
+/* 라디오 버튼이 있는 경우만 flex-start - 더 구체적인 선택자로 격리 */
+.event-insurance-mobile .tourGuard_form_tt.tourG_line:has(.tourG_rdo_area),
+.event-insurance-mobile .tourGuard_form_tt.tourG_line.tourG_line-with-radio {
   align-items: flex-start !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  min-height: 65px !important;
 }
 
 .event-insurance-mobile .tourG_line::after {
@@ -573,6 +589,12 @@
   z-index: 10;
   height: 23px;
   display: inline-block;
+}
+
+/* tourG_mat02 클래스의 margin-top 제거 (체크박스 정렬을 위해) */
+.event-insurance-mobile .tour2023_cir03.tourG_mat02,
+.event-insurance-mobile .tour2023_cir.tourG_mat02 {
+  margin-top: 0 !important;
 }
 
 .event-insurance-mobile .tour2023_cir03 input {
@@ -876,15 +898,16 @@
 
   /* 라디오 버튼 영역 - 더 안전하게 */
   .event-insurance-mobile .tourGuard_form_tt.tourG_line {
-    padding: 12px 10px !important;
     display: flex;
     justify-content: space-between;
     align-items: center !important;
-    min-height: 75px;
+    min-height: 65px !important;
   }
 
-  .event-insurance-mobile .tourGuard_form_tt.tourG_line:has(.tourG_rdo_area) {
+  .event-insurance-mobile .tourGuard_form_tt.tourG_line:has(.tourG_rdo_area),
+  .event-insurance-mobile .tourGuard_form_tt.tourG_line.tourG_line-with-radio {
     align-items: flex-start !important;
+    min-height: 65px !important;
   }
 
   .event-insurance-mobile .tourG_rdo_area {
@@ -974,6 +997,11 @@
     font-size: 16px;
   }
 
+  /* 날짜 입력 필드 글자 크기 줄이기 */
+  .event-insurance-mobile .tourGuard_form_tt input[type="date"] {
+    font-size: 10px !important;
+  }
+
   .event-insurance-mobile .tourGuard_input_cell08 {
     width: 28%;
   }
@@ -993,15 +1021,16 @@
 
   /* 라디오 버튼 영역 - 더 작게 */
   .event-insurance-mobile .tourGuard_form_tt.tourG_line {
-    padding: 10px 8px !important;
-    min-height: 70px;
+    min-height: 65px !important;
     display: flex;
     justify-content: space-between;
     align-items: center !important;
   }
 
-  .event-insurance-mobile .tourGuard_form_tt.tourG_line:has(.tourG_rdo_area) {
+  .event-insurance-mobile .tourGuard_form_tt.tourG_line:has(.tourG_rdo_area),
+  .event-insurance-mobile .tourGuard_form_tt.tourG_line.tourG_line-with-radio {
     align-items: flex-start !important;
+    min-height: 65px !important;
   }
 
   .event-insurance-mobile .tourG_rdo_area {
@@ -1017,7 +1046,7 @@
     color: #9797a3 !important;
     margin-top: 6px;
     margin-bottom: 7px;
-    margin-left: 20px;
+    margin-left: 5px;
     margin-right: 0;
     letter-spacing: -0.6px;
     white-space: nowrap;
@@ -1078,14 +1107,16 @@
   /* 아주 작은 화면 - 라디오 버튼 더 축소 */
   .event-insurance-mobile .tourGuard_form_tt.tourG_line {
     padding: 8px 6px !important;
-    min-height: 65px;
+    min-height: 65px !important;
     display: flex;
     justify-content: space-between;
     align-items: center !important;
   }
 
-  .event-insurance-mobile .tourGuard_form_tt.tourG_line:has(.tourG_rdo_area) {
+  .event-insurance-mobile .tourGuard_form_tt.tourG_line:has(.tourG_rdo_area),
+  .event-insurance-mobile .tourGuard_form_tt.tourG_line.tourG_line-with-radio {
     align-items: flex-start !important;
+    min-height: 65px !important;
   }
 
   .event-insurance-mobile .tourG_rdo_area {
@@ -1139,6 +1170,11 @@
   .event-insurance-mobile .tourGuard_form_tt input[type="tel"],
   .event-insurance-mobile .tourGuard_form_tt input[type="date"] {
     font-size: 13px;
+  }
+
+  /* 날짜 입력 필드 글자 크기 줄이기 */
+  .event-insurance-mobile .tourGuard_form_tt input[type="date"] {
+    font-size: 10px !important;
   }
 
   .event-insurance-mobile .tourGuard_sel07 {

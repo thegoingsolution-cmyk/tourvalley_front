@@ -34,12 +34,12 @@ export default function MobileEventInsurancePage() {
     end_date: todayString,
     end_hour: getDefaultHour(),
     insured_cnt: '',
-    action_info_1: '',
-    action_info_2: '',
-    action_info_3: '',
-    action_info_4: '',
-    action_info_5: '',
-    action_info_6: '',
+    action_info_1: null as string | null,
+    action_info_2: null as string | null,
+    action_info_3: null as string | null,
+    action_info_4: null as string | null,
+    action_info_5: null as string | null,
+    action_info_6: null as string | null,
     input_yn: false,
     me_check: true,
     bi_cover1: '10000',
@@ -56,6 +56,42 @@ export default function MobileEventInsurancePage() {
   const [overviewName, setOverviewName] = useState('');
   const [licenseFile, setLicenseFile] = useState<File | null>(null);
   const [overviewFile, setOverviewFile] = useState<File | null>(null);
+
+  // 컴포넌트 마운트 시 스타일 강제 재적용 (다른 페이지에서 돌아올 때 CSS 깨짐 방지)
+  useEffect(() => {
+    // 스타일이 제대로 적용되도록 강제 리플로우 및 클래스 재적용
+    const forceReflow = () => {
+      const elements = document.querySelectorAll('.event-insurance-mobile .tourGuard_form_tt.tourG_line');
+      elements.forEach((el) => {
+        const htmlEl = el as HTMLElement;
+        // 강제 리플로우 트리거
+        void htmlEl.offsetHeight;
+        
+        // 라디오 버튼이 있는 경우 클래스 추가
+        const hasRadio = htmlEl.querySelector('.tourG_rdo_area');
+        if (hasRadio && !htmlEl.classList.contains('tourG_line-with-radio')) {
+          htmlEl.classList.add('tourG_line-with-radio');
+        }
+        
+        // 스타일 강제 재계산
+        htmlEl.style.display = 'none';
+        void htmlEl.offsetHeight;
+        htmlEl.style.display = '';
+      });
+    };
+
+    // 마운트 시 즉시 실행
+    forceReflow();
+
+    // 약간의 지연 후 다시 실행 (다른 스타일이 적용된 후)
+    const timeoutId1 = setTimeout(forceReflow, 50);
+    const timeoutId2 = setTimeout(forceReflow, 200);
+
+    return () => {
+      clearTimeout(timeoutId1);
+      clearTimeout(timeoutId2);
+    };
+  }, []);
 
   const emailDomains = [
     'naver.com',
@@ -164,32 +200,33 @@ export default function MobileEventInsurancePage() {
       return;
     }
 
-    if (!formData.action_info_1) {
+    // action_info는 null이면 미선택, ''(빈 문자열)이면 "무" 선택, 다른 값이면 "유" 선택
+    if (formData.action_info_1 === null || formData.action_info_1 === undefined) {
       alert('운동경기 유무를 체크해 주세요.');
       return;
     }
 
-    if (!formData.action_info_2) {
+    if (formData.action_info_2 === null || formData.action_info_2 === undefined) {
       alert('불꽃놀이 유무를 체크해 주세요.');
       return;
     }
 
-    if (!formData.action_info_3) {
+    if (formData.action_info_3 === null || formData.action_info_3 === undefined) {
       alert('수상위험 활동 유무를 체크해 주세요.');
       return;
     }
 
-    if (!formData.action_info_4) {
+    if (formData.action_info_4 === null || formData.action_info_4 === undefined) {
       alert('놀이시설 유무를 체크해 주세요.');
       return;
     }
 
-    if (!formData.action_info_5) {
+    if (formData.action_info_5 === null || formData.action_info_5 === undefined) {
       alert('드론 유무를 체크해 주세요.');
       return;
     }
 
-    if (!formData.action_info_6) {
+    if (formData.action_info_6 === null || formData.action_info_6 === undefined) {
       alert('기타 위험활동 유무를 체크해 주세요.');
       return;
     }
@@ -304,12 +341,12 @@ export default function MobileEventInsurancePage() {
           end_date: todayString,
           end_hour: getDefaultHour(),
           insured_cnt: '',
-          action_info_1: '',
-          action_info_2: '',
-          action_info_3: '',
-          action_info_4: '',
-          action_info_5: '',
-          action_info_6: '',
+          action_info_1: null as string | null,
+          action_info_2: null as string | null,
+          action_info_3: null as string | null,
+          action_info_4: null as string | null,
+          action_info_5: null as string | null,
+          action_info_6: null as string | null,
           input_yn: false,
           me_check: true,
           bi_cover1: '10000',
@@ -573,7 +610,7 @@ export default function MobileEventInsurancePage() {
                       <div className="tourGuard_txt21">명</div>
                     </div>
 
-                    <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line">
+                    <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line tourG_line-with-radio">
                       <div className="tourG_rdo_area">
                         <label htmlFor="action_info_1_Y">운동경기/체육활동 유무</label>
                         <span className="tourG_inp_rdo">
@@ -627,7 +664,7 @@ export default function MobileEventInsurancePage() {
                       </div>
                     </div>
 
-                    <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line">
+                    <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line tourG_line-with-radio">
                       <div className="tourG_rdo_area">
                         <label htmlFor="action_info_3_Y">수상위험 유무</label>
                         <span className="tourG_inp_rdo">
@@ -681,7 +718,7 @@ export default function MobileEventInsurancePage() {
                       </div>
                     </div>
 
-                    <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line">
+                    <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line tourG_line-with-radio">
                       <div className="tourG_rdo_area">
                         <label htmlFor="action_info_5_Y">드론 유무</label>
                         <span className="tourG_inp_rdo">
