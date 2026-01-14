@@ -883,9 +883,263 @@ function MobileGroupInsuranceContent() {
   };
 
   const handlePaymentSubmit = async () => {
-    // 결제 처리 로직 (domestic/m/page.tsx와 동일)
-    // ... (생략)
-    alert('결제 기능은 추후 구현될 예정입니다.');
+    // 결제 방법 검증
+    if (!paymentMethod) {
+      alert('결제 방법을 선택해주세요.');
+      return;
+    }
+
+    if (paymentMethod === '기타결제') {
+      if (!paymentSubMethod) {
+        alert('결제 세부 방법을 선택해주세요.');
+        return;
+      }
+
+      if (paymentSubMethod === '무통장입금') {
+        if (!depositBank || !depositorName || expectedDepositYear === 0 || expectedDepositMonth === 0 || expectedDepositDay === 0) {
+          alert('입금 정보를 모두 입력해주세요.');
+          return;
+        }
+      } else if (paymentSubMethod === '수기카드') {
+        if (!cardNumber1 || !cardNumber2 || !cardNumber3 || !cardNumber4 ||
+            !cardExpiryMonth || !cardExpiryYear || !cardholderName || !cardholderResidentNumber ||
+            approvalYear === 0 || approvalMonth === 0 || approvalDay === 0) {
+          alert('카드 정보를 모두 입력해주세요.');
+          return;
+        }
+      }
+    }
+
+    try {
+      const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
+      const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
+
+      // 기간 계산
+      const departure = new Date(departureDateTime);
+      const arrival = new Date(arrivalDateTime);
+      const diffTime = arrival.getTime() - departure.getTime();
+      const periodDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+      // 가입자 정보 (그룹 또는 개인)
+      const currentParticipants = hasGroupParticipants ? groupParticipantsData : participants;
+      const currentCalculatedPremiums = calculatedPremiums;
+
+      if (!currentCalculatedPremiums || currentCalculatedPremiums.totalPremium <= 0) {
+        alert('보험료 정보가 없습니다.');
+        return;
+      }
+
+      // 나이스페이먼츠, 네이버페이, 카카오페이는 먼저 계약 등록 후 결제
+      if (paymentMethod === '나이스페이먼츠' || paymentMethod === '네이버페이' || paymentMethod === '카카오페이') {
+        // 1. 계약 등록 (결제 대기 상태)
+        const contractData = {
+          contract: {
+            member_id: isLoggedIn && member ? member.id : null,
+            insurance_type: getInsuranceType(),
+            departure_date: departureDateTime,
+            arrival_date: arrivalDateTime,
+            duration_months: 0,
+            duration_days: periodDays,
+            travel_region: activeTab !== 'DS' ? (travelCountry ? '해외' : null) : '전국일원',
+            travel_country: activeTab !== 'DS' ? travelCountry : null,
+            travel_purpose: travelPurpose || '관광',
+            travel_participants: currentParticipants.length,
+            total_premium: currentCalculatedPremiums.totalPremium,
+            device: '모바일',
+            access_path: '투어밸리 모바일 사이트',
+          },
+          contractor: {
+            contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
+            name: currentParticipants[0]?.name || '',
+            resident_number: currentParticipants[0]?.birthDate ? `${currentParticipants[0].birthDate}-${currentParticipants[0].gender === '남자' ? '1' : '2'}******` : '',
+            mobile_phone: currentParticipants[0]?.phone || '',
+            email: getFullEmail(currentParticipants[0]),
+          },
+          insured_persons: currentParticipants.map((p, idx) => {
+            const age = calculateAgeFromBirthDate(p.birthDate);
+            const participantPremium = currentCalculatedPremiums.participants.find(cp => cp.id === p.id || cp.name === p.name);
+            return {
+              sequence_number: idx + 1,
+              name: p.name,
+              resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
+              gender: p.gender,
+              age: age || 0,
+              plan_type: selectedPlan || '실속플랜',
+              premium: participantPremium?.premium || 0,
+              has_medical_expense: hasMedicalExpense ? 1 : 0,
+            };
+          }),
+          companions: [],
+          payment: {
+            payment_method: paymentMethod,
+            payment_sub_method: null,
+            amount: receiptPremium,
+            status: '대기',
+          },
+        };
+
+        const contractResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/travel/register-contract`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(contractData),
+        });
+
+        const contractData_result = await contractResponse.json();
+
+        if (!contractData_result.success) {
+          alert(contractData_result.message || '계약 등록에 실패했습니다.');
+          return;
+        }
+
+        const contract_id = contractData_result.contract_id;
+        const insuranceTypeName = getInsuranceType();
+
+        // 2. 결제 처리
+        if (paymentMethod === '나이스페이먼츠') {
+          const paymentRequest = await requestNicepayPayment({
+            contract_id,
+            amount: receiptPremium,
+            orderId: contractData_result.contract_number,
+            goodsName: insuranceTypeName,
+            buyerName: currentParticipants[0]?.name || '',
+            buyerEmail: getFullEmail(currentParticipants[0]),
+            buyerTel: currentParticipants[0]?.phone || '',
+            returnUrl: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/payments/nicepay/callback`,
+            closeUrl: `${window.location.origin}/payment/close`,
+          });
+
+          if (paymentRequest.success) {
+            localStorage.setItem('pendingPayment', JSON.stringify({
+              contract_id,
+              payment_method: paymentMethod,
+              amount: receiptPremium,
+            }));
+            try {
+              await openNicepayWindow(paymentRequest);
+            } catch (error) {
+              console.error('결제창 열기 오류:', error);
+              alert(error instanceof Error ? error.message : '결제창을 여는 중 오류가 발생했습니다.');
+            }
+          } else {
+            alert(paymentRequest.message || '결제 요청에 실패했습니다.');
+          }
+        } else if (paymentMethod === '네이버페이') {
+          try {
+            await processNaverPayPayment({
+              contractId: contract_id,
+              amount: receiptPremium,
+              productName: insuranceTypeName,
+              productCount: currentParticipants.length,
+              customerName: currentParticipants[0]?.name || '',
+              customerEmail: getFullEmail(currentParticipants[0]),
+              customerPhone: currentParticipants[0]?.phone || '',
+              checkOutDate: arrivalDate,
+            });
+          } catch (error) {
+            console.error('네이버 페이 결제 오류:', error);
+            alert(error instanceof Error ? error.message : '네이버 페이 결제 중 오류가 발생했습니다.');
+          }
+        } else if (paymentMethod === '카카오페이') {
+          try {
+            await processKakaoPayPayment({
+              contractId: contract_id,
+              amount: receiptPremium,
+              itemName: insuranceTypeName,
+              quantity: currentParticipants.length,
+              customerName: currentParticipants[0]?.name || '',
+              customerEmail: getFullEmail(currentParticipants[0]),
+              customerPhone: currentParticipants[0]?.phone || '',
+            });
+          } catch (error) {
+            console.error('카카오페이 결제 오류:', error);
+            alert(error instanceof Error ? error.message : '카카오페이 결제 중 오류가 발생했습니다.');
+          }
+        }
+      } else {
+        // 기타결제 (무통장입금, 수기카드)는 바로 계약 등록
+        const contractData = {
+          contract: {
+            member_id: isLoggedIn && member ? member.id : null,
+            insurance_type: getInsuranceType(),
+            departure_date: departureDateTime,
+            arrival_date: arrivalDateTime,
+            duration_months: 0,
+            duration_days: periodDays,
+            travel_region: activeTab !== 'DS' ? (travelCountry ? '해외' : null) : '전국일원',
+            travel_country: activeTab !== 'DS' ? travelCountry : null,
+            travel_purpose: travelPurpose || '관광',
+            travel_participants: currentParticipants.length,
+            total_premium: currentCalculatedPremiums.totalPremium,
+            device: '모바일',
+            access_path: '투어밸리 모바일 사이트',
+          },
+          contractor: {
+            contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
+            name: currentParticipants[0]?.name || '',
+            resident_number: currentParticipants[0]?.birthDate ? `${currentParticipants[0].birthDate}-${currentParticipants[0].gender === '남자' ? '1' : '2'}******` : '',
+            mobile_phone: currentParticipants[0]?.phone || '',
+            email: getFullEmail(currentParticipants[0]),
+          },
+          insured_persons: currentParticipants.map((p, idx) => {
+            const age = calculateAgeFromBirthDate(p.birthDate);
+            const participantPremium = currentCalculatedPremiums.participants.find(cp => cp.id === p.id || cp.name === p.name);
+            return {
+              sequence_number: idx + 1,
+              name: p.name,
+              resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
+              gender: p.gender,
+              age: age || 0,
+              plan_type: selectedPlan || '실속플랜',
+              premium: participantPremium?.premium || 0,
+              has_medical_expense: hasMedicalExpense ? 1 : 0,
+            };
+          }),
+          companions: [],
+          payment: {
+            payment_method: paymentMethod || '기타결제',
+            payment_sub_method: paymentSubMethod || null,
+            amount: receiptPremium,
+            status: paymentSubMethod === '무통장입금' ? '대기' : '완료',
+            depositor_name: paymentSubMethod === '무통장입금' ? depositorName : null,
+            bank_name: paymentSubMethod === '무통장입금' ? depositBank : null,
+            account_number: paymentSubMethod === '무통장입금' ? (depositBank === '우리은행' ? '1005-604-481542' : '301-0337-8596-01') : null,
+            card_type: paymentSubMethod === '수기카드' ? cardType : null,
+            card_category: paymentSubMethod === '수기카드' ? cardCategory : null,
+            card_number: paymentSubMethod === '수기카드' ? `${cardNumber1}-${cardNumber2}-${cardNumber3}-${cardNumber4}` : null,
+            card_expiry_month: paymentSubMethod === '수기카드' ? cardExpiryMonth : null,
+            card_expiry_year: paymentSubMethod === '수기카드' ? cardExpiryYear : null,
+            cardholder_name: paymentSubMethod === '수기카드' ? cardholderName : null,
+            cardholder_resident_number: paymentSubMethod === '수기카드' ? cardholderResidentNumber : null,
+            approval_date: paymentSubMethod === '수기카드' ? `${approvalYear}-${String(approvalMonth).padStart(2, '0')}-${String(approvalDay).padStart(2, '0')}` : null,
+            normal_premium: normalPremium,
+            receipt_premium: receiptPremium,
+          },
+        };
+
+        const response = await fetch('/api/travel/register-contract', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(contractData),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          setShowPaymentScreen(false);
+          setShowCompletionScreen(true);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          alert(data.message || '계약 등록에 실패했습니다.');
+        }
+      }
+    } catch (error) {
+      console.error('계약 등록 오류:', error);
+      alert('계약 등록 중 오류가 발생했습니다.');
+    }
   };
 
   const handleTwoOrMoreClick = () => {
