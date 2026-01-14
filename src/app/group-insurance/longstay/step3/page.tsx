@@ -55,6 +55,7 @@ export default function LongStayInsuranceStep3Page() {
   const [totalPremium, setTotalPremium] = useState(0);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [travelPurpose, setTravelPurpose] = useState('유학/어학연수');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -69,6 +70,7 @@ export default function LongStayInsuranceStep3Page() {
         setTourNum(data1.tourNum || 1);
         setStartDate(`${data1.startDate} ${data1.startHour}:00:00`);
         setEndDate(`${data1.endDate} ${data1.endHour}:00:00`);
+        setTravelPurpose(data2.travel_purpose || '유학/어학연수');
         
         const insuredPersons = [];
         for (let i = 1; i <= data1.tourNum; i++) {
@@ -117,7 +119,7 @@ export default function LongStayInsuranceStep3Page() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          insurance_type: '해외장기체류보험',
+          insurance_type: travelPurpose,
           insured_persons: insuredPersons,
           departure_date: startDate,
           arrival_date: endDate,

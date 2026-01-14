@@ -149,7 +149,7 @@
 }
 
 .long-term-stay-mobile .tourG_mab05 {
-  margin-bottom: 5px;
+  margin-bottom: 20px;
 }
 
 .long-term-stay-mobile .tourG_mleft04 {
@@ -612,6 +612,244 @@
 }
 
 /* ======================================== 
+   Plan Selection Styles - 플랜 선택 스타일
+   ======================================== */
+
+.long-term-stay-mobile .plan-selection-card {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #eee;
+  overflow: visible;
+}
+
+/* Plan Selection Guide (해외장기체류보험용) */
+.long-term-stay-mobile .plan-selection-guide {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.long-term-stay-mobile .guide-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.long-term-stay-mobile .guide-text {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+/* Currency Plan Tabs */
+.long-term-stay-mobile .currency-plan-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.long-term-stay-mobile .currency-tab {
+  flex: 1;
+  padding: 10px 16px;
+  background: #fff;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.long-term-stay-mobile .currency-tab.active {
+  background: #2843e5;
+  border-color: #2843e5;
+  color: #fff;
+}
+
+/* Exchange Rate Info */
+.long-term-stay-mobile .exchange-rate-info {
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background: #f0f4ff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.long-term-stay-mobile .rate-icon {
+  color: #2843e5;
+  font-size: 12px;
+}
+
+.long-term-stay-mobile .rate-text {
+  font-size: 12px;
+  color: #333;
+  line-height: 1.5;
+}
+
+/* Medical Expense Option */
+.long-term-stay-mobile .medical-expense-option {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.long-term-stay-mobile .medical-expense-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.long-term-stay-mobile .question-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: #999;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.long-term-stay-mobile .medical-expense-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.long-term-stay-mobile .medical-expense-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.long-term-stay-mobile .toggle-btn {
+  flex: 1;
+  padding: 10px 16px;
+  background: #fff;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.long-term-stay-mobile .toggle-btn.active {
+  background: #2843e5;
+  border-color: #2843e5;
+  color: #fff;
+}
+
+/* Plans Container */
+.long-term-stay-mobile .plans-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+  overflow: visible;
+}
+
+/* Plan Card */
+.long-term-stay-mobile .plan-card {
+  padding: 20px;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+}
+
+.long-term-stay-mobile .plan-card.selected {
+  border-color: #2843e5;
+  background: #f0f4ff;
+}
+
+.long-term-stay-mobile .plan-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.long-term-stay-mobile .plan-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.long-term-stay-mobile .plan-badge-economy {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.long-term-stay-mobile .plan-badge-high {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.long-term-stay-mobile .plan-price {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+  text-align: right;
+}
+
+/* Plan Coverages */
+.long-term-stay-mobile .plan-coverages {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.long-term-stay-mobile .coverage-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: #666;
+  width: 100%;
+}
+
+.long-term-stay-mobile .coverage-label {
+  color: #999;
+  text-align: left;
+  flex: 0 0 auto;
+}
+
+.long-term-stay-mobile .coverage-amount {
+  color: #333;
+  font-weight: 500;
+  text-align: right;
+  flex: 0 0 auto;
+}
+
+.long-term-stay-mobile .coverage-detail-link {
+  display: inline-block;
+  font-size: 13px;
+  color: #2843e5;
+  text-decoration: none;
+}
+
+.long-term-stay-mobile .coverage-detail-link:hover {
+  text-decoration: underline;
+}
+
+/* ======================================== 
    기존 long-term-stay 전용 스타일
    ======================================== */
 
@@ -979,7 +1217,7 @@
 }
 
 .long-term-stay-mobile .tourG_mab05 {
-    margin-bottom: 5px;
+    margin-bottom: 20px;
 }
 
 .long-term-stay-mobile .tourG_mleft05 {

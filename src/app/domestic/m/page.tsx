@@ -71,6 +71,7 @@ function MobileDomesticStep1Content() {
   // STEP2-1 관련 상태
   const [showStep2_1, setShowStep2_1] = useState(false);
   const [hasDangerousActivity, setHasDangerousActivity] = useState<boolean | null>(null);
+  const [travelPurpose, setTravelPurpose] = useState<string>('');
   const [showDangerousActivityModal, setShowDangerousActivityModal] = useState(false);
   
   // 동의서 모달 관련 상태
@@ -513,6 +514,11 @@ function MobileDomesticStep1Content() {
       return;
     }
 
+    if (!travelPurpose) {
+      alert('여행목적을 선택해주세요.');
+      return;
+    }
+
     if (hasDangerousActivity) {
       setShowDangerousActivityModal(true);
       return;
@@ -566,21 +572,23 @@ function MobileDomesticStep1Content() {
         const contractData = {
           contract: {
             member_id: isLoggedIn && member ? member.id : null,
-            insurance_type: '국내여행자보험',
+            insurance_type: '국내여행보험',
             departure_date: departureDateTime,
             arrival_date: arrivalDateTime,
             duration_months: 0,
             duration_days: periodDays,
             travel_region: null,
             travel_country: null,
-            travel_purpose: null,
+            travel_purpose: travelPurpose,
             travel_participants: participants.length,
             total_premium: calculatedPremiums?.totalPremium || 0,
+            device: '모바일',
+            access_path: '투어밸리 모바일 사이트',
           },
           contractor: {
             contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: participants[0]?.name || '',
-            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate.substring(0, 6)}-${participants[0].birthDate.substring(6, 7)}${participants[0].gender === '남자' ? '1' : '2'}******` : '',
+            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${participants[0].gender === '남자' ? '1' : '2'}******` : '',
             mobile_phone: participants[0]?.phone || '',
             email: getFullEmail(participants[0]),
           },
@@ -589,7 +597,7 @@ function MobileDomesticStep1Content() {
             return {
               sequence_number: idx + 1,
               name: p.name,
-              resident_number: `${p.birthDate.substring(0, 6)}-${p.birthDate.substring(6, 7)}${p.gender === '남자' ? '1' : '2'}******`,
+              resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
               gender: p.gender,
               age: age || 0,
               plan_type: selectedPlan || '실속플랜',
@@ -689,21 +697,23 @@ function MobileDomesticStep1Content() {
         const contractData = {
           contract: {
             member_id: isLoggedIn && member ? member.id : null,
-            insurance_type: '국내여행자보험',
+            insurance_type: '국내여행보험',
             departure_date: departureDateTime,
             arrival_date: arrivalDateTime,
             duration_months: 0,
             duration_days: periodDays,
             travel_region: null,
             travel_country: null,
-            travel_purpose: null,
+            travel_purpose: travelPurpose,
             travel_participants: participants.length,
             total_premium: calculatedPremiums?.totalPremium || 0,
+            device: '모바일',
+            access_path: '투어밸리 모바일 사이트',
           },
           contractor: {
             contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: participants[0]?.name || '',
-            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate.substring(0, 6)}-${participants[0].birthDate.substring(6, 7)}${participants[0].gender === '남자' ? '1' : '2'}******` : '',
+            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${participants[0].gender === '남자' ? '1' : '2'}******` : '',
             mobile_phone: participants[0]?.phone || '',
             email: getFullEmail(participants[0]),
           },
@@ -712,7 +722,7 @@ function MobileDomesticStep1Content() {
             return {
               sequence_number: idx + 1,
               name: p.name,
-              resident_number: `${p.birthDate.substring(0, 6)}-${p.birthDate.substring(6, 7)}${p.gender === '남자' ? '1' : '2'}******`,
+              resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
               gender: p.gender,
               age: age || 0,
               plan_type: selectedPlan || '실속플랜',
@@ -943,7 +953,7 @@ function MobileDomesticStep1Content() {
 
           <RiskActivityStep
             insuranceType={getTitle()}
-            travelPurpose=""
+            travelPurpose={travelPurpose}
             hasDangerousActivity={hasDangerousActivity}
             isCurrentlyAbroad={null}
             hasRestrictedCountry={null}
@@ -956,7 +966,7 @@ function MobileDomesticStep1Content() {
             }}
             onCurrentlyAbroadChange={() => {}}
             onRestrictedCountryChange={() => {}}
-            onTravelPurposeChange={() => {}}
+            onTravelPurposeChange={setTravelPurpose}
             onShowDangerousActivityModal={() => setShowDangerousActivityModal(true)}
             onNext={handleProceedToStep3}
           />
@@ -1033,7 +1043,7 @@ function MobileDomesticStep1Content() {
             departureTime={departureTime}
             arrivalDate={arrivalDate}
             arrivalTime={arrivalTime}
-            travelPurpose=""
+            travelPurpose={travelPurpose}
             travelCountry=""
             participants={participants}
             calculatedPremiums={calculatedPremiums}

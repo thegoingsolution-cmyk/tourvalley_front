@@ -44,9 +44,25 @@ export default function LongStayInsuranceStep2Page() {
     // 계약자(법인/단체) 정보 수집
     const contractCompanyInput = document.querySelector('input[name="contract_company"]') as HTMLInputElement;
     
+    // 여행목적 코드를 insurance_type으로 매핑
+    const getTravelPurpose = (goalCode: string): string => {
+      switch (goalCode) {
+        case '003': // 어학연수
+          return '유학/어학연수';
+        case '002': // 해외출장/주재원
+        case '014': // 교환교수
+          return '해외출장/주재원/교환교수';
+        case '001': // 워킹홀리데이
+          return '워킹홀리데이';
+        default:
+          return '유학/어학연수'; // 기본값
+      }
+    };
+
     // 피보험자 정보 수집
     const step2Data: any = {
       contractor_name: contractCompanyInput?.value || '',
+      travel_purpose: getTravelPurpose(tourGoal),
     };
     
     for (let i = 1; i <= tourNum; i++) {

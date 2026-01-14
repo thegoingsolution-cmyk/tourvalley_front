@@ -203,7 +203,7 @@ export default function DomesticInsuranceStep5Page() {
         insuredPersons.push({
           sequence_number: i,
           name: name,
-          resident_number: birthDate ? `${birthDate.substring(0, 6)}-${birthDate.substring(6, 7)}${gender === '남자' ? '1' : '2'}******` : '',
+          resident_number: birthDate ? `${birthDate}-${gender === '남자' ? '1' : '2'}******` : '',
           gender: gender,
           age: age,
           plan_type: planCode === 'BAW' ? '실속플랜' : '고보장플랜',
@@ -237,6 +237,8 @@ export default function DomesticInsuranceStep5Page() {
           travel_purpose: step2Data.travel_purpose || '',
           travel_participants: step1Data.tourNum,
           total_premium: step3Data?.total_premium || 0,
+          device: 'PC',
+          access_path: '투어밸리 사이트',
         },
         contractor: {
           contractor_type: (isLoggedIn && member) ? member.member_type : '단체',
