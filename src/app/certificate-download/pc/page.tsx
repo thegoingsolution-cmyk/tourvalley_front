@@ -394,30 +394,32 @@ function CertificateDownloadContent() {
                       </div>
                       <div className="cd-form-group cd-business-number">
                         <label>사업자번호</label>
-                        <input
-                          type="tel"
-                          value={formData.resno1}
-                          onChange={(e) => handleInputChange('resno1', e.target.value)}
-                          maxLength={3}
-                          placeholder=""
-                          className="cd-input cd-input-small"
-                        />
-                        <input
-                          type="tel"
-                          value={formData.resno2}
-                          onChange={(e) => handleInputChange('resno2', e.target.value)}
-                          maxLength={2}
-                          placeholder=""
-                          className="cd-input cd-input-small"
-                        />
-                        <input
-                          type="tel"
-                          value={formData.resno3}
-                          onChange={(e) => handleInputChange('resno3', e.target.value)}
-                          maxLength={5}
-                          placeholder=""
-                          className="cd-input cd-input-small"
-                        />
+                        <div className="cd-business-inputs">
+                          <input
+                            type="tel"
+                            value={formData.resno1}
+                            onChange={(e) => handleInputChange('resno1', e.target.value)}
+                            maxLength={3}
+                            placeholder=""
+                            className="cd-input cd-input-small"
+                          />
+                          <input
+                            type="tel"
+                            value={formData.resno2}
+                            onChange={(e) => handleInputChange('resno2', e.target.value)}
+                            maxLength={2}
+                            placeholder=""
+                            className="cd-input cd-input-small"
+                          />
+                          <input
+                            type="tel"
+                            value={formData.resno3}
+                            onChange={(e) => handleInputChange('resno3', e.target.value)}
+                            maxLength={5}
+                            placeholder=""
+                            className="cd-input cd-input-small"
+                          />
+                        </div>
                       </div>
                     </div>
                   )}

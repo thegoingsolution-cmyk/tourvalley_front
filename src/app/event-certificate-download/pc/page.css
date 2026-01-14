@@ -83,12 +83,12 @@
   display: flex;
   gap: 0;
   position: relative;
+  width: 100%;
 }
 
 .ecd-business-number .ecd-input-small {
-  width: 29%;
+  flex: 1;
   margin-right: 2%;
-  flex: 0 0 29%;
 }
 
 .ecd-business-number .ecd-input-small:last-child {
@@ -98,7 +98,7 @@
 .ecd-business-inputs::before {
   content: '';
   position: absolute;
-  left: 29%;
+  left: 33.33%;
   top: 50%;
   width: 8px;
   height: 2px;
@@ -110,7 +110,7 @@
 .ecd-business-inputs::after {
   content: '';
   position: absolute;
-  left: 61%;
+  left: 66.66%;
   top: 50%;
   width: 8px;
   height: 2px;

@@ -144,39 +144,44 @@
   flex-basis: 100%;
 }
 
+.cd-business-inputs {
+  display: flex;
+  gap: 0;
+  position: relative;
+  width: 100%;
+}
+
 .cd-business-number .cd-input-small {
-  width: 29%;
-  display: inline-block;
+  flex: 1;
   margin-right: 2%;
-  flex: 0 0 29%;
 }
 
 .cd-business-number .cd-input-small:last-child {
   margin-right: 0;
 }
 
-.cd-business-number::before {
+.cd-business-inputs::before {
   content: '';
   position: absolute;
-  left: 25%;
+  left: 33.33%;
   top: 50%;
   width: 8px;
   height: 2px;
   background-color: #d8d8d8;
-  transform: translateY(-50%);
-  margin-top: 12px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
-.cd-business-number::after {
+.cd-business-inputs::after {
   content: '';
   position: absolute;
-  left: 63%;
+  left: 66.66%;
   top: 50%;
   width: 8px;
   height: 2px;
   background-color: #d8d8d8;
-  transform: translateY(-50%);
-  margin-top: 12px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
 /* 버튼 */
