@@ -105,6 +105,13 @@ export default function TravelInfoStep({
     }
   }, [showPlanSelection]);
 
+  // 해외장기체류보험: travelPurpose가 비어있을 때 디폴트 값 설정
+  useEffect(() => {
+    if (onTravelPurposeChange && !travelPurpose) {
+      onTravelPurposeChange('유학/어학연수');
+    }
+  }, [onTravelPurposeChange, travelPurpose]);
+
   return (
     <section className="form-section">
       <div className="form-container">

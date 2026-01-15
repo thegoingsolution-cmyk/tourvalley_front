@@ -1507,13 +1507,14 @@
   font-size: 22px;
   color: #3e3e3e;
   letter-spacing: -0.5px;
-  line-height: 100%;
+  line-height: 1;
   text-align: center;
-  padding-top: 27px;
-  height: 70px;
   box-sizing: border-box;
   margin: 0;
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .overseas-page-pc .modal-close-btn {
@@ -1556,7 +1557,7 @@
 }
 
 .overseas-page-pc .modal-body {
-  padding: 24px;
+  padding: 12px;
 }
 
 .overseas-page-pc .modal-description {
@@ -1887,6 +1888,7 @@
    ======================================== */
 
 .overseas-page-pc .step2-1-section {
+  margin-top: 60px;
   margin-bottom: 32px;
 }
 
@@ -1940,13 +1942,13 @@
 }
 
 .overseas-page-pc .step2-1-option-btn:hover {
-  border-color: #2843e5;
-  color: #2843e5;
+  border-color: #2c3fb3;
+  color: #2c3fb3;
 }
 
 .overseas-page-pc .step2-1-option-btn.active {
-  background: #2843e5;
-  border-color: #2843e5;
+  background: #2c3fb3;
+  border-color: #2c3fb3;
   color: #fff;
 }
 
@@ -1967,7 +1969,7 @@
 .overseas-page-pc .step2-1-next-btn {
   width: 100%;
   padding: 16px;
-  background: #2843e5;
+  background: #2c3fb3;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -2048,6 +2050,11 @@
    Consent Modal
    ======================================== */
 
+/* ConsentModal의 modal-header 간격 조정 */
+.overseas-page-pc .modal-content:has(.tour2023_limit_state) .modal-header {
+  padding: 30px 24px;
+}
+
 /* ConsentModal의 modal-title은 제목이 더 길어서 다른 스타일 적용 */
 .overseas-page-pc .modal-content:has(.tour2023_limit_state) .modal-title {
   font-family: 'NanumSquareNeoTTF-cBd';
@@ -2055,9 +2062,7 @@
   color: #3e3e3e;
   letter-spacing: -1.5px;
   line-height: 126%;
-  text-align: center;
-  padding-top: 27px;
-  height: 98px;
+  height: 25px;
   box-sizing: border-box;
   margin: 0;
   flex: 1;
@@ -2065,7 +2070,7 @@
 
 /* tour2023_limit_state 컨테이너 */
 .overseas-page-pc .tour2023_limit_state {
-  padding: 20px;
+  padding: 15px;
 }
 
 .overseas-page-pc .tourG_mat06 {

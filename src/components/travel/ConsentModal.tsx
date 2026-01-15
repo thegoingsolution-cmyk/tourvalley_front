@@ -98,7 +98,8 @@ export default function ConsentModal({
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2 className="modal-title">
-            보험가입을 위한 개인(신용)정보 수집, 이용, 조회제공 동의서
+            보험가입을 위한 개인(신용)정보 수집,<br />
+            이용, 조회제공 동의서
           </h2>
           <button
             className="modal-close-btn"
