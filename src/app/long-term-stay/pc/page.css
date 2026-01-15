@@ -35,8 +35,8 @@
   justify-content: flex-start;
   padding: 40px 20px 60px;
   min-height: auto; /* 컨텐츠에 맞춰 자동 확장 */
-  background-size: 4800px auto;
-  background-position: 52.2% -800px;
+  background-size: 4900px auto;
+  background-position: 58.2% -800px;
   background-repeat: no-repeat;
   background-attachment: fixed;
   overflow: visible; /* main 영역 스크롤 제거 */
@@ -55,6 +55,7 @@
   max-width: 480px;
   margin-bottom: 0;
   overflow: visible;
+  padding: 0 !important; /* 전역 CSS 오버라이드 */
 }
 
 .long-term-stay-page-pc .form-section:last-of-type {
@@ -83,7 +84,7 @@
 .long-term-stay-page-pc .form-card {
   background: #ffffff;
   border-radius: 16px;
-  padding: 32px;
+  padding: 22px;
   padding-bottom: 40px; /* 단체보험 섹션 확장을 위한 추가 여백 */
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   overflow: visible; /* 내부 컨텐츠 잘리지 않도록 */
@@ -97,92 +98,166 @@
   isolation: isolate; /* 새로운 stacking context 생성 */
 }
 
-/* Form Header */
+/* Form Header - 모바일 스타일 적용 (tour2023_BWrap와 동일) */
 .long-term-stay-page-pc .form-header {
-  display: flex;
-  flex-direction: row;
+  position: relative;
+  display: inline-flex;
   justify-content: space-between;
+  width: 100%;
+  vertical-align: top;
+  height: 40px;
+  padding-bottom: 0;
+  border-bottom: none;
   align-items: center;
-  gap: 20px;
-  margin-bottom: 32px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #eee;
+  gap: 0;
 }
 
+/* tourG_mab05 - 모바일과 동일 */
+.long-term-stay-page-pc .tourG_mab05 {
+  margin-bottom: 35px;
+}
+
+/* tour2023_title01 - 모바일과 동일 */
+.long-term-stay-page-pc .tour2023_title01 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #000;
+  text-align: center;
+  margin-bottom: 0;
+  margin-top: 0;
+  line-height: 40px;
+  height: 40px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 0;
+}
+
+/* form-title도 tour2023_title01와 동일하게 */
 .long-term-stay-page-pc .form-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin: 0;
+  font-size: 23px;
+  font-weight: bold;
+  color: #000;
+  text-align: center;
+  margin-bottom: 0;
+  margin-top: 0;
+  line-height: 40px;
+  height: 40px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 0;
 }
 
 /* ========================================
-   Step Indicator
+   Step Indicator - 모바일 스타일 적용
    ======================================== */
 
-.long-term-stay-page-pc .step-indicator {
+.long-term-stay-page-pc .tour2023_step_w {
+  position: absolute;
+  text-align: right;
+  right: 0;
+  top: 5px;
+  height: 40px;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
+}
+
+.long-term-stay-page-pc .tour2023_step {
+  position: relative;
+  display: inline-flex;
   justify-content: flex-end;
-  gap: 8px;
+  width: 54px;
+  height: 40px;
+  text-align: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-.long-term-stay-page-pc .step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
+.long-term-stay-page-pc .tour2023_step ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-.long-term-stay-page-pc .step-number {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #e0e0e0;
-  color: #999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 600;
-  transition: all 0.2s;
+.long-term-stay-page-pc .tour2023_step01 {
+  position: relative;
+  text-align: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-.long-term-stay-page-pc .step.active .step-number {
-  background: #2843e5;
+.long-term-stay-page-pc .tour2023_step .tour2023_step_num {
+  width: 20px;
+  height: 20px;
+  background: #d1d1d1;
+  border-radius: 100px;
+  text-align: center;
+  vertical-align: middle;
+  display: inline-block;
+}
+
+.long-term-stay-page-pc .tour2023_step .tour2023_step_txt {
+  font-size: 13px;
+  color: #c1c1c1;
+  text-align: center;
+  line-height: 135%;
+  letter-spacing: -2px;
+  margin-top: 3px;
+  z-index: 2;
+}
+
+.long-term-stay-page-pc .tour2023_step.on .tour2023_step_num {
+  width: 20px;
+  height: 20px;
+  background: #2c3fb3;
+  border-radius: 100px;
+  text-align: center;
+  vertical-align: middle;
+  display: inline-block;
+}
+
+.long-term-stay-page-pc .tour2023_step.on .tour2023_step_txt {
+  font-size: 13px;
+  color: #2c3fb3;
+  text-align: center;
+  line-height: 135%;
+  letter-spacing: -1.4px;
+  margin-top: 3px;
+  z-index: 2;
+}
+
+.long-term-stay-page-pc .tour2023_step_num01 {
   color: #fff;
+  font-size: 15px;
+  font-weight: 900;
+  display: inline-block;
+  text-align: center;
+  vertical-align: top;
+  margin-top: 0px;
+  z-index: 2;
+  line-height: 20px;
 }
 
-.long-term-stay-page-pc .step.completed .step-number {
-  background: #e0e0e0;
-  color: #999;
+.long-term-stay-page-pc .tour2023_step_line:before {
+  content: '';
+  position: absolute;
+  display: inline-block;
+  width: 120px;
+  height: 1px;
+  top: 10px;
+  right: 19px;
+  margin: 0px 0 0px 0px;
+  border-bottom: 1px solid #d5d5d5;
+  vertical-align: middle;
+  transform: rotate(0deg);
+  z-index: 0;
 }
 
-.long-term-stay-page-pc .step-label {
-  font-size: 12px;
-  color: #999;
-  transition: color 0.2s;
-}
-
-.long-term-stay-page-pc .step.active .step-label {
-  color: #2843e5;
-  font-weight: 600;
-}
-
-.long-term-stay-page-pc .step.completed .step-label {
-  color: #999;
-}
-
-.long-term-stay-page-pc .step-line {
-  width: 40px;
-  height: 2px;
-  background: #e0e0e0;
-  margin: 0 4px;
-  transition: background 0.2s;
-}
-
-.long-term-stay-page-pc .step.completed + .step-line {
-  background: #e0e0e0;
+.long-term-stay-page-pc .tour2023_step_line.tour {
+  position: relative;
 }
 
 /* ========================================
@@ -193,149 +268,320 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  margin-bottom: 24px;
   overflow: visible;
 }
 
+/* mag5 클래스 - 모바일과 동일 */
+.long-term-stay-page-pc .mag5 {
+  margin: 5px 0;
+}
+
 .long-term-stay-page-pc .field-row {
-  display: flex;
-  align-items: stretch;
-  border: 1px solid #e8e8e8;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 20px;
   position: relative;
+  height: 65px;
+  border: 1px solid #c3c6ce;
+  border-radius: 15px;
+  background: #fff;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  overflow: hidden;
+  margin-bottom: 10px;
 }
 
 .long-term-stay-page-pc .field-group {
   flex: 1;
-  padding: 18px 16px;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
   position: relative;
   z-index: 1;
 }
 
 .long-term-stay-page-pc .date-field {
-  flex: 2;
+  width: 38%;
 }
 
 .long-term-stay-page-pc .time-field {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 38%;
   position: relative;
-  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  height: 32px;
+  padding-left: 40px;
+  font-size: 18px;
+  vertical-align: top;
+  margin: 23px 0 0 40px;
+  margin-right: 0;
 }
 
 .long-term-stay-page-pc .birth-field {
-  flex: 2;
+  width: 38%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
 }
 
 .long-term-stay-page-pc .gender-field {
-  flex: 1;
+  width: 42%;
+  margin-right: 0;
+  margin-left: 40px;
+  text-align: left;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  min-width: 0;
+  height: 65px;
 }
 
 .long-term-stay-page-pc .field-separator {
-  display: flex;
-  align-items: center;
-  padding: 0 8px;
-  color: #d0d0d0;
-  font-size: 20px;
-  font-weight: 300;
-  background: #fff;
-  flex-shrink: 0;
-  pointer-events: none;
+  display: none;
+}
+
+/* tourG_line 스타일 - 모바일과 동일한 구분선 */
+.long-term-stay-page-pc .field-row.tourG_line:after {
+  content: '';
+  position: absolute;
+  display: inline-block;
+  width: 47px;
+  height: 50px;
+  top: -4px;
+  left: 40%;
+  margin: 0px 0 0px 0px;
+  border-bottom: 1px solid #d5d7dd;
+  vertical-align: middle;
+  transform: rotate(297deg);
   z-index: 0;
 }
 
 .long-term-stay-page-pc .field-label {
+  position: absolute;
+  top: 6px;
+  left: 20px;
+  color: #9797a3;
   font-size: 12px;
-  color: #999;
-  margin-bottom: 2px;
+  font-family: 'Malgun Gothic','맑은 고딕',dotum,'돋움',AppleGothic,sans-serif;
+  letter-spacing: -0.8px;
+  margin-bottom: 0;
 }
 
 .long-term-stay-page-pc .field-input {
-  border: none;
+  border: 0;
   outline: none;
-  font-size: 16px;
-  color: #333;
   padding: 0;
   background: transparent;
   width: 100%;
   cursor: pointer;
   position: relative;
   z-index: 2;
+  display: inline-block;
+  vertical-align: text-top;
 }
 
 .long-term-stay-page-pc .date-input {
-  font-size: 15px;
-  color: #999;
+  height: 32px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border: 0;
+  color: #dddddd;
+  font-size: 13px;
+  letter-spacing: 0px;
+  caret-color: #222;
+  display: inline-block;
+  vertical-align: text-top;
+  padding-top: 0px;
+  margin-top: 23px;
+  margin-left: 10px;
+  width: calc(100% - 20px);
+  box-sizing: border-box;
   cursor: pointer;
+  position: relative;
+  z-index: 1;
 }
 
 .long-term-stay-page-pc .date-input::-webkit-calendar-picker-indicator {
   opacity: 0;
   position: absolute;
+  right: 0;
   width: 100%;
   height: 100%;
-  left: 0;
-  top: 0;
   cursor: pointer;
-  z-index: 3;
+}
+
+.long-term-stay-page-pc .date-input::-webkit-inner-spin-button,
+.long-term-stay-page-pc .date-input::-webkit-clear-button {
+  display: none;
 }
 
 .long-term-stay-page-pc .time-select {
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  border: 0;
+  color: #000;
   font-size: 18px;
-  font-weight: 600;
-  color: #1a1a1a;
-  cursor: pointer;
-  text-align: center;
-  appearance: none;
+  background: transparent;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background: transparent;
-  border: none;
-  padding: 8px 12px;
-  min-height: 32px;
-  width: 100%;
+  appearance: none;
+  cursor: pointer;
   position: relative;
   z-index: 2;
 }
 
-.long-term-stay-page-pc .birth-input::placeholder {
-  color: #ccc;
-  font-size: 14px;
-}
-
-/* Gender Options */
-.long-term-stay-page-pc .gender-options {
-  display: flex;
-  gap: 16px;
-}
-
-.long-term-stay-page-pc .gender-option {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-}
-
-.long-term-stay-page-pc .gender-radio {
+.long-term-stay-page-pc .time-select::-ms-expand {
   display: none;
 }
 
+.long-term-stay-page-pc .purpose-select {
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  border: 0;
+  color: #000;
+  font-size: 18px;
+  background: transparent;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+  margin-left: 10px;
+  width: calc(100% - 20px);
+  box-sizing: border-box;
+  line-height: 32px;
+  font-weight: normal;
+}
+
+.long-term-stay-page-pc .purpose-select::-ms-expand {
+  display: none;
+}
+
+.long-term-stay-page-pc .birth-input {
+  height: 32px;
+  padding-left: 10px;
+  border: 0;
+  color: #000;
+  font-size: 18px;
+  letter-spacing: 0px;
+  caret-color: #222;
+  display: inline-block;
+  vertical-align: text-top;
+  padding-top: 0px;
+  margin-top: 23px;
+  margin-left: 10px;
+  background: transparent;
+  width: calc(100% - 20px);
+  box-sizing: border-box;
+  line-height: 32px;
+}
+
+.long-term-stay-page-pc .birth-input::placeholder {
+  color: #dddddd;
+  text-shadow: initial;
+}
+
+.long-term-stay-page-pc .birth-input:-ms-input-placeholder {
+  color: #dddddd;
+  text-shadow: initial;
+}
+
+/* Gender Options - 모바일 스타일 적용 (.tourG_rdo_area와 동일) */
+.long-term-stay-page-pc .gender-options {
+  font-size: 0px;
+  width: 100%;
+  margin-right: 0;
+  vertical-align: middle;
+  text-align: left;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-top: 23px;
+  padding: 0;
+  padding-left: 30px;
+  z-index: 2;
+  height: 32px;
+}
+
+.long-term-stay-page-pc .gender-option {
+  position: relative;
+  width: 40%;
+  display: flex;
+  align-items: center;
+  overflow-wrap: normal;
+  word-break: normal;
+  text-align: center;
+  background: transparent;
+  cursor: pointer;
+  z-index: 2;
+}
+
+/* one_line0 클래스 - 모바일과 동일 */
+.long-term-stay-page-pc .gender-option.one_line0 {
+  border-left: 0px !important;
+}
+
+.long-term-stay-page-pc .gender-radio {
+  position: absolute;
+  display: block;
+  width: 1px;
+  height: 1px;
+  margin: 0px;
+  padding: 0px;
+  border: 0px;
+  background: none;
+  background: transparent;
+}
+
+/* gender-text는 모바일의 .tourG_inp_rdo input + label과 동일한 스타일 */
 .long-term-stay-page-pc .gender-text {
-  font-size: 16px;
-  color: #999;
+  width: 100%;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  text-align: left;
+  font-size: 17px;
+  letter-spacing: -0.8px;
+  color: #dddddd;
+  box-sizing: border-box;
+  margin: 0;
   transition: color 0.2s;
+  position: relative;
+  z-index: 2;
+  line-height: 32px;
 }
 
 .long-term-stay-page-pc .gender-option.selected .gender-text {
-  color: #2843e5;
-  font-weight: 600;
+  color: #0000ff;
+  font-weight: 500;
+  z-index: 2;
+}
+
+.long-term-stay-page-pc .gender-option.selected.one_line0 .gender-text {
+  color: #0000ff;
+  border: none;
+}
+
+/* gender-field 안의 label 표시 (모바일의 tourG_rdo_area 안 label과 동일) */
+.long-term-stay-page-pc .gender-field > .field-label {
+  position: absolute;
+  top: 6px;
+  left: 30px;
+  color: #9797a3;
+  font-size: 12px;
+  font-family: 'Malgun Gothic','맑은 고딕',dotum,'돋움',AppleGothic,sans-serif;
+  letter-spacing: -0.8px;
+  margin-bottom: 0;
+  z-index: 1;
 }
 
 /* ========================================
@@ -345,7 +591,7 @@
 .long-term-stay-page-pc .calculate-btn {
   width: 100%;
   padding: 18px;
-  background: #2843e5;
+  background: #2c3fb3;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -353,6 +599,7 @@
   font-weight: 600;
   cursor: pointer;
   margin-top: 8px;
+  margin-bottom: 70px;
   transition: background 0.2s;
 }
 
@@ -1655,7 +1902,7 @@
 }
 
 .long-term-stay-page-pc .tourG_mat13 {
-  margin-top: 20px;
+  margin-top: 5px;
 }
 
 .long-term-stay-page-pc .tourG_mab01 {
@@ -1731,10 +1978,6 @@
 
 .long-term-stay-page-pc .tourG_mab04 {
   margin-bottom: 0;
-}
-
-.long-term-stay-page-pc .tourG_mab05 {
-  margin-bottom: 5px;
 }
 
 .long-term-stay-page-pc .tourG_mleft05 {
@@ -2867,7 +3110,7 @@
 /* 노트북 화면 (1600px 이하) */
 @media (max-width: 1600px) {
   .long-term-stay-page-pc .long-term-stay-content-pc {
-    background-position: 52.2% -600px;
+    background-position: 58.2% -600px;
     background-size: 3600px auto;
   }
 }
@@ -2875,7 +3118,7 @@
 /* 작은 노트북 화면 (1366px 이하) */
 @media (max-width: 1366px) {
   .long-term-stay-page-pc .long-term-stay-content-pc {
-    background-position: 52.2% -400px;
+    background-position: 58.2% -400px;
     background-size: 3000px auto;
   }
   

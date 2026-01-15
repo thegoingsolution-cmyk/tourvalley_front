@@ -110,15 +110,15 @@ export default function TravelInfoStep({
       <div className="form-container">
         <div className="form-card">
           {/* Header with title and steps */}
-          <div className="form-header">
-            <h1 className="form-title">{insuranceType}</h1>
+          <div className="form-header tourG_mat13 tourG_mab05">
+            <p className="form-title tour2023_title01">{insuranceType}</p>
             <StepIndicator currentStep={1} />
           </div>
 
           {/* Form Fields */}
           <div className="form-fields">
             {/* 출발일 */}
-            <div className="field-row">
+            <div className="field-row tourG_line">
               <div className="field-group date-field">
                 <label className="field-label">출발일</label>
                 <input
@@ -137,7 +137,7 @@ export default function TravelInfoStep({
                 >
                   {timeOptions.map((hour) => (
                     <option key={hour} value={String(hour).padStart(2, '0')}>
-                      {hour}시
+                      {String(hour).padStart(2, '0')}시
                     </option>
                   ))}
                 </select>
@@ -145,7 +145,7 @@ export default function TravelInfoStep({
             </div>
 
             {/* 도착일 */}
-            <div className="field-row">
+            <div className="field-row tourG_line">
               <div className="field-group date-field">
                 <label className="field-label">도착일</label>
                 <input
@@ -164,7 +164,7 @@ export default function TravelInfoStep({
                 >
                   {timeOptions.map((hour) => (
                     <option key={hour} value={String(hour).padStart(2, '0')}>
-                      {hour}시
+                      {String(hour).padStart(2, '0')}시
                     </option>
                   ))}
                 </select>
@@ -172,7 +172,7 @@ export default function TravelInfoStep({
             </div>
 
             {/* 생년월일 & 성별 */}
-            <div className="field-row">
+            <div className="field-row tourG_line">
               <div className="field-group birth-field">
                 <label className="field-label">생년월일 8자리</label>
                 <input
@@ -216,74 +216,124 @@ export default function TravelInfoStep({
 
             {/* 여행국가 (해외여행보험용) */}
             {onTravelCountryChange && (
-              <div className="field-row">
-                <div className="field-group country-field" style={{ width: '100%' }}>
-                  <label className="field-label">여행국가</label>
-                  <div
-                    onClick={() => {
-                      setIsCountryModalOpen(true);
-                      if (onShowCountryModal) {
-                        onShowCountryModal(true);
-                      }
-                    }}
-                    style={{
-                      width: '100%',
-                      padding: '12px 16px',
-                      borderRadius: '8px',
-                      backgroundColor: '#fff',
-                      cursor: 'pointer',
-                      fontSize: '16px',
-                      color: travelCountry ? '#333' : '#999',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <span>{travelCountry || ''}</span>
-                    <span style={{ fontSize: '12px', color: '#999' }}>▼</span>
-                  </div>
-                  {travelCountry && (
-                    <div style={{ marginTop: '8px', fontSize: '12px', color: '#666', lineHeight: '1.6' }}>
-                      <p style={{ margin: 0 }}>
-                        ※ 여러국가를 여행하는 경우 <span style={{ color: '#2843e5', fontWeight: 600 }}>최초 방문국가</span>를 선택하세요.
-                      </p>
-                      <p style={{ margin: '4px 0 0 0' }}>
-                        단, <span style={{ color: '#2843e5', fontWeight: 600 }}>체코</span>가 포함된 여행인 경우 여행국가는 꼭 체코로 선택하시기 바랍니다.
-                      </p>
+              <>
+                <div className="field-row">
+                  <div className="field-group country-field" style={{ width: '100%' }}>
+                    <label className="field-label">여행국가</label>
+                    <div
+                      onClick={() => {
+                        setIsCountryModalOpen(true);
+                        if (onShowCountryModal) {
+                          onShowCountryModal(true);
+                        }
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '0 10px',
+                        paddingRight: '25px',
+                        borderRadius: '8px',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        fontSize: '18px',
+                        color: travelCountry ? '#000' : '#dddddd',
+                        fontWeight: 'normal',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginTop: '25px',
+                        marginLeft: '10px',
+                        height: '32px',
+                        lineHeight: '32px',
+                      }}
+                    >
+                      <span>{travelCountry || ''}</span>
+                      <img src="/icons/icon_sel.png" alt="선택" style={{ width: 'auto', height: '10px', marginLeft: '8px' }} />
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
+                {/* 해외여행보험인 경우에만 안내 문구 표시 (해외장기체류보험 제외) */}
+                {!onTravelPurposeChange && (
+                  <div className="tour2023_txt01 tour2023_grey tourG_mleft04 tourG_mab04 tourG_mat06" style={{ marginLeft: '5px', marginTop: '15px', marginBottom: '35px', color: '#a5a5a5', fontWeight: 'normal' }}>
+                    <ul className="tourGuard_inline">
+                      <li className="tourGuard_inline_t01">※</li>
+                      <li className="tourGuard_inline_t02">
+                        여러국가를 여행하는 경우 <span className="tour2023_blue">최초 방문국가를</span> 선택하세요.<br />
+                        단, <span className="tour2023_blue">체코</span>가 포함된 여행인 경우 여행국가는 꼭 체코로 선택하시기 바랍니다.
+                      </li>
+                    </ul>
+                  </div>
+                )}
+              </>
             )}
 
             {/* 여행목적 (해외장기체류보험용) */}
             {onTravelPurposeChange && longTermPurposeOptions && (
-              <div className="field-row">
-                <div className="field-group purpose-field" style={{ width: '100%' }}>
-                  <label className="field-label">여행목적</label>
-                  <select
-                    value={travelPurpose || ''}
-                    onChange={(e) => onTravelPurposeChange(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '12px 16px',
-                      borderRadius: '8px',
-                      backgroundColor: '#fff',
-                      fontSize: '16px',
-                      color: travelPurpose ? '#333' : '#999',
-                      border: '1px solid #ddd',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <option value="">선택해 주세요</option>
-                    {longTermPurposeOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+              <>
+                <div className="field-row">
+                  <div className="field-group purpose-field" style={{ width: '100%' }}>
+                    <label className="field-label">여행목적</label>
+                    <div
+                      style={{
+                        width: '100%',
+                        padding: '0 10px',
+                        paddingRight: '25px',
+                        borderRadius: '8px',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        fontSize: '18px',
+                        color: travelPurpose ? '#000' : '#dddddd',
+                        fontWeight: 'normal',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginTop: '25px',
+                        marginLeft: '10px',
+                        height: '32px',
+                        lineHeight: '32px',
+                      }}
+                    >
+                      <select
+                        value={travelPurpose || ''}
+                        onChange={(e) => onTravelPurposeChange(e.target.value)}
+                        className="purpose-select"
+                        style={{
+                          flex: 1,
+                          height: '32px',
+                          padding: '0',
+                          border: '0',
+                          color: travelPurpose ? '#000' : '#dddddd',
+                          fontSize: '18px',
+                          background: 'transparent',
+                          cursor: 'pointer',
+                          fontWeight: 'normal',
+                          appearance: 'none',
+                          WebkitAppearance: 'none',
+                          MozAppearance: 'none',
+                          lineHeight: '32px',
+                        }}
+                      >
+                        <option value="">선택해 주세요</option>
+                        {longTermPurposeOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                      <img src="/icons/icon_sel.png" alt="선택" style={{ width: 'auto', height: '10px', marginLeft: '8px', pointerEvents: 'none' }} />
+                    </div>
+                  </div>
                 </div>
-              </div>
+                {/* 해외장기체류보험인 경우 여행목적 필드 아래에 안내 문구 표시 */}
+                <div className="tour2023_txt01 tour2023_grey tourG_mleft04 tourG_mab04 tourG_mat06" style={{ marginLeft: '5px', marginTop: '15px', marginBottom: '35px', color: '#a5a5a5', fontWeight: 'normal' }}>
+                  <ul className="tourGuard_inline">
+                    <li className="tourGuard_inline_t01">※</li>
+                    <li className="tourGuard_inline_t02">
+                      여러국가를 여행하는 경우 <span className="tour2023_blue">최초 방문국가를</span> 선택하세요.<br />
+                      단, <span className="tour2023_blue">체코</span>가 포함된 여행인 경우 여행국가는 꼭 체코로 선택하시기 바랍니다.
+                    </li>
+                  </ul>
+                </div>
+              </>
             )}
           </div>
 
