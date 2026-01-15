@@ -125,13 +125,15 @@
   width: 100%;
   background: #fff;
   border-bottom: 1px solid #e0e0e0;
-  padding: 1rem;
+  padding-left: 4.68%;
+  padding-right: 4.68%;
 }
 
 .header-mobile-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: 56px;
 }
 
 .header-mobile-logo {
@@ -145,7 +147,6 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0.5rem;
   font-size: 1.5rem;
   color: #333;
 }

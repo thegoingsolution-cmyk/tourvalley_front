@@ -66,8 +66,8 @@ export default function Header({ isMobile = false, onOpenAccidentFreeCashModal }
                 <img
                   src={getImagePath('/images/logo.png')}
                   alt="투어밸리 로고"
-                  width={120}
-                  height={40}
+                  width={110}
+                  height={32}
                   className="header-logo"
                   style={{ objectFit: 'contain', maxWidth: '100%', height: 'auto' }}
                   onError={() => setLogoError(true)}
@@ -81,7 +81,14 @@ export default function Header({ isMobile = false, onOpenAccidentFreeCashModal }
               aria-label="메뉴"
               onClick={() => setIsMobileMenuOpen(true)}
             >
-              <span className="hamburger-icon">☰</span>
+              <img 
+                src={getImagePath('/images/btn_gnb_open.png')}
+                alt="메뉴"
+                width={25}
+                height={25}
+                className="hamburger-icon"
+                style={{ width: '25px', height: 'auto' }}
+              />
             </button>
           </div>
         </header>
