@@ -175,7 +175,7 @@ export default function ParticipantInfoStep({
       <div className="form-container">
         <div className="form-card">
           <div className="form-header">
-            <h1 className="form-title">{insuranceType}</h1>
+            {/* <h1 className="form-title">{insuranceType}</h1> */}
             <StepIndicator currentStep={2} />
           </div>
 
@@ -192,7 +192,7 @@ export default function ParticipantInfoStep({
             >
               <div className="participant-form-header">
                 <h3 className="participant-form-subtitle">
-                  가입자 {index + 1}{index === 0 ? '(대표)' : ''}
+                  가입자{index + 1}{index === 0 ? '(대표)' : ''}
                 </h3>
                 {index > 0 && (
                   <button
@@ -206,133 +206,231 @@ export default function ParticipantInfoStep({
 
               <div className="participant-form-fields">
                 {/* 이름, 국적 */}
-                <div className="participant-form-row">
-                  <div className="participant-form-group-item">
-                    <label>이름</label>
+                <section className="tourGuard_Info">
+                  <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line">
+                    <label htmlFor={`insured_name_${index + 1}`}>이름</label>
                     <input
                       type="text"
+                      id={`insured_name_${index + 1}`}
+                      name="insured_name"
                       value={participant.name}
-                      onChange={(e) => handleParticipantChange(index, 'name', e.target.value)}
+                      maxLength={8}
                       placeholder="이름"
+                      className="tourGuard_input_w01"
+                      onChange={(e) => handleParticipantChange(index, 'name', e.target.value)}
+                      style={{
+                        height: '32px',
+                        paddingLeft: '10px',
+                        color: '#000',
+                        fontSize: '18px',
+                        letterSpacing: '0px',
+                        marginTop: '23px',
+                        marginLeft: '10px',
+                        paddingTop: '0px',
+                      }}
                     />
-                  </div>
-                  <span className="participant-form-separator">/</span>
-                  <div className="participant-form-group-item">
-                    <label>국적</label>
-                    <div className="radio-group">
-                      <label>
+                    <div className="tourG_rdo_area">
+                      <label htmlFor={`inp-phone2-${index}`}>국적</label>
+                      <span className="tourG_inp_rdo">
                         <input
                           type="radio"
-                          name={`nationality_${participant.id}`}
+                          id={`country_type_D_${index + 1}`}
                           value="내국인"
+                          name={`country_type_${index + 1}`}
                           checked={participant.nationality === '내국인'}
-                          onChange={(e) => handleParticipantChange(index, 'nationality', e.target.value)}
+                          onChange={(e) => handleParticipantChange(index, 'nationality', '내국인')}
                         />
-                        내국인
-                      </label>
-                      <label>
+                        <label htmlFor={`country_type_D_${index + 1}`}>내국인</label>
+                      </span>
+                      <span className="tourG_inp_rdo">
                         <input
                           type="radio"
-                          name={`nationality_${participant.id}`}
+                          id={`country_type_F_${index + 1}`}
                           value="외국인"
+                          name={`country_type_${index + 1}`}
                           checked={participant.nationality === '외국인'}
-                          onChange={(e) => handleParticipantChange(index, 'nationality', e.target.value)}
+                          onChange={(e) => handleParticipantChange(index, 'nationality', '외국인')}
                         />
-                        외국인
-                      </label>
+                        <label htmlFor={`country_type_F_${index + 1}`} className="one_line0">외국인</label>
+                      </span>
                     </div>
                   </div>
-                </div>
+                </section>
 
                 {/* 영문이름 - 해외장기체류보험인 경우에만 표시 */}
                 {insuranceType === '해외장기체류보험' && (
-                  <div className="participant-form-row">
-                    <div className="participant-form-group-item full-width">
-                      <label>영문이름</label>
-                      <input
-                        type="text"
-                        value={participant.englishName || ''}
-                        onChange={(e) => handleParticipantChange(index, 'englishName', e.target.value)}
-                        placeholder="예)HONG GIL DONG"
-                      />
-                    </div>
+                  <div className="tourGuard_form_tt mag5 tourG_mab03">
+                    <label htmlFor={`english_name_${index}`}>영문이름</label>
+                    <input
+                      type="text"
+                      id={`english_name_${index}`}
+                      value={participant.englishName || ''}
+                      onChange={(e) => handleParticipantChange(index, 'englishName', e.target.value)}
+                      placeholder="예)HONG GIL DONG"
+                      className="tourGuard_input_w01"
+                      style={{
+                        height: '32px',
+                        paddingLeft: '10px',
+                        color: '#000',
+                        fontSize: '18px',
+                        letterSpacing: '0px',
+                        marginTop: '23px',
+                        marginLeft: '10px',
+                        paddingTop: '0px',
+                      }}
+                    />
                   </div>
                 )}
 
                 {/* 생년월일, 성별 */}
-                <div className="participant-form-row">
-                  <div className="participant-form-group-item">
+                {participant.nationality === '내국인' && (
+                  <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line" id={`birth_area_${index + 1}`}>
                     <label>생년월일 8자리</label>
                     <input
-                      type="text"
+                      type="tel"
+                      id={`birth_${index + 1}`}
+                      name="birth"
                       value={participant.birthDate}
-                      onChange={(e) => handleParticipantChange(index, 'birthDate', e.target.value.replace(/\D/g, '').slice(0, 8))}
-                      placeholder={index === 0 ? "19881212" : "예)19981022"}
                       maxLength={8}
+                      placeholder={index === 0 ? "19881212" : "예)19981022"}
+                      className="tourGuard_input_w01"
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/[^0-9]/g, '');
+                        if (value.length <= 8) {
+                          handleParticipantChange(index, 'birthDate', value);
+                        }
+                      }}
+                      style={{
+                        height: '32px',
+                        paddingLeft: '10px',
+                        color: '#000',
+                        fontSize: '18px',
+                        letterSpacing: '0px',
+                        marginTop: '23px',
+                        marginLeft: '10px',
+                        paddingTop: '0px',
+                      }}
                     />
-                  </div>
-                  <span className="participant-form-separator">/</span>
-                  <div className="participant-form-group-item">
-                    <label>성별</label>
-                    <div className="radio-group">
-                      <label>
+                    <div className="tourG_rdo_area">
+                      <label htmlFor={`inp-phone2-gender-${index}`}>성별</label>
+                      <span className="tourG_inp_rdo">
                         <input
                           type="radio"
-                          name={`gender_${participant.id}`}
+                          id={`gender_M_${index + 1}`}
                           value="남자"
+                          name={`gender_${index + 1}`}
                           checked={participant.gender === '남자'}
-                          onChange={(e) => handleParticipantChange(index, 'gender', e.target.value)}
+                          onChange={() => handleParticipantChange(index, 'gender', '남자')}
                         />
-                        남자
-                      </label>
-                      <label>
+                        <label htmlFor={`gender_M_${index + 1}`}>남자</label>
+                      </span>
+                      <span className="tourG_inp_rdo">
                         <input
                           type="radio"
-                          name={`gender_${participant.id}`}
+                          id={`gender_W_${index + 1}`}
                           value="여자"
+                          name={`gender_${index + 1}`}
                           checked={participant.gender === '여자'}
-                          onChange={(e) => handleParticipantChange(index, 'gender', e.target.value)}
+                          onChange={() => handleParticipantChange(index, 'gender', '여자')}
                         />
-                        여자
-                      </label>
+                        <label htmlFor={`gender_W_${index + 1}`} className="one_line0">여자</label>
+                      </span>
                     </div>
                   </div>
-                </div>
+                )}
 
                 {/* 이메일 주소 - 가입자 1(대표)만 */}
                 {index === 0 && (
-                  <div className="participant-form-row">
-                    <div className="participant-form-group-item full-width">
-                      <label>이메일 주소</label>
-                      <div className="email-inputs">
-                        <input
-                          type="text"
-                          value={participant.email1}
-                          onChange={(e) => handleParticipantChange(index, 'email1', e.target.value)}
-                          placeholder="아이디"
-                        />
-                        <span>@</span>
-                        <input
-                          type="text"
-                          value={participant.email2 === '직접입력' ? (participant.customEmail || '') : participant.email2}
-                          onChange={(e) => {
-                            if (participant.email2 === '직접입력') {
-                              handleParticipantChange(index, 'customEmail', e.target.value);
-                            }
-                          }}
-                          placeholder="도메인"
-                          readOnly={participant.email2 !== '직접입력'}
-                        />
+                  <div className="tourGuard_form_tt mag5 tourG_mab03">
+                    <label htmlFor={`email1_${index}`}>이메일 주소</label>
+                    <input
+                      type="text"
+                      id={`email1_${index}`}
+                      name="email1"
+                      maxLength={20}
+                      placeholder="아이디"
+                      className="tourGuard_input_w01"
+                      value={participant.email1}
+                      onChange={(e) => handleParticipantChange(index, 'email1', e.target.value)}
+                      style={{
+                        height: '32px',
+                        paddingLeft: '10px',
+                        color: '#000',
+                        fontSize: '18px',
+                        letterSpacing: '0px',
+                        marginTop: '23px',
+                        marginLeft: '10px',
+                        paddingTop: '0px',
+                      }}
+                    />
+                    <div 
+                      className="tourGuard_txt03"
+                      style={{
+                        marginTop: '23px',
+                        marginLeft: '10px',
+                      }}
+                    >@</div>
+                    <input
+                      type="text"
+                      id={`email2_${index}`}
+                      name="email2"
+                      maxLength={20}
+                      className="tourGuard_input_w01"
+                      value={participant.email2 === '직접입력' ? (participant.customEmail || '') : (participant.email2 || '')}
+                      onChange={(e) => {
+                        if (participant.email2 === '직접입력') {
+                          handleParticipantChange(index, 'customEmail', e.target.value);
+                        }
+                      }}
+                      readOnly={participant.email2 !== '직접입력' && participant.email2 !== ''}
+                      style={{
+                        height: '32px',
+                        paddingLeft: '10px',
+                        color: '#000',
+                        fontSize: '18px',
+                        letterSpacing: '0px',
+                        marginTop: '23px',
+                        marginLeft: '10px',
+                        paddingTop: '0px',
+                      }}
+                    />
+                    <div 
+                      className="tourGuard_input_cell08 tourGuard_input_cell09 tourGuard"
+                      style={{
+                        marginTop: '23px',
+                        marginLeft: '10px',
+                        marginRight: '15px',
+                        display: 'inline-block',
+                        verticalAlign: 'middle',
+                      }}
+                    >
+                      <span className="tourGuard_ps_box" style={{
+                        position: 'relative',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        height: '32px',
+                        lineHeight: '32px',
+                      }}>
                         <select
-                          value={participant.email2}
+                          className="tourGuard_sel"
+                          id={`select_email_${index}`}
+                          name="select_email"
+                          value={participant.email2 || ''}
                           onChange={(e) => {
                             const updated = [...participants];
                             updated[index] = { 
                               ...updated[index], 
                               email2: e.target.value,
-                              customEmail: e.target.value === '직접입력' ? '' : updated[index].customEmail
+                              customEmail: e.target.value !== '직접입력' ? '' : updated[index].customEmail
                             };
                             onParticipantsChange(updated);
+                          }}
+                          style={{
+                            flex: 1,
+                            appearance: 'none',
+                            WebkitAppearance: 'none',
+                            MozAppearance: 'none',
                           }}
                         >
                           <option value="">선택</option>
@@ -343,62 +441,138 @@ export default function ParticipantInfoStep({
                           <option value="hotmail.com">hotmail.com</option>
                           <option value="직접입력">직접입력</option>
                         </select>
-                      </div>
+                        <img src="/icons/icon_sel.png" alt="선택" style={{ width: 'auto', height: '7px', marginLeft: '8px', pointerEvents: 'none' }} />
+                      </span>
                     </div>
                   </div>
                 )}
 
                 {/* 휴대폰 번호 - 가입자 1(대표)만 */}
                 {index === 0 && (
-                  <div className="participant-form-row">
-                    <div className="participant-form-group-item full-width">
-                      <label>휴대폰 번호</label>
-                      <div className="phone-inputs">
-                        <input
-                          type="text"
-                          value={participant.phone}
-                          onChange={(e) => handleParticipantChange(index, 'phone', e.target.value.replace(/\D/g, ''))}
-                          placeholder="숫자만 입력해주세요."
-                        />
-                        <button
-                          type="button"
-                          className="verify-btn"
-                          onClick={() => handleSendVerification(participant.phone)}
-                        >
-                          인증받기
-                        </button>
-                      </div>
+                  <div className="tourGuard_form_tt mag5 tourG_mab03" style={{ paddingRight: '20px', position: 'relative' }}>
+                    <label htmlFor={`phone_${index}`}>휴대폰 번호</label>
+                    <input
+                      type="text"
+                      id={`phone_${index}`}
+                      value={participant.phone}
+                      onChange={(e) => handleParticipantChange(index, 'phone', e.target.value.replace(/\D/g, ''))}
+                      placeholder="숫자만 입력해주세요."
+                      className="tourGuard_input_w01"
+                      style={{
+                        width: '70%',
+                        height: '32px',
+                        paddingLeft: '10px',
+                        color: '#000',
+                        fontSize: '18px',
+                        letterSpacing: '0px',
+                        marginTop: '23px',
+                        marginLeft: '10px',
+                        paddingTop: '0px',
+                      }}
+                    />
+                    <div style={{
+                      position: 'absolute',
+                      right: '20px',
+                      marginTop: '11.5px',
+                    }}>
+                      <button
+                        type="button"
+                        className="verify-btn"
+                        onClick={() => handleSendVerification(participant.phone)}
+                        style={{
+                          padding: '0',
+                          backgroundColor: '#eef0fc',
+                          color: '#4d60d6',
+                          border: '1px solid #4d60d6',
+                          borderRadius: '5px',
+                          fontSize: '13px',
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap',
+                          width: '93px',
+                          height: '37px',
+                          lineHeight: '37px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          boxSizing: 'border-box',
+                        }}
+                      >
+                        인증받기
+                      </button>
                     </div>
                   </div>
                 )}
 
                 {/* 인증번호 입력 필드 */}
                 {index === 0 && verificationSent && !participant.isVerified && (
-                  <div className="participant-form-row">
-                    <div className="participant-form-group-item full-width">
-                      <label>인증번호</label>
-                      <div className="verification-inputs">
-                        <input
-                          type="text"
-                          value={verificationCode}
-                          onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                          placeholder="6자리 입력"
-                          maxLength={6}
-                        />
-                        {remainingTime > 0 && (
-                          <span className="verification-timer">
-                            {Math.floor(remainingTime / 60).toString().padStart(2, '0')}:
-                            {(remainingTime % 60).toString().padStart(2, '0')}
-                          </span>
-                        )}
-                        <button
-                          type="button"
-                          className="verify-confirm-btn"
-                          onClick={() => handleVerifyCode(participant.phone, verificationCode)}
-                        >
-                          확인
-                        </button>
-                      </div>
+                  <div className="tourGuard_form_tt mag5 tourG_mab03" style={{ paddingRight: '20px', position: 'relative' }}>
+                    <label htmlFor={`verification_code_${index}`}>인증번호</label>
+                    <input
+                      type="text"
+                      id={`verification_code_${index}`}
+                      value={verificationCode}
+                      onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      placeholder="6자리 입력"
+                      maxLength={6}
+                      className="tourGuard_input_w01"
+                      style={{
+                        height: '32px',
+                        paddingLeft: '10px',
+                        color: '#000',
+                        fontSize: '18px',
+                        letterSpacing: '0px',
+                        marginTop: '23px',
+                        marginLeft: '10px',
+                        paddingTop: '0px',
+                      }}
+                    />
+                    {remainingTime > 0 && (
+                      <span className="verification-timer" style={{
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        color: '#f15a24',
+                        marginLeft: '8px',
+                        marginTop: '23px',
+                        marginRight: '100px',
+                        verticalAlign: 'middle',
+                        display: 'inline-block',
+                        lineHeight: '32px',
+                        position: 'relative',
+                        zIndex: 1,
+                      }}>
+                        {Math.floor(remainingTime / 60).toString().padStart(2, '0')}:
+                        {(remainingTime % 60).toString().padStart(2, '0')}
+                      </span>
+                    )}
+                    <div style={{
+                      position: 'absolute',
+                      right: '20px',
+                      marginTop: '11.5px',
+                    }}>
+                      <button
+                        type="button"
+                        className="verify-confirm-btn"
+                        onClick={() => handleVerifyCode(participant.phone, verificationCode)}
+                        style={{
+                          padding: '0',
+                          backgroundColor: '#2c3fb3',
+                          color: '#fff',
+                          border: '1px solid #2c3fb3',
+                          borderRadius: '5px',
+                          fontSize: '13px',
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap',
+                          width: '93px',
+                          height: '37px',
+                          lineHeight: '37px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          boxSizing: 'border-box',
+                        }}
+                      >
+                        확인
+                      </button>
                     </div>
                   </div>
                 )}
@@ -436,7 +610,7 @@ export default function ParticipantInfoStep({
             className={`calculate-final-btn ${calculatedPremiums ? 'calculated' : ''}`}
             onClick={onCalculate}
             disabled={isCalculating || !!calculatedPremiums}
-            style={{ marginTop: participantCount === 1 ? '12px' : '24px' }}
+            style={{ marginTop: participantCount === 1 ? '0px' : '24px' }}
           >
             {isCalculating ? '계산 중...' : '보험료 계산하기'}
           </button>

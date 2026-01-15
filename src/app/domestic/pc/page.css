@@ -272,7 +272,7 @@
 
 /* mag5 클래스 - 모바일과 동일 */
 .domestic-page-pc .mag5 {
-  margin: 5px 0;
+  margin: 10px 0;
 }
 
 .domestic-page-pc .field-row {
@@ -556,6 +556,225 @@
 .domestic-page-pc .gender-option.selected.one_line0 .gender-text {
   color: #0000ff;
   border: none;
+}
+
+/* ========================================
+   Participant Form - tourGuard 스타일 (모바일과 동일)
+   ======================================== */
+
+.domestic-page-pc .tourGuard_form_tt {
+  position: relative;
+  height: 65px;
+  border: 1px solid #c3c6ce;
+  border-radius: 15px;
+  background: #fff;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.domestic-page-pc .tourGuard_form_tt input[type="text"],
+.domestic-page-pc .tourGuard_form_tt input[type="tel"] {
+  height: 32px;
+  padding-left: 10px;
+  border: 0;
+  color: #000;
+  font-size: 18px;
+  letter-spacing: 0px;
+  caret-color: #222;
+  display: inline-block;
+  vertical-align: text-top;
+  padding-top: 0px;
+  margin-top: 23px;
+  margin-left: 10px;
+  background: transparent;
+}
+
+.domestic-page-pc .tourGuard_form_tt input[type="text"]::placeholder,
+.domestic-page-pc .tourGuard_form_tt input[type="tel"]::placeholder {
+  color: #dddddd;
+  text-shadow: initial;
+}
+
+.domestic-page-pc .tourGuard_form_tt input[type="text"]:-ms-input-placeholder,
+.domestic-page-pc .tourGuard_form_tt input[type="tel"]:-ms-input-placeholder {
+  color: #dddddd;
+  text-shadow: initial;
+}
+
+/* tourGuard_form_tt의 직접 자식 label (이름, 생년월일 등) */
+.domestic-page-pc .tourGuard_form_tt > label {
+  position: absolute;
+  top: 6px;
+  left: 20px;
+  color: #9797a3;
+  font-size: 12px;
+  font-family: 'Malgun Gothic','맑은 고딕',dotum,'돋움',AppleGothic,sans-serif;
+  letter-spacing: -0.8px;
+}
+
+.domestic-page-pc .tourGuard_input_w01 {
+  width: 38%;
+}
+
+.domestic-page-pc .tourGuard_txt03 {
+  display: inline-block;
+  font-size: 18px;
+  color: #333;
+  margin: 0 10px;
+  vertical-align: middle;
+  line-height: 32px;
+}
+
+.domestic-page-pc .tourGuard_input_cell08 {
+  width: 30%;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.domestic-page-pc .tourGuard_input_cell09 {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.domestic-page-pc .tourGuard_ps_box {
+  position: relative;
+}
+
+.domestic-page-pc .tourGuard_ps_box select,
+.domestic-page-pc .tourGuard_sel {
+  width: 100%;
+  height: 32px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 18px;
+  color: #000;
+  padding: 0 10px;
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+}
+
+.domestic-page-pc .tourG_rdo_area {
+  font-size: 0px;
+  width: 45%;
+  margin-right: 0;
+  vertical-align: middle;
+  text-align: center;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 65px;
+  padding-left: 30px;
+  z-index: 2;
+}
+
+/* tourG_rdo_area 내부의 label (국적, 성별) - 더 높은 우선순위로 명시 */
+.domestic-page-pc .tourGuard_form_tt .tourG_rdo_area > label,
+.domestic-page-pc .tourG_rdo_area > label {
+  position: absolute !important;
+  top: 6px !important;
+  left: 30px !important;
+  color: #9797a3 !important;
+  font-size: 12px !important;
+  font-family: 'Malgun Gothic','맑은 고딕',dotum,'돋움',AppleGothic,sans-serif !important;
+  letter-spacing: -0.8px !important;
+  z-index: 2;
+}
+
+.domestic-page-pc .tourG_inp_rdo {
+  position: relative;
+  width: 40%;
+  display: inline-block;
+  overflow-wrap: normal;
+  word-break: normal;
+  vertical-align: middle;
+  align-items: center;
+  text-align: center;
+  background: transparent;
+  font-size: 17px;
+  font-family: 'Malgun Gothic','맑은 고딕',dotum,'돋움',AppleGothic,sans-serif;
+}
+
+.domestic-page-pc .tourG_inp_rdo input {
+  position: absolute;
+  display: block;
+  width: 1px;
+  height: 1px;
+  margin: 0px;
+  padding: 0px;
+  border: 0px;
+  background: none;
+  background: transparent;
+}
+
+.domestic-page-pc .tourG_inp_rdo input:checked + label {
+  background: transparent;
+  border: none;
+  z-index: 2;
+}
+
+.domestic-page-pc .tourG_inp_rdo input + label {
+  position: relative;
+  top: 8px;
+  left: 0;
+  width: 100%;
+  height: 32px;
+  display: inline-block;
+  text-align: left;
+  font-size: 17px;
+  font-family: 'Malgun Gothic','맑은 고딕',dotum,'돋움',AppleGothic,sans-serif;
+  vertical-align: middle;
+  letter-spacing: -0.8px;
+  color: #dddddd;
+  box-sizing: border-box;
+  margin: 0 0 0 0;
+  line-height: 32px;
+  white-space: nowrap;
+  overflow: visible;
+  word-wrap: normal;
+  word-break: keep-all;
+}
+
+.domestic-page-pc .tourG_inp_rdo input:checked + label {
+  color: #0000ff;
+  font-weight: 500;
+}
+
+.domestic-page-pc .one_line0 {
+  border-left: 0px !important;
+}
+
+.domestic-page-pc .tourG_inp_rdo input:checked + label.one_line0 {
+  color: #0000ff;
+  border: none;
+}
+
+.domestic-page-pc .tourG_line:after {
+  content: '';
+  position: absolute;
+  display: inline-block;
+  width: 47px;
+  height: 50px;
+  top: -4px;
+  left: 40%;
+  margin: 0px 0 0px 0px;
+  border-bottom: 1px solid #d5d7dd;
+  vertical-align: middle;
+  transform: rotate(297deg);
+  z-index: 1;
+}
+
+.domestic-page-pc .mag5 {
+  margin: 10px 0;
+}
+
+.domestic-page-pc .tourG_mab03 {
+  margin-bottom: 3px;
 }
 
 /* ========================================
@@ -867,11 +1086,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+  margin-top: 30px;
 }
 
 .domestic-page-pc .participant-form-subtitle {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 600;
   color: #333;
   margin: 0;
@@ -899,30 +1119,41 @@
 }
 
 .domestic-page-pc .participant-form-row {
-  display: flex;
-  align-items: stretch;
+  position: relative;
+  height: 65px;
   border: 1px solid #c3c6ce;
   border-radius: 15px;
+  background: #fff;
+  box-sizing: border-box;
+  display: flex;
+  align-items: stretch;
   overflow: hidden;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .domestic-page-pc .participant-form-group-item {
   flex: 1;
-  padding: 14px 16px;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0;
+  position: relative;
 }
 
 .domestic-page-pc .participant-form-group-item.full-width {
-  flex: 1;
+  width: 100%;
 }
 
-.domestic-page-pc .participant-form-group-item label {
+/* 이메일, 휴대폰, 인증번호 필드의 라벨만 적용 */
+.domestic-page-pc .participant-form-row .participant-form-group-item.full-width > label {
+  position: absolute;
+  top: 6px;
+  left: 20px;
+  color: #9797a3;
   font-size: 12px;
-  color: #999;
-  margin-bottom: 2px;
+  font-family: 'Malgun Gothic','맑은 고딕',dotum,'돋움',AppleGothic,sans-serif;
+  letter-spacing: -0.8px;
+  margin-bottom: 0;
 }
 
 .domestic-page-pc .participant-form-group-item input,
@@ -989,36 +1220,61 @@
 .domestic-page-pc .email-inputs {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   width: 100%;
+  margin-top: 26px;
+  margin-left: 10px;
+  padding-right: 10px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .domestic-page-pc .email-inputs input {
   flex: 1;
-  padding: 10px 12px;
+  padding: 0;
+  padding-left: 0;
   border: none;
   outline: none;
-  font-size: 16px;
+  font-size: 18px;
   background: transparent;
+  height: 32px;
+  color: #000;
+  letter-spacing: 0px;
+  caret-color: #222;
+  min-width: 0;
+  display: inline-block;
+  vertical-align: text-top;
+  box-sizing: border-box;
 }
 
 .domestic-page-pc .email-inputs span {
-  color: #333;
-  font-size: 16px;
+  color: #000;
+  font-size: 18px;
   flex-shrink: 0;
+  margin: 0;
+  line-height: 32px;
+  white-space: nowrap;
 }
 
 .domestic-page-pc .email-inputs select {
   flex: 1;
-  padding: 10px 12px;
+  padding: 0;
+  padding-left: 0;
   border: none;
   outline: none;
-  font-size: 16px;
+  font-size: 18px;
   background: transparent;
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
+  height: 32px;
+  color: #000;
+  letter-spacing: 0px;
+  min-width: 0;
+  display: inline-block;
+  vertical-align: text-top;
+  box-sizing: border-box;
 }
 
 .domestic-page-pc .phone-inputs {
@@ -1026,27 +1282,47 @@
   align-items: center;
   gap: 8px;
   width: 100%;
+  margin-top: 26px;
+  margin-left: 10px;
+  padding-right: 20px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .domestic-page-pc .phone-inputs input {
   flex: 1;
-  padding: 10px 12px;
+  padding: 0;
+  padding-left: 0;
   border: none;
   outline: none;
-  font-size: 16px;
+  font-size: 18px;
   background: transparent;
+  height: 32px;
+  line-height: 32px;
+  color: #000;
+  letter-spacing: 0px;
+  caret-color: #222;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .domestic-page-pc .verify-btn {
-  padding: 10px 20px;
+  padding: 0 16px;
   background-color: #eef0fc;
   color: #4d60d6;
   border: 1px solid #4d60d6;
   border-radius: 5px;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
+  height: 32px;
+  line-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  margin: 0;
 }
 
 .domestic-page-pc .verify-btn:hover {
@@ -1058,35 +1334,60 @@
   align-items: center;
   gap: 8px;
   width: 100%;
+  margin-top: 26px;
+  margin-left: 10px;
+  padding-right: 20px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .domestic-page-pc .verification-inputs input {
   flex: 1;
-  padding: 10px 12px;
+  padding: 0;
+  padding-left: 0;
   border: none;
   outline: none;
-  font-size: 16px;
+  font-size: 18px;
   background: transparent;
+  height: 32px;
+  color: #000;
+  letter-spacing: 0px;
+  caret-color: #222;
+  min-width: 0;
+  display: inline-block;
+  vertical-align: text-top;
+  box-sizing: border-box;
 }
 
 .domestic-page-pc .verification-timer {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: #f15a24;
   min-width: 50px;
   text-align: center;
+  flex-shrink: 0;
+  line-height: 32px;
+  white-space: nowrap;
 }
 
 .domestic-page-pc .verify-confirm-btn {
-  padding: 10px 20px;
+  padding: 0 16px;
   background-color: #2c3fb3;
   color: #fff;
   border: 1px solid #2c3fb3;
   border-radius: 5px;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
+  height: 32px;
+  line-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  margin: 0;
+  vertical-align: text-top;
 }
 
 .domestic-page-pc .verify-confirm-btn:hover {
@@ -1145,14 +1446,15 @@
 .domestic-page-pc .calculate-final-btn {
   width: 100%;
   padding: 18px;
-  background: #2843e5;
+  background: #2c3fb3;
   color: #fff;
   border: none;
   border-radius: 8px;
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 24px;
+  margin-top: 8px;
+  margin-bottom: 70px;
   transition: background 0.2s;
 }
 
