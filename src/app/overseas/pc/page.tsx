@@ -28,9 +28,12 @@ export default function PCOverseasPage() {
   // 회원 정보 가져오기
   const { member, isLoggedIn } = useAuth();
   
-  // Get today's date in YYYY-MM-DD format
+  // Get today's date in YYYY-MM-DD format (Korea timezone)
   const today = new Date();
-  const formattedDate = today.toISOString().split('T')[0];
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  const formattedDate = `${year}-${month}-${day}`;
   
   // Get current hour + 2 hours (default time)
   // 예: 오후 10시 5분이면 +2시간 = 24시, 오후 11시 3분이면 +2시간 = 01시
