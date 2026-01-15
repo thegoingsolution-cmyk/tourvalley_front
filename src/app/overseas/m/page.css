@@ -436,6 +436,11 @@
     margin: 5px 0;
 }
 
+/* Margin left utilities - CSS 충돌 방지를 위해 명시적으로 정의 */
+.tourG_mleft04 {
+    margin-left: 5px;
+}
+
 .prow_01 {
     padding: 0 20px;
 }
@@ -1659,6 +1664,13 @@
 
 .overseas-step1-mobile .tourG_mab04 {
     margin-bottom: 0;
+}
+
+/* 안내문(tour2023_txt01) 부분의 여백 - CSS 충돌 방지를 위해 명시적으로 정의 */
+.overseas-step1-mobile .tour2023_txt01.tourG_mleft04 {
+    margin-top: 30px !important;
+    margin-bottom: 30px !important;
+    margin-left: 5px;
 }
 
 .overseas-step1-mobile .tourG_mab05 {

@@ -10,7 +10,7 @@ import MobileStepIndicator from '@/components/mobiletravel/StepIndicator';
 import MobileGroupTravelInfoStep from '@/components/mobiletravel/GroupTravelInfoStep';
 import MobilePlanSelection from '@/components/mobiletravel/PlanSelection';
 import ParticipantInfoStep from '@/components/travel/ParticipantInfoStep';
-import GroupParticipantInfoStep from '@/components/mobiletravel/GroupParticipantInfoStep';
+import GroupParticipantInfoStep, { GroupInfo } from '@/components/mobiletravel/GroupParticipantInfoStep';
 import RiskActivityStep from '@/components/travel/RiskActivityStep';
 import ContractInfoStep from '@/components/travel/ContractInfoStep';
 import PaymentStep from '@/components/travel/PaymentStep';
@@ -53,6 +53,7 @@ function MobileGroupInsuranceContent() {
   const [hasGroupParticipants, setHasGroupParticipants] = useState(false);
   const [groupParticipantsData, setGroupParticipantsData] = useState<Participant[]>([]);
   const [groupInsuredData, setGroupInsuredData] = useState<any[]>([]); // InsuredData 형식으로 저장
+  const [groupInfo, setGroupInfo] = useState<GroupInfo | null>(null); // 그룹 정보 (사업자정보, 담당자 등)
   const [participantPremiumsByPlan, setParticipantPremiumsByPlan] = useState<Record<string, Array<{ id: number; name: string; gender: string; birthDate: string; planType: string; premium: number }>>>({});
   
   // 보험료 계산 관련 상태
@@ -247,7 +248,17 @@ function MobileGroupInsuranceContent() {
   // 이메일 전체 주소 가져오기
   const getFullEmail = (participant: Participant): string => {
     if (!participant.email1 || !participant.email2) return '';
-    return `${participant.email1}@${participant.email2}`;
+    const domain = participant.email2 === '직접입력' ? (participant.customEmail || '') : participant.email2;
+    if (!domain) return '';
+    return `${participant.email1}@${domain}`;
+  };
+
+  // 그룹 정보에서 이메일 전체 주소 가져오기
+  const getGroupFullEmail = (info: GroupInfo | null): string => {
+    if (!info || !info.email1 || !info.email2) return '';
+    const domain = info.email2 === '직접입력' ? (info.customEmail || '') : info.email2;
+    if (!domain) return '';
+    return `${info.email1}@${domain}`;
   };
 
   // 기간 검증
@@ -948,7 +959,19 @@ function MobileGroupInsuranceContent() {
             device: '모바일',
             access_path: '투어밸리 모바일 사이트',
           },
-          contractor: {
+          contractor: hasGroupParticipants && groupInfo ? {
+            // 그룹 보험인 경우 법인 정보 사용
+            contractor_type: '법인',
+            name: groupInfo.contactPerson || '', // 담당자명 → contractors.name
+            resident_number: null,
+            company_name: groupInfo.groupName || '', // 단체명 → contractors.company_name
+            business_number: `${groupInfo.businessNumber1}-${groupInfo.businessNumber2}-${groupInfo.businessNumber3}`, // 사업자번호 → contractors.business_number
+            contact_person: groupInfo.contactPerson || '', // 담당자명 → contractors.contact_person
+            phone: groupInfo.phone || '', // 휴대폰 번호 → contractors.phone (법인)
+            mobile_phone: groupInfo.phone || '', // 휴대폰 번호 → contractors.mobile_phone
+            email: getGroupFullEmail(groupInfo), // 이메일 → contractors.email
+          } : {
+            // 개인 보험인 경우 기존 로직
             contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: currentParticipants[0]?.name || '',
             resident_number: currentParticipants[0]?.birthDate ? `${currentParticipants[0].birthDate}-${currentParticipants[0].gender === '남자' ? '1' : '2'}******` : '',
@@ -998,14 +1021,25 @@ function MobileGroupInsuranceContent() {
 
         // 2. 결제 처리
         if (paymentMethod === '나이스페이먼츠') {
+          // 결제 정보: 그룹 보험인 경우 그룹 정보 사용, 개인 보험인 경우 개인 정보 사용
+          const buyerName = hasGroupParticipants && groupInfo 
+            ? groupInfo.contactPerson || '' 
+            : currentParticipants[0]?.name || '';
+          const buyerEmail = hasGroupParticipants && groupInfo 
+            ? getGroupFullEmail(groupInfo) 
+            : getFullEmail(currentParticipants[0]);
+          const buyerTel = hasGroupParticipants && groupInfo 
+            ? groupInfo.phone || '' 
+            : currentParticipants[0]?.phone || '';
+
           const paymentRequest = await requestNicepayPayment({
             contract_id,
             amount: receiptPremium,
             orderId: contractData_result.contract_number,
             goodsName: insuranceTypeName,
-            buyerName: currentParticipants[0]?.name || '',
-            buyerEmail: getFullEmail(currentParticipants[0]),
-            buyerTel: currentParticipants[0]?.phone || '',
+            buyerName,
+            buyerEmail,
+            buyerTel,
             returnUrl: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/payments/nicepay/callback`,
             closeUrl: `${window.location.origin}/payment/close`,
           });
@@ -1026,15 +1060,26 @@ function MobileGroupInsuranceContent() {
             alert(paymentRequest.message || '결제 요청에 실패했습니다.');
           }
         } else if (paymentMethod === '네이버페이') {
+          // 결제 정보: 그룹 보험인 경우 그룹 정보 사용, 개인 보험인 경우 개인 정보 사용
+          const customerName = hasGroupParticipants && groupInfo 
+            ? groupInfo.contactPerson || '' 
+            : currentParticipants[0]?.name || '';
+          const customerEmail = hasGroupParticipants && groupInfo 
+            ? getGroupFullEmail(groupInfo) 
+            : getFullEmail(currentParticipants[0]);
+          const customerPhone = hasGroupParticipants && groupInfo 
+            ? groupInfo.phone || '' 
+            : currentParticipants[0]?.phone || '';
+
           try {
             await processNaverPayPayment({
               contractId: contract_id,
               amount: receiptPremium,
               productName: insuranceTypeName,
               productCount: currentParticipants.length,
-              customerName: currentParticipants[0]?.name || '',
-              customerEmail: getFullEmail(currentParticipants[0]),
-              customerPhone: currentParticipants[0]?.phone || '',
+              customerName,
+              customerEmail,
+              customerPhone,
               checkOutDate: arrivalDate,
             });
           } catch (error) {
@@ -1042,15 +1087,26 @@ function MobileGroupInsuranceContent() {
             alert(error instanceof Error ? error.message : '네이버 페이 결제 중 오류가 발생했습니다.');
           }
         } else if (paymentMethod === '카카오페이') {
+          // 결제 정보: 그룹 보험인 경우 그룹 정보 사용, 개인 보험인 경우 개인 정보 사용
+          const customerName = hasGroupParticipants && groupInfo 
+            ? groupInfo.contactPerson || '' 
+            : currentParticipants[0]?.name || '';
+          const customerEmail = hasGroupParticipants && groupInfo 
+            ? getGroupFullEmail(groupInfo) 
+            : getFullEmail(currentParticipants[0]);
+          const customerPhone = hasGroupParticipants && groupInfo 
+            ? groupInfo.phone || '' 
+            : currentParticipants[0]?.phone || '';
+
           try {
             await processKakaoPayPayment({
               contractId: contract_id,
               amount: receiptPremium,
               itemName: insuranceTypeName,
               quantity: currentParticipants.length,
-              customerName: currentParticipants[0]?.name || '',
-              customerEmail: getFullEmail(currentParticipants[0]),
-              customerPhone: currentParticipants[0]?.phone || '',
+              customerName,
+              customerEmail,
+              customerPhone,
             });
           } catch (error) {
             console.error('카카오페이 결제 오류:', error);
@@ -1075,7 +1131,19 @@ function MobileGroupInsuranceContent() {
             device: '모바일',
             access_path: '투어밸리 모바일 사이트',
           },
-          contractor: {
+          contractor: hasGroupParticipants && groupInfo ? {
+            // 그룹 보험인 경우 법인 정보 사용
+            contractor_type: '법인',
+            name: groupInfo.contactPerson || '', // 담당자명 → contractors.name
+            resident_number: null,
+            company_name: groupInfo.groupName || '', // 단체명 → contractors.company_name
+            business_number: `${groupInfo.businessNumber1}-${groupInfo.businessNumber2}-${groupInfo.businessNumber3}`, // 사업자번호 → contractors.business_number
+            contact_person: groupInfo.contactPerson || '', // 담당자명 → contractors.contact_person
+            phone: groupInfo.phone || '', // 휴대폰 번호 → contractors.phone (법인)
+            mobile_phone: groupInfo.phone || '', // 휴대폰 번호 → contractors.mobile_phone
+            email: getGroupFullEmail(groupInfo), // 이메일 → contractors.email
+          } : {
+            // 개인 보험인 경우 기존 로직
             contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: currentParticipants[0]?.name || '',
             resident_number: currentParticipants[0]?.birthDate ? `${currentParticipants[0].birthDate}-${currentParticipants[0].gender === '남자' ? '1' : '2'}******` : '',
@@ -1404,8 +1472,9 @@ function MobileGroupInsuranceContent() {
       {showParticipantForm && !showStep2_1 && !showStep3 && !showCompletionScreen && hasGroupParticipants && (
         <GroupParticipantInfoStep
           insuranceType={getTitle()}
-          onApply={() => {
-            // TODO: 그룹 가입 정보 검증 및 다음 단계로 이동
+          onApply={(info: GroupInfo) => {
+            // 그룹 정보 저장
+            setGroupInfo(info);
             setShowParticipantForm(false);
             setShowStep2_1(true);
             window.scrollTo({ top: 0, behavior: 'smooth' });

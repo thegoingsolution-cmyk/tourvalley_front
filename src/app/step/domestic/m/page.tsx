@@ -41,7 +41,7 @@ export default function DomesticStepPage() {
                     href="javascript:void(0);"
                     onClick={(e) => {
                       e.preventDefault();
-                      goToDomesticPage('group');
+                      router.push('/group-insurance/m');
                     }}
                     style={{ pointerEvents: 'auto' }}
                     className="tourGuard_btn_b tour2023_btn"

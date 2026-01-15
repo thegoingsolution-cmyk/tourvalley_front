@@ -156,6 +156,13 @@
   margin-left: 10px;
 }
 
+/* 안내문(tour2023_txt01) 부분의 여백 - CSS 충돌 방지를 위해 명시적으로 정의 */
+.long-term-stay-mobile .tour2023_txt01.tourG_mleft04 {
+    margin-top: 30px !important;
+    margin-bottom: 30px !important;
+    margin-left: 5px;
+}
+
 .long-term-stay-mobile .tourG_line:after {
   content: '';
   position: absolute;
@@ -1214,6 +1221,13 @@
 
 .long-term-stay-mobile .tourG_mab04 {
     margin-bottom: 0;
+}
+
+/* 안내문(tour2023_txt01) 부분의 여백 - CSS 충돌 방지를 위해 명시적으로 정의 */
+.long-term-stay-mobile .tour2023_txt01.tourG_mleft04 {
+    margin-top: 30px !important;
+    margin-bottom: 30px !important;
+    margin-left: 5px;
 }
 
 .long-term-stay-mobile .tourG_mab05 {

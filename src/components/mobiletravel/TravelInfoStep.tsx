@@ -218,7 +218,7 @@ export default function MobileTravelInfoStep({
         )}
 
         {/* 안내문 */}
-        <div className="tour2023_txt01 tour2023_grey tourG_mleft04 tourG_mab04 tourG_mat06">
+        <div className="tour2023_txt01 tour2023_grey tourG_mleft04" style={{ marginTop: '30px', marginBottom: '30px' }}>
           <ul className="tourGuard_inline">
             <li className="tourGuard_inline_t01">※</li>
             <li className="tourGuard_inline_t02">

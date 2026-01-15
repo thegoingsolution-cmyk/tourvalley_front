@@ -4,12 +4,7 @@ import React, { useState, useEffect } from 'react';
 import MobileStepIndicator from './StepIndicator';
 import { sendVerificationCode, verifyCode } from '@/services/smsService';
 
-interface GroupParticipantInfoStepProps {
-  insuranceType: string;
-  onApply: () => void;
-}
-
-interface GroupInfo {
+export interface GroupInfo {
   businessNumber1: string; // 사업자번호 첫 번째 부분 (3자리)
   businessNumber2: string; // 사업자번호 두 번째 부분 (2자리)
   businessNumber3: string; // 사업자번호 세 번째 부분 (5자리)
@@ -20,6 +15,11 @@ interface GroupInfo {
   customEmail: string; // 직접입력 도메인
   phone: string; // 휴대폰 번호
   isVerified: boolean; // 인증 완료 여부
+}
+
+interface GroupParticipantInfoStepProps {
+  insuranceType: string;
+  onApply: (groupInfo: GroupInfo) => void;
 }
 
 export default function GroupParticipantInfoStep({
@@ -158,8 +158,8 @@ export default function GroupParticipantInfoStep({
       return;
     }
 
-    // TODO: 그룹 정보 저장 및 다음 단계로 이동
-    onApply();
+    // 그룹 정보와 함께 다음 단계로 이동
+    onApply(groupInfo);
   };
 
   return (

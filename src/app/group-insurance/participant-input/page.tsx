@@ -205,13 +205,20 @@ export default function ParticipantInputPage() {
                 {/* 기존 가입 이력 불러오기 버튼 */}
                 <div className="tourG_mab10 tourG_mat14">
                   <a 
-                    href="#" 
-                    className="tourGuard_btn_b tour2023_btn10"
+                    href="javascript:void(0);"
                     onClick={(e) => {
                       e.preventDefault();
-                      // TODO: 기존 가입 이력 불러오기 팝업 구현
-                      alert('기존 가입 이력 불러오기 기능은 준비 중입니다.');
+                      const width = 500;
+                      const height = 700;
+                      const left = (window.screen.width / 2) - (width / 2);
+                      const top = (window.screen.height / 2) - (height / 2);
+                      window.open(
+                        '/group-insurance/participant-input/load-history',
+                        'loadHistory',
+                        `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+                      );
                     }}
+                    className="tourGuard_btn_b tour2023_btn10"
                   >
                     기존 가입 이력 불러오기<span className="tour2023_arr02"></span>
                   </a>

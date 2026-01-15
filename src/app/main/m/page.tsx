@@ -1,15 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import AccidentFreeCashModal from '@/components/travel/AccidentFreeCashModal';
 import { getImagePath } from '@/utils/path';
 import './page.css';
 
 export default function MobileMainPage() {
-  const [showCashModal, setShowCashModal] = useState(false);
 
   return (
     <div className="main-page-mobile">
@@ -54,13 +52,7 @@ export default function MobileMainPage() {
               </Link>
               
               {/* 무사고캐시 */}
-              <a 
-                href="javascript:void(0);" 
-                onClick={(e) => { 
-                  e.preventDefault(); 
-                  setShowCashModal(true);
-                }}
-              >
+              <Link href="/accident-free-cash">
                 <div className="tour2023_intro_box06 tourG_mat15">
                   <p className="tour2023_intro_txt14 tourG_mat09">무사고CASH 적립</p>
                   <p className="link_more"></p>
@@ -68,7 +60,7 @@ export default function MobileMainPage() {
                     <span className="tour2023_intro_txt04">투어밸리 무사고 고객님께 드리는 특별한... </span>
                   </div>
                 </div>
-              </a>
+              </Link>
 
               {/* 단체(법인)보험 */}
               <div className="tourG_line05 tourG_mat13 tourG_mab08"></div>
@@ -107,12 +99,6 @@ export default function MobileMainPage() {
       </main>
 
       <Footer isMobile={true} />
-
-      {/* 무사고캐시 모달 */}
-      <AccidentFreeCashModal
-        isOpen={showCashModal}
-        onClose={() => setShowCashModal(false)}
-      />
     </div>
   );
 }

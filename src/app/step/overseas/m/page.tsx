@@ -66,7 +66,7 @@ export default function OverseasStepPage() {
                     href="javascript:void(0);" 
                     onClick={(e) => {
                       e.preventDefault();
-                      goToOverseasPage('group');
+                      router.push('/group-insurance/m');
                     }}
                     style={{pointerEvents: 'auto'}} 
                     className="tourGuard_btn_b tour2023_btn"
