@@ -293,7 +293,7 @@ export default function TravelInfoStep({
                       }}
                     >
                       <select
-                        value={travelPurpose || ''}
+                        value={travelPurpose || '유학/어학연수'}
                         onChange={(e) => onTravelPurposeChange(e.target.value)}
                         className="purpose-select"
                         style={{
@@ -301,7 +301,7 @@ export default function TravelInfoStep({
                           height: '32px',
                           padding: '0',
                           border: '0',
-                          color: travelPurpose ? '#000' : '#dddddd',
+                          color: (travelPurpose || '유학/어학연수') ? '#000' : '#dddddd',
                           fontSize: '18px',
                           background: 'transparent',
                           cursor: 'pointer',
@@ -312,7 +312,6 @@ export default function TravelInfoStep({
                           lineHeight: '32px',
                         }}
                       >
-                        <option value="">선택해 주세요</option>
                         {longTermPurposeOptions.map((option) => (
                           <option key={option.value} value={option.value}>
                             {option.label}
