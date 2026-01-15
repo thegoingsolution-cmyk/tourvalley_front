@@ -2276,8 +2276,7 @@
 
 .long-term-stay-page-pc .step3-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
   margin-bottom: 24px;
 }
 
@@ -2285,6 +2284,8 @@
   font-size: 24px;
   font-weight: 700;
   color: #333;
+  text-align: left;
+  margin-bottom: 12px;
 }
 
 .long-term-stay-page-pc .print-btn {
@@ -2298,6 +2299,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  align-self: flex-end;
 }
 
 .long-term-stay-page-pc .Print_ico {
@@ -2314,10 +2316,10 @@
 .long-term-stay-page-pc .contract-info-grid {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 30px;
   background: transparent;
   border-radius: 8px;
-  margin-bottom: 24px;
+  margin-top: 24px;
 }
 
 .long-term-stay-page-pc .contract-info-grid-divider {
@@ -2336,7 +2338,8 @@
 .long-term-stay-page-pc .contract-info-item label {
   font-size: 16px;
   color: #999999;
-  font-weight: 700;
+  font-weight: 500;
+  letter-spacing: -1.5px;
   min-width: 150px;
   flex-shrink: 0;
 }

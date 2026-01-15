@@ -69,6 +69,15 @@ export default function ContractInfoStep({
     onReceiptPremiumChange((calculatedPremiums?.totalPremium || 0) - maxValue);
   };
 
+  const formatResidentNumber = (birthDate: string, gender: '남자' | '여자') => {
+    if (!birthDate || birthDate.length !== 8) return '';
+    // YYYYMMDD 형식에서 뒤 6자리 추출 (YYMMDD)
+    const yearMonthDay = birthDate.substring(2, 8);
+    // 성별 코드: 남자 = 1, 여자 = 2
+    const genderCode = gender === '남자' ? '1' : '2';
+    return `${yearMonthDay}-${genderCode}******`;
+  };
+
   const handleContractConfirm = (checked: boolean) => {
     onContractConfirmedChange(checked);
     if (checked) {
@@ -91,7 +100,7 @@ export default function ContractInfoStep({
       <div className="form-container">
         <div className="form-card">
           <div className="form-header">
-            <h1 className="form-title">{insuranceType}</h1>
+            {/* <h1 className="form-title">{insuranceType}</h1> */}
             <StepIndicator currentStep={3} />
           </div>
 
@@ -101,7 +110,76 @@ export default function ContractInfoStep({
               <button
                 type="button"
                 className="print-btn"
-                onClick={() => window.print()}
+                onClick={() => {
+                  const printContent = document.querySelector('.contract-info-grid')?.parentElement;
+                  if (!printContent) return;
+                  
+                  const printWindow = window.open('', '_blank');
+                  if (!printWindow) return;
+                  
+                  printWindow.document.write(`
+                    <html>
+                      <head>
+                        <title>계약정보</title>
+                        <style>
+                          body {
+                            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                            padding: 20px;
+                            margin: 0;
+                          }
+                          .contract-info-grid {
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            gap: 16px;
+                          }
+                          .contract-info-item {
+                            padding: 12px;
+                            border-bottom: 1px solid #e0e0e0;
+                          }
+                          .contract-info-item label {
+                            display: block;
+                            font-weight: 600;
+                            margin-bottom: 8px;
+                            color: #333;
+                          }
+                          .contract-info-item div {
+                            color: #666;
+                          }
+                          .contract-info-item-divider {
+                            border-top: 2px solid #333;
+                            padding-top: 16px;
+                            margin-top: 8px;
+                          }
+                          .contract-info-item-divider label {
+                            font-size: 18px;
+                          }
+                          .contract-info-item-divider div {
+                            font-size: 18px;
+                            font-weight: 700;
+                            color: #333;
+                          }
+                          .participant-info-details div {
+                            margin-bottom: 4px;
+                          }
+                          .participant-detail-link {
+                            display: none;
+                          }
+                          @media print {
+                            body { margin: 0; padding: 10px; }
+                          }
+                        </style>
+                      </head>
+                      <body>
+                        <h2 style="margin-bottom: 20px; font-size: 24px; font-weight: 700;">계약정보</h2>
+                        ${printContent.querySelector('.contract-info-grid')?.outerHTML || ''}
+                      </body>
+                    </html>
+                  `);
+                  printWindow.document.close();
+                  setTimeout(() => {
+                    printWindow.print();
+                  }, 250);
+                }}
               >
                 <span className="Print_ico"></span>
                 인쇄
@@ -173,7 +251,7 @@ export default function ContractInfoStep({
                 <label>대표 가입자</label>
                 <div className="participant-info-details">
                   <div>{participants[0]?.name || ''}</div>
-                  <div>{participants[0]?.birthDate ? `${participants[0].birthDate.substring(0, 6)}-${participants[0].birthDate.substring(6, 7)}******` : ''}</div>
+                  <div>{participants[0]?.birthDate && participants[0]?.gender ? formatResidentNumber(participants[0].birthDate, participants[0].gender) : ''}</div>
                   <div>{participants[0]?.phone ? `${participants[0].phone.substring(0, 3)}-${participants[0].phone.substring(3, 7)}-${participants[0].phone.substring(7)}` : ''}</div>
                   <div>{participants[0]?.email1 && participants[0]?.email2 ? `${participants[0].email1}@${participants[0].email2}` : ''}</div>
                 </div>
