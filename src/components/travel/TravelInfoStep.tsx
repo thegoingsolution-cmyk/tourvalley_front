@@ -94,6 +94,8 @@ export default function TravelInfoStep({
 }: TravelInfoStepProps) {
   const planSelectionRef = useRef<HTMLDivElement>(null);
   const [isCountryModalOpen, setIsCountryModalOpen] = useState(false);
+  const [hasSelectedDepartureDate, setHasSelectedDepartureDate] = useState(false);
+  const [hasSelectedArrivalDate, setHasSelectedArrivalDate] = useState(false);
 
   // 보험료 계산 결과가 표시되면 해당 위치로 스크롤
   useEffect(() => {
@@ -131,8 +133,23 @@ export default function TravelInfoStep({
                 <input
                   type="date"
                   value={departureDate}
-                  onChange={(e) => onDepartureDateChange(e.target.value)}
-                  className="field-input date-input"
+                  onChange={(e) => {
+                    onDepartureDateChange(e.target.value);
+                    setHasSelectedDepartureDate(true);
+                  }}
+                  onClick={(e) => {
+                    // 달력을 열 때 이미 값이 있으면 선택된 것으로 간주
+                    if (e.currentTarget.value) {
+                      setHasSelectedDepartureDate(true);
+                    }
+                  }}
+                  onBlur={(e) => {
+                    // 달력에서 날짜를 선택한 후 포커스가 벗어날 때
+                    if (e.target.value) {
+                      setHasSelectedDepartureDate(true);
+                    }
+                  }}
+                  className={`field-input date-input ${hasSelectedDepartureDate ? 'has-value' : ''}`}
                 />
               </div>
               <span className="field-separator">/</span>
@@ -158,8 +175,23 @@ export default function TravelInfoStep({
                 <input
                   type="date"
                   value={arrivalDate}
-                  onChange={(e) => onArrivalDateChange(e.target.value)}
-                  className="field-input date-input"
+                  onChange={(e) => {
+                    onArrivalDateChange(e.target.value);
+                    setHasSelectedArrivalDate(true);
+                  }}
+                  onClick={(e) => {
+                    // 달력을 열 때 이미 값이 있으면 선택된 것으로 간주
+                    if (e.currentTarget.value) {
+                      setHasSelectedArrivalDate(true);
+                    }
+                  }}
+                  onBlur={(e) => {
+                    // 달력에서 날짜를 선택한 후 포커스가 벗어날 때
+                    if (e.target.value) {
+                      setHasSelectedArrivalDate(true);
+                    }
+                  }}
+                  className={`field-input date-input ${hasSelectedArrivalDate ? 'has-value' : ''}`}
                 />
               </div>
               <span className="field-separator">/</span>

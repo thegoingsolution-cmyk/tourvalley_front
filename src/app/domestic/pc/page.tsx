@@ -253,8 +253,10 @@ export default function PCDomesticPage() {
       if (age === null) return;
       if (!planInfo) return;
 
-      const updatedPlans = { ...planInfo };
       const medicalExpense = medicalExpenseValue !== undefined ? medicalExpenseValue : hasMedicalExpense;
+
+      // 빈 객체로 시작하여 성공한 플랜만 추가 (제외 시 표준플랜 등이 사라질 수 있음)
+      const updatedPlans: Record<string, PlanInfo> = {};
 
       // 각 플랜별 보험료 재계산
       for (const planType of ['실속플랜', '표준플랜'] as PlanType[]) {
@@ -278,11 +280,42 @@ export default function PCDomesticPage() {
           });
 
           const data = await response.json();
-          if (data.success && updatedPlans[planType]) {
-            updatedPlans[planType].premium = data.premium;
+          if (data.success) {
+            // 기존 planInfo에 플랜이 있으면 coverages를 유지, 없으면 기본 coverages 생성
+            if (planInfo[planType]) {
+              // 기존 planInfo의 coverages를 유지하면서 premium만 업데이트
+              updatedPlans[planType] = {
+                ...planInfo[planType],
+                premium: data.premium,
+              };
+            } else {
+              // planInfo에 없으면 새로운 플랜 정보 생성 (handleCalculate와 동일한 로직)
+              updatedPlans[planType] = {
+                type: planType,
+                premium: data.premium,
+                coverages: [
+                  { label: '상해사망후유장해', amount: '1억원' },
+                  { label: '상해입원의료비', amount: '1,000만원' },
+                  { label: '상해통원의료비', amount: '10만원' },
+                  ...(planType !== '실속플랜' ? [
+                    { label: '질병입원의료비', amount: '1,000만원' },
+                    { label: '질병통원의료비', amount: '10만원' },
+                  ] : []),
+                  { label: '휴대품손해(휴대폰은 보상제외)', amount: '50만원' },
+                ],
+              };
+            }
           }
         } catch (error) {
           console.error(`보험료 재계산 오류 (${planType}):`, error);
+        }
+      }
+
+      // 현재 선택된 플랜이 더 이상 유효하지 않으면 첫 번째 사용 가능한 플랜으로 변경
+      if (selectedPlan && !updatedPlans[selectedPlan]) {
+        const availablePlans = Object.keys(updatedPlans);
+        if (availablePlans.length > 0) {
+          setSelectedPlan(availablePlans[0] as PlanType);
         }
       }
 

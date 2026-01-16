@@ -2,7 +2,8 @@
 .footer-pc {
   width: 100%;
   background: #fff;
-  padding: 2rem 0;
+  padding-top: 2rem;
+  padding-bottom: 0.5rem;
   margin-top: 1rem;
 }
 
@@ -18,16 +19,18 @@
 }
 
 .footer-pc-disclaimer p {
-  font-size: 0.75rem;
-  color: #666;
-  line-height: 1.6;
+  font-size: 14px;
+  font-weight: 300;
+  letter-spacing: -1px;
+  color: #95979d;
+  line-height: 140%;
   text-align: center;
+  margin: 25px 0 15px 0;
 }
 
 .footer-pc-content {
   display: flex;
   gap: 2rem;
-  margin-bottom: 1.5rem;
   align-items: flex-start;
   justify-content: center;
 }
@@ -41,10 +44,13 @@
 }
 
 .footer-pc-info p {
-  font-size: 0.85rem;
-  color: #666;
-  margin-bottom: 0.5rem;
-  line-height: 1.6;
+  font-size: 14px;
+  font-weight: 300;
+  letter-spacing: -1px;
+  color: #95979d;
+  line-height: 140%;
+  text-align: left;
+  margin-left: 30px;
 }
 
 .footer-pc-copyright {

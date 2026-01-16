@@ -85,10 +85,10 @@ export default function Footer({ isMobile = false }: FooterProps) {
           <div className="footer-pc-logo">
             {!logoError ? (
               <img
-                src={getImagePath('/images/logo.png')}
+                src={getImagePath('/images/logo_f.png')}
                 alt="투어밸리 로고"
-                width={120}
-                height={40}
+                width={115}
+                height={37}
                 className="footer-logo"
                 style={{ objectFit: 'contain', maxWidth: '100%', height: 'auto' }}
                 onError={() => setLogoError(true)}
