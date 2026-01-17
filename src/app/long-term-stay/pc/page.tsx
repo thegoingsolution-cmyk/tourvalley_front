@@ -357,7 +357,27 @@ export default function PCLongTermStayPage() {
         }
 
         // 플랜 타입 결정 (STEP1에서 선택한 플랜 사용)
-        const planType = selectedPlan || '실속플랜';
+        const displayPlanType = selectedPlan || '실속플랜';
+
+        // 워킹홀리데이인 경우 플랜명 매핑: 프론트엔드 표시명 -> DB 저장명
+        let dbPlanType: string = displayPlanType;
+        let currencyPlanValue = currencyPlan || '원화';
+        
+        if (travelPurpose === '워킹홀리데이') {
+          const workingHolidayPlanMapping: Record<string, string> = {
+            '실속플랜': '워킹홀리데이실속플랜',
+            '표준플랜': '워킹홀리데이표준플랜',
+            '고급플랜': '워킹홀리데이(유로화플랜)',
+          };
+          dbPlanType = workingHolidayPlanMapping[displayPlanType] || displayPlanType;
+          
+          // 워킹홀리데이 플랜별 currency_plan 결정
+          if (displayPlanType === '고급플랜') {
+            currencyPlanValue = '외화';
+          } else {
+            currencyPlanValue = '원화';
+          }
+        }
 
         // 보험료 계산 API 호출
         const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
@@ -372,11 +392,11 @@ export default function PCLongTermStayPage() {
             insurance_type: travelPurpose || '유학/어학연수',
             age: age,
             gender: participant.gender,
-            plan_type: planType,
+            plan_type: dbPlanType, // DB에 저장된 플랜명 사용
             has_medical_expense: hasMedicalExpense ? 1 : 0,
             departure_date: departureDateTime,
             arrival_date: arrivalDateTime,
-            currency_plan: String(travelPurpose === '워킹홀리데이' ? '외화' : (currencyPlan || '원화')),
+            currency_plan: String(currencyPlanValue),
             travel_country: travelCountry,
           }),
         });
@@ -389,7 +409,7 @@ export default function PCLongTermStayPage() {
             name: participant.name,
             gender: participant.gender,
             birthDate: participant.birthDate,
-            planType: planType,
+            planType: displayPlanType, // 프론트엔드에는 표시용 플랜명 사용
             premium: data.premium,
           });
           totalPremium += data.premium;
@@ -472,15 +492,23 @@ export default function PCLongTermStayPage() {
 
       // 워킹홀리데이인 경우: 원화(실속, 표준) + 외화(고급) 플랜 계산
       if (travelPurpose === '워킹홀리데이') {
+        // 워킹홀리데이 플랜명 매핑: 프론트엔드 표시명 -> DB 저장명
+        const workingHolidayPlanMapping: Record<string, string> = {
+          '실속플랜': '워킹홀리데이실속플랜',
+          '표준플랜': '워킹홀리데이표준플랜',
+          '고급플랜': '워킹홀리데이(유로화플랜)',
+        };
+        
         // 원화 플랜: 실속, 표준
         const wonPlans: PlanType[] = ['실속플랜', '표준플랜'];
-        for (const planType of wonPlans) {
+        for (const displayPlanType of wonPlans) {
           try {
+            const dbPlanType = workingHolidayPlanMapping[displayPlanType] || displayPlanType;
             const requestBody = {
               insurance_type: String(travelPurpose || ''),
               age: Number(age),
               gender: String(genderValue || ''),
-              plan_type: String(planType),
+              plan_type: String(dbPlanType), // DB에 저장된 플랜명 사용
               has_medical_expense: hasMedicalExpense ? 1 : 0,
               departure_date: String(departureDateTime),
               arrival_date: String(arrivalDateTime),
@@ -499,8 +527,9 @@ export default function PCLongTermStayPage() {
             const data = await response.json();
             
             if (data.success) {
-              plans[planType] = {
-                type: planType,
+              // 프론트엔드에는 표시용 플랜명으로 저장
+              plans[displayPlanType] = {
+                type: displayPlanType,
                 premium: data.premium,
                 coverages: [
                   { label: '상해사망후유장해', amount: '1억원' },
@@ -509,20 +538,21 @@ export default function PCLongTermStayPage() {
                 ],
               };
             } else {
-              console.error(`보험료 계산 실패 (${planType}):`, data.message);
+              console.error(`보험료 계산 실패 (${displayPlanType} -> ${dbPlanType}):`, data.message);
             }
           } catch (error) {
-            console.error(`보험료 계산 오류 (${planType}):`, error);
+            console.error(`보험료 계산 오류 (${displayPlanType}):`, error);
           }
         }
 
         // 외화 플랜: 고급
         try {
+          const dbPlanType = workingHolidayPlanMapping['고급플랜'] || '고급플랜';
           const requestBody = {
             insurance_type: String(travelPurpose || ''),
             age: Number(age),
             gender: String(genderValue || ''),
-            plan_type: '고급플랜',
+            plan_type: String(dbPlanType), // '워킹홀리데이(유로화플랜)' 사용
             has_medical_expense: hasMedicalExpense ? 1 : 0,
             departure_date: String(departureDateTime),
             arrival_date: String(arrivalDateTime),
@@ -541,6 +571,7 @@ export default function PCLongTermStayPage() {
           const data = await response.json();
           
           if (data.success) {
+            // 프론트엔드에는 표시용 플랜명으로 저장
             plans['고급플랜'] = {
               type: '고급플랜',
               premium: data.premium,
@@ -551,7 +582,7 @@ export default function PCLongTermStayPage() {
               ],
             };
           } else {
-            console.error(`보험료 계산 실패 (고급플랜):`, data.message);
+            console.error(`보험료 계산 실패 (고급플랜 -> ${dbPlanType}):`, data.message);
           }
         } catch (error) {
           console.error(`보험료 계산 오류 (고급플랜):`, error);
