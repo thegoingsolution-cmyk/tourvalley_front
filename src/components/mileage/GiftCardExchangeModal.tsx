@@ -71,7 +71,7 @@ const GiftCardExchangeModal: React.FC<GiftCardExchangeModalProps> = ({
     setIsSubmitting(true);
 
     try {
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
       const response = await fetch(`${API_BASE_URL}/api/mileage/exchange-gift`, {
         method: 'POST',
         headers: {
@@ -195,18 +195,6 @@ const GiftCardExchangeModal: React.FC<GiftCardExchangeModalProps> = ({
                             </div>
                           </div>
                           <div className="tourGuard_form_tt mag5 tourG_mab03">
-                            <label htmlFor="tot_amount">금액</label>
-                            <input
-                              type="text"
-                              id="tot_amount"
-                              name="tot_amount"
-                              value={totalAmount.toLocaleString()}
-                              className="tourGuard_input_w02"
-                              readOnly
-                            />
-                            <div className="tourGuard_txt21">원</div>
-                          </div>
-                          <div className="tourGuard_form_tt mag5 tourG_mab03">
                             <label htmlFor="quantity">매수 선택</label>
                             <div className="tourGuard_bg_join tourGuard_input_cell tourGuard_input_cell01 tourGuard" style={{ marginRight: 0 }}>
                               <span className="tourGuard_ps_box">
@@ -227,6 +215,18 @@ const GiftCardExchangeModal: React.FC<GiftCardExchangeModalProps> = ({
                                 </select>
                               </span>
                             </div>
+                          </div>
+                          <div className="tourGuard_form_tt mag5 tourG_mab03">
+                            <label htmlFor="tot_amount">금액</label>
+                            <input
+                              type="text"
+                              id="tot_amount"
+                              name="tot_amount"
+                              value={totalAmount.toLocaleString()}
+                              className="tourGuard_input_w02"
+                              readOnly
+                            />
+                            <div className="tourGuard_txt21">원</div>
                           </div>
                           <div className="tour2023_mileC_Wrap">
                             <p className="tour2023_mileC_tt tourG_mab05">
