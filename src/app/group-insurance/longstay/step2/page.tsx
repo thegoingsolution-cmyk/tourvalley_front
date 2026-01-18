@@ -43,6 +43,37 @@ export default function LongStayInsuranceStep2Page() {
   const handleSubmit = () => {
     // 계약자(법인/단체) 정보 수집
     const contractCompanyInput = document.querySelector('input[name="contract_company"]') as HTMLInputElement;
+    const resno1Input = document.querySelector('input[name="resno1"]') as HTMLInputElement;
+    const resno2Input = document.querySelector('input[name="resno2"]') as HTMLInputElement;
+    const resno3Input = document.querySelector('input[name="resno3"]') as HTMLInputElement;
+    const chargeInput = document.querySelector('input[name="charge"]') as HTMLInputElement;
+    const positionInput = document.querySelector('input[name="position"]') as HTMLInputElement;
+    const telno1Input = document.querySelector('input[name="contract_telno1"]') as HTMLInputElement;
+    const telno2Input = document.querySelector('input[name="contract_telno2"]') as HTMLInputElement;
+    const telno3Input = document.querySelector('input[name="contract_telno3"]') as HTMLInputElement;
+    const ctelNo1Select = document.querySelector('select[name="contract_ctel_no1"]') as HTMLSelectElement;
+    const ctelNo2Input = document.querySelector('input[name="contract_ctel_no2"]') as HTMLInputElement;
+    const ctelNo3Input = document.querySelector('input[name="contract_ctel_no3"]') as HTMLInputElement;
+    const email2SelSelect = document.querySelector('select[name="email2_sel"]') as HTMLSelectElement;
+    
+    // 사업자번호 합치기 (3-2-5 형식)
+    const businessNumber = [resno1Input?.value || '', resno2Input?.value || '', resno3Input?.value || '']
+      .filter(v => v).join('-');
+    
+    // 전화번호 합치기
+    const phone = [telno1Input?.value || '', telno2Input?.value || '', telno3Input?.value || '']
+      .filter(v => v).join('-');
+    
+    // 핸드폰번호 합치기
+    const mobilePhone = [
+      ctelNo1Select?.value || '', 
+      ctelNo2Input?.value || '', 
+      ctelNo3Input?.value || ''
+    ].filter(v => v).join('-');
+    
+    // 이메일 합치기
+    const emailDomain = email2SelSelect?.value || email2;
+    const email = [email1, emailDomain].filter(v => v).join('@');
     
     // 여행목적 코드를 insurance_type으로 매핑
     const getTravelPurpose = (goalCode: string): string => {
@@ -62,6 +93,12 @@ export default function LongStayInsuranceStep2Page() {
     // 피보험자 정보 수집
     const step2Data: any = {
       contractor_name: contractCompanyInput?.value || '',
+      contractor_business_number: businessNumber || '',
+      contractor_contact_person: chargeInput?.value || '',
+      contractor_position: positionInput?.value || '',
+      contractor_phone: phone || '',
+      contractor_mobile_phone: mobilePhone || '',
+      contractor_email: email || '',
       travel_purpose: getTravelPurpose(tourGoal),
     };
     
