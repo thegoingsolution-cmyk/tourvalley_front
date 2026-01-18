@@ -129,7 +129,7 @@ export default function DomesticInsurancePopupPage() {
                               onChange={(e) => setStartHour(e.target.value)}
                             >
                               {Array.from({ length: 24 }, (_, i) => i + 1).map(h => (
-                                <option key={h} value={String(h).padStart(2, '0')}>{h}시</option>
+                                <option key={h} value={String(h).padStart(2, '0')}>{String(h).padStart(2, '0')}시</option>
                               ))}
                             </select>
                           </span>
@@ -158,7 +158,7 @@ export default function DomesticInsurancePopupPage() {
                               onChange={(e) => setEndHour(e.target.value)}
                             >
                               {Array.from({ length: 24 }, (_, i) => i + 1).map(h => (
-                                <option key={h} value={String(h).padStart(2, '0')}>{h}시</option>
+                                <option key={h} value={String(h).padStart(2, '0')}>{String(h).padStart(2, '0')}시</option>
                               ))}
                             </select>
                           </span>
@@ -238,7 +238,7 @@ export default function DomesticInsurancePopupPage() {
           <a href="#" onClick={(e) => { e.preventDefault(); handleSubmit(); }}>설계하기</a>
         </div>
 
-        <section className="tour2023_pc_insuBox">
+        {/* <section className="tour2023_pc_insuBox">
           <div className="tour2023_pc_insuBox01">
             <span className="tour2023_pc_txt01">투어밸리 회원님은 회원 로그인후 이용하세요. (마일리지 적립)</span>
           </div>
@@ -253,7 +253,7 @@ export default function DomesticInsurancePopupPage() {
             </span>
           </div>
           <a href="#"><span className="tour2023_pc_joinTxt01">회원가입&nbsp;&gt;</span></a>
-        </section>
+        </section> */}
 
         <div className="Box_line01 mtb20">
           <p className="txt">

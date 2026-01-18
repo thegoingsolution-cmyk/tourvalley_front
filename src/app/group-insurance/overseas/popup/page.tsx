@@ -12,6 +12,7 @@ export default function OverseasInsurancePopupPage() {
   const [tourPlace, setTourPlace] = useState('');
   const [tourGoal, setTourGoal] = useState('');
   const [tourNum, setTourNum] = useState('1');
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const now = new Date();
@@ -168,7 +169,7 @@ export default function OverseasInsurancePopupPage() {
                               onChange={(e) => setStartHour(e.target.value)}
                             >
                               {Array.from({ length: 24 }, (_, i) => i + 1).map(h => (
-                                <option key={h} value={String(h).padStart(2, '0')}>{h}시</option>
+                                <option key={h} value={String(h).padStart(2, '0')}>{String(h).padStart(2, '0')}시</option>
                               ))}
                             </select>
                           </span>
@@ -197,7 +198,7 @@ export default function OverseasInsurancePopupPage() {
                               onChange={(e) => setEndHour(e.target.value)}
                             >
                               {Array.from({ length: 24 }, (_, i) => i + 1).map(h => (
-                                <option key={h} value={String(h).padStart(2, '0')}>{h}시</option>
+                                <option key={h} value={String(h).padStart(2, '0')}>{String(h).padStart(2, '0')}시</option>
                               ))}
                             </select>
                           </span>
@@ -295,13 +296,41 @@ export default function OverseasInsurancePopupPage() {
 
         <div className="con03">
           <div>
-            <span className="con3Tit">GUIDE</span>
-            <ul>
-              <li>- 해외여행보험의 보험기간은 최대 3개월입니다.<br />3개월이 넘는 경우에는 목적에 따라 해외장기체류 보험의 유학생플랜, 어학연수 플랜, 교환교수(학생)플랜, 해외장기출장(주재원)플랜을 선택하시기 바랍니다.</li>
-              <li>- 이미 출국하셨거나 해외에 거주하는 경우 여행보험에 가입하실 수 없습니다.</li>
-              <li>- 2개 이상의 국가를 여행하는 경우 최초 방문하는 국가를 선택하시기 바랍니다.(단, 여행국가 중에 체코가 포함되는 경우 체코를 선택하시기 바랍니다.)</li>
-              <li>- 여행예정인 국가 중 보험인수 제한 국가가 포함되어 있을 경우 여행 보험 가입이 불가능합니다.</li>
-            </ul>
+            {currentPage === 1 ? (
+              <>
+                <span className="con3Tit">GUIDE</span>
+                <ul>
+                  <li>- 해외여행보험의 보험기간은 최대 3개월입니다.<br />3개월이 넘는 경우에는 목적에 따라 해외장기체류 보험의 유학생플랜, 어학연수 플랜, 교환교수(학생)플랜, 해외장기출장(주재원)플랜을 선택하시기 바랍니다.</li>
+                  <li>- 이미 출국하셨거나 해외에 거주하는 경우 여행보험에 가입하실 수 없습니다.</li>
+                  <li>- 2개 이상의 국가를 여행하는 경우 최초 방문하는 국가를 선택하시기 바랍니다.(단, 여행국가 중에 체코가 포함되는 경우 체코를 선택하시기 바랍니다.)</li>
+                  <li>- 여행예정인 국가 중 보험인수 제한 국가가 포함되어 있을 경우 여행 보험 가입이 불가능합니다.</li>
+                </ul>
+              </>
+            ) : (
+              <>
+                <span className="con3Tit">중복가입 유의사항</span>
+                <ul>
+                  <li>- 이미 실손 의료보험에 가입하셨다면 해외여행보험의 <span style={{ color: 'red' }}>국내의료비를 중복 가입하는 것은 권장하지 않습니다.</span></li>
+                  <li>- 국내의료비를 중복가입 하더라도 보험금은 실제 발생한 손해액을 기준으로 지급하므로 중복가입의 실익이 낮을 수 있습니다.</li>
+                  <li>- <span style={{ color: 'red' }}>실손 의료보험 가입자는 국내의료비 부담보 플랜을 선택하시기 바랍니다.</span></li>
+                  <li>- 실손 의료보험 계약보유여부 확인방법<br />한국신용정보원보험신용정보(<span style={{ color: '#15aefd' }}>www.credit4u.or.kr</span>)<br />에서 이미 가입한 실손의료보험을 조회하실 수 있습니다.</li>
+                </ul>
+              </>
+            )}
+            <div style={{ position: 'absolute', bottom: '10px', left: '50%', transform: 'translateX(-50%)', textAlign: 'center', color: '#16569a', fontSize: '14px', fontWeight: 'bold' }}>
+              <span 
+                onClick={() => setCurrentPage(1)} 
+                style={{ cursor: 'pointer', marginRight: '10px', color: currentPage === 1 ? '#16569a' : '#999' }}
+              >
+                1
+              </span>
+              <span 
+                onClick={() => setCurrentPage(2)} 
+                style={{ cursor: 'pointer', color: currentPage === 2 ? '#16569a' : '#999' }}
+              >
+                2
+              </span>
+            </div>
           </div>
         </div>
 
@@ -309,7 +338,7 @@ export default function OverseasInsurancePopupPage() {
           <a href="#" onClick={(e) => { e.preventDefault(); handleSubmit(); }}>설계하기</a>
         </div>
 
-        <section className="tour2023_pc_insuBox">
+        {/* <section className="tour2023_pc_insuBox">
           <div className="tour2023_pc_insuBox01">
             <span className="tour2023_pc_txt01">투어밸리 회원님은 회원 로그인후 이용하세요. (마일리지 적립)</span>
           </div>
@@ -324,7 +353,7 @@ export default function OverseasInsurancePopupPage() {
             </span>
           </div>
           <a href="#"><span className="tour2023_pc_joinTxt01">회원가입&nbsp;&gt;</span></a>
-        </section>
+        </section> */}
 
         <div className="Box_line01 mtb20">
           <p className="txt">

@@ -659,13 +659,14 @@ select::-ms-expand {
 /* 가이드 박스 */
 .con03 {
   width: 259px;
-  height: 324px;
+  height: 346px;
   border: 1px solid #cacaca;
   float: left;
   font-size: 12.5px;
   margin-bottom: 32px;
   padding: 10px 10px 10px 16px;
   position: relative;
+  box-sizing: border-box;
 }
 
 .con03::after {
@@ -702,8 +703,10 @@ select::-ms-expand {
   margin-bottom: 5px;
   font-size: 12.5px;
   color: #333;
-  line-height: 1.6;
+  line-height: 1.4;
   font-family: 'Nanum Gothic', sans-serif;
+  font-weight: 300;
+  letter-spacing: -1.7px;
 }
 
 /* 설계하기 버튼 */
