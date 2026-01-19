@@ -43,6 +43,11 @@
   margin-bottom: 0;
 }
 
+.estimate-step1-page .form-container {
+  width: 100%;
+  overflow: visible;
+}
+
 .estimate-step1-page .form-card {
   background: #ffffff;
   border-radius: 16px;
@@ -111,7 +116,7 @@
 
 /* form-title도 tour2023_title01와 동일하게 */
 .estimate-step1-page .form-title {
-  font-size: 27px;
+  font-size: 23px;
   font-weight: bold;
   color: #000;
   text-align: center;
@@ -246,34 +251,39 @@
 /* Tab Menu */
 .estimate-step1-page .menu_wrap_tab {
   display: flex;
-  gap: 10px;
   margin-bottom: 30px;
-  border-bottom: 2px solid #e0e0e0;
 }
 
-.estimate-step1-page .menu_tab {
+.estimate-step1-page .menu_wrap_tab .menu_tab {
+  width: 33.333%;
+  position: relative;
   flex: 1;
   text-align: center;
-  padding: 15px 0;
   cursor: pointer;
   border-bottom: 3px solid transparent;
   transition: all 0.3s;
 }
 
 .estimate-step1-page .menu_tab.on {
-  border-bottom-color: #1b37e1;
+  border-bottom-color: transparent;
 }
 
-.estimate-step1-page .menu_tab a {
+.estimate-step1-page .menu_wrap_tab .menu_tab a {
   display: block;
-  font-size: 16px;
-  color: #666;
+  height: 35px;
+  font-size: 20px;
+  color: #d4d5d9;
+  border-bottom: 5px solid #e0e3eb;
+  margin-bottom: 1px;
+  font-family: 'NanumSquareNeoTTF-cBd';
   text-decoration: none;
 }
 
-.estimate-step1-page .menu_tab.on a {
+.estimate-step1-page .menu_wrap_tab .menu_tab.on a {
+  height: 35px;
+  border-bottom: 5px solid #1b37e1;
   color: #1b37e1;
-  font-weight: bold;
+  font-family: 'NanumSquareNeoTTF-dEb';
 }
 
 /* Form */
@@ -334,6 +344,22 @@
 
 .estimate-step1-page .field-separator {
   display: none;
+}
+
+/* tourG_line 스타일 - domestic/pc/page.css와 동일한 구분선 */
+.estimate-step1-page .field-row.tourG_line:after {
+  content: '';
+  position: absolute;
+  display: inline-block;
+  width: 47px;
+  height: 50px;
+  top: -4px;
+  left: 40%;
+  margin: 0px 0 0px 0px;
+  border-bottom: 1px solid #d5d7dd;
+  vertical-align: middle;
+  transform: rotate(297deg);
+  z-index: 0;
 }
 
 .estimate-step1-page .field-label {
@@ -475,8 +501,21 @@
 
 .estimate-step1-page .tourGuard_ps_box {
   position: relative;
+  width: 100%;
+  padding: 0;
 }
 
+.estimate-step1-page .tourGuard_ps_box .tourGuard_sel_icon {
+  position: absolute;
+  right: 17px;
+  top: calc(50% + 11.5px);
+  transform: translateY(-50%);
+  width: auto;
+  height: 10px;
+  pointer-events: none;
+}
+
+.estimate-step1-page .tourGuard_ps_box select,
 .estimate-step1-page .tourGuard_sel {
   width: 100%;
   height: 32px;
@@ -485,7 +524,7 @@
   background: transparent;
   font-size: 18px;
   color: #000;
-  padding: 0 10px;
+  padding: 0 30px 0 10px;
   box-sizing: border-box;
   appearance: none;
   -webkit-appearance: none;
@@ -500,39 +539,48 @@
   display: block;
   width: 100%;
   padding: 18px;
-  background: #1b37e1;
+  background: #2c3fb3;
   color: #fff;
   text-align: center;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: 600;
   border-radius: 8px;
   text-decoration: none;
   border: none;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background 0.2s;
 }
 
-.estimate-step1-page .tourGuard_btn_b:hover {
-  background: #1529c4;
+.estimate-step1-page .tourGuard_btn_b:hover:not(:disabled) {
+  background: #1e33c4;
+}
+
+.estimate-step1-page .tourGuard_btn_b:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  color: #999;
 }
 
 .estimate-step1-page .tour2023_btn01 {
-  background: #1b37e1;
+  background: #2c3fb3;
 }
 
 /* Reference Section */
 .estimate-step1-page .tourG_box_know {
-  background: #f8f9fa;
+  border: 1px solid #e6e8ed;
   padding: 25px;
   border-radius: 8px;
   margin-top: 30px;
 }
 
 .estimate-step1-page .tourG_know_tit {
-  font-size: 18px;
-  font-weight: bold;
-  color: #333;
+  font-size: 15px;
+  color: #5e5e5e;
+  text-align: left;
+  line-height: 130%;
+  letter-spacing: -1px;
   margin-bottom: 15px;
+  font-weight: normal;
 }
 
 .estimate-step1-page .tourG_know_s {
@@ -552,31 +600,72 @@
   margin: 0;
 }
 
-.estimate-step1-page .know_dot {
-  width: 6px;
-  height: 6px;
-  background: #666;
-  border-radius: 50%;
-  margin-top: 8px;
+.estimate-step1-page .tourG_know_s li.know_dot {
+  display: inline-block;
+  width: 3px;
+  height: 3px;
+  background-color: #a7a7a7;
+  margin-right: 4px;
+  margin-bottom: 4px;
+  margin-left: 0px;
+  margin-top: 7px;
+  vertical-align: top;
   flex-shrink: 0;
 }
 
 .estimate-step1-page .tourG_know_txt {
-  font-size: 14px;
-  color: #666;
-  line-height: 1.6;
+  font-size: 13px;
+  color: #9b9b9b;
+  text-align: left;
+  line-height: 120%;
+  letter-spacing: -0.8px;
+  width: 97%;
+  padding-top: 1px;
   flex: 1;
+  font-weight: normal;
 }
 
 .estimate-step1-page .tour2023_blue {
-  color: #1b37e1;
-  font-weight: bold;
+  color: #1b37e1 !important;
+}
+
+/* 안내 문구 - domestic/pc/page.css와 동일 */
+.estimate-step1-page .tour2023_txt01 {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.estimate-step1-page .tour2023_grey {
+  color: #a5a5a5;
+}
+
+.estimate-step1-page .tourGuard_inline {
+  position: relative;
+  width: 100%;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: flex-start;
+}
+
+.estimate-step1-page .tourGuard_inline li {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.estimate-step1-page .tourGuard_inline_t01 {
+  margin-right: 5px;
+  color: #a5a5a5;
+}
+
+.estimate-step1-page .tourGuard_inline_t02 {
+  width: 95%;
+  color: #a5a5a5;
 }
 
 /* Utility Classes */
-.estimate-step1-page .prow_01 {
-  padding: 20px 0;
-}
 
 .estimate-step1-page .tourG_mat10 {
   margin-top: 35px;
@@ -598,8 +687,20 @@
   margin-bottom: 5px;
 }
 
+.estimate-step1-page .tourG_mat06 {
+  margin-top: 15px;
+}
+
 .estimate-step1-page .tourG_mat08 {
   margin-top: 8px;
+}
+
+.estimate-step1-page .tourG_mab04 {
+  margin-bottom: 15px;
+}
+
+.estimate-step1-page .tourG_mleft04 {
+  margin-left: 5px;
 }
 
 .estimate-step1-page .tourG_pat02 {

@@ -8,6 +8,7 @@ import ServiceModal from '@/components/ServiceModal';
 import AccidentFreeCashModal from '@/components/travel/AccidentFreeCashModal';
 import ExcelUploadModal from '@/components/travel/ExcelUploadModal';
 import EstimateCompletionModal from '@/components/estimate/EstimateCompletionModal';
+import StepIndicator from '@/components/travel/StepIndicator';
 import { getImagePath } from '@/utils/path';
 import './page.css';
 
@@ -22,6 +23,7 @@ interface ContractorInfo {
   phone: string;
   email1: string;
   email2: string;
+  customEmail?: string;
 }
 
 function PCStep2PageContent() {
@@ -51,6 +53,7 @@ function PCStep2PageContent() {
     phone: '',
     email1: '',
     email2: '',
+    customEmail: '',
   });
   
   // 피보험자 리스트
@@ -123,6 +126,10 @@ function PCStep2PageContent() {
         alert('이메일 주소를 입력해주세요.');
         return;
       }
+      if (contractorInfo.email2 === '직접입력' && !contractorInfo.customEmail) {
+        alert('이메일 도메인을 입력해주세요.');
+        return;
+      }
       
       // 피보험자 정보 검증
       for (const participant of participants) {
@@ -141,7 +148,8 @@ function PCStep2PageContent() {
     setIsSubmitting(true);
     
     try {
-      const email = `${contractorInfo.email1}@${contractorInfo.email2}`;
+      const emailDomain = contractorInfo.email2 === '직접입력' ? contractorInfo.customEmail : contractorInfo.email2;
+      const email = `${contractorInfo.email1}@${emailDomain}`;
       
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/estimate/submit`, {
         method: 'POST',
@@ -220,61 +228,37 @@ function PCStep2PageContent() {
     <div className="estimate-step2-page">
       <Header isMobile={false} />
       
-      <section 
-        className="main_bg01 main_bg01_w"
+      <main 
+        className="estimate-content-pc"
         style={{ backgroundImage: `url(${getImagePath('/202309_main_bg02.png')})` }}
       >
-        <div className="container_w">
-          {/* 오른쪽 고정 버튼 */}
-          <div className="container_box_w">
-            <a href="#" onClick={(e) => { e.preventDefault(); setShowCashModal(true); }}>
-              <div className="fixedRight_b01">
-                <p className="icon_cash"><span className="icon_cash01"></span></p>
-                <p className="fixedRight_txt01">무사고캐시란?</p>
-              </div>
-            </a>
+        {/* 오른쪽 고정 버튼 */}
+        <div className="container_box_w">
+          <a href="#" onClick={(e) => { e.preventDefault(); setShowCashModal(true); }}>
+            <div className="fixedRight_b01">
+              <p className="icon_cash"><span className="icon_cash01"></span></p>
+              <p className="fixedRight_txt01">무사고캐시란?</p>
+            </div>
+          </a>
 
-            <a href="#" onClick={(e) => { e.preventDefault(); setShowServiceModal(true); }}>
-              <div className="fixedRight_b02" style={{}}>
-                <p className="icon_menu"><span className="icon_menu01"></span></p>
-                <p className="fixedRight_txt02">서비스<br/>전체보기</p>
-              </div>
-            </a>
-          </div>
+          <a href="#" onClick={(e) => { e.preventDefault(); setShowServiceModal(true); }}>
+            <div className="fixedRight_b02" style={{}}>
+              <p className="icon_menu"><span className="icon_menu01"></span></p>
+              <p className="fixedRight_txt02">서비스<br/>전체보기</p>
+            </div>
+          </a>
+        </div>
 
-          <div className="container_box">
-            <form name="inputForm" method="POST">
-              <div className="prow_01">
-                <div className="tour2023_BWrap tourG_mat13 tourG_mab05">
-                  <p className="tour2023_title17">여행자보험 견적신청</p>
-                  <section className="tour2023_step_w">
-                    <div className="tour2023_step_line tour">
-                      <ul className="tour2023_step">
-                        <li className="tour2023_step01">
-                          <div className="tour2023_step_num">
-                            <span className="tour2023_step_num01">1</span>
-                          </div>
-                          <div className="tour2023_step_txt">여행정보</div>
-                        </li>
-                      </ul>
-                      <ul className="tour2023_step on">
-                        <li className="tour2023_step01">
-                          <div className="tour2023_step_num">
-                            <span className="tour2023_step_num01">2</span>
-                          </div>
-                          <div className="tour2023_step_txt">정보동의</div>
-                        </li>
-                      </ul>
-                      <ul className="tour2023_step">
-                        <li className="tour2023_step01">
-                          <div className="tour2023_step_num">
-                            <span className="tour2023_step_num01">3</span>
-                          </div>
-                          <div className="tour2023_step_txt">신청완료</div>
-                        </li>
-                      </ul>
-                    </div>
-                  </section>
+        <div className="form-section">
+          <div className="form-container">
+            <div className="form-card">
+              <form name="inputForm" method="POST">
+                {/* Header with title and steps */}
+                <div className="form-header tourG_mat13 tourG_mab05">
+                  <StepIndicator 
+                    currentStep={2} 
+                    stepLabels={['여행정보', '정보동의', '신청완료']}
+                  />
                 </div>
 
                 {!showParticipantList ? (
@@ -317,85 +301,163 @@ function PCStep2PageContent() {
                         신청자 정보
                       </p>
                       <section className="tourGuard_Info">
-                        <div className="form-fields">
-                          {/* 이름 */}
-                          <div className="field-row">
-                            <div className="field-group">
-                              <label className="field-label">이름</label>
-                              <input
-                                type="text"
-                                className="field-input"
-                                value={contractorInfo.name}
-                                onChange={(e) => setContractorInfo({ ...contractorInfo, name: e.target.value })}
-                                placeholder="이름입력"
-                                maxLength={15}
-                              />
-                            </div>
-                          </div>
-                          
-                          {/* 휴대폰 번호 */}
-                          <div className="field-row">
-                            <div className="field-group">
-                              <label className="field-label">휴대폰 번호</label>
-                              <input
-                                type="text"
-                                className="field-input"
-                                value={contractorInfo.phone}
+                        {/* 이름 */}
+                        <div className="tourGuard_form_tt mag5 tourG_mab03">
+                          <label htmlFor="contractor_name">이름</label>
+                          <input
+                            type="text"
+                            id="contractor_name"
+                            name="contractor_name"
+                            value={contractorInfo.name}
+                            maxLength={15}
+                            placeholder="이름입력"
+                            className="tourGuard_input_w01"
+                            onChange={(e) => setContractorInfo({ ...contractorInfo, name: e.target.value })}
+                            style={{
+                              height: '32px',
+                              paddingLeft: '10px',
+                              color: '#000',
+                              fontSize: '18px',
+                              letterSpacing: '0px',
+                              marginTop: '23px',
+                              marginLeft: '10px',
+                              paddingTop: '0px',
+                            }}
+                          />
+                        </div>
+                        
+                        {/* 이메일 주소 */}
+                        <div className="tourGuard_form_tt mag5 tourG_mab03">
+                          <label htmlFor="email1">이메일 주소</label>
+                          <input
+                            type="text"
+                            id="email1"
+                            name="email1"
+                            maxLength={20}
+                            placeholder="아이디"
+                            className="tourGuard_input_w01"
+                            value={contractorInfo.email1}
+                            onChange={(e) => setContractorInfo({ ...contractorInfo, email1: e.target.value })}
+                            style={{
+                              height: '32px',
+                              paddingLeft: '10px',
+                              color: '#000',
+                              fontSize: '18px',
+                              letterSpacing: '0px',
+                              marginTop: '23px',
+                              marginLeft: '10px',
+                              paddingTop: '0px',
+                            }}
+                          />
+                          <div 
+                            className="tourGuard_txt03"
+                            style={{
+                              marginTop: '23px',
+                              marginLeft: '10px',
+                            }}
+                          >@</div>
+                          <input
+                            type="text"
+                            id="email2"
+                            name="email2"
+                            maxLength={20}
+                            className="tourGuard_input_w01"
+                            value={contractorInfo.email2 === '직접입력' ? (contractorInfo.customEmail || '') : (contractorInfo.email2 || '')}
+                            onChange={(e) => {
+                              if (contractorInfo.email2 === '직접입력') {
+                                setContractorInfo({ ...contractorInfo, customEmail: e.target.value });
+                              } else {
+                                setContractorInfo({ ...contractorInfo, email2: e.target.value });
+                              }
+                            }}
+                            readOnly={contractorInfo.email2 !== '직접입력' && contractorInfo.email2 !== '' && contractorInfo.email2 !== undefined}
+                            style={{
+                              height: '32px',
+                              paddingLeft: '10px',
+                              color: '#000',
+                              fontSize: '18px',
+                              letterSpacing: '0px',
+                              marginTop: '23px',
+                              marginLeft: '10px',
+                              paddingTop: '0px',
+                            }}
+                          />
+                          <div 
+                            className="tourGuard_input_cell08 tourGuard_input_cell09 tourGuard"
+                            style={{
+                              marginTop: '23px',
+                              marginLeft: '10px',
+                              marginRight: '15px',
+                              display: 'inline-block',
+                              verticalAlign: 'middle',
+                            }}
+                          >
+                            <span className="tourGuard_ps_box" style={{
+                              position: 'relative',
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              height: '32px',
+                              lineHeight: '32px',
+                            }}>
+                              <select
+                                className="tourGuard_sel"
+                                id="select_email"
+                                name="select_email"
+                                value={contractorInfo.email2 || ''}
                                 onChange={(e) => {
-                                  const value = e.target.value.replace(/\D/g, '').slice(0, 11);
-                                  setContractorInfo({ ...contractorInfo, phone: value });
+                                  const email2 = e.target.value;
+                                  setContractorInfo({ 
+                                    ...contractorInfo, 
+                                    email2: email2,
+                                    customEmail: email2 !== '직접입력' ? '' : contractorInfo.customEmail
+                                  });
                                 }}
-                                placeholder="숫자만 입력해주세요."
-                                maxLength={11}
-                              />
-                            </div>
+                                style={{
+                                  flex: 1,
+                                  appearance: 'none',
+                                  WebkitAppearance: 'none',
+                                  MozAppearance: 'none',
+                                }}
+                              >
+                                <option value="">선택</option>
+                                <option value="gmail.com">gmail.com</option>
+                                <option value="naver.com">naver.com</option>
+                                <option value="daum.net">daum.net</option>
+                                <option value="nate.com">nate.com</option>
+                                <option value="hotmail.com">hotmail.com</option>
+                                <option value="직접입력">직접입력</option>
+                              </select>
+                              <img src="/icons/icon_sel.png" alt="선택" style={{ width: 'auto', height: '7px', marginLeft: '8px', pointerEvents: 'none' }} />
+                            </span>
                           </div>
-                          
-                          {/* 이메일 주소 */}
-                          <div className="field-row">
-                            <div className="field-group" style={{ flex: 1 }}>
-                              <label className="field-label">이메일 주소</label>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <input
-                                  type="text"
-                                  className="field-input"
-                                  value={contractorInfo.email1}
-                                  onChange={(e) => setContractorInfo({ ...contractorInfo, email1: e.target.value })}
-                                  placeholder="아이디"
-                                  maxLength={20}
-                                  style={{ flex: 1 }}
-                                />
-                                <span style={{ fontSize: '16px', color: '#999', flexShrink: 0 }}>@</span>
-                                <input
-                                  type="text"
-                                  className="field-input"
-                                  value={contractorInfo.email2}
-                                  onChange={(e) => setContractorInfo({ ...contractorInfo, email2: e.target.value })}
-                                  placeholder=""
-                                  maxLength={20}
-                                  style={{ flex: 1 }}
-                                />
-                                <select
-                                  className="field-input"
-                                  onChange={(e) => {
-                                    if (e.target.value) {
-                                      setContractorInfo({ ...contractorInfo, email2: e.target.value });
-                                    }
-                                  }}
-                                  style={{
-                                    flex: 1,
-                                    minWidth: '120px',
-                                    paddingRight: '24px',
-                                  }}
-                                >
-                                  <option value="">선택</option>
-                                  <option value="gmail.com">gmail.com</option>
-                                  <option value="naver.com">naver.com</option>
-                                  <option value="daum.net">daum.net</option>
-                                </select>
-                              </div>
-                            </div>
-                          </div>
+                        </div>
+                        
+                        {/* 휴대폰 번호 */}
+                        <div className="tourGuard_form_tt mag5 tourG_mab03" style={{ paddingRight: '20px', position: 'relative' }}>
+                          <label htmlFor="phone">휴대폰 번호</label>
+                          <input
+                            type="text"
+                            id="phone"
+                            value={contractorInfo.phone}
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/\D/g, '').slice(0, 11);
+                              setContractorInfo({ ...contractorInfo, phone: value });
+                            }}
+                            placeholder="숫자만 입력해주세요."
+                            className="tourGuard_input_w01"
+                            style={{
+                              width: '70%',
+                              height: '32px',
+                              paddingLeft: '10px',
+                              color: '#000',
+                              fontSize: '18px',
+                              letterSpacing: '0px',
+                              marginTop: '23px',
+                              marginLeft: '10px',
+                              paddingTop: '0px',
+                            }}
+                          />
                         </div>
                       </section>
                     </div>
@@ -562,9 +624,6 @@ function PCStep2PageContent() {
                     <div className="tour2023_txt01 tour2023_grey tourG_mleft04 tourG_mat06" style={{
                       marginTop: '20px',
                       marginBottom: '20px',
-                      fontSize: '14px',
-                      color: '#666',
-                      lineHeight: '1.6',
                     }}>
                       <ul className="tourGuard_inline" style={{ listStyle: 'none', padding: 0, margin: '10px 0' }}>
                         <li className="tourGuard_inline_t01" style={{ display: 'inline', marginRight: '5px' }}>※</li>
@@ -604,25 +663,25 @@ function PCStep2PageContent() {
                     </a>
                   </div>
                 </section>
-              </div>
 
-              <input type="hidden" name="product_cd" value={productCd} />
-              <input type="hidden" name="start_year" value={startDate.split('-')[0]} />
-              <input type="hidden" name="start_month" value={startDate.split('-')[1]} />
-              <input type="hidden" name="start_day" value={startDate.split('-')[2]} />
-              <input type="hidden" name="start_date" value={startDate} />
-              <input type="hidden" name="start_hour" value={startHour} />
-              <input type="hidden" name="end_year" value={endDate.split('-')[0]} />
-              <input type="hidden" name="end_month" value={endDate.split('-')[1]} />
-              <input type="hidden" name="end_day" value={endDate.split('-')[2]} />
-              <input type="hidden" name="end_date" value={endDate} />
-              <input type="hidden" name="end_hour" value={endHour} />
-              <input type="hidden" name="tour_num" value={tourNum} />
-              <input type="hidden" name="tour_day" value={tourDay} />
-            </form>
+                <input type="hidden" name="product_cd" value={productCd} />
+                <input type="hidden" name="start_year" value={startDate.split('-')[0]} />
+                <input type="hidden" name="start_month" value={startDate.split('-')[1]} />
+                <input type="hidden" name="start_day" value={startDate.split('-')[2]} />
+                <input type="hidden" name="start_date" value={startDate} />
+                <input type="hidden" name="start_hour" value={startHour} />
+                <input type="hidden" name="end_year" value={endDate.split('-')[0]} />
+                <input type="hidden" name="end_month" value={endDate.split('-')[1]} />
+                <input type="hidden" name="end_day" value={endDate.split('-')[2]} />
+                <input type="hidden" name="end_date" value={endDate} />
+                <input type="hidden" name="end_hour" value={endHour} />
+                <input type="hidden" name="tour_num" value={tourNum} />
+                <input type="hidden" name="tour_day" value={tourDay} />
+              </form>
+            </div>
           </div>
         </div>
-      </section>
+      </main>
 
       <Footer />
 

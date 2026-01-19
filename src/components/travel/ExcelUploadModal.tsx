@@ -90,10 +90,25 @@ export default function ExcelUploadModal({
 
             const name = String(row[0] || '').trim();
             const genderStr = String(row[1] || '').trim();
-            const birthDateStr = String(row[2] || '').trim().replace(/[^0-9]/g, '');
+            let birthDateStr = String(row[2] || '').trim().replace(/[^0-9]/g, '');
 
             // 유효성 검증
             if (!name || !genderStr || !birthDateStr) continue;
+            
+            // 주민번호 형태(13자리)인 경우 생년월일(앞 6자리)만 추출
+            if (birthDateStr.length === 13) {
+              const yy = birthDateStr.substring(0, 2);
+              const mm = birthDateStr.substring(2, 4);
+              const dd = birthDateStr.substring(4, 6);
+              // 주민번호 앞자리가 50 이상이면 1900년대, 아니면 2000년대
+              const yearPrefix = parseInt(yy) >= 50 ? '19' : '20';
+              birthDateStr = `${yearPrefix}${yy}${mm}${dd}`;
+            } else if (birthDateStr.length > 8) {
+              // 8자리보다 긴 경우 앞 8자리만 사용
+              birthDateStr = birthDateStr.substring(0, 8);
+            }
+            
+            // 최종 검증: 8자리가 아니면 건너뜀
             if (birthDateStr.length !== 8) continue;
 
             // 성별 변환: "남" -> "남자", "여" -> "여자"

@@ -132,16 +132,17 @@ export default function PCStep1Page() {
         </div>
 
         <div className="form-section">
-          <div className="form-card">
+          <div className="form-container">
+            <div className="form-card">
               <form name="inputForm" method="POST">
-                <div className="prow_01">
-                  <div className="form-header tourG_mat13 tourG_mab05">
-                    <p className="form-title tour2023_title01">여행자보험 견적신청</p>
-                    <StepIndicator 
-                      currentStep={1} 
-                      stepLabels={['여행정보', '정보동의', '신청완료']}
-                    />
-                  </div>
+              {/* Header with title and steps */}
+              <div className="form-header tourG_mat13 tourG_mab05">
+                <p className="form-title tour2023_title01">여행자보험 견적신청</p>
+                <StepIndicator 
+                  currentStep={1} 
+                  stepLabels={['여행정보', '정보동의', '신청완료']}
+                />
+              </div>
 
                   <div className="menu_wrap_tab tourG_mat10 tourG_mab05">
                     <span 
@@ -169,7 +170,7 @@ export default function PCStep1Page() {
                   <div className="tourGuard_Info">
                     <div className="form-fields">
                       {/* 출발일 */}
-                      <div className="field-row">
+                      <div className="field-row tourG_line">
                         <div className="field-group date-field">
                           <label className="field-label">출발일</label>
                           <input
@@ -201,7 +202,7 @@ export default function PCStep1Page() {
                       </div>
 
                       {/* 도착일 */}
-                      <div className="field-row">
+                      <div className="field-row tourG_line">
                         <div className="field-group date-field">
                           <label className="field-label">도착일</label>
                           <input
@@ -233,13 +234,13 @@ export default function PCStep1Page() {
                       </div>
                     </div>
 
-                    <div className="field-row">
-                      <div className="field-group">
-                        <label className="field-label" htmlFor="tour_num">인원</label>
+                    <div className="tourGuard_form_tt">
+                      <label htmlFor="tour_num">인원</label>
+                      <div className="tourGuard_ps_box">
                         <select
                           id="tour_num"
                           name="tour_num"
-                          className="field-input"
+                          className="tourGuard_sel"
                           value={tourNum}
                           onChange={(e) => setTourNum(e.target.value)}
                           required
@@ -250,47 +251,55 @@ export default function PCStep1Page() {
                             </option>
                           ))}
                         </select>
+                        <img src="/icons/icon_sel.png" alt="선택" className="tourGuard_sel_icon" />
                       </div>
                     </div>
 
                     {/* 여행국가 (해외여행보험용) */}
                     {productCd === '해외여행' && (
-                      <div className="field-row">
-                        <div className="field-group country-field" style={{ width: '100%' }}>
-                          <label className="field-label">여행국가</label>
-                          <div
-                            onClick={() => {
-                              setIsCountryModalOpen(true);
-                              // onShowCountryModal 콜백이 필요하면 여기에 추가
-                            }}
-                            style={{
-                              width: '100%',
-                              padding: '12px 16px',
-                              borderRadius: '8px',
-                              backgroundColor: '#fff',
-                              cursor: 'pointer',
-                              fontSize: '16px',
-                              color: travelCountry ? '#333' : '#999',
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                            }}
-                          >
-                            <span>{travelCountry || '여행국가를 선택하세요'}</span>
-                            <span style={{ fontSize: '12px', color: '#999' }}>▼</span>
-                          </div>
-                          {travelCountry && (
-                            <div style={{ marginTop: '8px', fontSize: '12px', color: '#666', lineHeight: '1.6' }}>
-                              <p style={{ margin: 0 }}>
-                                ※ 여러국가를 여행하는 경우 <span style={{ color: '#2843e5', fontWeight: 600 }}>최초 방문국가</span>를 선택하세요.
-                              </p>
-                              <p style={{ margin: '4px 0 0 0' }}>
-                                단, <span style={{ color: '#2843e5', fontWeight: 600 }}>체코</span>가 포함된 여행인 경우 여행국가는 꼭 체코로 선택하시기 바랍니다.
-                              </p>
+                      <>
+                        <div className="field-row">
+                          <div className="field-group country-field" style={{ width: '100%' }}>
+                            <label className="field-label">여행국가</label>
+                            <div
+                              onClick={() => {
+                                setIsCountryModalOpen(true);
+                              }}
+                              style={{
+                                width: '100%',
+                                padding: '0 10px',
+                                paddingRight: '25px',
+                                borderRadius: '8px',
+                                backgroundColor: 'transparent',
+                                cursor: 'pointer',
+                                fontSize: '18px',
+                                color: travelCountry ? '#000' : '#dddddd',
+                                fontWeight: 'normal',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                marginTop: '25px',
+                                marginLeft: '10px',
+                                height: '32px',
+                                lineHeight: '32px',
+                              }}
+                            >
+                              <span>{travelCountry || ''}</span>
+                              <img src="/icons/icon_sel.png" alt="선택" style={{ width: 'auto', height: '10px', marginLeft: '8px', pointerEvents: 'none' }} />
                             </div>
-                          )}
+                          </div>
                         </div>
-                      </div>
+                        {/* 해외여행보험인 경우에만 안내 문구 표시 */}
+                        <div className="tour2023_txt01 tour2023_grey tourG_mleft04 tourG_mab04 tourG_mat06" style={{ marginLeft: '5px', marginTop: '15px', marginBottom: '35px', color: '#a5a5a5', fontWeight: 'normal' }}>
+                          <ul className="tourGuard_inline">
+                            <li className="tourGuard_inline_t01">※</li>
+                            <li className="tourGuard_inline_t02">
+                              여러국가를 여행하는 경우 <span className="tour2023_blue">최초 방문국가를</span> 선택하세요.<br />
+                              단, <span className="tour2023_blue">체코</span>가 포함된 여행인 경우 여행국가는 꼭 체코로 선택하시기 바랍니다.
+                            </li>
+                          </ul>
+                        </div>
+                      </>
                     )}
                   </div>
 
@@ -329,16 +338,16 @@ export default function PCStep1Page() {
                       </ul>
                     </div>
                   </section>
-                </div>
 
-                <input type="hidden" name="product_cd" value={productCd} />
-                <input type="hidden" name="start_year" value={startDate.split('-')[0]} />
-                <input type="hidden" name="start_month" value={startDate.split('-')[1]} />
-                <input type="hidden" name="start_day" value={startDate.split('-')[2]} />
-                <input type="hidden" name="end_year" value={endDate.split('-')[0]} />
-                <input type="hidden" name="end_month" value={endDate.split('-')[1]} />
-                <input type="hidden" name="end_day" value={endDate.split('-')[2]} />
+              <input type="hidden" name="product_cd" value={productCd} />
+              <input type="hidden" name="start_year" value={startDate.split('-')[0]} />
+              <input type="hidden" name="start_month" value={startDate.split('-')[1]} />
+              <input type="hidden" name="start_day" value={startDate.split('-')[2]} />
+              <input type="hidden" name="end_year" value={endDate.split('-')[0]} />
+              <input type="hidden" name="end_month" value={endDate.split('-')[1]} />
+              <input type="hidden" name="end_day" value={endDate.split('-')[2]} />
               </form>
+            </div>
           </div>
         </div>
       </main>
