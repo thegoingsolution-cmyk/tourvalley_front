@@ -14,6 +14,92 @@ export default function OverseasInsuranceStep2Page() {
   const [tourNum, setTourNum] = useState(1);
   const [email1, setEmail1] = useState('');
   const [email2, setEmail2] = useState('');
+  // 외국인 선택 상태 관리 (각 피보험자별)
+  const [countryTypes, setCountryTypes] = useState<{ [key: number]: string }>({});
+  // 대륙별 국가 목록 (각 피보험자별)
+  const [countryLists, setCountryLists] = useState<{ [key: number]: any[] }>({});
+
+  // 대륙별 국가 목록 (popup 페이지와 동일하게 통일)
+  const continentPlaces: { [key: string]: { value: string; label: string }[] } = {
+    EU: [
+      { value: 'DE', label: '독일' },
+      { value: 'FR', label: '프랑스' },
+      { value: 'GB', label: '영국' },
+      { value: 'IT', label: '이탈리아' },
+      { value: 'ES', label: '스페인' },
+      { value: 'NL', label: '네덜란드' },
+      { value: 'BE', label: '벨기에' },
+      { value: 'CH', label: '스위스' },
+      { value: 'AT', label: '오스트리아' },
+      { value: 'GR', label: '그리스' },
+      { value: 'PT', label: '포르투갈' },
+      { value: 'CZ', label: '체코' },
+      { value: 'PL', label: '폴란드' },
+      { value: 'HU', label: '헝가리' },
+      { value: 'SE', label: '스웨덴' },
+      { value: 'NO', label: '노르웨이' },
+      { value: 'DK', label: '덴마크' },
+      { value: 'FI', label: '핀란드' },
+      { value: 'RU', label: '러시아' },
+    ],
+    AS: [
+      { value: 'JP', label: '일본' },
+      { value: 'CN', label: '중국' },
+      { value: 'TW', label: '대만' },
+      { value: 'HK', label: '홍콩' },
+      { value: 'SG', label: '싱가포르' },
+      { value: 'TH', label: '태국' },
+      { value: 'VN', label: '베트남' },
+      { value: 'PH', label: '필리핀' },
+      { value: 'ID', label: '인도네시아' },
+      { value: 'MY', label: '말레이시아' },
+      { value: 'IN', label: '인도' },
+      { value: 'MN', label: '몽골' },
+      { value: 'KZ', label: '카자흐스탄' },
+      { value: 'UZ', label: '우즈베키스탄' },
+    ],
+    AF: [
+      { value: 'ZA', label: '남아프리카공화국' },
+      { value: 'EG', label: '이집트' },
+      { value: 'MA', label: '모로코' },
+      { value: 'KE', label: '케냐' },
+      { value: 'TZ', label: '탄자니아' },
+    ],
+    AU: [
+      { value: 'AU', label: '호주' },
+      { value: 'NZ', label: '뉴질랜드' },
+      { value: 'FJ', label: '피지' },
+      { value: 'PG', label: '파푸아뉴기니' },
+    ],
+    NA: [
+      { value: 'US', label: '미국' },
+      { value: 'CA', label: '캐나다' },
+      { value: 'MX', label: '멕시코' },
+      { value: 'CU', label: '쿠바' },
+    ],
+    SA: [
+      { value: 'BR', label: '브라질' },
+      { value: 'AR', label: '아르헨티나' },
+      { value: 'CL', label: '칠레' },
+      { value: 'PE', label: '페루' },
+      { value: 'CO', label: '콜롬비아' },
+    ],
+  };
+
+  // 국적 타입 변경 핸들러
+  const handleCountryTypeChange = (index: number, value: string) => {
+    setCountryTypes(prev => ({ ...prev, [index]: value }));
+    if (value === 'F') {
+      // 외국인 선택 시 국가 목록 초기화
+      setCountryLists(prev => ({ ...prev, [index]: [] }));
+    }
+  };
+
+  // 대륙 선택 시 국가 목록 업데이트
+  const handleContinentChange = (index: number, continentCode: string) => {
+    const countries = continentPlaces[continentCode] || [];
+    setCountryLists(prev => ({ ...prev, [index]: countries }));
+  };
 
   // 이메일 도메인 선택 핸들러
   const handleEmailDomainChange = (value: string) => {
@@ -23,6 +109,8 @@ export default function OverseasInsuranceStep2Page() {
   // step1에서 전달받은 데이터 로드
   useEffect(() => {
     const savedData = localStorage.getItem('overseasInsuranceStep1');
+    let tourNumValue = 1;
+    
     if (savedData) {
       try {
         const data = JSON.parse(savedData);
@@ -34,10 +122,18 @@ export default function OverseasInsuranceStep2Page() {
         setTourPlace(data.tourPlace || '');
         setTourGoal(data.tourGoal || '');
         setTourNum(data.tourNum || 1);
+        tourNumValue = data.tourNum || 1;
       } catch (error) {
         console.error('Failed to parse saved data:', error);
       }
     }
+    
+    // 초기 국적 타입 설정 (모두 내국인으로)
+    const initialCountryTypes: { [key: number]: string } = {};
+    for (let i = 1; i <= tourNumValue; i++) {
+      initialCountryTypes[i] = 'D';
+    }
+    setCountryTypes(initialCountryTypes);
   }, []);
 
   const handleSubmit = () => {
@@ -88,19 +184,44 @@ export default function OverseasInsuranceStep2Page() {
     
     for (let i = 1; i <= tourNum; i++) {
       const nameInput = document.querySelector(`input[name="insured_name_${i}"]`) as HTMLInputElement;
+      const engNameInput = document.querySelector(`input[name="insured_engname_${i}"]`) as HTMLInputElement;
       const birthInput = document.querySelector(`input[name="birth_${i}"]`) as HTMLInputElement;
       const genderInput = document.querySelector(`input[name="gender_${i}"]:checked`) as HTMLInputElement;
+      const countryTypeSelect = document.querySelector(`select[name="country_type_${i}"]`) as HTMLSelectElement;
+      const ssn1Input = document.querySelector(`input[name="insured_ssn1_${i}"]`) as HTMLInputElement;
+      const ssn2Input = document.querySelector(`input[name="insured_ssn2_${i}"]`) as HTMLInputElement;
+      const country1Select = document.querySelector(`select[name="insured_country1_${i}"]`) as HTMLSelectElement;
+      const country2Select = document.querySelector(`select[name="insured_country2_${i}"]`) as HTMLSelectElement;
       
       if (nameInput) {
         step2Data[`insured_name_${i}`] = nameInput.value;
       }
       
-      // 생년월일(8자리)과 성별(1,2,3,4)을 조합하여 주민번호 앞 7자리 생성
-      if (birthInput && genderInput) {
-        const birth = birthInput.value; // 예: 19880818
-        const genderCode = genderInput.value; // 1: 남자(1900년대), 2: 여자(1900년대), 3: 남자(2000년대), 4: 여자(2000년대)
+      // 영문 이름 저장
+      if (engNameInput) {
+        step2Data[`insured_engname_${i}`] = engNameInput.value;
+      }
+      
+      const countryType = countryTypeSelect?.value || 'D';
+      step2Data[`insured_country_type_${i}`] = countryType;
+      
+      if (countryType === 'D') {
+        // 내국인: 생년월일 저장
+        if (birthInput && birthInput.value) {
+          step2Data[`insured_birth_${i}`] = birthInput.value;
+        }
         
-        if (birth.length === 8) {
+        // 성별 저장 (1 -> '남자', 2 -> '여자')
+        if (genderInput) {
+          const genderValue = genderInput.value === '1' ? '남자' : '여자';
+          step2Data[`insured_gender_${i}`] = genderValue;
+        }
+        
+        // 생년월일(8자리)과 성별(1,2,3,4)을 조합하여 주민번호 앞 7자리 생성
+        if (birthInput && genderInput && birthInput.value.length === 8) {
+          const birth = birthInput.value; // 예: 19880818
+          const genderCode = genderInput.value; // 1: 남자, 2: 여자
+          
           // 생년월일 뒤 6자리 (YYMMDD)
           const birthSuffix = birth.substring(2, 8);
           
@@ -119,6 +240,20 @@ export default function OverseasInsuranceStep2Page() {
           // 주민번호 앞 7자리 (YYMMDD + 성별코드)
           step2Data[`insured_ssn_${i}`] = birthSuffix + finalGenderCode;
         }
+      } else {
+        // 외국인: 주민등록번호 저장
+        if (ssn1Input && ssn2Input) {
+          step2Data[`insured_ssn1_${i}`] = ssn1Input.value;
+          step2Data[`insured_ssn2_${i}`] = ssn2Input.value;
+        }
+        
+        // 외국인 국적 저장
+        if (country1Select) {
+          step2Data[`insured_country1_${i}`] = country1Select.value;
+        }
+        if (country2Select) {
+          step2Data[`insured_country2_${i}`] = country2Select.value;
+        }
       }
     }
     
@@ -135,6 +270,13 @@ export default function OverseasInsuranceStep2Page() {
 
   const changeTourNum = (newNum: number) => {
     setTourNum(newNum);
+    
+    // 새로운 인원에 대한 국적 타입 초기화
+    const updatedCountryTypes: { [key: number]: string } = {};
+    for (let i = 1; i <= newNum; i++) {
+      updatedCountryTypes[i] = countryTypes[i] || 'D';
+    }
+    setCountryTypes(updatedCountryTypes);
   };
 
   return (
@@ -248,7 +390,10 @@ export default function OverseasInsuranceStep2Page() {
                                 className="sel01" 
                                 name="tour_continent"
                                 value={tourContinent}
-                                onChange={(e) => setTourContinent(e.target.value)}
+                                onChange={(e) => {
+                                  setTourContinent(e.target.value);
+                                  setTourPlace(''); // 대륙 변경 시 국가 초기화
+                                }}
                               >
                                 <option value="">선택</option>
                                 <option value="EU">유럽</option>
@@ -267,8 +412,12 @@ export default function OverseasInsuranceStep2Page() {
                                 name="tour_place"
                                 value={tourPlace}
                                 onChange={(e) => setTourPlace(e.target.value)}
+                                disabled={!tourContinent}
                               >
                                 <option value="">선택</option>
+                                {tourContinent && continentPlaces[tourContinent]?.map(place => (
+                                  <option key={place.value} value={place.value}>{place.label}</option>
+                                ))}
                               </select>
                             </span>
                           </div>
@@ -477,66 +626,140 @@ export default function OverseasInsuranceStep2Page() {
                     <colgroup>
                       <col width="7%" />
                       <col width="15%" />
+                      <col width="17%" />
                       <col width="34%" />
                       <col width="15%" />
                     </colgroup>
-                    <tbody>
+                    <tbody id="insured_people_area">
                       <tr>
                         <td className="sName ag_center">순번</td>
                         <td className="sName ag_center">성명</td>
+                        <td className="sName ag_center">영문이름</td>
                         <td className="sName ag_center">생년월일 / 성별</td>
                         <td className="sName ag_center">국적</td>
                       </tr>
-                      {Array.from({ length: tourNum }, (_, i) => (
-                        <React.Fragment key={i}>
-                          <tr>
-                            <td className="ag_center line_03" rowSpan={2}>{i + 1}</td>
-                            <td className="ag_center box line_03 bgcolor_red">
-                              <div className="in_wrap01">
-                                <div className="bg_join input_cell_01">
-                                  <input type="text" maxLength={15} className="tf_g" name={`insured_name_${i + 1}`} />
+                      {Array.from({ length: tourNum }, (_, i) => {
+                        const index = i + 1;
+                        const countryType = countryTypes[index] || 'D';
+                        const countryList = countryLists[index] || [];
+                        const isForeigner = countryType === 'F';
+                        
+                        return (
+                          <React.Fragment key={i}>
+                            <tr>
+                              <td className="ag_center line_03" rowSpan={isForeigner ? 2 : 2}>{index}</td>
+                              <td className="ag_center box line_03 bgcolor_red">
+                                <div className="in_wrap01">
+                                  <div className="bg_join input_cell_01">
+                                    <input type="text" maxLength={15} className="tf_g" name={`insured_name_${index}`} style={{ imeMode: 'active' }} />
+                                  </div>
                                 </div>
-                              </div>
-                            </td>
-                            <td className="ag_center box line_03 bgcolor_red">
-                              <div className="in_wrap01" style={{ alignItems: 'center' }}>
-                                <div className="bg_join input_cell_01 wd_45">
-                                  <input type="text" maxLength={8} className="tf_g" name={`birth_${i + 1}`} placeholder="19880818" />
+                              </td>
+                              <td className="ag_center box line_03">
+                                <div className="in_wrap01">
+                                  <div className="bg_join input_cell_01">
+                                    <input type="text" maxLength={25} className="tf_g" name={`insured_engname_${index}`} style={{ imeMode: 'disabled' }} />
+                                  </div>
                                 </div>
-                                <div className="btn_group_02">
-                                  <input type="radio" id={`gender_M_${i + 1}`} value="1" name={`gender_${i + 1}`} defaultChecked />
-                                  <label htmlFor={`gender_M_${i + 1}`} className="nomal_btn">
-                                    <div className="nomal_btn_txt">남자</div>
-                                  </label>
-                                  <input type="radio" id={`gender_W_${i + 1}`} value="2" name={`gender_${i + 1}`} />
-                                  <label htmlFor={`gender_W_${i + 1}`} className="nomal_btn">
-                                    <div className="nomal_btn_txt">여자</div>
-                                  </label>
+                              </td>
+                              <td className="ag_center box line_03 bgcolor_red" id={`birth_area_${index}`} style={{ display: isForeigner ? 'none' : '' }}>
+                                <div className="in_wrap01" style={{ alignItems: 'center' }}>
+                                  <div className="bg_join input_cell_01 wd_45">
+                                    <input type="text" maxLength={8} className="tf_g" name={`birth_${index}`} id={`birth_${index}`} placeholder="19880818" />
+                                  </div>
+                                  <div className="btn_group_02">
+                                    <input type="radio" id={`gender_M_${index}`} value="1" name={`gender_${index}`} defaultChecked />
+                                    <label htmlFor={`gender_M_${index}`} className="nomal_btn">
+                                      <div className="nomal_btn_txt">남자</div>
+                                    </label>
+                                    <input type="radio" id={`gender_W_${index}`} value="2" name={`gender_${index}`} />
+                                    <label htmlFor={`gender_W_${index}`} className="nomal_btn">
+                                      <div className="nomal_btn_txt">여자</div>
+                                    </label>
+                                  </div>
                                 </div>
-                              </div>
-                            </td>
-                            <td className="ag_center box line_03">
-                              <div className="in_wrap01">
-                                <div className="bg_join input_cell_01 wd_100">
-                                  <span className="ps_box02 wd_100">
-                                    <select className="sel01" name={`country_type_${i + 1}`}>
-                                      <option value="D">내국인</option>
-                                      <option value="F">외국인</option>
-                                    </select>
-                                  </span>
+                              </td>
+                              <td className="ag_center box line_03 bgcolor_red" id={`jumin_area_${index}`} style={{ display: isForeigner ? '' : 'none' }}>
+                                <div className="in_wrap01">
+                                  <div className="bg_join input_cell_01">
+                                    <input type="tel" maxLength={6} className="tf_g" name={`insured_ssn1_${index}`} id={`insured_ssn1_${index}`} placeholder={isForeigner ? '외국인등록번호' : '주민등록번호'} />
+                                  </div>
+                                  <span className="fff-bar"> - </span>
+                                  <div className="bg_join input_cell_01">
+                                    <input type="password" maxLength={7} className="tf_g" name={`insured_ssn2_${index}`} id={`insured_ssn2_${index}`} />
+                                  </div>
                                 </div>
-                              </div>
-                            </td>
-                          </tr>
-                          <tr></tr>
-                        </React.Fragment>
-                      ))}
+                              </td>
+                              <td className="ag_center box line_03">
+                                <div className="in_wrap01">
+                                  <div className="bg_join input_cell_01 wd_100">
+                                    <span className="ps_box02 wd_100">
+                                      <select 
+                                        className="sel01" 
+                                        name={`country_type_${index}`}
+                                        value={countryType}
+                                        onChange={(e) => handleCountryTypeChange(index, e.target.value)}
+                                      >
+                                        <option value="D">내국인</option>
+                                        <option value="F">외국인</option>
+                                      </select>
+                                    </span>
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                            {isForeigner && (
+                              <tr id={`insured_person_${i}_2`}>
+                                <td className="ag_center box line_03">
+                                  <div className="in_wrap01" style={{ padding: '0px 0px 0px 20%' }}>국적입력</div>
+                                </td>
+                                <td className="ag_center box bgcolor_red" colSpan={3}>
+                                  <div className="in_wrap01">
+                                    <div className="bg_join input_cell_01 wd_48">
+                                      <span className="ps_box02 wd_100">
+                                        <select 
+                                          className="sel01" 
+                                          name={`insured_country1_${index}`}
+                                          onChange={(e) => handleContinentChange(index, e.target.value)}
+                                        >
+                                          <option value="">선택</option>
+                                          <option value="EU">유럽</option>
+                                          <option value="AS">아시아</option>
+                                          <option value="AF">아프리카</option>
+                                          <option value="AU">오세아니아</option>
+                                          <option value="NA">북아메리카</option>
+                                          <option value="SA">남아메리카</option>
+                                        </select>
+                                      </span>
+                                    </div>
+                                    <div className="bg_join input_cell_01 wd_48 ml10">
+                                      <span className="ps_box02 wd_100">
+                                        <select className="sel01" name={`insured_country2_${index}`}>
+                                          <option value="">선택</option>
+                                          {countryList.map((country) => (
+                                            <option key={country.value} value={country.value}>
+                                              {country.label}
+                                            </option>
+                                          ))}
+                                        </select>
+                                      </span>
+                                    </div>
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                            {!isForeigner && <tr></tr>}
+                          </React.Fragment>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
                 <div className="login_Btxt box01">
                   <dl>
+                    <dd className="font_red">영문증서가 필요한 경우에는 영문이름을 입력해 주시기 바랍니다.</dd>
                     <dd className="font_gray">외국인은 외국인 등록번호가 있어야 보험가입이 가능합니다.</dd>
+                    <dd className="font_gray">외국인이 본국으로 여행하는 경우 보험에 가입하실 수 없습니다.</dd>
                     <dd className="font_gray">여행자보험은 여행기간(보험기간)중 발생한 사고를 보장하는 보험입니다. 현재 치료중이거나 보험기간 이전 과거 상병으로 인한 치료는 보상받으실 수 없으며, 이를 보험계약시 알리지 않았다면 보상에 제한받으실 수도 있습니다.</dd>
                   </dl>
                 </div>

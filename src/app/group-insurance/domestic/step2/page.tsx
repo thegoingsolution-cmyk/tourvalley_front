@@ -87,40 +87,56 @@ export default function DomesticInsuranceStep2Page() {
       const nameInput = document.querySelector(`input[name="insured_name_${i}"]`) as HTMLInputElement;
       const birthInput = document.querySelector(`input[name="birth_${i}"]`) as HTMLInputElement;
       const genderInput = document.querySelector(`input[name="gender_${i}"]:checked`) as HTMLInputElement;
+      const countryTypeSelect = document.querySelector(`select[name="country_type_${i}"]`) as HTMLSelectElement;
       
       console.log(`=== 피보험자 ${i} 입력 필드 ===`);
       console.log('nameInput:', nameInput?.value);
       console.log('birthInput:', birthInput?.value);
       console.log('genderInput:', genderInput?.value);
+      console.log('countryTypeSelect:', countryTypeSelect?.value);
       
       if (nameInput) {
         step2Data[`insured_name_${i}`] = nameInput.value;
       }
       
+      // 생년월일 저장
+      if (birthInput && birthInput.value) {
+        step2Data[`insured_birth_${i}`] = birthInput.value;
+      }
+      
+      // 성별 저장 (1 -> '남자', 2 -> '여자')
+      if (genderInput) {
+        const genderValue = genderInput.value === '1' ? '남자' : '여자';
+        step2Data[`insured_gender_${i}`] = genderValue;
+      }
+      
+      // 국적 저장
+      if (countryTypeSelect) {
+        step2Data[`insured_country_type_${i}`] = countryTypeSelect.value;
+      }
+      
       // 생년월일(8자리)과 성별(1,2,3,4)을 조합하여 주민번호 앞 7자리 생성
-      if (birthInput && genderInput) {
+      if (birthInput && genderInput && birthInput.value.length === 8) {
         const birth = birthInput.value; // 예: 19880818
-        const genderCode = genderInput.value; // 1: 남자(1900년대), 2: 여자(1900년대), 3: 남자(2000년대), 4: 여자(2000년대)
+        const genderCode = genderInput.value; // 1: 남자, 2: 여자
         
-        if (birth.length === 8) {
-          // 생년월일 뒤 6자리 (YYMMDD)
-          const birthSuffix = birth.substring(2, 8);
-          
-          // 생년에 따라 성별코드 결정
-          const birthYear = parseInt(birth.substring(0, 4));
-          let finalGenderCode = genderCode;
-          
-          if (birthYear >= 2000) {
-            // 2000년대생
-            finalGenderCode = genderCode === '1' ? '3' : '4';
-          } else {
-            // 1900년대생
-            finalGenderCode = genderCode === '1' ? '1' : '2';
-          }
-          
-          // 주민번호 앞 7자리 (YYMMDD + 성별코드)
-          step2Data[`insured_ssn_${i}`] = birthSuffix + finalGenderCode;
+        // 생년월일 뒤 6자리 (YYMMDD)
+        const birthSuffix = birth.substring(2, 8);
+        
+        // 생년에 따라 성별코드 결정
+        const birthYear = parseInt(birth.substring(0, 4));
+        let finalGenderCode = genderCode;
+        
+        if (birthYear >= 2000) {
+          // 2000년대생
+          finalGenderCode = genderCode === '1' ? '3' : '4';
+        } else {
+          // 1900년대생
+          finalGenderCode = genderCode === '1' ? '1' : '2';
         }
+        
+        // 주민번호 앞 7자리 (YYMMDD + 성별코드)
+        step2Data[`insured_ssn_${i}`] = birthSuffix + finalGenderCode;
       }
     }
     

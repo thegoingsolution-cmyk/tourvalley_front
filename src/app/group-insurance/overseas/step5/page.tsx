@@ -66,8 +66,20 @@ export default function OverseasInsuranceStep5Page() {
         const insuredPersons = [];
         for (let i = 1; i <= data1.tourNum; i++) {
           const name = data2[`insured_name_${i}`] || `피보험자${i}`;
-          const planCode = data3.selected_plans?.[i] || 'BAW';
-          const planName = planCode === 'BAW' ? '실속플랜(해외실손 포함)' : '고보장플랜(해외실손 포함)';
+          const planCode = data3.selected_plans?.[i] || 'STW';
+          const planType = data3.plan_types?.[i] || 'V';
+          
+          // 플랜명 생성
+          let planName = '';
+          if (planCode === 'STW' || planCode === 'STM') {
+            planName = '표준플랜';
+          } else if (planCode === 'BAW' || planCode === 'BAM') {
+            planName = '실속플랜';
+          } else if (planCode === 'HCW' || planCode === 'HCM') {
+            planName = '고보장플랜';
+          }
+          planName += planType === 'V' ? '(국내실손 포함)' : '(국내실손 제외)';
+          
           const premium = data3.premiums?.[i] || 0;
 
           insuredPersons.push({
@@ -183,11 +195,13 @@ export default function OverseasInsuranceStep5Page() {
         const name = step2Data[`insured_name_${i}`] || '';
         const birthDate = step2Data[`insured_birth_${i}`] || '';
         const gender = step2Data[`insured_gender_${i}`] || '남자';
-        const planCode = step3Data.selected_plans?.[i] || 'BAW';
+        const planCode = step3Data.selected_plans?.[i] || 'STW';
+        const planType = step3Data.plan_types?.[i] || 'V';
         const premium = step3Data.premiums?.[i] || 0;
 
         // 생년월일에서 나이 계산
         let age = 0;
+        let genderCode = '1'; // 기본값
         if (birthDate && birthDate.length >= 8) {
           const year = parseInt(birthDate.substring(0, 4));
           const month = parseInt(birthDate.substring(4, 6));
@@ -197,17 +211,36 @@ export default function OverseasInsuranceStep5Page() {
           if (today.getMonth() < month - 1 || (today.getMonth() === month - 1 && today.getDate() < day)) {
             age--;
           }
+          
+          // 생년에 따라 성별코드 결정 (주민번호 성별코드)
+          // 1900년대생: 남자='1', 여자='2'
+          // 2000년대생: 남자='3', 여자='4'
+          if (year >= 2000) {
+            genderCode = gender === '남자' ? '3' : '4';
+          } else {
+            genderCode = gender === '남자' ? '1' : '2';
+          }
+        }
+
+        // 플랜 타입 변환 (DB ENUM에 맞춤: '어린이플랜', '어르신플랜', '어르신플랜2', '실속플랜', '고보장플랜', '기준플랜')
+        let planTypeName = '';
+        if (planCode === 'STW' || planCode === 'STM') {
+          planTypeName = '기준플랜'; // DB ENUM: '기준플랜' (표준플랜이 아님)
+        } else if (planCode === 'BAW' || planCode === 'BAM') {
+          planTypeName = '실속플랜';
+        } else if (planCode === 'HCW' || planCode === 'HCM') {
+          planTypeName = '고보장플랜';
         }
 
         insuredPersons.push({
           sequence_number: i,
           name: name,
-          resident_number: birthDate ? `${birthDate}-${gender === '남자' ? '1' : '2'}******` : '',
+          resident_number: birthDate ? `${birthDate}-${genderCode}******` : '',
           gender: gender,
           age: age,
-          plan_type: planCode === 'BAW' ? '실속플랜' : '고보장플랜',
+          plan_type: planTypeName,
           premium: premium,
-          has_medical_expense: 1,
+          has_medical_expense: planType === 'V' ? 1 : 0, // V면 국내실손 담보(1), N이면 부담보(0)
         });
       }
 
@@ -222,6 +255,97 @@ export default function OverseasInsuranceStep5Page() {
       };
       const paymentMethodName = paymentMethodMap[payMethod] || '나이스페이먼츠';
 
+      // 여행지 정보 변환 (대륙 코드 → 한글 대륙명, 국가 코드 → 한글 국가명)
+      const continentMap: { [key: string]: string } = {
+        'EU': '유럽',
+        'AS': '아시아',
+        'AF': '아프리카',
+        'AU': '오세아니아',
+        'NA': '북아메리카',
+        'SA': '남아메리카',
+      };
+
+      const continentPlaces: { [key: string]: { value: string; label: string }[] } = {
+        EU: [
+          { value: 'DE', label: '독일' },
+          { value: 'FR', label: '프랑스' },
+          { value: 'GB', label: '영국' },
+          { value: 'IT', label: '이탈리아' },
+          { value: 'ES', label: '스페인' },
+          { value: 'NL', label: '네덜란드' },
+          { value: 'BE', label: '벨기에' },
+          { value: 'CH', label: '스위스' },
+          { value: 'AT', label: '오스트리아' },
+          { value: 'GR', label: '그리스' },
+          { value: 'PT', label: '포르투갈' },
+          { value: 'CZ', label: '체코' },
+          { value: 'PL', label: '폴란드' },
+          { value: 'HU', label: '헝가리' },
+          { value: 'SE', label: '스웨덴' },
+          { value: 'NO', label: '노르웨이' },
+          { value: 'DK', label: '덴마크' },
+          { value: 'FI', label: '핀란드' },
+          { value: 'RU', label: '러시아' },
+        ],
+        AS: [
+          { value: 'JP', label: '일본' },
+          { value: 'CN', label: '중국' },
+          { value: 'TW', label: '대만' },
+          { value: 'HK', label: '홍콩' },
+          { value: 'SG', label: '싱가포르' },
+          { value: 'TH', label: '태국' },
+          { value: 'VN', label: '베트남' },
+          { value: 'PH', label: '필리핀' },
+          { value: 'ID', label: '인도네시아' },
+          { value: 'MY', label: '말레이시아' },
+          { value: 'IN', label: '인도' },
+          { value: 'MN', label: '몽골' },
+          { value: 'KZ', label: '카자흐스탄' },
+          { value: 'UZ', label: '우즈베키스탄' },
+        ],
+        AF: [
+          { value: 'ZA', label: '남아프리카공화국' },
+          { value: 'EG', label: '이집트' },
+          { value: 'MA', label: '모로코' },
+          { value: 'KE', label: '케냐' },
+          { value: 'TZ', label: '탄자니아' },
+        ],
+        AU: [
+          { value: 'AU', label: '호주' },
+          { value: 'NZ', label: '뉴질랜드' },
+          { value: 'FJ', label: '피지' },
+          { value: 'PG', label: '파푸아뉴기니' },
+        ],
+        NA: [
+          { value: 'US', label: '미국' },
+          { value: 'CA', label: '캐나다' },
+          { value: 'MX', label: '멕시코' },
+          { value: 'CU', label: '쿠바' },
+        ],
+        SA: [
+          { value: 'BR', label: '브라질' },
+          { value: 'AR', label: '아르헨티나' },
+          { value: 'CL', label: '칠레' },
+          { value: 'PE', label: '페루' },
+          { value: 'CO', label: '콜롬비아' },
+        ],
+      };
+
+      // 대륙명 변환
+      const travelRegion = step1Data.tourContinent ? (continentMap[step1Data.tourContinent] || null) : null;
+      
+      // 국가명 변환
+      let travelCountry = null;
+      if (step1Data.tourContinent && step1Data.tourPlace) {
+        const places = continentPlaces[step1Data.tourContinent];
+        if (places) {
+          const selectedPlace = places.find(p => p.value === step1Data.tourPlace);
+          if (selectedPlace) {
+            travelCountry = selectedPlace.label;
+          }
+        }
+      }
+
       // 계약 데이터 구성
       const contractData = {
         contract: {
@@ -231,8 +355,8 @@ export default function OverseasInsuranceStep5Page() {
           arrival_date: arrivalDateTime,
           duration_months: 0,
           duration_days: periodDays,
-          travel_region: null,
-          travel_country: step1Data.tourPlace || null,
+          travel_region: travelRegion,
+          travel_country: travelCountry,
           travel_purpose: step2Data.travel_purpose || '',
           travel_participants: step1Data.tourNum,
           total_premium: step3Data?.total_premium || 0,

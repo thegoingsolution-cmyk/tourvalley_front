@@ -189,6 +189,7 @@ export default function DomesticInsuranceStep5Page() {
 
         // 생년월일에서 나이 계산
         let age = 0;
+        let genderCode = '1'; // 기본값
         if (birthDate && birthDate.length >= 8) {
           const year = parseInt(birthDate.substring(0, 4));
           const month = parseInt(birthDate.substring(4, 6));
@@ -198,12 +199,21 @@ export default function DomesticInsuranceStep5Page() {
           if (today.getMonth() < month - 1 || (today.getMonth() === month - 1 && today.getDate() < day)) {
             age--;
           }
+          
+          // 생년에 따라 성별코드 결정 (주민번호 성별코드)
+          // 1900년대생: 남자='1', 여자='2'
+          // 2000년대생: 남자='3', 여자='4'
+          if (year >= 2000) {
+            genderCode = gender === '남자' ? '3' : '4';
+          } else {
+            genderCode = gender === '남자' ? '1' : '2';
+          }
         }
 
         insuredPersons.push({
           sequence_number: i,
           name: name,
-          resident_number: birthDate ? `${birthDate}-${gender === '남자' ? '1' : '2'}******` : '',
+          resident_number: birthDate ? `${birthDate}-${genderCode}******` : '',
           gender: gender,
           age: age,
           plan_type: planCode === 'BAW' ? '실속플랜' : '고보장플랜',

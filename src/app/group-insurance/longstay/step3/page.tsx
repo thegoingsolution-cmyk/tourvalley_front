@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import '../../popup/page.css';
 
 const calculateAgeAndGender = (residentNumber: string) => {
@@ -16,12 +16,20 @@ const calculateAgeAndGender = (residentNumber: string) => {
   let gender = '남자';
   let centuryPrefix = 1900;
   
+  // 내국인: 1,2 (1900년대), 3,4 (2000년대)
+  // 외국인: 5,6 (1900년대), 7,8 (2000년대)
   if (genderCode === 1 || genderCode === 2) {
     centuryPrefix = 1900;
     gender = genderCode === 1 ? '남자' : '여자';
   } else if (genderCode === 3 || genderCode === 4) {
     centuryPrefix = 2000;
     gender = genderCode === 3 ? '남자' : '여자';
+  } else if (genderCode === 5 || genderCode === 6) {
+    centuryPrefix = 1900;
+    gender = genderCode === 5 ? '남자' : '여자';
+  } else if (genderCode === 7 || genderCode === 8) {
+    centuryPrefix = 2000;
+    gender = genderCode === 7 ? '남자' : '여자';
   }
 
   const fullBirthYear = centuryPrefix + birthYear;
@@ -39,12 +47,46 @@ const calculateAgeAndGender = (residentNumber: string) => {
   return { age, gender };
 };
 
-const getPlanType = (planCd: string): string => {
+const getPlanType = (planCd: string, travelPurpose?: string): string => {
+  // 워킹홀리데이인 경우 특별한 플랜명 매핑
+  if (travelPurpose === '워킹홀리데이') {
+    const workingHolidayPlanMap: { [key: string]: string } = {
+      'BAW': '워킹홀리데이실속플랜',
+      'HCW': '워킹홀리데이표준플랜',
+      'HAW': '워킹홀리데이(유로화플랜)', // 고급플랜
+    };
+    return workingHolidayPlanMap[planCd] || '워킹홀리데이실속플랜';
+  }
+  
+  // 일반 플랜
   const planMap: { [key: string]: string } = {
+    // 일반 플랜
     'BAW': '실속플랜',
     'HCW': '표준플랜', // 화면에는 "고보장플랜"으로 표시되지만 백엔드에는 "표준플랜"으로 전송
+    // 원화 플랜
+    'BAS': '실속플랜',
+    'STD': '표준플랜',
+    'HCV': '고급플랜', // 고급플랜으로 전송
+    // 외화 플랜
+    'BAU': '실속플랜',
+    'STU': '표준플랜',
+    'HCU': '고급플랜', // 고급플랜으로 전송
   };
   return planMap[planCd] || '실속플랜';
+};
+
+const getCurrencyPlan = (planCd: string, travelPurpose?: string): '원화' | '외화' => {
+  // 워킹홀리데이인 경우: 고급플랜(HAW)만 외화
+  if (travelPurpose === '워킹홀리데이') {
+    return planCd === 'HAW' ? '외화' : '원화';
+  }
+  
+  // 외화 플랜: BAU, STU, HCU
+  if (planCd === 'BAU' || planCd === 'STU' || planCd === 'HCU') {
+    return '외화';
+  }
+  // 나머지는 원화
+  return '원화';
 };
 
 export default function LongStayInsuranceStep3Page() {
@@ -75,7 +117,19 @@ export default function LongStayInsuranceStep3Page() {
         const insuredPersons = [];
         for (let i = 1; i <= data1.tourNum; i++) {
           const name = data2[`insured_name_${i}`] || `피보험자${i}`;
-          const residentNumber = data2[`insured_ssn_${i}`] || '';
+          const countryType = data2[`insured_country_type_${i}`] || 'D';
+          
+          let residentNumber = '';
+          if (countryType === 'D') {
+            // 내국인: insured_ssn_${i} 사용
+            residentNumber = data2[`insured_ssn_${i}`] || '';
+          } else {
+            // 외국인: insured_ssn1_${i}와 insured_ssn2_${i}를 합침
+            const ssn1 = data2[`insured_ssn1_${i}`] || '';
+            const ssn2 = data2[`insured_ssn2_${i}`] || '';
+            residentNumber = ssn1 + ssn2;
+          }
+          
           const { age, gender } = calculateAgeAndGender(residentNumber);
           
           insuredPersons.push({
@@ -89,8 +143,12 @@ export default function LongStayInsuranceStep3Page() {
         setInsuredList(insuredPersons);
         
         const defaultPlans: { [key: number]: string } = {};
+        const travelPurposeValue = data2.travel_purpose || '유학/어학연수';
+        // 워킹홀리데이를 제외한 모든 목적은 원화/외화 플랜 사용
+        const hasCurrencyPlans = travelPurposeValue !== '워킹홀리데이';
         insuredPersons.forEach((person) => {
-          defaultPlans[person.index] = 'BAW';
+          // 원화/외화 플랜이 있는 경우 기본값: 실속플랜(원화), 아니면 일반 플랜
+          defaultPlans[person.index] = hasCurrencyPlans ? 'BAS' : 'BAW';
         });
         setSelectedPlans(defaultPlans);
       } catch (error) {
@@ -99,19 +157,35 @@ export default function LongStayInsuranceStep3Page() {
     }
   }, []);
 
-  const calculatePremiums = async () => {
+  const calculatePremiums = useCallback(async () => {
     if (!startDate || !endDate || insuredList.length === 0) {
+      return;
+    }
+
+    // 모든 피보험자의 플랜이 선택되었는지 확인
+    const allPlansSelected = insuredList.every(person => {
+      return selectedPlans[person.index];
+    });
+
+    if (!allPlansSelected) {
       return;
     }
 
     setLoading(true);
     try {
-      const insuredPersons = insuredList.map(person => ({
-        age: person.age,
-        gender: person.gender,
-        plan_type: getPlanType(selectedPlans[person.index] || 'BAW'),
-        has_medical_expense: true,
-      }));
+      // 워킹홀리데이를 제외한 모든 목적은 원화/외화 플랜 사용
+      const hasCurrencyPlans = travelPurpose !== '워킹홀리데이';
+      const defaultPlan = hasCurrencyPlans ? 'BAS' : (travelPurpose === '워킹홀리데이' ? 'BAW' : 'BAW');
+      const insuredPersons = insuredList.map(person => {
+        const planCode = selectedPlans[person.index] || defaultPlan;
+        return {
+          age: person.age,
+          gender: person.gender,
+          plan_type: getPlanType(planCode, travelPurpose),
+          has_medical_expense: true,
+          currency_plan: getCurrencyPlan(planCode, travelPurpose),
+        };
+      });
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/travel/calculate-group-premium`, {
         method: 'POST',
@@ -144,19 +218,44 @@ export default function LongStayInsuranceStep3Page() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [startDate, endDate, insuredList, selectedPlans, travelPurpose]);
+
+  // selectedPlans 변경 감지를 위한 ref
+  const prevSelectedPlansRef = React.useRef<string>('');
 
   useEffect(() => {
-    if (insuredList.length > 0 && Object.keys(selectedPlans).length === insuredList.length) {
+    const selectedPlansStr = JSON.stringify(selectedPlans);
+    
+    if (insuredList.length > 0 && 
+        Object.keys(selectedPlans).length === insuredList.length &&
+        selectedPlansStr !== prevSelectedPlansRef.current) {
+      prevSelectedPlansRef.current = selectedPlansStr;
       calculatePremiums();
     }
-  }, [selectedPlans, insuredList]);
+  }, [calculatePremiums, insuredList.length, selectedPlans]);
 
   const handlePlanChange = (index: number, planCd: string) => {
-    setSelectedPlans(prev => ({
-      ...prev,
-      [index]: planCd
-    }));
+    setSelectedPlans(prev => {
+      const newSelectedPlans = {
+        ...prev,
+        [index]: planCd
+      };
+      
+      // 일반 플랜 코드 (어린이/어르신 플랜 제외)
+      const normalPlans = ['BAS', 'STD', 'HCV', 'BAU', 'STU', 'HCU', 'BAW', 'HCW', 'HAW'];
+      
+      // 일반 플랜인 경우에만 일괄 적용
+      if (normalPlans.includes(planCd)) {
+        // 다른 모든 피보험자들에게도 동일한 플랜 적용
+        insuredList.forEach(person => {
+          if (person.index !== index) {
+            newSelectedPlans[person.index] = planCd;
+          }
+        });
+      }
+      
+      return newSelectedPlans;
+    });
   };
 
   const handleSubmit = () => {
@@ -232,30 +331,50 @@ export default function LongStayInsuranceStep3Page() {
                         <td className="sName bgcolor_02"><strong>플랜선택</strong></td>
                         <td className="sName"><strong>보험료</strong></td>
                       </tr>
-                      {insuredList.map((insured, index) => (
-                        <tr key={index}>
-                          <td className="ag_center">{insured.index}</td>
-                          <td className="ag_center">{insured.name}</td>
-                          <td className="ag_center">{insured.age}</td>
-                          <td className="ag_center box bgcolor_02" style={{ paddingLeft: '4px' }}>
-                            <div className="bg_join input_cell_01">
-                              <span className="ps_box02 wd_100">
-                                <select 
-                                  className="sel01" 
-                                  value={selectedPlans[insured.index] || 'BAW'}
-                                  onChange={(e) => handlePlanChange(insured.index, e.target.value)}
-                                >
-                                  <option value="BAW">실속플랜</option>
-                                  <option value="HCW">고보장플랜</option>
-                                </select>
-                              </span>
-                            </div>
-                          </td>
-                          <td className="ag_right bgcolor_red">
-                            {premiums[insured.index] ? `${premiums[insured.index].toLocaleString()}원` : '-원'}
-                          </td>
-                        </tr>
-                      ))}
+                      {insuredList.map((insured, index) => {
+                        // 워킹홀리데이를 제외한 모든 목적은 원화/외화 플랜 사용
+                        const hasCurrencyPlans = travelPurpose !== '워킹홀리데이';
+                        const defaultPlan = hasCurrencyPlans ? 'BAS' : 'BAW';
+                        const availablePlans = hasCurrencyPlans
+                          ? [
+                              { value: 'BAS', label: '실속플랜(원화)' },
+                              { value: 'STD', label: '표준플랜(원화)' },
+                              { value: 'HCV', label: '고급플랜(원화)' },
+                              { value: 'BAU', label: '실속플랜(U$달러)' },
+                              { value: 'STU', label: '표준플랜(U$달러)' },
+                              { value: 'HCU', label: '고급플랜(U$달러)' },
+                            ]
+                          : [
+                              { value: 'BAW', label: '실속플랜' },
+                              { value: 'HCW', label: '표준플랜' },
+                              { value: 'HAW', label: '고급플랜' },
+                            ];
+                        return (
+                          <tr key={index}>
+                            <td className="ag_center">{insured.index}</td>
+                            <td className="ag_center">{insured.name}</td>
+                            <td className="ag_center">{insured.age}</td>
+                            <td className="ag_center box bgcolor_02" style={{ paddingLeft: '4px' }}>
+                              <div className="bg_join input_cell_01">
+                                <span className="ps_box02 wd_100">
+                                  <select 
+                                    className="sel01" 
+                                    value={selectedPlans[insured.index] || defaultPlan}
+                                    onChange={(e) => handlePlanChange(insured.index, e.target.value)}
+                                  >
+                                    {availablePlans.map(plan => (
+                                      <option key={plan.value} value={plan.value}>{plan.label}</option>
+                                    ))}
+                                  </select>
+                                </span>
+                              </div>
+                            </td>
+                            <td className="ag_right bgcolor_red">
+                              {premiums[insured.index] ? `${premiums[insured.index].toLocaleString()}원` : '-원'}
+                            </td>
+                          </tr>
+                        );
+                      })}
                       <tr>
                         <td colSpan={4} className="ag_center bgcolor_g02 font_red font16"><strong>합계보험료</strong></td>
                         <td className="ag_right bgcolor_red font_red font16">
@@ -270,7 +389,16 @@ export default function LongStayInsuranceStep3Page() {
               <div className="plan_guide mb10">
                 <dl>
                   <dt>플랜선택 가이드</dt>
-                  <dd><span className="font_blue">플랜명을 클릭하시면 플랜을 변경하실 수 있습니다.</span></dd>
+                  {travelPurpose !== '워킹홀리데이' ? (
+                    <>
+                      <dd>기본 설정은 실속플랜입니다.</dd>
+                      <dd>플랜별 보장내용을 확인하고 플랜선택을 변경하실 수 있습니다.</dd>
+                      <dd>체류지가 미국 또는 캐나다인 경우 표준플랜이나 고급플랜을 선택하는 것을 추천드립니다.</dd>
+                      <dd>비자나 학교보험 웨이버를 신청하는 경우 외화(US$)플랜을 선택하시기 바랍니다.</dd>
+                    </>
+                  ) : (
+                    <dd><span className="font_blue">플랜명을 클릭하시면 플랜을 변경하실 수 있습니다.</span></dd>
+                  )}
                 </dl>
               </div>
 
