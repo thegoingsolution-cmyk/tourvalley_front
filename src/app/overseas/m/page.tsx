@@ -227,8 +227,27 @@ function MobileOverseasStep1Content() {
     setIsCalculating(true);
 
     try {
-      const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
-      const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
+      // 24시는 다음날 00시로 변환
+      let departureDateFormatted = departureDate;
+      let departureHour = parseInt(departureTime);
+      if (departureHour === 24) {
+        const date = new Date(departureDate);
+        date.setDate(date.getDate() + 1);
+        departureDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        departureHour = 0;
+      }
+      
+      let arrivalDateFormatted = arrivalDate;
+      let arrivalHour = parseInt(arrivalTime);
+      if (arrivalHour === 24) {
+        const date = new Date(arrivalDate);
+        date.setDate(date.getDate() + 1);
+        arrivalDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        arrivalHour = 0;
+      }
+      
+      const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
+      const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
       const genderValue = getGenderFromBirthDate(birthDate, gender);
       const insuranceType = type === 'short' ? '해외여행보험' : type === 'long' ? '해외장기체류보험' : '단체여행자보험';
 
@@ -340,8 +359,27 @@ function MobileOverseasStep1Content() {
     setIsCalculating(true);
 
     try {
-      const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
-      const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
+      // 24시는 다음날 00시로 변환
+      let departureDateFormatted = departureDate;
+      let departureHour = parseInt(departureTime);
+      if (departureHour === 24) {
+        const date = new Date(departureDate);
+        date.setDate(date.getDate() + 1);
+        departureDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        departureHour = 0;
+      }
+      
+      let arrivalDateFormatted = arrivalDate;
+      let arrivalHour = parseInt(arrivalTime);
+      if (arrivalHour === 24) {
+        const date = new Date(arrivalDate);
+        date.setDate(date.getDate() + 1);
+        arrivalDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        arrivalHour = 0;
+      }
+      
+      const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
+      const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
       const genderValue = getGenderFromBirthDate(birthDate, gender);
 
       // 보험 타입 결정
@@ -458,8 +496,27 @@ function MobileOverseasStep1Content() {
         const planType = selectedPlan || '실속플랜';
 
         // 보험료 계산 API 호출
-        const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
-        const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
+        // 24시는 다음날 00시로 변환
+        let departureDateFormatted = departureDate;
+        let departureHour = parseInt(departureTime);
+        if (departureHour === 24) {
+          const date = new Date(departureDate);
+          date.setDate(date.getDate() + 1);
+          departureDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+          departureHour = 0;
+        }
+        
+        let arrivalDateFormatted = arrivalDate;
+        let arrivalHour = parseInt(arrivalTime);
+        if (arrivalHour === 24) {
+          const date = new Date(arrivalDate);
+          date.setDate(date.getDate() + 1);
+          arrivalDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+          arrivalHour = 0;
+        }
+        
+        const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
+        const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
 
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/travel/calculate-premium`, {
           method: 'POST',
@@ -558,9 +615,28 @@ function MobileOverseasStep1Content() {
 
     // 결제 방법별 처리
     try {
-      const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
-      const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
-      const periodDays = Math.ceil((new Date(`${arrivalDate}T${arrivalTime}:00:00`).getTime() - new Date(`${departureDate}T${departureTime}:00:00`).getTime()) / (1000 * 60 * 60 * 24));
+      // 24시는 다음날 00시로 변환
+      let departureDateFormatted = departureDate;
+      let departureHour = parseInt(departureTime);
+      if (departureHour === 24) {
+        const date = new Date(departureDate);
+        date.setDate(date.getDate() + 1);
+        departureDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        departureHour = 0;
+      }
+      
+      let arrivalDateFormatted = arrivalDate;
+      let arrivalHour = parseInt(arrivalTime);
+      if (arrivalHour === 24) {
+        const date = new Date(arrivalDate);
+        date.setDate(date.getDate() + 1);
+        arrivalDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        arrivalHour = 0;
+      }
+      
+      const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
+      const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
+      const periodDays = Math.ceil((new Date(`${arrivalDateFormatted}T${String(arrivalHour).padStart(2, '0')}:00:00`).getTime() - new Date(`${departureDateFormatted}T${String(departureHour).padStart(2, '0')}:00:00`).getTime()) / (1000 * 60 * 60 * 24));
 
       // 나이스페이먼츠, 네이버페이, 카카오페이는 먼저 계약 등록 후 결제 처리
       if (paymentMethod === '나이스페이먼츠' || paymentMethod === '네이버페이' || paymentMethod === '카카오페이') {
@@ -733,7 +809,7 @@ function MobileOverseasStep1Content() {
             payment_method: paymentMethod || '기타결제',
             payment_sub_method: paymentSubMethod || null,
             amount: receiptPremium,
-            status: paymentSubMethod === '무통장입금' ? '대기' : '완료',
+            status: (paymentSubMethod === '무통장입금' || paymentSubMethod === '수기카드') ? '대기' : '완료',
             depositor_name: paymentSubMethod === '무통장입금' ? depositorName : null,
             bank_name: paymentSubMethod === '무통장입금' ? depositBank : null,
             account_number: paymentSubMethod === '무통장입금' ? (depositBank === '우리은행' ? '1005-604-481542' : '301-0337-8596-01') : null,

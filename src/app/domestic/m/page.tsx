@@ -195,8 +195,27 @@ function MobileDomesticStep1Content() {
     setIsCalculating(true);
 
     try {
-      const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
-      const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
+      // 24시는 다음날 00시로 변환
+      let departureDateFormatted = departureDate;
+      let departureHour = parseInt(departureTime);
+      if (departureHour === 24) {
+        const date = new Date(departureDate);
+        date.setDate(date.getDate() + 1);
+        departureDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        departureHour = 0;
+      }
+      
+      let arrivalDateFormatted = arrivalDate;
+      let arrivalHour = parseInt(arrivalTime);
+      if (arrivalHour === 24) {
+        const date = new Date(arrivalDate);
+        date.setDate(date.getDate() + 1);
+        arrivalDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        arrivalHour = 0;
+      }
+      
+      const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
+      const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
       const genderValue = getGenderFromBirthDate(birthDate, gender);
 
       // 각 플랜별 보험료 계산
@@ -280,8 +299,27 @@ function MobileDomesticStep1Content() {
     setIsCalculating(true);
 
     try {
-      const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
-      const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
+      // 24시는 다음날 00시로 변환
+      let departureDateFormatted = departureDate;
+      let departureHour = parseInt(departureTime);
+      if (departureHour === 24) {
+        const date = new Date(departureDate);
+        date.setDate(date.getDate() + 1);
+        departureDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        departureHour = 0;
+      }
+      
+      let arrivalDateFormatted = arrivalDate;
+      let arrivalHour = parseInt(arrivalTime);
+      if (arrivalHour === 24) {
+        const date = new Date(arrivalDate);
+        date.setDate(date.getDate() + 1);
+        arrivalDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        arrivalHour = 0;
+      }
+      
+      const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
+      const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
       const genderValue = getGenderFromBirthDate(birthDate, gender);
 
       // 보험 타입
@@ -425,8 +463,27 @@ function MobileDomesticStep1Content() {
         const planType = selectedPlan === '실속플랜' ? '실속플랜' : '표준플랜';
 
         // 보험료 계산 API 호출
-        const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
-        const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
+        // 24시는 다음날 00시로 변환
+        let departureDateFormatted = departureDate;
+        let departureHour = parseInt(departureTime);
+        if (departureHour === 24) {
+          const date = new Date(departureDate);
+          date.setDate(date.getDate() + 1);
+          departureDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+          departureHour = 0;
+        }
+        
+        let arrivalDateFormatted = arrivalDate;
+        let arrivalHour = parseInt(arrivalTime);
+        if (arrivalHour === 24) {
+          const date = new Date(arrivalDate);
+          date.setDate(date.getDate() + 1);
+          arrivalDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+          arrivalHour = 0;
+        }
+        
+        const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
+        const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
 
         const response = await fetch('/api/travel/calculate-premium', {
           method: 'POST',
@@ -557,8 +614,27 @@ function MobileDomesticStep1Content() {
     }
 
     try {
-      const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
-      const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
+      // 24시는 다음날 00시로 변환
+      let departureDateFormatted = departureDate;
+      let departureHour = parseInt(departureTime);
+      if (departureHour === 24) {
+        const date = new Date(departureDate);
+        date.setDate(date.getDate() + 1);
+        departureDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        departureHour = 0;
+      }
+      
+      let arrivalDateFormatted = arrivalDate;
+      let arrivalHour = parseInt(arrivalTime);
+      if (arrivalHour === 24) {
+        const date = new Date(arrivalDate);
+        date.setDate(date.getDate() + 1);
+        arrivalDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        arrivalHour = 0;
+      }
+      
+      const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
+      const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
 
       // 기간 계산
       const departure = new Date(departureDateTime);
@@ -735,7 +811,7 @@ function MobileDomesticStep1Content() {
             payment_method: paymentMethod || '기타결제',
             payment_sub_method: paymentSubMethod || null,
             amount: receiptPremium,
-            status: paymentSubMethod === '무통장입금' ? '대기' : '완료',
+            status: (paymentSubMethod === '무통장입금' || paymentSubMethod === '수기카드') ? '대기' : '완료',
             depositor_name: paymentSubMethod === '무통장입금' ? depositorName : null,
             bank_name: paymentSubMethod === '무통장입금' ? depositBank : null,
             account_number: paymentSubMethod === '무통장입금' ? (depositBank === '우리은행' ? '1005-604-481542' : '301-0337-8596-01') : null,

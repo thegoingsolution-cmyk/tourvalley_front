@@ -245,8 +245,27 @@ export default function PCDomesticPage() {
     setIsCalculating(true);
 
     try {
-      const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
-      const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
+      // 24시는 다음날 00시로 변환
+      let departureDateFormatted = departureDate;
+      let departureHour = parseInt(departureTime);
+      if (departureHour === 24) {
+        const date = new Date(departureDate);
+        date.setDate(date.getDate() + 1);
+        departureDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        departureHour = 0;
+      }
+      
+      let arrivalDateFormatted = arrivalDate;
+      let arrivalHour = parseInt(arrivalTime);
+      if (arrivalHour === 24) {
+        const date = new Date(arrivalDate);
+        date.setDate(date.getDate() + 1);
+        arrivalDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        arrivalHour = 0;
+      }
+      
+      const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
+      const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
       const genderValue = getGenderFromBirthDate(birthDate, gender);
       const age = calculateAgeFromBirthDate(birthDate);
 
@@ -377,8 +396,27 @@ export default function PCDomesticPage() {
         const planType = selectedPlan === '실속플랜' ? '실속플랜' : '표준플랜';
 
         // 보험료 계산 API 호출
-        const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
-        const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
+        // 24시는 다음날 00시로 변환
+        let departureDateFormatted = departureDate;
+        let departureHour = parseInt(departureTime);
+        if (departureHour === 24) {
+          const date = new Date(departureDate);
+          date.setDate(date.getDate() + 1);
+          departureDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+          departureHour = 0;
+        }
+        
+        let arrivalDateFormatted = arrivalDate;
+        let arrivalHour = parseInt(arrivalTime);
+        if (arrivalHour === 24) {
+          const date = new Date(arrivalDate);
+          date.setDate(date.getDate() + 1);
+          arrivalDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+          arrivalHour = 0;
+        }
+        
+        const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
+        const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
 
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/travel/calculate-premium`, {
           method: 'POST',
@@ -474,8 +512,27 @@ export default function PCDomesticPage() {
     setIsCalculating(true);
 
     try {
-      const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
-      const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
+      // 24시는 다음날 00시로 변환
+      let departureDateFormatted = departureDate;
+      let departureHour = parseInt(departureTime);
+      if (departureHour === 24) {
+        const date = new Date(departureDate);
+        date.setDate(date.getDate() + 1);
+        departureDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        departureHour = 0;
+      }
+      
+      let arrivalDateFormatted = arrivalDate;
+      let arrivalHour = parseInt(arrivalTime);
+      if (arrivalHour === 24) {
+        const date = new Date(arrivalDate);
+        date.setDate(date.getDate() + 1);
+        arrivalDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        arrivalHour = 0;
+      }
+      
+      const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
+      const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
       const genderValue = getGenderFromBirthDate(birthDate, gender);
 
       // 각 플랜별 보험료 계산 (동적으로 생성)
@@ -585,9 +642,28 @@ export default function PCDomesticPage() {
 
     // 결제 방법별 처리
     try {
-      const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
-      const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
-      const periodDays = Math.ceil((new Date(`${arrivalDate}T${arrivalTime}:00:00`).getTime() - new Date(`${departureDate}T${departureTime}:00:00`).getTime()) / (1000 * 60 * 60 * 24));
+      // 24시는 다음날 00시로 변환
+      let departureDateFormatted = departureDate;
+      let departureHour = parseInt(departureTime);
+      if (departureHour === 24) {
+        const date = new Date(departureDate);
+        date.setDate(date.getDate() + 1);
+        departureDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        departureHour = 0;
+      }
+      
+      let arrivalDateFormatted = arrivalDate;
+      let arrivalHour = parseInt(arrivalTime);
+      if (arrivalHour === 24) {
+        const date = new Date(arrivalDate);
+        date.setDate(date.getDate() + 1);
+        arrivalDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        arrivalHour = 0;
+      }
+      
+      const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
+      const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
+      const periodDays = Math.ceil((new Date(`${arrivalDateFormatted}T${String(arrivalHour).padStart(2, '0')}:00:00`).getTime() - new Date(`${departureDateFormatted}T${String(departureHour).padStart(2, '0')}:00:00`).getTime()) / (1000 * 60 * 60 * 24));
 
       // 나이스페이먼츠, 네이버페이, 카카오페이는 먼저 계약 등록 후 결제 처리
       if (paymentMethod === '나이스페이먼츠' || paymentMethod === '네이버페이' || paymentMethod === '카카오페이') {
@@ -617,15 +693,21 @@ export default function PCDomesticPage() {
           },
           insured_persons: participants.map((p, idx) => {
             const age = calculateAgeFromBirthDate(p.birthDate);
+            // 국적 정보 변환
+            const nationalityType = p.nationality === '외국인' ? '외국인' : '내국인';
             return {
               sequence_number: idx + 1,
               name: p.name,
+              english_name: (p as any).englishName || null,
               resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
               gender: p.gender,
               age: age || 0,
               plan_type: selectedPlan || '실속플랜',
               premium: calculatedPremiums?.participants.find(cp => cp.id === p.id)?.premium || 0,
               has_medical_expense: hasMedicalExpense ? 1 : 0,
+              nationality_type: nationalityType,
+              nationality_continent: null, // 일반 경로에서는 외국인 대륙 정보를 수집하지 않음
+              nationality_country: null, // 일반 경로에서는 외국인 국가 정보를 수집하지 않음
             };
           }),
           companions: [],
@@ -757,15 +839,21 @@ export default function PCDomesticPage() {
           },
           insured_persons: participants.map((p, idx) => {
             const age = calculateAgeFromBirthDate(p.birthDate);
+            // 국적 정보 변환
+            const nationalityType = p.nationality === '외국인' ? '외국인' : '내국인';
             return {
               sequence_number: idx + 1,
               name: p.name,
+              english_name: (p as any).englishName || null,
               resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
               gender: p.gender,
               age: age || 0,
               plan_type: selectedPlan || '실속플랜',
               premium: calculatedPremiums?.participants.find(cp => cp.id === p.id)?.premium || 0,
               has_medical_expense: hasMedicalExpense ? 1 : 0,
+              nationality_type: nationalityType,
+              nationality_continent: null, // 일반 경로에서는 외국인 대륙 정보를 수집하지 않음
+              nationality_country: null, // 일반 경로에서는 외국인 국가 정보를 수집하지 않음
             };
           }),
           companions: [],

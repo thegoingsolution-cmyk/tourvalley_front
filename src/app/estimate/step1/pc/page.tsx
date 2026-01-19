@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import ServiceModal from '@/components/ServiceModal';
 import AccidentFreeCashModal from '@/components/travel/AccidentFreeCashModal';
 import CountrySelectModal from '@/components/travel/CountrySelectModal';
+import StepIndicator from '@/components/travel/StepIndicator';
 import { getImagePath } from '@/utils/path';
 import './page.css';
 
@@ -109,61 +110,37 @@ export default function PCStep1Page() {
     <div className="estimate-step1-page">
       <Header isMobile={false} />
       
-      <section 
-        className="main_bg01 main_bg01_w"
+      <main 
+        className="estimate-content-pc"
         style={{ backgroundImage: `url(${getImagePath('/202309_main_bg02.png')})` }}
       >
-        <div className="container_w">
-          {/* 오른쪽 고정 버튼 */}
-          <div className="container_box_w">
-            <a href="#" onClick={(e) => { e.preventDefault(); setShowCashModal(true); }}>
-              <div className="fixedRight_b01">
-                <p className="icon_cash"><span className="icon_cash01"></span></p>
-                <p className="fixedRight_txt01">무사고캐시란?</p>
-              </div>
-            </a>
+        {/* 오른쪽 고정 버튼 */}
+        <div className="container_box_w">
+          <a href="#" onClick={(e) => { e.preventDefault(); setShowCashModal(true); }}>
+            <div className="fixedRight_b01">
+              <p className="icon_cash"><span className="icon_cash01"></span></p>
+              <p className="fixedRight_txt01">무사고캐시란?</p>
+            </div>
+          </a>
 
-            <a href="#" onClick={(e) => { e.preventDefault(); setShowServiceModal(true); }}>
-              <div className="fixedRight_b02" style={{}}>
-                <p className="icon_menu"><span className="icon_menu01"></span></p>
-                <p className="fixedRight_txt02">서비스<br/>전체보기</p>
-              </div>
-            </a>
-          </div>
+          <a href="#" onClick={(e) => { e.preventDefault(); setShowServiceModal(true); }}>
+            <div className="fixedRight_b02" style={{}}>
+              <p className="icon_menu"><span className="icon_menu01"></span></p>
+              <p className="fixedRight_txt02">서비스<br/>전체보기</p>
+            </div>
+          </a>
+        </div>
 
-          <div className="container_box">
+        <div className="form-section">
+          <div className="form-card">
               <form name="inputForm" method="POST">
                 <div className="prow_01">
-                  <div className="tour2023_BWrap tourG_mat13 tourG_mab05">
-                    <p className="tour2023_title17">여행자보험 견적신청</p>
-                    <section className="tour2023_step_w">
-                      <div className="tour2023_step_line tour">
-                        <ul className="tour2023_step on">
-                          <li className="tour2023_step01">
-                            <div className="tour2023_step_num">
-                              <span className="tour2023_step_num01">1</span>
-                            </div>
-                            <div className="tour2023_step_txt">여행정보</div>
-                          </li>
-                        </ul>
-                        <ul className="tour2023_step">
-                          <li className="tour2023_step01">
-                            <div className="tour2023_step_num">
-                              <span className="tour2023_step_num01">2</span>
-                            </div>
-                            <div className="tour2023_step_txt">정보동의</div>
-                          </li>
-                        </ul>
-                        <ul className="tour2023_step">
-                          <li className="tour2023_step01">
-                            <div className="tour2023_step_num">
-                              <span className="tour2023_step_num01">3</span>
-                            </div>
-                            <div className="tour2023_step_txt">신청완료</div>
-                          </li>
-                        </ul>
-                      </div>
-                    </section>
+                  <div className="form-header tourG_mat13 tourG_mab05">
+                    <p className="form-title tour2023_title01">여행자보험 견적신청</p>
+                    <StepIndicator 
+                      currentStep={1} 
+                      stepLabels={['여행정보', '정보동의', '신청완료']}
+                    />
                   </div>
 
                   <div className="menu_wrap_tab tourG_mat10 tourG_mab05">
@@ -364,9 +341,9 @@ export default function PCStep1Page() {
               </form>
           </div>
         </div>
-      </section>
+      </main>
 
-      <Footer />
+      <Footer isMobile={false} />
 
       {/* 서비스 전체보기 모달 */}
       <ServiceModal 

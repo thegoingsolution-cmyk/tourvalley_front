@@ -261,8 +261,27 @@ function MobileLongTermStayContent() {
     setIsCalculating(true);
 
     try {
-      const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
-      const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
+      // 24시는 다음날 00시로 변환
+      let departureDateFormatted = departureDate;
+      let departureHour = parseInt(departureTime);
+      if (departureHour === 24) {
+        const date = new Date(departureDate);
+        date.setDate(date.getDate() + 1);
+        departureDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        departureHour = 0;
+      }
+      
+      let arrivalDateFormatted = arrivalDate;
+      let arrivalHour = parseInt(arrivalTime);
+      if (arrivalHour === 24) {
+        const date = new Date(arrivalDate);
+        date.setDate(date.getDate() + 1);
+        arrivalDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        arrivalHour = 0;
+      }
+      
+      const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
+      const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
       const genderValue = getGenderFromBirthDate(birthDate, gender);
       const insuranceType = getTravelPurposeText(travelPurposeLong);
 
@@ -470,8 +489,28 @@ function MobileLongTermStayContent() {
         }
 
         const planType = selectedPlan || '실속플랜';
-        const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
-        const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
+        
+        // 24시는 다음날 00시로 변환
+        let departureDateFormatted = departureDate;
+        let departureHour = parseInt(departureTime);
+        if (departureHour === 24) {
+          const date = new Date(departureDate);
+          date.setDate(date.getDate() + 1);
+          departureDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+          departureHour = 0;
+        }
+        
+        let arrivalDateFormatted = arrivalDate;
+        let arrivalHour = parseInt(arrivalTime);
+        if (arrivalHour === 24) {
+          const date = new Date(arrivalDate);
+          date.setDate(date.getDate() + 1);
+          arrivalDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+          arrivalHour = 0;
+        }
+        
+        const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
+        const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
 
         // 워킹홀리데이인 경우 외화, 그 외는 선택된 통화 플랜 사용
         const useCurrencyPlan = isWorkingHoliday ? '외화' : currencyPlan;
@@ -533,9 +572,278 @@ function MobileLongTermStayContent() {
       alert('결제 방법을 선택해주세요.');
       return;
     }
-    // 결제 검증 로직...
-    
-    alert('결제 기능은 구현 예정입니다.');
+    if (paymentMethod === '기타결제' && !paymentSubMethod) {
+      alert('결제 세부 방법을 선택해주세요.');
+      return;
+    }
+    if (paymentMethod === '기타결제' && paymentSubMethod === '무통장입금') {
+      if (!depositBank) {
+        alert('입금은행을 선택해주세요.');
+        return;
+      }
+      if (!depositorName) {
+        alert('입금자명을 입력해주세요.');
+        return;
+      }
+    }
+    if (paymentMethod === '기타결제' && paymentSubMethod === '수기카드') {
+      if (!cardCategory) {
+        alert('카드종류를 선택해주세요.');
+        return;
+      }
+      if (!cardNumber1 || !cardNumber2 || !cardNumber3 || !cardNumber4) {
+        alert('카드번호를 모두 입력해주세요.');
+        return;
+      }
+      if (!cardExpiryMonth || !cardExpiryYear) {
+        alert('유효기간을 선택해주세요.');
+        return;
+      }
+      if (!cardholderName) {
+        alert('카드소유자명을 입력해주세요.');
+        return;
+      }
+      if (!cardholderResidentNumber || cardholderResidentNumber.length < 14) {
+        alert('카드소유자 주민번호를 입력해주세요.');
+        return;
+      }
+    }
+
+    // 결제 방법별 처리
+    try {
+      // 24시는 다음날 00시로 변환
+      let departureDateFormatted = departureDate;
+      let departureHour = parseInt(departureTime);
+      if (departureHour === 24) {
+        const date = new Date(departureDate);
+        date.setDate(date.getDate() + 1);
+        departureDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        departureHour = 0;
+      }
+      
+      let arrivalDateFormatted = arrivalDate;
+      let arrivalHour = parseInt(arrivalTime);
+      if (arrivalHour === 24) {
+        const date = new Date(arrivalDate);
+        date.setDate(date.getDate() + 1);
+        arrivalDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        arrivalHour = 0;
+      }
+      
+      const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
+      const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
+      const periodDays = Math.ceil((new Date(`${arrivalDateFormatted}T${String(arrivalHour).padStart(2, '0')}:00:00`).getTime() - new Date(`${departureDateFormatted}T${String(departureHour).padStart(2, '0')}:00:00`).getTime()) / (1000 * 60 * 60 * 24));
+
+      // 나이스페이먼츠, 네이버페이, 카카오페이는 먼저 계약 등록 후 결제 처리
+      if (paymentMethod === '나이스페이먼츠' || paymentMethod === '네이버페이' || paymentMethod === '카카오페이') {
+        // 1. 계약 등록 (결제 대기 상태)
+        const contractData = {
+          contract: {
+            member_id: isLoggedIn && member ? member.id : null,
+            insurance_type: getTravelPurposeText(travelPurposeLong),
+            departure_date: departureDateTime,
+            arrival_date: arrivalDateTime,
+            duration_months: 0,
+            duration_days: periodDays,
+            travel_region: null,
+            travel_country: travelCountry,
+            travel_purpose: getTravelPurposeText(travelPurposeLong),
+            travel_participants: participants.length,
+            total_premium: calculatedPremiums?.totalPremium || 0,
+            device: '모바일',
+            access_path: '투어밸리 모바일 사이트',
+          },
+          contractor: {
+            contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
+            name: participants[0]?.name || '',
+            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${participants[0].gender === '남자' ? '1' : '2'}******` : '',
+            mobile_phone: participants[0]?.phone || '',
+            email: getFullEmail(participants[0]),
+          },
+          insured_persons: participants.map((p, idx) => {
+            const age = calculateAgeFromBirthDate(p.birthDate);
+            return {
+              sequence_number: idx + 1,
+              name: p.name,
+              resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
+              gender: p.gender,
+              age: age || 0,
+              plan_type: selectedPlan || '실속플랜',
+              premium: calculatedPremiums?.participants.find(cp => cp.id === p.id)?.premium || 0,
+              has_medical_expense: hasMedicalExpense ? 1 : 0,
+            };
+          }),
+          companions: [],
+          payment: {
+            payment_method: paymentMethod,
+            payment_sub_method: null,
+            amount: receiptPremium,
+            status: '대기',
+          },
+        };
+
+        const contractResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/travel/register-contract`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(contractData),
+        });
+
+        const contractData_result = await contractResponse.json();
+
+        if (!contractData_result.success) {
+          alert(contractData_result.message || '계약 등록에 실패했습니다.');
+          return;
+        }
+
+        const contract_id = contractData_result.contract_id;
+
+        // 2. 결제 처리
+        if (paymentMethod === '나이스페이먼츠') {
+          const paymentRequest = await requestNicepayPayment({
+            contract_id,
+            amount: receiptPremium,
+            orderId: contractData_result.contract_number,
+            goodsName: getTitle(),
+            buyerName: participants[0]?.name || '',
+            buyerEmail: getFullEmail(participants[0]),
+            buyerTel: participants[0]?.phone || '',
+            returnUrl: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/payments/nicepay/callback`,
+            closeUrl: `${window.location.origin}/payment/close`,
+          });
+
+          if (paymentRequest.success) {
+            localStorage.setItem('pendingPayment', JSON.stringify({
+              contract_id,
+              payment_method: paymentMethod,
+              amount: receiptPremium,
+            }));
+            try {
+              await openNicepayWindow(paymentRequest);
+            } catch (error) {
+              console.error('결제창 열기 오류:', error);
+              alert(error instanceof Error ? error.message : '결제창을 여는 중 오류가 발생했습니다.');
+            }
+          } else {
+            alert(paymentRequest.message || '결제 요청에 실패했습니다.');
+          }
+        } else if (paymentMethod === '네이버페이') {
+          try {
+            await processNaverPayPayment({
+              contractId: contract_id,
+              amount: receiptPremium,
+              productName: getTitle(),
+              productCount: participants.length,
+              customerName: participants[0]?.name || '',
+              customerEmail: getFullEmail(participants[0]),
+              customerPhone: participants[0]?.phone || '',
+              checkOutDate: arrivalDate,
+            });
+            // 네이버 페이 결제창이 열리면, 콜백으로 결과가 처리됩니다
+          } catch (error) {
+            console.error('네이버 페이 결제 오류:', error);
+            alert(error instanceof Error ? error.message : '네이버 페이 결제 중 오류가 발생했습니다.');
+          }
+        } else if (paymentMethod === '카카오페이') {
+          try {
+            await processKakaoPayPayment({
+              contractId: contract_id,
+              amount: receiptPremium,
+              itemName: getTitle(),
+              quantity: participants.length,
+              customerName: participants[0]?.name || '',
+              customerEmail: getFullEmail(participants[0]),
+              customerPhone: participants[0]?.phone || '',
+            });
+            // 카카오페이 결제 페이지로 리다이렉트됨
+          } catch (error) {
+            console.error('카카오페이 결제 오류:', error);
+            alert(error instanceof Error ? error.message : '카카오페이 결제 중 오류가 발생했습니다.');
+          }
+        }
+      } else {
+        // 기타결제 (무통장입금, 수기카드)는 바로 계약 등록
+        const contractData = {
+          contract: {
+            member_id: isLoggedIn && member ? member.id : null,
+            insurance_type: getTravelPurposeText(travelPurposeLong),
+            departure_date: departureDateTime,
+            arrival_date: arrivalDateTime,
+            duration_months: 0,
+            duration_days: periodDays,
+            travel_region: null,
+            travel_country: travelCountry,
+            travel_purpose: getTravelPurposeText(travelPurposeLong),
+            travel_participants: participants.length,
+            total_premium: calculatedPremiums?.totalPremium || 0,
+            device: '모바일',
+            access_path: '투어밸리 모바일 사이트',
+          },
+          contractor: {
+            contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
+            name: participants[0]?.name || '',
+            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${participants[0].gender === '남자' ? '1' : '2'}******` : '',
+            mobile_phone: participants[0]?.phone || '',
+            email: getFullEmail(participants[0]),
+          },
+          insured_persons: participants.map((p, idx) => {
+            const age = calculateAgeFromBirthDate(p.birthDate);
+            return {
+              sequence_number: idx + 1,
+              name: p.name,
+              resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
+              gender: p.gender,
+              age: age || 0,
+              plan_type: selectedPlan || '실속플랜',
+              premium: calculatedPremiums?.participants.find(cp => cp.id === p.id)?.premium || 0,
+              has_medical_expense: hasMedicalExpense ? 1 : 0,
+            };
+          }),
+          companions: [],
+          payment: {
+            payment_method: paymentMethod || '기타결제',
+            payment_sub_method: paymentSubMethod || null,
+            amount: receiptPremium,
+            status: (paymentSubMethod === '무통장입금' || paymentSubMethod === '수기카드') ? '대기' : '완료',
+            depositor_name: paymentSubMethod === '무통장입금' ? depositorName : null,
+            bank_name: paymentSubMethod === '무통장입금' ? depositBank : null,
+            account_number: paymentSubMethod === '무통장입금' ? (depositBank === '우리은행' ? '1005-604-481542' : '301-0337-8596-01') : null,
+            card_type: paymentSubMethod === '수기카드' ? cardType : null,
+            card_category: paymentSubMethod === '수기카드' ? cardCategory : null,
+            card_number: paymentSubMethod === '수기카드' ? `${cardNumber1}-${cardNumber2}-${cardNumber3}-${cardNumber4}` : null,
+            card_expiry_month: paymentSubMethod === '수기카드' ? cardExpiryMonth : null,
+            card_expiry_year: paymentSubMethod === '수기카드' ? cardExpiryYear : null,
+            cardholder_name: paymentSubMethod === '수기카드' ? cardholderName : null,
+            cardholder_resident_number: paymentSubMethod === '수기카드' ? cardholderResidentNumber : null,
+            approval_date: paymentSubMethod === '수기카드' ? `${approvalYear}-${String(approvalMonth).padStart(2, '0')}-${String(approvalDay).padStart(2, '0')}` : null,
+            normal_premium: normalPremium,
+            receipt_premium: receiptPremium,
+          },
+        };
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/travel/register-contract`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(contractData),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          setShowPaymentScreen(false);
+          setShowCompletionScreen(true);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          alert(data.message || '계약 등록에 실패했습니다.');
+        }
+      }
+    } catch (error) {
+      console.error('계약 등록 오류:', error);
+      alert('계약 등록 중 오류가 발생했습니다.');
+    }
   };
 
   const handleTwoOrMoreClick = () => {

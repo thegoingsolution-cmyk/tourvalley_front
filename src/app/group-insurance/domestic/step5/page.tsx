@@ -174,9 +174,30 @@ export default function DomesticInsuranceStep5Page() {
       }
 
       // 날짜/시간 계산
-      const departureDateTime = `${step1Data.startDate} ${String(step1Data.startHour).padStart(2, '0')}:00:00`;
-      const arrivalDateTime = `${step1Data.endDate} ${String(step1Data.endHour).padStart(2, '0')}:00:00`;
-      const periodDays = Math.ceil((new Date(`${step1Data.endDate}T${step1Data.endHour}:00:00`).getTime() - new Date(`${step1Data.startDate}T${step1Data.startHour}:00:00`).getTime()) / (1000 * 60 * 60 * 24));
+      // 24시는 다음날 00시로 변환
+      let departureDate = step1Data.startDate;
+      let departureHour = parseInt(step1Data.startHour);
+      if (departureHour === 24) {
+        // 다음날로 변경
+        const date = new Date(step1Data.startDate);
+        date.setDate(date.getDate() + 1);
+        departureDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        departureHour = 0;
+      }
+      
+      let arrivalDate = step1Data.endDate;
+      let arrivalHour = parseInt(step1Data.endHour);
+      if (arrivalHour === 24) {
+        // 다음날로 변경
+        const date = new Date(step1Data.endDate);
+        date.setDate(date.getDate() + 1);
+        arrivalDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        arrivalHour = 0;
+      }
+      
+      const departureDateTime = `${departureDate} ${String(departureHour).padStart(2, '0')}:00:00`;
+      const arrivalDateTime = `${arrivalDate} ${String(arrivalHour).padStart(2, '0')}:00:00`;
+      const periodDays = Math.ceil((new Date(`${arrivalDate}T${String(arrivalHour).padStart(2, '0')}:00:00`).getTime() - new Date(`${departureDate}T${String(departureHour).padStart(2, '0')}:00:00`).getTime()) / (1000 * 60 * 60 * 24));
 
       // 피보험자 정보 구성
       const insuredPersons = [];
@@ -266,7 +287,7 @@ export default function DomesticInsuranceStep5Page() {
           payment_method: paymentMethodName,
           payment_sub_method: payMethod === 'W' ? '수기카드' : (payMethod === 'B' ? '무통장입금' : null),
           amount: step3Data?.total_premium || 0,
-          status: (payMethod === 'C' || payMethod === 'N' || payMethod === 'K') ? '대기' : (payMethod === 'B' ? '대기' : '완료'),
+          status: (payMethod === 'C' || payMethod === 'N' || payMethod === 'K' || payMethod === 'W' || payMethod === 'B') ? '대기' : '완료',
           depositor_name: payMethod === 'B' ? (document.querySelector('input[name="payment_name"]') as HTMLInputElement)?.value : null,
           bank_name: payMethod === 'B' ? ((document.querySelector('input[name="accountB"]:checked') as HTMLInputElement)?.value === 'B1' ? '우리은행' : '농협') : null,
           account_number: payMethod === 'B' ? ((document.querySelector('input[name="accountB"]:checked') as HTMLInputElement)?.value === 'B1' ? '1005-604-481542' : '301-0337-8596-01') : null,

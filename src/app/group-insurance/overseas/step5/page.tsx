@@ -185,40 +185,91 @@ export default function OverseasInsuranceStep5Page() {
       }
 
       // 날짜/시간 계산
-      const departureDateTime = `${step1Data.startDate} ${String(step1Data.startHour).padStart(2, '0')}:00:00`;
-      const arrivalDateTime = `${step1Data.endDate} ${String(step1Data.endHour).padStart(2, '0')}:00:00`;
-      const periodDays = Math.ceil((new Date(`${step1Data.endDate}T${step1Data.endHour}:00:00`).getTime() - new Date(`${step1Data.startDate}T${step1Data.startHour}:00:00`).getTime()) / (1000 * 60 * 60 * 24));
+      // 24시는 다음날 00시로 변환
+      let departureDate = step1Data.startDate;
+      let departureHour = parseInt(step1Data.startHour);
+      if (departureHour === 24) {
+        // 다음날로 변경
+        const date = new Date(step1Data.startDate);
+        date.setDate(date.getDate() + 1);
+        departureDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        departureHour = 0;
+      }
+      
+      let arrivalDate = step1Data.endDate;
+      let arrivalHour = parseInt(step1Data.endHour);
+      if (arrivalHour === 24) {
+        // 다음날로 변경
+        const date = new Date(step1Data.endDate);
+        date.setDate(date.getDate() + 1);
+        arrivalDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        arrivalHour = 0;
+      }
+      
+      const departureDateTime = `${departureDate} ${String(departureHour).padStart(2, '0')}:00:00`;
+      const arrivalDateTime = `${arrivalDate} ${String(arrivalHour).padStart(2, '0')}:00:00`;
+      const periodDays = Math.ceil((new Date(`${arrivalDate}T${String(arrivalHour).padStart(2, '0')}:00:00`).getTime() - new Date(`${departureDate}T${String(departureHour).padStart(2, '0')}:00:00`).getTime()) / (1000 * 60 * 60 * 24));
 
       // 피보험자 정보 구성
       const insuredPersons = [];
       for (let i = 1; i <= step1Data.tourNum; i++) {
         const name = step2Data[`insured_name_${i}`] || '';
+        const engName = step2Data[`insured_engname_${i}`] || '';
         const birthDate = step2Data[`insured_birth_${i}`] || '';
         const gender = step2Data[`insured_gender_${i}`] || '남자';
+        const countryType = step2Data[`insured_country_type_${i}`] || 'D'; // D: 내국인, F: 외국인
         const planCode = step3Data.selected_plans?.[i] || 'STW';
         const planType = step3Data.plan_types?.[i] || 'V';
         const premium = step3Data.premiums?.[i] || 0;
+        
+        // 외국인등록번호 또는 주민번호 처리
+        const ssn1 = step2Data[`insured_ssn1_${i}`] || ''; // 주민번호 앞자리 또는 외국인등록번호 앞자리
+        const ssn2 = step2Data[`insured_ssn2_${i}`] || ''; // 주민번호 뒷자리 또는 외국인등록번호 뒷자리
 
         // 생년월일에서 나이 계산
         let age = 0;
         let genderCode = '1'; // 기본값
-        if (birthDate && birthDate.length >= 8) {
-          const year = parseInt(birthDate.substring(0, 4));
-          const month = parseInt(birthDate.substring(4, 6));
-          const day = parseInt(birthDate.substring(6, 8));
-          const today = new Date();
-          age = today.getFullYear() - year;
-          if (today.getMonth() < month - 1 || (today.getMonth() === month - 1 && today.getDate() < day)) {
-            age--;
+        let residentNumber = ''; // 주민번호 또는 외국인등록번호
+        
+        if (countryType === 'F') {
+          // 외국인인 경우: 외국인등록번호 사용
+          if (ssn1 && ssn2) {
+            residentNumber = `${ssn1}-${ssn2}`;
           }
-          
-          // 생년에 따라 성별코드 결정 (주민번호 성별코드)
-          // 1900년대생: 남자='1', 여자='2'
-          // 2000년대생: 남자='3', 여자='4'
-          if (year >= 2000) {
-            genderCode = gender === '남자' ? '3' : '4';
-          } else {
-            genderCode = gender === '남자' ? '1' : '2';
+          // 외국인인 경우 나이 계산은 생년월일로
+          if (birthDate && birthDate.length >= 8) {
+            const year = parseInt(birthDate.substring(0, 4));
+            const month = parseInt(birthDate.substring(4, 6));
+            const day = parseInt(birthDate.substring(6, 8));
+            const today = new Date();
+            age = today.getFullYear() - year;
+            if (today.getMonth() < month - 1 || (today.getMonth() === month - 1 && today.getDate() < day)) {
+              age--;
+            }
+          }
+        } else {
+          // 내국인인 경우: 주민번호 생성 (기존 로직)
+          if (birthDate && birthDate.length >= 8) {
+            const year = parseInt(birthDate.substring(0, 4));
+            const month = parseInt(birthDate.substring(4, 6));
+            const day = parseInt(birthDate.substring(6, 8));
+            const today = new Date();
+            age = today.getFullYear() - year;
+            if (today.getMonth() < month - 1 || (today.getMonth() === month - 1 && today.getDate() < day)) {
+              age--;
+            }
+            
+            // 생년에 따라 성별코드 결정 (주민번호 성별코드)
+            // 1900년대생: 남자='1', 여자='2'
+            // 2000년대생: 남자='3', 여자='4'
+            if (year >= 2000) {
+              genderCode = gender === '남자' ? '3' : '4';
+            } else {
+              genderCode = gender === '남자' ? '1' : '2';
+            }
+            
+            // 주민번호 생성 (생년월일 + 성별코드 + ******)
+            residentNumber = `${birthDate}-${genderCode}******`;
           }
         }
 
@@ -232,15 +283,109 @@ export default function OverseasInsuranceStep5Page() {
           planTypeName = '고보장플랜';
         }
 
+        // 국적 정보 변환
+        let nationalityType = countryType === 'D' ? '내국인' : '외국인';
+        let nationalityContinent = null;
+        let nationalityCountry = null;
+        
+        if (countryType === 'F') {
+          // 외국인인 경우 대륙과 국가 정보 변환
+          const country1Code = step2Data[`insured_country1_${i}`] || ''; // 대륙 코드 (EU, AS, AF, AU, NA, SA)
+          const country2Code = step2Data[`insured_country2_${i}`] || ''; // 국가 코드 (DE, FR, JP 등)
+          
+          nationalityContinent = country1Code || null;
+          
+          // 국가 코드를 한글 국가명으로 변환
+          if (country1Code && country2Code) {
+            const continentPlacesForNationality: { [key: string]: { value: string; label: string }[] } = {
+              EU: [
+                { value: 'DE', label: '독일' },
+                { value: 'FR', label: '프랑스' },
+                { value: 'GB', label: '영국' },
+                { value: 'IT', label: '이탈리아' },
+                { value: 'ES', label: '스페인' },
+                { value: 'NL', label: '네덜란드' },
+                { value: 'BE', label: '벨기에' },
+                { value: 'CH', label: '스위스' },
+                { value: 'AT', label: '오스트리아' },
+                { value: 'GR', label: '그리스' },
+                { value: 'PT', label: '포르투갈' },
+                { value: 'CZ', label: '체코' },
+                { value: 'PL', label: '폴란드' },
+                { value: 'HU', label: '헝가리' },
+                { value: 'SE', label: '스웨덴' },
+                { value: 'NO', label: '노르웨이' },
+                { value: 'DK', label: '덴마크' },
+                { value: 'FI', label: '핀란드' },
+                { value: 'RU', label: '러시아' },
+              ],
+              AS: [
+                { value: 'JP', label: '일본' },
+                { value: 'CN', label: '중국' },
+                { value: 'TW', label: '대만' },
+                { value: 'HK', label: '홍콩' },
+                { value: 'SG', label: '싱가포르' },
+                { value: 'TH', label: '태국' },
+                { value: 'VN', label: '베트남' },
+                { value: 'PH', label: '필리핀' },
+                { value: 'ID', label: '인도네시아' },
+                { value: 'MY', label: '말레이시아' },
+                { value: 'IN', label: '인도' },
+                { value: 'MN', label: '몽골' },
+                { value: 'KZ', label: '카자흐스탄' },
+                { value: 'UZ', label: '우즈베키스탄' },
+              ],
+              AF: [
+                { value: 'ZA', label: '남아프리카공화국' },
+                { value: 'EG', label: '이집트' },
+                { value: 'MA', label: '모로코' },
+                { value: 'KE', label: '케냐' },
+                { value: 'TZ', label: '탄자니아' },
+              ],
+              AU: [
+                { value: 'AU', label: '호주' },
+                { value: 'NZ', label: '뉴질랜드' },
+                { value: 'FJ', label: '피지' },
+                { value: 'PG', label: '파푸아뉴기니' },
+              ],
+              NA: [
+                { value: 'US', label: '미국' },
+                { value: 'CA', label: '캐나다' },
+                { value: 'MX', label: '멕시코' },
+                { value: 'CU', label: '쿠바' },
+              ],
+              SA: [
+                { value: 'BR', label: '브라질' },
+                { value: 'AR', label: '아르헨티나' },
+                { value: 'CL', label: '칠레' },
+                { value: 'PE', label: '페루' },
+                { value: 'CO', label: '콜롬비아' },
+              ],
+            };
+            
+            const places = continentPlacesForNationality[country1Code];
+            if (places) {
+              const selectedPlace = places.find(p => p.value === country2Code);
+              if (selectedPlace) {
+                nationalityCountry = selectedPlace.label;
+              }
+            }
+          }
+        }
+
         insuredPersons.push({
           sequence_number: i,
           name: name,
-          resident_number: birthDate ? `${birthDate}-${genderCode}******` : '',
+          english_name: engName || null,
+          resident_number: residentNumber,
           gender: gender,
           age: age,
           plan_type: planTypeName,
           premium: premium,
           has_medical_expense: planType === 'V' ? 1 : 0, // V면 국내실손 담보(1), N이면 부담보(0)
+          nationality_type: nationalityType,
+          nationality_continent: nationalityContinent,
+          nationality_country: nationalityCountry,
         });
       }
 
@@ -379,7 +524,7 @@ export default function OverseasInsuranceStep5Page() {
           payment_method: paymentMethodName,
           payment_sub_method: payMethod === 'W' ? '수기카드' : (payMethod === 'B' ? '무통장입금' : null),
           amount: step3Data?.total_premium || 0,
-          status: (payMethod === 'C' || payMethod === 'N' || payMethod === 'K') ? '대기' : (payMethod === 'B' ? '대기' : '완료'),
+          status: (payMethod === 'C' || payMethod === 'N' || payMethod === 'K' || payMethod === 'W' || payMethod === 'B') ? '대기' : '완료',
           depositor_name: payMethod === 'B' ? (document.querySelector('input[name="payment_name"]') as HTMLInputElement)?.value : null,
           bank_name: payMethod === 'B' ? ((document.querySelector('input[name="accountB"]:checked') as HTMLInputElement)?.value === 'B1' ? '우리은행' : '농협') : null,
           account_number: payMethod === 'B' ? ((document.querySelector('input[name="accountB"]:checked') as HTMLInputElement)?.value === 'B1' ? '1005-604-481542' : '301-0337-8596-01') : null,
