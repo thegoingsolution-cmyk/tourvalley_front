@@ -1,6 +1,27 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
+import DatePicker, { registerLocale } from 'react-datepicker';
+import { ko } from 'date-fns/locale';
+import { format, parse } from 'date-fns';
+import 'react-datepicker/dist/react-datepicker.css';
+
+// 한국어 locale 등록
+registerLocale('ko', ko);
+
+// 날짜 포맷 함수
+const formatDate = (date: Date): string => {
+  return format(date, 'yyyy-MM-dd');
+};
+
+// 날짜 파싱 함수
+const parseDate = (dateString: string): Date | null => {
+  try {
+    return parse(dateString, 'yyyy-MM-dd', new Date());
+  } catch {
+    return null;
+  }
+};
 import StepIndicator from './StepIndicator';
 import PlanSelection from './PlanSelection';
 import CountrySelectModal from './CountrySelectModal';
@@ -114,6 +135,19 @@ export default function TravelInfoStep({
     }
   }, [onTravelPurposeChange, travelPurpose]);
 
+  // 날짜가 이미 선택되어 있을 때 상태 초기화
+  useEffect(() => {
+    if (departureDate) {
+      setHasSelectedDepartureDate(true);
+    }
+  }, [departureDate]);
+
+  useEffect(() => {
+    if (arrivalDate) {
+      setHasSelectedArrivalDate(true);
+    }
+  }, [arrivalDate]);
+
   return (
     <section className="form-section">
       <div className="form-container">
@@ -130,26 +164,39 @@ export default function TravelInfoStep({
             <div className="field-row tourG_line">
               <div className="field-group date-field">
                 <label className="field-label">출발일</label>
-                <input
-                  type="date"
-                  value={departureDate}
-                  onChange={(e) => {
-                    onDepartureDateChange(e.target.value);
-                    setHasSelectedDepartureDate(true);
+                <DatePicker
+                  selected={departureDate ? parseDate(departureDate) : null}
+                  onChange={(date: Date | null) => {
+                    if (date) {
+                      const formattedDate = formatDate(date);
+                      onDepartureDateChange(formattedDate);
+                      setHasSelectedDepartureDate(true);
+                    } else {
+                      onDepartureDateChange('');
+                      setHasSelectedDepartureDate(false);
+                    }
                   }}
-                  onClick={(e) => {
-                    // 달력을 열 때 이미 값이 있으면 선택된 것으로 간주
-                    if (e.currentTarget.value) {
+                  onSelect={(date: Date | null) => {
+                    if (date) {
+                      const formattedDate = formatDate(date);
+                      onDepartureDateChange(formattedDate);
                       setHasSelectedDepartureDate(true);
                     }
                   }}
-                  onBlur={(e) => {
-                    // 달력에서 날짜를 선택한 후 포커스가 벗어날 때
-                    if (e.target.value) {
-                      setHasSelectedDepartureDate(true);
-                    }
-                  }}
+                  dateFormat="yyyy-MM-dd"
+                  formatWeekDay={(nameOfDay: string) => nameOfDay.substring(0, 1)}
+                  locale="ko"
+                  placeholderText="날짜 선택"
+                  dateFormatCalendar="yyyy년 MM월"
                   className={`field-input date-input ${hasSelectedDepartureDate ? 'has-value' : ''}`}
+                  wrapperClassName="date-picker-wrapper"
+                  calendarClassName="custom-calendar"
+                  popperClassName="custom-popper"
+                  minDate={new Date()}
+                  showPopperArrow={false}
+                  popperPlacement="bottom-start"
+                  shouldCloseOnSelect={true}
+                  strictParsing
                 />
               </div>
               <span className="field-separator">/</span>
@@ -172,26 +219,39 @@ export default function TravelInfoStep({
             <div className="field-row tourG_line">
               <div className="field-group date-field">
                 <label className="field-label">도착일</label>
-                <input
-                  type="date"
-                  value={arrivalDate}
-                  onChange={(e) => {
-                    onArrivalDateChange(e.target.value);
-                    setHasSelectedArrivalDate(true);
+                <DatePicker
+                  selected={arrivalDate ? parseDate(arrivalDate) : null}
+                  onChange={(date: Date | null) => {
+                    if (date) {
+                      const formattedDate = formatDate(date);
+                      onArrivalDateChange(formattedDate);
+                      setHasSelectedArrivalDate(true);
+                    } else {
+                      onArrivalDateChange('');
+                      setHasSelectedArrivalDate(false);
+                    }
                   }}
-                  onClick={(e) => {
-                    // 달력을 열 때 이미 값이 있으면 선택된 것으로 간주
-                    if (e.currentTarget.value) {
+                  onSelect={(date: Date | null) => {
+                    if (date) {
+                      const formattedDate = formatDate(date);
+                      onArrivalDateChange(formattedDate);
                       setHasSelectedArrivalDate(true);
                     }
                   }}
-                  onBlur={(e) => {
-                    // 달력에서 날짜를 선택한 후 포커스가 벗어날 때
-                    if (e.target.value) {
-                      setHasSelectedArrivalDate(true);
-                    }
-                  }}
+                  dateFormat="yyyy-MM-dd"
+                  formatWeekDay={(nameOfDay: string) => nameOfDay.substring(0, 1)}
+                  locale="ko"
+                  placeholderText="날짜 선택"
+                  dateFormatCalendar="yyyy년 MM월"
                   className={`field-input date-input ${hasSelectedArrivalDate ? 'has-value' : ''}`}
+                  wrapperClassName="date-picker-wrapper"
+                  calendarClassName="custom-calendar"
+                  popperClassName="custom-popper"
+                  minDate={departureDate ? (parseDate(departureDate) || new Date()) : new Date()}
+                  showPopperArrow={false}
+                  popperPlacement="bottom-start"
+                  shouldCloseOnSelect={true}
+                  strictParsing
                 />
               </div>
               <span className="field-separator">/</span>

@@ -1,6 +1,27 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import DatePicker, { registerLocale } from 'react-datepicker';
+import { ko } from 'date-fns/locale';
+import { format, parse } from 'date-fns';
+import 'react-datepicker/dist/react-datepicker.css';
+
+// 한국어 locale 등록
+registerLocale('ko', ko);
+
+// 날짜 포맷 함수
+const formatDate = (date: Date): string => {
+  return format(date, 'yyyy-MM-dd');
+};
+
+// 날짜 파싱 함수
+const parseDate = (dateString: string): Date | null => {
+  try {
+    return parse(dateString, 'yyyy-MM-dd', new Date());
+  } catch {
+    return null;
+  }
+};
 
 interface TravelInfoStepProps {
   // Form data
@@ -50,6 +71,22 @@ export default function MobileTravelInfoStep({
   travelCountries = [],
   timeOptions = Array.from({ length: 24 }, (_, i) => i + 1),
 }: TravelInfoStepProps) {
+  const [hasSelectedDepartureDate, setHasSelectedDepartureDate] = useState(false);
+  const [hasSelectedArrivalDate, setHasSelectedArrivalDate] = useState(false);
+
+  // 날짜가 이미 선택되어 있을 때 상태 초기화
+  useEffect(() => {
+    if (departureDate) {
+      setHasSelectedDepartureDate(true);
+    }
+  }, [departureDate]);
+
+  useEffect(() => {
+    if (arrivalDate) {
+      setHasSelectedArrivalDate(true);
+    }
+  }, [arrivalDate]);
+
   const handleBirthDateInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9]/g, '');
     if (value.length <= 8) {
@@ -61,16 +98,44 @@ export default function MobileTravelInfoStep({
     <form name="inputForm" method="POST">
       <div className="tourGuard_Info">
         {/* 출발일 */}
-        <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line">
+        <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line departure-date-field">
           <label>출발일</label>
-          <input
-            type="date"
-            id="start_date"
-            name="start_date"
-            className="tourGuard_input_w01"
-            value={departureDate}
-            onChange={(e) => onDepartureDateChange(e.target.value)}
-          />
+          <div className="date-picker-wrapper" style={{ width: '45%', display: 'inline-block' }}>
+            <DatePicker
+              selected={departureDate ? parseDate(departureDate) : null}
+              onChange={(date: Date | null) => {
+                if (date) {
+                  const formattedDate = formatDate(date);
+                  onDepartureDateChange(formattedDate);
+                  setHasSelectedDepartureDate(true);
+                } else {
+                  onDepartureDateChange('');
+                  setHasSelectedDepartureDate(false);
+                }
+              }}
+              onSelect={(date: Date | null) => {
+                if (date) {
+                  const formattedDate = formatDate(date);
+                  onDepartureDateChange(formattedDate);
+                  setHasSelectedDepartureDate(true);
+                }
+              }}
+              dateFormat="yyyy-MM-dd"
+              formatWeekDay={(nameOfDay: string) => nameOfDay.substring(0, 1)}
+              locale="ko"
+              placeholderText="날짜 선택"
+              dateFormatCalendar="yyyy년 MM월"
+              className={`tourGuard_input_w01 ${hasSelectedDepartureDate ? 'has-value' : ''}`}
+              wrapperClassName="date-picker-wrapper"
+              calendarClassName="custom-calendar"
+              popperClassName="custom-popper"
+              minDate={new Date()}
+              showPopperArrow={false}
+              popperPlacement="bottom-start"
+              shouldCloseOnSelect={true}
+              strictParsing
+            />
+          </div>
           {/* 시간 */}
           <div className="tourGuard_bg_join tourGuard_input_cell tourGuard_input_cell02 tourGuard" style={{ marginRight: 0 }}>
             <span className="tourGuard_ps_box">
@@ -92,16 +157,44 @@ export default function MobileTravelInfoStep({
         </div>
 
         {/* 도착일 */}
-        <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line">
+        <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line arrival-date-field">
           <label>도착일</label>
-          <input
-            type="date"
-            id="end_date"
-            name="end_date"
-            className="tourGuard_input_w01"
-            value={arrivalDate}
-            onChange={(e) => onArrivalDateChange(e.target.value)}
-          />
+          <div className="date-picker-wrapper" style={{ width: '45%', display: 'inline-block' }}>
+            <DatePicker
+              selected={arrivalDate ? parseDate(arrivalDate) : null}
+              onChange={(date: Date | null) => {
+                if (date) {
+                  const formattedDate = formatDate(date);
+                  onArrivalDateChange(formattedDate);
+                  setHasSelectedArrivalDate(true);
+                } else {
+                  onArrivalDateChange('');
+                  setHasSelectedArrivalDate(false);
+                }
+              }}
+              onSelect={(date: Date | null) => {
+                if (date) {
+                  const formattedDate = formatDate(date);
+                  onArrivalDateChange(formattedDate);
+                  setHasSelectedArrivalDate(true);
+                }
+              }}
+              dateFormat="yyyy-MM-dd"
+              formatWeekDay={(nameOfDay: string) => nameOfDay.substring(0, 1)}
+              locale="ko"
+              placeholderText="날짜 선택"
+              dateFormatCalendar="yyyy년 MM월"
+              className={`tourGuard_input_w01 ${hasSelectedArrivalDate ? 'has-value' : ''}`}
+              wrapperClassName="date-picker-wrapper"
+              calendarClassName="custom-calendar"
+              popperClassName="custom-popper"
+              minDate={departureDate ? (parseDate(departureDate) || new Date()) : new Date()}
+              showPopperArrow={false}
+              popperPlacement="bottom-start"
+              shouldCloseOnSelect={true}
+              strictParsing
+            />
+          </div>
           <div className="tourGuard_bg_join tourGuard_input_cell tourGuard_input_cell02 tourGuard" style={{ marginRight: 0 }}>
             <span className="tourGuard_ps_box">
               <select

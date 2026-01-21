@@ -82,3 +82,515 @@ body {
   font-weight: 500;
 }
 
+/* ========================================
+   React DatePicker 전역 스타일
+   프로젝트 전역에서 사용되는 달력 컴포넌트 스타일
+   ======================================== */
+
+/* DatePicker Wrapper */
+.date-picker-wrapper {
+  width: 100%;
+  position: relative;
+}
+
+.date-picker-wrapper .react-datepicker__input-container {
+  width: 100%;
+}
+
+.date-picker-wrapper .react-datepicker__input-container input {
+  height: 32px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border: 0;
+  color: #dddddd;
+  font-size: 13px;
+  letter-spacing: 0px;
+  caret-color: #222;
+  display: inline-block;
+  vertical-align: text-top;
+  padding-top: 0px;
+  margin-top: 23px;
+  margin-left: 10px;
+  width: calc(100% - 20px);
+  box-sizing: border-box;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  outline: none;
+}
+
+/* group-insurance popup 페이지용 date-picker 스타일 */
+.input_cell_01 .date-picker-wrapper {
+  width: 100% !important;
+  display: block !important;
+}
+
+.input_cell_01 .date-picker-wrapper .react-datepicker__input-container {
+  width: 100% !important;
+  display: block !important;
+}
+
+.input_cell_01 .date-picker-wrapper .react-datepicker__input-container input {
+  height: 29px !important;
+  padding-left: 34px !important;
+  padding-right: 10px !important;
+  margin-top: 2px !important;
+  margin-left: 0 !important;
+  margin-bottom: 3px !important;
+  width: 100% !important;
+  line-height: 220% !important;
+  font-family: 'Nanum Gothic', sans-serif !important;
+  border: none !important;
+  box-sizing: border-box !important;
+  color: #dddddd !important;
+  font-size: 13px !important;
+  background: url(/images/speed_d.jpg) no-repeat left center !important;
+  background-size: 21px !important;
+}
+
+/* dicon 클래스가 있을 때 배경 이미지 적용 (명시적으로) */
+.input_cell_01 .date-picker-wrapper .react-datepicker__input-container input.dicon {
+  background: url(/images/speed_d.jpg) no-repeat left center !important;
+  background-size: 21px !important;
+  padding-left: 34px !important;
+}
+
+.input_cell_01 .date-picker-wrapper .react-datepicker__input-container input.dicon.has-value,
+.input_cell_01 .date-picker-wrapper .react-datepicker__input-container input.dicon:not(:placeholder-shown) {
+  color: #000 !important;
+}
+
+.input_cell_01 .date-picker-wrapper .react-datepicker__input-container input.dicon::placeholder {
+  color: #dddddd !important;
+}
+
+.date-picker-wrapper .react-datepicker__input-container input.has-value,
+.date-picker-wrapper .react-datepicker__input-container input:not(:placeholder-shown) {
+  color: #000;
+}
+
+.date-picker-wrapper .react-datepicker__input-container input::placeholder {
+  color: #dddddd;
+}
+
+/* DatePicker 캘린더 스타일 - 크기 축소 */
+.custom-calendar {
+  font-family: 'NanumSquare', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif !important;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+  background: #ffffff !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-smooth: always;
+  padding: 10px;
+  transform: scale(0.95);
+  transform-origin: top left;
+}
+
+.custom-calendar * {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-smooth: always;
+}
+
+.custom-calendar .react-datepicker__header {
+  background-color: #f8f9fa !important;
+  border-bottom: 1px solid #e0e0e0;
+  border-radius: 6px 6px 0 0;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.custom-calendar .react-datepicker__current-month {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 6px;
+  font-smooth: always;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.custom-calendar .react-datepicker__day-names {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 2px;
+}
+
+.custom-calendar .react-datepicker__day-name {
+  width: 32px;
+  line-height: 32px;
+  margin: 0;
+  color: #666;
+  font-size: 13px;
+  font-weight: 600;
+  font-smooth: always;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.custom-calendar .react-datepicker__week {
+  display: flex;
+  justify-content: space-around;
+}
+
+.custom-calendar .react-datepicker__day {
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  margin: 1px;
+  border-radius: 4px;
+  color: #333;
+  font-size: 14px;
+  transition: all 0.2s;
+  font-smooth: always;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.custom-calendar .react-datepicker__day:hover {
+  background-color: #e8f4f8;
+  border-radius: 4px;
+}
+
+.custom-calendar .react-datepicker__day--selected,
+.custom-calendar .react-datepicker__day--keyboard-selected {
+  background-color: #2843e5;
+  color: white;
+  font-weight: 600;
+}
+
+.custom-calendar .react-datepicker__day--selected:hover {
+  background-color: #1e32b8;
+}
+
+.custom-calendar .react-datepicker__day--disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.custom-calendar .react-datepicker__day--today {
+  font-weight: 600;
+  color: #999999;
+}
+
+/* 오늘 날짜가 선택되었을 때는 흰색 */
+.custom-calendar .react-datepicker__day--today.react-datepicker__day--selected,
+.custom-calendar .react-datepicker__day--today.react-datepicker__day--keyboard-selected {
+  color: #ffffff;
+}
+
+.custom-calendar .react-datepicker__day--outside-month {
+  color: #ccc;
+}
+
+.custom-calendar .react-datepicker__navigation {
+  top: 10px;
+  width: 26px;
+  height: 26px;
+}
+
+.custom-calendar .react-datepicker__navigation-icon::before {
+  border-color: #666;
+  border-width: 2px 2px 0 0;
+}
+
+.custom-calendar .react-datepicker__navigation:hover *::before {
+  border-color: #2843e5;
+}
+
+/* Popper 스타일 - 최상위 레이어 (z-index 최대값) */
+.custom-popper {
+  z-index: 999999 !important;
+}
+
+.custom-popper .react-datepicker-popper {
+  z-index: 999999 !important;
+  position: absolute !important;
+}
+
+/* react-datepicker-popper 직접 스타일링 */
+.react-datepicker-popper {
+  z-index: 999999 !important;
+  position: absolute !important;
+}
+
+.react-datepicker-popper[data-placement] {
+  z-index: 999999 !important;
+  position: absolute !important;
+}
+
+/* 포지셔닝 개선 - 입력 필드 바로 아래에 표시 */
+.react-datepicker-popper[data-placement^="bottom"] {
+  margin-top: 4px !important;
+}
+
+.react-datepicker-popper[data-placement^="top"] {
+  margin-bottom: 8px !important;
+}
+
+/* group-insurance popup: 테이블 구조에서 달력이 입력 필드 바로 아래에 표시되도록 */
+.specialB .react-datepicker-popper[data-placement^="bottom"] {
+  margin-top: 4px !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+/* group-insurance popup: 위쪽으로 배치되는 것을 방지하고 강제로 아래쪽에 배치 */
+.specialB .input_cell_01 .react-datepicker-popper[data-placement^="top"],
+.specialB .input_cell_01 .react-datepicker-popper[data-placement^="top-start"],
+.specialB .input_cell_01 .react-datepicker-popper[data-placement^="top-end"] {
+  top: auto !important;
+  bottom: auto !important;
+  margin-top: 15px !important;
+  margin-bottom: 0 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+/* group-insurance popup: 입력 필드 기준으로 아래쪽에 강제 배치 */
+.specialB .input_cell_01 .date-picker-wrapper {
+  position: relative !important;
+}
+
+.specialB .input_cell_01 .react-datepicker-popper {
+  position: absolute !important;
+  top: 100% !important;
+  left: 0 !important;
+  margin-top: 4px !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+/* field-group 내부에서 포지셔닝이 제대로 작동하도록 */
+.field-group.date-field {
+  position: relative !important;
+  overflow: visible !important;
+  z-index: 10 !important;
+}
+
+/* 달력이 열려있을 때 (포커스 상태) z-index를 높여서 다른 필드 위에 표시 */
+.field-group.date-field:focus-within {
+  z-index: 100 !important;
+}
+
+/* 출발일 필드가 활성화되어 있을 때 더 높은 z-index */
+.field-row:first-of-type .field-group.date-field:focus-within {
+  z-index: 100 !important;
+}
+
+/* react-datepicker input이 포커스를 받았을 때 */
+.date-picker-wrapper:focus-within {
+  z-index: 100 !important;
+}
+
+.field-group.date-field:has(.date-picker-wrapper:focus-within) {
+  z-index: 100 !important;
+}
+
+/* field-row에서 달력이 잘리지 않도록 - 모든 페이지에 적용 */
+.field-row,
+.domestic-page-pc .field-row,
+.overseas-page-pc .field-row,
+.long-term-stay-page-pc .field-row {
+  overflow: visible !important;
+}
+
+/* form-fields에서도 overflow visible */
+.form-fields {
+  overflow: visible !important;
+}
+
+/* group-insurance popup 페이지용 overflow visible */
+.in_wrap01 {
+  overflow: visible !important;
+  position: relative !important;
+}
+
+.input_cell_01 {
+  overflow: visible !important;
+  position: relative !important;
+}
+
+/* group-insurance popup: 테이블 셀에서도 overflow visible */
+.specialB td,
+.specialB td.box,
+.specialB td.box02,
+.specialB td.dd,
+.specialB td.ddT {
+  overflow: visible !important;
+  position: relative !important;
+}
+
+/* group-insurance popup: input_cell_01 내부 date-picker-wrapper 포지셔닝 */
+.input_cell_01 .date-picker-wrapper {
+  position: relative !important;
+  width: 100% !important;
+  z-index: 10 !important;
+}
+
+.input_cell_01 .date-picker-wrapper:focus-within {
+  z-index: 100 !important;
+}
+
+/* group-insurance popup: 출발일시 행의 date-picker-wrapper */
+tbody tr:first-of-type .input_cell_01 .date-picker-wrapper:focus-within {
+  z-index: 100 !important;
+}
+
+/* group-insurance popup: react-datepicker popper 포지셔닝 */
+.specialB .input_cell_01 .date-picker-wrapper .react-datepicker-popper {
+  position: absolute !important;
+  z-index: 999999 !important;
+}
+
+.specialB .input_cell_01:focus-within .date-picker-wrapper .react-datepicker-popper {
+  z-index: 999999 !important;
+}
+
+/* group-insurance popup: 테이블 구조에서 달력이 정확한 위치에 표시되도록 */
+.specialB tbody tr td {
+  overflow: visible !important;
+  position: relative !important;
+}
+
+.specialB tbody tr td.box,
+.specialB tbody tr td.box02 {
+  overflow: visible !important;
+  position: relative !important;
+}
+
+/* date-picker-wrapper가 정확한 위치에 달력을 표시하도록 */
+.date-picker-wrapper {
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+/* 달력이 열려있을 때 wrapper의 z-index도 높이기 */
+.field-group.date-field:focus-within .date-picker-wrapper,
+.field-group.date-field:has(.react-datepicker__input-container input:focus) .date-picker-wrapper {
+  z-index: 100 !important;
+}
+
+.date-picker-wrapper .react-datepicker__input-container {
+  position: relative;
+  width: 100%;
+}
+
+/* 배경 오버레이 제거 (Portal 사용 시) */
+.react-datepicker__portal {
+  background: transparent !important;
+}
+
+.react-datepicker__portal::before {
+  display: none !important;
+}
+
+/* 모든 react-datepicker 요소의 z-index 최상위 설정 */
+.react-datepicker {
+  z-index: 999999 !important;
+}
+
+.react-datepicker__triangle {
+  z-index: 999999 !important;
+}
+
+/* ========================================
+   모바일 Date Input z-index 스타일
+   출발일/도착일 필드가 겹치지 않도록 처리
+   ======================================== */
+
+/* 모바일 날짜 입력 필드 컨테이너 */
+.tourGuard_form_tt {
+  position: relative;
+  overflow: visible !important;
+}
+
+/* 모바일: tourG_line 클래스가 있는 필드 행에서 overflow visible */
+.tourGuard_form_tt.tourG_line {
+  overflow: visible !important;
+  position: relative;
+  z-index: 10 !important;
+}
+
+/* 모바일: date-picker-wrapper 기본 z-index */
+.tourGuard_form_tt .date-picker-wrapper {
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+/* 모바일: date-picker-wrapper가 포커스를 받았을 때 */
+.tourGuard_form_tt .date-picker-wrapper:focus-within {
+  z-index: 100 !important;
+}
+
+/* 모바일: tourGuard_form_tt가 포커스를 받았을 때 (react-datepicker input이 포커스) */
+.tourGuard_form_tt.tourG_line:focus-within {
+  z-index: 100 !important;
+}
+
+.tourGuard_form_tt.tourG_line:focus-within .date-picker-wrapper {
+  z-index: 100 !important;
+}
+
+/* 모바일: 출발일 필드가 활성화되어 있을 때 */
+.tourGuard_form_tt.tourG_line.departure-date-field:focus-within,
+.tourGuard_form_tt.tourG_line.departure-date-field:has(.date-picker-wrapper:focus-within) {
+  z-index: 100 !important;
+}
+
+.tourGuard_form_tt.tourG_line.departure-date-field:focus-within .date-picker-wrapper,
+.tourGuard_form_tt.tourG_line.departure-date-field:has(.date-picker-wrapper:focus-within) .date-picker-wrapper {
+  z-index: 100 !important;
+}
+
+/* 모바일: 출발일 필드 (첫 번째 tourG_line)가 활성화되어 있을 때 - fallback */
+.tourGuard_Info > .tourGuard_form_tt.tourG_line:first-of-type:focus-within,
+.tourGuard_Info > .tourGuard_form_tt.tourG_line:first-of-type:has(.date-picker-wrapper:focus-within) {
+  z-index: 100 !important;
+}
+
+.tourGuard_Info > .tourGuard_form_tt.tourG_line:first-of-type:focus-within .date-picker-wrapper,
+.tourGuard_Info > .tourGuard_form_tt.tourG_line:first-of-type:has(.date-picker-wrapper:focus-within) .date-picker-wrapper {
+  z-index: 100 !important;
+}
+
+/* 모바일: react-datepicker input이 포커스를 받았을 때 */
+.tourGuard_form_tt .date-picker-wrapper .react-datepicker__input-container input:focus {
+  z-index: 100 !important;
+}
+
+/* 모바일: 네이티브 date input (혹시 남아있는 경우를 대비) */
+.tourGuard_form_tt input[type="date"] {
+  position: relative;
+  z-index: 10 !important;
+}
+
+.tourGuard_form_tt input[type="date"]:focus {
+  z-index: 100 !important;
+}
+
+/* PC 버전: tourGuard_form_tt에서 date-picker-wrapper 포지셔닝 */
+.tourGuard_form_tt.tourG_line .date-picker-wrapper {
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+.tourGuard_form_tt.tourG_line:focus-within .date-picker-wrapper,
+.tourGuard_form_tt.tourG_line:has(.date-picker-wrapper:focus-within) .date-picker-wrapper {
+  z-index: 100 !important;
+}
+
+/* PC 버전: 첫 번째 tourGuard_form_tt (행사시작일)가 활성화되어 있을 때 */
+.tourGuard_form_tt.tourG_line:first-of-type:focus-within,
+.tourGuard_form_tt.tourG_line:first-of-type:has(.date-picker-wrapper:focus-within) {
+  z-index: 100 !important;
+}
+
+.tourGuard_form_tt.tourG_line:first-of-type:focus-within .date-picker-wrapper,
+.tourGuard_form_tt.tourG_line:first-of-type:has(.date-picker-wrapper:focus-within) .date-picker-wrapper {
+  z-index: 100 !important;
+}

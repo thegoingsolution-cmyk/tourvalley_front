@@ -1034,6 +1034,8 @@
   }
 
   .event-insurance-mobile .tourG_rdo_area {
+    top: 6px;
+    left: 8px;
     width: 48%;
     margin-right: 0;
     display: block;
@@ -1044,9 +1046,9 @@
   .event-insurance-mobile .tourG_rdo_area > label:first-child {
     font-size: 12px !important;
     color: #9797a3 !important;
-    margin-top: 6px;
-    margin-bottom: 7px;
-    margin-left: 5px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-left: 0px;
     margin-right: 0;
     letter-spacing: -0.6px;
     white-space: nowrap;
@@ -1058,7 +1060,8 @@
     width: 40% !important;
     display: inline-block !important;
     vertical-align: top;
-    margin-left: 15px;
+    margin-left: 0px;
+    margin-top: 5px;
   }
 
   .event-insurance-mobile .tourG_inp_rdo input + label {

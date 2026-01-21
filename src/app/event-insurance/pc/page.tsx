@@ -6,9 +6,12 @@ import Footer from '@/components/Footer';
 import ServiceModal from '@/components/ServiceModal';
 import AccidentFreeCashModal from '@/components/travel/AccidentFreeCashModal';
 import { getImagePath } from '@/utils/path';
-import DatePicker from 'react-datepicker';
+import DatePicker, { registerLocale } from 'react-datepicker';
 import { ko } from 'date-fns/locale';
 import 'react-datepicker/dist/react-datepicker.css';
+
+// 한국어 locale 등록
+registerLocale('ko', ko);
 import './page.css';
 
 export default function PCEventInsurancePage() {
@@ -40,6 +43,8 @@ export default function PCEventInsurancePage() {
   const [startHour, setStartHour] = useState(getDefaultHour());
   const [endDate, setEndDate] = useState<Date | null>(today);
   const [endHour, setEndHour] = useState(getDefaultHour());
+  const [hasSelectedStartDate, setHasSelectedStartDate] = useState(true); // today로 초기화되어 있으므로 true
+  const [hasSelectedEndDate, setHasSelectedEndDate] = useState(true); // today로 초기화되어 있으므로 true
   const [insuredCnt, setInsuredCnt] = useState('');
   const [actionInfo1, setActionInfo1] = useState<string | null>(null); // 운동경기
   const [actionInfo2, setActionInfo2] = useState<string | null>(null); // 불꽃놀이
@@ -669,75 +674,109 @@ export default function PCEventInsurancePage() {
                               />
                             </div>
                             {/* 행사시작일 */}
-                            <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line">
-                              <label htmlFor="start_date">행사시작일</label>
-                              <DatePicker
-                                id="start_date"
-                                selected={startDate}
-                                onChange={(date: Date | null) => {
-                                  setStartDate(date);
-                                  if (date && endDate && date > endDate) {
-                                    setEndDate(date);
-                                  }
-                                }}
-                                dateFormat="yyyy-MM-dd"
-                                locale={ko}
-                                minDate={today}
-                                placeholderText={today.toISOString().split('T')[0]}
-                                className="tourGuard_input_w01"
-                                autoComplete="off"
-                              />
-                              <div className="tourGuard_bg_join tourGuard_input_cell tourGuard_input_cell02 tourGuard" style={{ marginRight: 0 }}>
-                                <span className="tourGuard_ps_box">
-                                  <select
-                                    className="tourGuard_sel07"
-                                    id="start_hour"
-                                    name="start_hour"
-                                    value={startHour}
-                                    onChange={(e) => setStartHour(e.target.value)}
-                                  >
-                                    {hours.map((hour) => (
-                                      <option key={hour} value={hour}>{hour}시</option>
-                                    ))}
-                                  </select>
-                                </span>
+                            <div className="field-row tourG_line">
+                              <div className="field-group date-field">
+                                <label className="field-label" htmlFor="start_date">행사시작일</label>
+                                <DatePicker
+                                  id="start_date"
+                                  selected={startDate}
+                                  onChange={(date: Date | null) => {
+                                    setStartDate(date);
+                                    setHasSelectedStartDate(!!date);
+                                    if (date && endDate && date > endDate) {
+                                      setEndDate(date);
+                                      setHasSelectedEndDate(true);
+                                    }
+                                  }}
+                                  onSelect={(date: Date | null) => {
+                                    if (date) {
+                                      setHasSelectedStartDate(true);
+                                    }
+                                  }}
+                                  dateFormat="yyyy-MM-dd"
+                                  formatWeekDay={(nameOfDay: string) => nameOfDay.substring(0, 1)}
+                                  locale="ko"
+                                  placeholderText="날짜 선택"
+                                  dateFormatCalendar="yyyy년 MM월"
+                                  minDate={today}
+                                  className={`field-input date-input ${hasSelectedStartDate ? 'has-value' : ''}`}
+                                  wrapperClassName="date-picker-wrapper"
+                                  calendarClassName="custom-calendar"
+                                  popperClassName="custom-popper"
+                                  showPopperArrow={false}
+                                  popperPlacement="bottom-start"
+                                  shouldCloseOnSelect={true}
+                                  strictParsing
+                                  autoComplete="off"
+                                />
+                              </div>
+                              <span className="field-separator">/</span>
+                              <div className="field-group time-field">
+                                <select
+                                  id="start_hour"
+                                  name="start_hour"
+                                  value={startHour}
+                                  onChange={(e) => setStartHour(e.target.value)}
+                                  className="field-input time-select"
+                                >
+                                  {hours.map((hour) => (
+                                    <option key={hour} value={hour}>{hour}시</option>
+                                  ))}
+                                </select>
                               </div>
                             </div>
                             {/* 행사종료일 */}
-                            <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line">
-                              <label htmlFor="end_date">행사종료일</label>
-                              <DatePicker
-                                id="end_date"
-                                selected={endDate}
-                                onChange={(date: Date | null) => {
-                                  if (date && startDate && date < startDate) {
-                                    alert('종료일은 시작일보다 이전일 수 없습니다.');
-                                    setEndDate(startDate);
-                                  } else {
-                                    setEndDate(date);
-                                  }
-                                }}
-                                dateFormat="yyyy-MM-dd"
-                                locale={ko}
-                                minDate={startDate || today}
-                                placeholderText={today.toISOString().split('T')[0]}
-                                className="tourGuard_input_w01"
-                                autoComplete="off"
-                              />
-                              <div className="tourGuard_bg_join tourGuard_input_cell tourGuard_input_cell02 tourGuard" style={{ marginRight: 0 }}>
-                                <span className="tourGuard_ps_box">
-                                  <select
-                                    className="tourGuard_sel07"
-                                    id="end_hour"
-                                    name="end_hour"
-                                    value={endHour}
-                                    onChange={(e) => setEndHour(e.target.value)}
-                                  >
-                                    {hours.map((hour) => (
-                                      <option key={hour} value={hour}>{hour}시</option>
-                                    ))}
-                                  </select>
-                                </span>
+                            <div className="field-row tourG_line">
+                              <div className="field-group date-field">
+                                <label className="field-label" htmlFor="end_date">행사종료일</label>
+                                <DatePicker
+                                  id="end_date"
+                                  selected={endDate}
+                                  onChange={(date: Date | null) => {
+                                    if (date && startDate && date < startDate) {
+                                      alert('종료일은 시작일보다 이전일 수 없습니다.');
+                                      setEndDate(startDate);
+                                      setHasSelectedEndDate(true);
+                                    } else {
+                                      setEndDate(date);
+                                      setHasSelectedEndDate(!!date);
+                                    }
+                                  }}
+                                  onSelect={(date: Date | null) => {
+                                    if (date) {
+                                      setHasSelectedEndDate(true);
+                                    }
+                                  }}
+                                  dateFormat="yyyy-MM-dd"
+                                  formatWeekDay={(nameOfDay: string) => nameOfDay.substring(0, 1)}
+                                  locale="ko"
+                                  placeholderText="날짜 선택"
+                                  dateFormatCalendar="yyyy년 MM월"
+                                  minDate={startDate || today}
+                                  className={`field-input date-input ${hasSelectedEndDate ? 'has-value' : ''}`}
+                                  wrapperClassName="date-picker-wrapper"
+                                  calendarClassName="custom-calendar"
+                                  popperClassName="custom-popper"
+                                  showPopperArrow={false}
+                                  popperPlacement="bottom-start"
+                                  shouldCloseOnSelect={true}
+                                  strictParsing
+                                  autoComplete="off"
+                                />
+                              </div>
+                              <span className="field-separator">/</span>
+                              <div className="field-group time-field">
+                                <select
+                                  id="end_hour"
+                                  name="end_hour"
+                                  value={endHour}
+                                  onChange={(e) => setEndHour(e.target.value)}
+                                  className="field-input time-select"
+                                >
+                                  {hours.map((hour) => (
+                                    <option key={hour} value={hour}>{hour}시</option>
+                                  ))}
+                                </select>
                               </div>
                             </div>
                             {/* 예상참여인원 */}

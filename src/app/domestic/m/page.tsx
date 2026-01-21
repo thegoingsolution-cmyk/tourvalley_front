@@ -126,7 +126,7 @@ function MobileDomesticStep1Content() {
     }
   };
 
-  // 생년월일로부터 나이 계산
+  // 생년월일로부터 보험나이 계산 (만나이에서 6개월 경과 시 +1)
   const calculateAgeFromBirthDate = (birthDateStr: string): number | null => {
     if (birthDateStr.length !== 8) return null;
     
@@ -145,8 +145,19 @@ function MobileDomesticStep1Content() {
       let age = today.getFullYear() - birthDate.getFullYear();
       const monthDiff = today.getMonth() - birthDate.getMonth();
       
+      // 만나이 계산
       if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
         age--;
+      }
+      
+      // 보험나이 계산: 만나이에서 6개월이 경과하면 +1
+      // 생일로부터 6개월 후 날짜 계산
+      const sixMonthsLater = new Date(birthDate);
+      sixMonthsLater.setMonth(sixMonthsLater.getMonth() + 6);
+      
+      // 오늘이 생일로부터 6개월 후 날짜보다 이후이면 보험나이 +1
+      if (today >= sixMonthsLater) {
+        age++;
       }
       
       return age;

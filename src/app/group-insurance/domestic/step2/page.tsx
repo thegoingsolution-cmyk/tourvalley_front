@@ -1,7 +1,28 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import DatePicker, { registerLocale } from 'react-datepicker';
+import { ko } from 'date-fns/locale';
+import { format, parse } from 'date-fns';
+import 'react-datepicker/dist/react-datepicker.css';
 import '../../popup/page.css';
+
+// 한국어 locale 등록
+registerLocale('ko', ko);
+
+// 날짜 포맷 함수
+const formatDate = (date: Date): string => {
+  return format(date, 'yyyy-MM-dd');
+};
+
+// 날짜 파싱 함수
+const parseDate = (dateString: string): Date | null => {
+  try {
+    return parse(dateString, 'yyyy-MM-dd', new Date());
+  } catch {
+    return null;
+  }
+};
 
 export default function DomesticInsuranceStep2Page() {
   // Form states
@@ -9,6 +30,8 @@ export default function DomesticInsuranceStep2Page() {
   const [startHour, setStartHour] = useState('01');
   const [endDate, setEndDate] = useState('');
   const [endHour, setEndHour] = useState('01');
+  const [hasSelectedStartDate, setHasSelectedStartDate] = useState(false);
+  const [hasSelectedEndDate, setHasSelectedEndDate] = useState(false);
   const [tourGoal, setTourGoal] = useState('');
   const [tourNum, setTourNum] = useState(1);
   const [email1, setEmail1] = useState('');
@@ -202,14 +225,40 @@ export default function DomesticInsuranceStep2Page() {
                       <td className="sName ag_left">출발일시</td>
                       <td className="ddT ag_left box">
                         <div className="in_wrap01">
-                          <div className="bg_join input_cell_01 wd_48">
-                            <input 
-                              type="date" 
-                              className="tf_g dicon" 
-                              name="start_date" 
-                              id="start_date"
-                              value={startDate}
-                              onChange={(e) => setStartDate(e.target.value)}
+                          <div className="bg_join input_cell_01 wd_48" style={{ position: 'relative', overflow: 'visible' }}>
+                            <DatePicker
+                              selected={startDate ? parseDate(startDate) : null}
+                              onChange={(date: Date | null) => {
+                                if (date) {
+                                  const formattedDate = formatDate(date);
+                                  setStartDate(formattedDate);
+                                  setHasSelectedStartDate(true);
+                                } else {
+                                  setStartDate('');
+                                  setHasSelectedStartDate(false);
+                                }
+                              }}
+                              onSelect={(date: Date | null) => {
+                                if (date) {
+                                  const formattedDate = formatDate(date);
+                                  setStartDate(formattedDate);
+                                  setHasSelectedStartDate(true);
+                                }
+                              }}
+                              dateFormat="yyyy-MM-dd"
+                              formatWeekDay={(nameOfDay: string) => nameOfDay.substring(0, 1)}
+                              locale="ko"
+                              placeholderText="날짜 선택"
+                              dateFormatCalendar="yyyy년 MM월"
+                              className={`tf_g dicon ${hasSelectedStartDate ? 'has-value' : ''}`}
+                              wrapperClassName="date-picker-wrapper"
+                              calendarClassName="custom-calendar"
+                              popperClassName="custom-popper"
+                              minDate={new Date()}
+                              showPopperArrow={false}
+                              popperPlacement="bottom-start"
+                              shouldCloseOnSelect={true}
+                              strictParsing
                             />
                           </div>
                           <div className="bg_join input_cell_01 wd_48 ml10">
@@ -233,14 +282,40 @@ export default function DomesticInsuranceStep2Page() {
                       <td className="sName01 ag_left">도착일시</td>
                       <td className="dd ag_left box">
                         <div className="in_wrap01">
-                          <div className="bg_join input_cell_01 wd_48">
-                            <input 
-                              type="date" 
-                              className="tf_g dicon" 
-                              name="end_date" 
-                              id="end_date"
-                              value={endDate}
-                              onChange={(e) => setEndDate(e.target.value)}
+                          <div className="bg_join input_cell_01 wd_48" style={{ position: 'relative', overflow: 'visible' }}>
+                            <DatePicker
+                              selected={endDate ? parseDate(endDate) : null}
+                              onChange={(date: Date | null) => {
+                                if (date) {
+                                  const formattedDate = formatDate(date);
+                                  setEndDate(formattedDate);
+                                  setHasSelectedEndDate(true);
+                                } else {
+                                  setEndDate('');
+                                  setHasSelectedEndDate(false);
+                                }
+                              }}
+                              onSelect={(date: Date | null) => {
+                                if (date) {
+                                  const formattedDate = formatDate(date);
+                                  setEndDate(formattedDate);
+                                  setHasSelectedEndDate(true);
+                                }
+                              }}
+                              dateFormat="yyyy-MM-dd"
+                              formatWeekDay={(nameOfDay: string) => nameOfDay.substring(0, 1)}
+                              locale="ko"
+                              placeholderText="날짜 선택"
+                              dateFormatCalendar="yyyy년 MM월"
+                              className={`tf_g dicon ${hasSelectedEndDate ? 'has-value' : ''}`}
+                              wrapperClassName="date-picker-wrapper"
+                              calendarClassName="custom-calendar"
+                              popperClassName="custom-popper"
+                              minDate={startDate ? (parseDate(startDate) || new Date()) : new Date()}
+                              showPopperArrow={false}
+                              popperPlacement="bottom-start"
+                              shouldCloseOnSelect={true}
+                              strictParsing
                             />
                           </div>
                           <div className="bg_join input_cell_01 wd_48 ml10">

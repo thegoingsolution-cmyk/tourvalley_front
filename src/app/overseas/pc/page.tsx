@@ -145,7 +145,7 @@ export default function PCOverseasPage() {
   // 시간 옵션: 1시부터 24시까지 (0시 제외, 24시 포함)
   const timeOptions = Array.from({ length: 24 }, (_, i) => i + 1);
 
-  // 주민번호에서 나이 계산
+  // 주민번호에서 보험나이 계산 (만나이에서 6개월 경과 시 +1)
   const calculateAgeFromBirthDate = (birthDateStr: string): number | null => {
     if (!birthDateStr || birthDateStr.length !== 8) return null;
     
@@ -158,9 +158,19 @@ export default function PCOverseasPage() {
       const birthDate = new Date(year, month - 1, day);
       let age = today.getFullYear() - year;
       
-      // 생일이 지나지 않았으면 나이 -1
+      // 생일이 지나지 않았으면 나이 -1 (만나이 계산)
       if (today.getMonth() < month - 1 || (today.getMonth() === month - 1 && today.getDate() < day)) {
         age--;
+      }
+      
+      // 보험나이 계산: 만나이에서 6개월이 경과하면 +1
+      // 생일로부터 6개월 후 날짜 계산
+      const sixMonthsLater = new Date(birthDate);
+      sixMonthsLater.setMonth(sixMonthsLater.getMonth() + 6);
+      
+      // 오늘이 생일로부터 6개월 후 날짜보다 이후이면 보험나이 +1
+      if (today >= sixMonthsLater) {
+        age++;
       }
       
       return age;

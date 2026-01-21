@@ -2,6 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import DatePicker, { registerLocale } from 'react-datepicker';
+import { ko } from 'date-fns/locale';
+import { format, parse } from 'date-fns';
+import 'react-datepicker/dist/react-datepicker.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ServiceModal from '@/components/ServiceModal';
@@ -10,6 +14,23 @@ import CountrySelectModal from '@/components/travel/CountrySelectModal';
 import StepIndicator from '@/components/travel/StepIndicator';
 import { getImagePath } from '@/utils/path';
 import './page.css';
+
+// 한국어 locale 등록
+registerLocale('ko', ko);
+
+// 날짜 포맷 함수
+const formatDate = (date: Date): string => {
+  return format(date, 'yyyy-MM-dd');
+};
+
+// 날짜 파싱 함수
+const parseDate = (dateString: string): Date | null => {
+  try {
+    return parse(dateString, 'yyyy-MM-dd', new Date());
+  } catch {
+    return null;
+  }
+};
 
 export default function PCStep1Page() {
   const router = useRouter();
@@ -33,6 +54,8 @@ export default function PCStep1Page() {
   const [showCashModal, setShowCashModal] = useState(false);
   const [travelCountry, setTravelCountry] = useState('');
   const [isCountryModalOpen, setIsCountryModalOpen] = useState(false);
+  const [hasSelectedStartDate, setHasSelectedStartDate] = useState(true);
+  const [hasSelectedEndDate, setHasSelectedEndDate] = useState(true);
 
   // 시간 옵션 생성 (01시 ~ 24시)
   const hourOptions = Array.from({ length: 24 }, (_, i) => {
@@ -173,14 +196,39 @@ export default function PCStep1Page() {
                       <div className="field-row tourG_line">
                         <div className="field-group date-field">
                           <label className="field-label">출발일</label>
-                          <input
-                            type="date"
-                            id="start_date"
-                            name="start_date"
-                            className="field-input date-input"
-                            value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                            min={formattedDate}
+                          <DatePicker
+                            selected={startDate ? parseDate(startDate) : null}
+                            onChange={(date: Date | null) => {
+                              if (date) {
+                                const formattedDate = formatDate(date);
+                                setStartDate(formattedDate);
+                                setHasSelectedStartDate(true);
+                              } else {
+                                setStartDate('');
+                                setHasSelectedStartDate(false);
+                              }
+                            }}
+                            onSelect={(date: Date | null) => {
+                              if (date) {
+                                const formattedDate = formatDate(date);
+                                setStartDate(formattedDate);
+                                setHasSelectedStartDate(true);
+                              }
+                            }}
+                            dateFormat="yyyy-MM-dd"
+                            formatWeekDay={(nameOfDay: string) => nameOfDay.substring(0, 1)}
+                            locale="ko"
+                            placeholderText="날짜 선택"
+                            dateFormatCalendar="yyyy년 MM월"
+                            className={`field-input date-input ${hasSelectedStartDate ? 'has-value' : ''}`}
+                            wrapperClassName="date-picker-wrapper"
+                            calendarClassName="custom-calendar"
+                            popperClassName="custom-popper"
+                            minDate={new Date()}
+                            showPopperArrow={false}
+                            popperPlacement="bottom-start"
+                            shouldCloseOnSelect={true}
+                            strictParsing
                           />
                         </div>
                         <span className="field-separator">/</span>
@@ -205,14 +253,39 @@ export default function PCStep1Page() {
                       <div className="field-row tourG_line">
                         <div className="field-group date-field">
                           <label className="field-label">도착일</label>
-                          <input
-                            type="date"
-                            id="end_date"
-                            name="end_date"
-                            className="field-input date-input"
-                            value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                            min={startDate || formattedDate}
+                          <DatePicker
+                            selected={endDate ? parseDate(endDate) : null}
+                            onChange={(date: Date | null) => {
+                              if (date) {
+                                const formattedDate = formatDate(date);
+                                setEndDate(formattedDate);
+                                setHasSelectedEndDate(true);
+                              } else {
+                                setEndDate('');
+                                setHasSelectedEndDate(false);
+                              }
+                            }}
+                            onSelect={(date: Date | null) => {
+                              if (date) {
+                                const formattedDate = formatDate(date);
+                                setEndDate(formattedDate);
+                                setHasSelectedEndDate(true);
+                              }
+                            }}
+                            dateFormat="yyyy-MM-dd"
+                            formatWeekDay={(nameOfDay: string) => nameOfDay.substring(0, 1)}
+                            locale="ko"
+                            placeholderText="날짜 선택"
+                            dateFormatCalendar="yyyy년 MM월"
+                            className={`field-input date-input ${hasSelectedEndDate ? 'has-value' : ''}`}
+                            wrapperClassName="date-picker-wrapper"
+                            calendarClassName="custom-calendar"
+                            popperClassName="custom-popper"
+                            minDate={startDate ? (parseDate(startDate) || new Date()) : new Date()}
+                            showPopperArrow={false}
+                            popperPlacement="bottom-start"
+                            shouldCloseOnSelect={true}
+                            strictParsing
                           />
                         </div>
                         <span className="field-separator">/</span>

@@ -1,9 +1,30 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import DatePicker, { registerLocale } from 'react-datepicker';
+import { ko } from 'date-fns/locale';
+import { format, parse } from 'date-fns';
+import 'react-datepicker/dist/react-datepicker.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import './page.css';
+
+// 한국어 locale 등록
+registerLocale('ko', ko);
+
+// 날짜 포맷 함수
+const formatDate = (date: Date): string => {
+  return format(date, 'yyyy-MM-dd');
+};
+
+// 날짜 파싱 함수
+const parseDate = (dateString: string): Date | null => {
+  try {
+    return parse(dateString, 'yyyy-MM-dd', new Date());
+  } catch {
+    return null;
+  }
+};
 
 export default function MobileEventInsurancePage() {
   const today = new Date();
@@ -56,6 +77,8 @@ export default function MobileEventInsurancePage() {
   const [overviewName, setOverviewName] = useState('');
   const [licenseFile, setLicenseFile] = useState<File | null>(null);
   const [overviewFile, setOverviewFile] = useState<File | null>(null);
+  const [hasSelectedStartDate, setHasSelectedStartDate] = useState(true);
+  const [hasSelectedEndDate, setHasSelectedEndDate] = useState(true);
 
   // 컴포넌트 마운트 시 스타일 강제 재적용 (다른 페이지에서 돌아올 때 CSS 깨짐 방지)
   useEffect(() => {
@@ -537,16 +560,44 @@ export default function MobileEventInsurancePage() {
                       />
                     </div>
 
-                    <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line">
+                    <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line departure-date-field">
                       <label htmlFor="start_date">행사시작일</label>
-                      <input 
-                        type="date" 
-                        id="start_date" 
-                        name="start_date"
-                        value={formData.start_date}
-                        onChange={handleInputChange}
-                        className="tourGuard_input_w01"
-                      />
+                      <div className="date-picker-wrapper" style={{ width: '38%', display: 'inline-block' }}>
+                        <DatePicker
+                          selected={formData.start_date ? parseDate(formData.start_date) : null}
+                          onChange={(date: Date | null) => {
+                            if (date) {
+                              const formattedDate = formatDate(date);
+                              setFormData(prev => ({ ...prev, start_date: formattedDate }));
+                              setHasSelectedStartDate(true);
+                            } else {
+                              setFormData(prev => ({ ...prev, start_date: '' }));
+                              setHasSelectedStartDate(false);
+                            }
+                          }}
+                          onSelect={(date: Date | null) => {
+                            if (date) {
+                              const formattedDate = formatDate(date);
+                              setFormData(prev => ({ ...prev, start_date: formattedDate }));
+                              setHasSelectedStartDate(true);
+                            }
+                          }}
+                          dateFormat="yyyy-MM-dd"
+                          formatWeekDay={(nameOfDay: string) => nameOfDay.substring(0, 1)}
+                          locale="ko"
+                          placeholderText="날짜 선택"
+                          dateFormatCalendar="yyyy년 MM월"
+                          className={`tourGuard_input_w01 ${hasSelectedStartDate ? 'has-value' : ''}`}
+                          wrapperClassName="date-picker-wrapper"
+                          calendarClassName="custom-calendar"
+                          popperClassName="custom-popper"
+                          minDate={new Date()}
+                          showPopperArrow={false}
+                          popperPlacement="bottom-start"
+                          shouldCloseOnSelect={true}
+                          strictParsing
+                        />
+                      </div>
                       <div className="tourGuard_bg_join tourGuard_input_cell tourGuard_input_cell02 tourGuard" style={{ marginRight: 0 }}>
                         <span className="tourGuard_ps_box">
                           <select 
@@ -566,16 +617,44 @@ export default function MobileEventInsurancePage() {
                       </div>
                     </div>
 
-                    <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line">
+                    <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line arrival-date-field">
                       <label htmlFor="end_date">행사종료일</label>
-                      <input 
-                        type="date" 
-                        id="end_date" 
-                        name="end_date"
-                        value={formData.end_date}
-                        onChange={handleInputChange}
-                        className="tourGuard_input_w01"
-                      />
+                      <div className="date-picker-wrapper" style={{ width: '38%', display: 'inline-block' }}>
+                        <DatePicker
+                          selected={formData.end_date ? parseDate(formData.end_date) : null}
+                          onChange={(date: Date | null) => {
+                            if (date) {
+                              const formattedDate = formatDate(date);
+                              setFormData(prev => ({ ...prev, end_date: formattedDate }));
+                              setHasSelectedEndDate(true);
+                            } else {
+                              setFormData(prev => ({ ...prev, end_date: '' }));
+                              setHasSelectedEndDate(false);
+                            }
+                          }}
+                          onSelect={(date: Date | null) => {
+                            if (date) {
+                              const formattedDate = formatDate(date);
+                              setFormData(prev => ({ ...prev, end_date: formattedDate }));
+                              setHasSelectedEndDate(true);
+                            }
+                          }}
+                          dateFormat="yyyy-MM-dd"
+                          formatWeekDay={(nameOfDay: string) => nameOfDay.substring(0, 1)}
+                          locale="ko"
+                          placeholderText="날짜 선택"
+                          dateFormatCalendar="yyyy년 MM월"
+                          className={`tourGuard_input_w01 ${hasSelectedEndDate ? 'has-value' : ''}`}
+                          wrapperClassName="date-picker-wrapper"
+                          calendarClassName="custom-calendar"
+                          popperClassName="custom-popper"
+                          minDate={formData.start_date ? (parseDate(formData.start_date) || new Date()) : new Date()}
+                          showPopperArrow={false}
+                          popperPlacement="bottom-start"
+                          shouldCloseOnSelect={true}
+                          strictParsing
+                        />
+                      </div>
                       <div className="tourGuard_bg_join tourGuard_input_cell tourGuard_input_cell02 tourGuard" style={{ marginRight: 0 }}>
                         <span className="tourGuard_ps_box">
                           <select 
