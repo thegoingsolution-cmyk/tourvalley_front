@@ -14,7 +14,8 @@
   position: absolute;
   text-align: right;
   right: 0;
-  top: 0;
+  top: 50%;
+  transform: translateY(-50%);
   height: 40px;
 }
 
@@ -182,10 +183,12 @@
 .long-term-stay-mobile .tour2023_BWrap {
   position: relative;
   display: inline-flex;
+  align-items: center;
   justify-content: space-between;
   width: 100%;
   vertical-align: top;
   height: 33px;
+  padding: 0;
 }
 
 .long-term-stay-mobile .tour2023_title01 {
@@ -193,7 +196,8 @@
   font-weight: bold;
   color: #000;
   text-align: center;
-  margin-bottom: 20px;
+  margin: 0;
+  line-height: 33px;
 }
 
 .long-term-stay-mobile .tour2023_txt01 {
@@ -909,6 +913,34 @@
   border-radius: 12px;
   padding: 24px 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Form Section (ParticipantInfoStep 등 공통 컴포넌트용) */
+.long-term-stay-mobile .form-section {
+  position: relative;
+  width: 100%;
+  margin-bottom: 0;
+  overflow: visible;
+  padding: 0 20px;
+}
+
+.long-term-stay-mobile .form-container {
+  width: 100%;
+  overflow: visible;
+}
+
+.long-term-stay-mobile .form-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 0;
+  box-shadow: none;
+  overflow: visible;
+  min-height: 0;
+  max-height: none;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
 
 /* Form Header */

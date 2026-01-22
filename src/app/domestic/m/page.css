@@ -10,7 +10,8 @@
     position: absolute;
     text-align: right;
     right: 0;
-    top: 0;
+    top: 50%;
+    transform: translateY(-50%);
     height: 40px;
 }
 
@@ -115,10 +116,12 @@
 .tour2023_BWrap {
     position: relative;
     display: inline-flex;
+    align-items: center;
     justify-content: space-between;
     width: 100%;
     vertical-align: top;
     height: 33px;
+    padding: 0;
 }
 
 .tour2023_title01 {
@@ -126,7 +129,8 @@
     font-weight: bold;
     color: #000;
     text-align: center;
-    margin-bottom: 20px;
+    margin: 0;
+    line-height: 33px;
 }
 
 /* Form Styles */
@@ -835,23 +839,27 @@
    ======================================== */
 
 /* Form Section */
-.form-section {
+.domestic-step1-mobile .form-section {
     position: relative;
     width: 100%;
     margin-bottom: 0;
     overflow: visible;
 }
 
-.form-container {
+.domestic-step1-mobile .form-container {
     width: 100%;
     overflow: visible;
 }
 
-.form-card {
+.domestic-step1-mobile .form-card {
     background: #ffffff;
     border-radius: 16px;
+    padding: 0;
     padding-top: 20px;
     padding-bottom: 20px;
+    padding-left: 0;
+    padding-right: 0;
+    box-shadow: none;
     overflow: visible;
     min-height: 0;
     max-height: none;
