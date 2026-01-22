@@ -100,7 +100,7 @@
 /* Form Header - 모바일 스타일 적용 (tour2023_BWrap와 동일) */
 .overseas-page-pc .form-header {
   position: relative;
-  display: inline-flex;
+  display: flex;
   justify-content: space-between;
   width: 100%;
   vertical-align: top;
@@ -142,15 +142,16 @@
   font-size: 27px;
   font-weight: bold;
   color: #000;
-  text-align: center;
+  text-align: left;
   margin-bottom: 0;
   margin-top: 0;
   line-height: 40px;
   height: 40px;
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  align-items: center;
+  justify-content: flex-start;
   padding-bottom: 0;
+  flex: 1;
 }
 
 /* ========================================
@@ -158,13 +159,12 @@
    ======================================== */
 
 .overseas-page-pc .tour2023_step_w {
-  position: absolute;
+  position: relative;
   text-align: right;
-  right: 0;
-  top: 5px;
   height: 40px;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .overseas-page-pc .tour2023_step {

@@ -384,12 +384,14 @@
 
 /* Text Styles */
 .tour2023_txt01 {
-    font-size: 13px;
+    font-size: 11px;
     text-align: left;
-    line-height: 130%;
+    line-height: 150%;
     letter-spacing: -1px;
     display: inline-block;
     width: 100%;
+    font-weight: 300;
+    color: #666;
 }
 
 .tour2023_blue {
@@ -3102,4 +3104,19 @@
 .tour2023PC_cash_info li:last-child {
     flex: 1;
     font-size: 12px;
+}
+
+/* ========================================
+   심의번호 섹션 스타일 - estimate/m/step1과 동일
+   ======================================== */
+
+.overseas-step1-mobile .tour2023_txt02 {
+    font-size: 11px;
+    line-height: 150%;
+    letter-spacing: -1px;
+    display: inline-block;
+    text-align: center;
+    font-weight: 300;
+    color: #666;
+    padding: 0;
 }

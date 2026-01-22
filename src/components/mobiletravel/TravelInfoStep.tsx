@@ -264,28 +264,30 @@ export default function MobileTravelInfoStep({
           </div>
         </div>
 
-        {/* 여행국가 */}
-        <div className="tourGuard_form_tt mag5 tourG_mab03">
-          <label>여행국가</label>
-          <div className="tourGuard_bg_join tourGuard_input_cell tourGuard_input_cell01 tourGuard" style={{ marginRight: 0 }}>
-            <span className="tourGuard_ps_box">
-              <select
-                className="tourGuard_sel"
-                id="tour_place"
-                name="tour_place"
-                value={travelCountry}
-                onChange={(e) => onTravelCountryChange(e.target.value)}
-              >
-                <option value="">선택하세요</option>
-                {travelCountries.map((country) => (
-                  <option key={country.code} value={country.name}>
-                    {country.name}
-                  </option>
-                ))}
-              </select>
-            </span>
+        {/* 여행국가 - 해외여행보험 및 해외장기체류보험일 때만 표시 */}
+        {travelCountries && travelCountries.length > 0 && (
+          <div className="tourGuard_form_tt mag5 tourG_mab03">
+            <label>여행국가</label>
+            <div className="tourGuard_bg_join tourGuard_input_cell tourGuard_input_cell01 tourGuard" style={{ marginRight: 0 }}>
+              <span className="tourGuard_ps_box">
+                <select
+                  className="tourGuard_sel"
+                  id="tour_place"
+                  name="tour_place"
+                  value={travelCountry}
+                  onChange={(e) => onTravelCountryChange(e.target.value)}
+                >
+                  <option value="">선택하세요</option>
+                  {travelCountries.map((country) => (
+                    <option key={country.code} value={country.name}>
+                      {country.name}
+                    </option>
+                  ))}
+                </select>
+              </span>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* 여행목적 - 장기여행일 때만 표시 */}
         {type === 'long' && (
@@ -310,16 +312,18 @@ export default function MobileTravelInfoStep({
           </div>
         )}
 
-        {/* 안내문 */}
-        <div className="tour2023_txt01 tour2023_grey tourG_mleft04" style={{ marginTop: '30px', marginBottom: '30px' }}>
-          <ul className="tourGuard_inline">
-            <li className="tourGuard_inline_t01">※</li>
-            <li className="tourGuard_inline_t02">
-              여러국가를 여행하는 경우 <span className="tour2023_blue">최초 방문국가를</span> 선택하세요.<br />
-              단, <span className="tour2023_blue">체코</span>가 포함된 여행인 경우 여행국가는 꼭 체코로 선택하시기 바랍니다.
-            </li>
-          </ul>
-        </div>
+        {/* 안내문 - 해외여행보험 및 해외장기체류보험일 때만 표시 */}
+        {travelCountries && travelCountries.length > 0 && (
+          <div className="tour2023_txt01 tour2023_grey tourG_mleft04" style={{ marginTop: '30px', marginBottom: '30px' }}>
+            <ul className="tourGuard_inline">
+              <li className="tourGuard_inline_t01">※</li>
+              <li className="tourGuard_inline_t02">
+                여러국가를 여행하는 경우 <span className="tour2023_blue">최초 방문국가를</span> 선택하세요.<br />
+                단, <span className="tour2023_blue">체코</span>가 포함된 여행인 경우 여행국가는 꼭 체코로 선택하시기 바랍니다.
+              </li>
+            </ul>
+          </div>
+        )}
         
       </div>
     </form>

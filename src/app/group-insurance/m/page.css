@@ -37,8 +37,11 @@
 
 /* Step Indicator Styles */
 .tour2023_step_w {
-    position: relative;
+    position: absolute;
     text-align: right;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
     flex-shrink: 0;
     height: 40px;
 }
@@ -160,13 +163,15 @@
 /* tour2023_BWrap 스타일 */
 .tour2023_BWrap {
     background: #fff;
-    padding: 20px;
+    padding: 0;
     position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
     width: 100%;
     box-sizing: border-box;
+    height: auto;
+    min-height: 40px;
 }
 
 .tour2023_title01 {
@@ -177,9 +182,9 @@
     font-family: 'NanumSquareNeoTTF-dEb';
     margin: 0;
     min-width: 0; /* flex item이 축소될 수 있도록 */
-    overflow: hidden; /* 텍스트 오버플로우 방지 */
-    text-overflow: ellipsis; /* 긴 텍스트는 말줄임표 표시 */
-    white-space: nowrap; /* 한 줄로 표시 */
+    overflow: visible; /* 두 줄 표시를 위해 visible로 변경 */
+    text-overflow: clip; /* 말줄임표 제거 */
+    white-space: normal; /* 두 줄 표시를 위해 normal로 변경 */
 }
 
 .tour2023_title09 {
@@ -2952,4 +2957,19 @@
     background: #ccc !important;
     cursor: not-allowed !important;
     color: #999 !important;
+}
+
+/* ========================================
+   심의번호 섹션 스타일 - estimate/m/step1과 동일
+   ======================================== */
+
+.group-insurance-mobile .tour2023_txt02 {
+    font-size: 11px;
+    line-height: 150%;
+    letter-spacing: -1px;
+    display: inline-block;
+    text-align: center;
+    font-weight: 300;
+    color: #666;
+    padding: 0;
 }

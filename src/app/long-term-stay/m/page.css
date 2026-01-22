@@ -2404,3 +2404,17 @@
     background: #1e33c4;
 }
 
+/* ========================================
+   심의번호 섹션 스타일 - estimate/m/step1과 동일
+   ======================================== */
+
+.long-term-stay-mobile .tour2023_txt02 {
+    font-size: 11px;
+    line-height: 150%;
+    letter-spacing: -1px;
+    display: inline-block;
+    text-align: center;
+    font-weight: 300;
+    color: #666;
+    padding: 0;
+}

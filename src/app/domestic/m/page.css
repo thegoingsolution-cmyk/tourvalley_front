@@ -1662,6 +1662,7 @@
 }
 
 .domestic-step1-mobile .tourG_mab02 {
+    margin-top: 12px;
     margin-bottom: 12px;
 }
 
@@ -3105,4 +3106,19 @@
 .tour2023PC_cash_info li:last-child {
     flex: 1;
     font-size: 12px;
+}
+
+/* ========================================
+   심의번호 섹션 스타일 - estimate/m/step1과 동일
+   ======================================== */
+
+.domestic-step1-mobile .tour2023_txt02 {
+    font-size: 11px;
+    line-height: 150%;
+    letter-spacing: -1px;
+    display: inline-block;
+    text-align: center;
+    font-weight: 300;
+    color: #666;
+    padding: 0;
 }

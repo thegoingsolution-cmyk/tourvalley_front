@@ -1354,11 +1354,10 @@ function MobileOverseasStep1Content() {
       {/* 심의번호 */}
       <div className="bgcolor_white prow_01 ptb20 essential_Wrap" style={{ textAlign: 'center' }}>
         <span className="tour2023_txt02 tour2023_grey">
-          <span style={{ whiteSpace: 'nowrap' }}>
-            ※ 본 광고는 광고심의기준을 준수하였으며, 유효기간은 심의일로부터 1년입니다.
+          <span>
+            ※ 본 광고는 광고심의기준을 준수하였으며, 유효기간은 심의일로부터 1년입니다.<br />
+            준법감시필 제2025-광고T-002(2025.04.07-2026-04.06)
           </span>
-          <br />
-          준법감시필 제2025-광고T-002(2025.04.07-2026-04.06)
         </span>
       </div>
 

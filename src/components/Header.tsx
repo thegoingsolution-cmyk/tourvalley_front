@@ -173,7 +173,7 @@ export default function Header({ isMobile = false, onOpenAccidentFreeCashModal }
                 <span className="mobile-menu-text">단체여행자보험</span>
                 <span className="mobile-menu-arrow">›</span>
               </Link>
-              <Link href="/event-insurance" className="mobile-menu-item" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link href="/estimate" className="mobile-menu-item" onClick={() => setIsMobileMenuOpen(false)}>
                 <span className="mobile-menu-text">
                   여행자보험 견적신청 <span className="mobile-menu-new">new</span>
                 </span>

@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { isMobileDevice } from '@/utils/device';
-import PCStep2Page from '../pc/step2/page';
-import MobileStep2Page from '../m/step2/page';
+import PCEstimatePage from './pc/step1/page';
+import MobileEstimatePage from './m/step1/page';
 
-export default function EstimateStep2Page() {
+export default function EstimatePage() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -13,8 +13,8 @@ export default function EstimateStep2Page() {
   }, []);
 
   if (isMobile) {
-    return <MobileStep2Page />;
+    return <MobileEstimatePage />;
   }
 
-  return <PCStep2Page />;
+  return <PCEstimatePage />;
 }
