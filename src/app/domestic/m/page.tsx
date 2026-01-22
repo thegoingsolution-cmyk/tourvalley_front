@@ -614,6 +614,11 @@ function MobileDomesticStep1Content() {
           alert('입금 정보를 모두 입력해주세요.');
           return;
         }
+      } else if (paymentSubMethod === '가상계좌') {
+        if (!depositBank) {
+          alert('입금은행을 선택해주세요.');
+          return;
+        }
       } else if (paymentSubMethod === '수기카드') {
         if (!cardNumber1 || !cardNumber2 || !cardNumber3 || !cardNumber4 ||
             !cardExpiryMonth || !cardExpiryYear || !cardholderName || !cardholderResidentNumber ||
@@ -779,7 +784,7 @@ function MobileDomesticStep1Content() {
             alert(error instanceof Error ? error.message : '카카오페이 결제 중 오류가 발생했습니다.');
           }
         }
-      } else {
+      } else if (paymentMethod === '기타결제' && paymentSubMethod !== '가상계좌') {
         // 기타결제 (무통장입금, 수기카드)는 바로 계약 등록
         const contractData = {
           contract: {
@@ -855,6 +860,96 @@ function MobileDomesticStep1Content() {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
           alert(data.message || '계약 등록에 실패했습니다.');
+        }
+      } else if (paymentMethod === '기타결제' && paymentSubMethod === '가상계좌') {
+        // 가상계좌 결제 처리
+        // 1. 계약 등록 (결제 대기 상태)
+        const contractData = {
+          contract: {
+            member_id: isLoggedIn && member ? member.id : null,
+            insurance_type: '국내여행보험',
+            departure_date: departureDateTime,
+            arrival_date: arrivalDateTime,
+            duration_months: 0,
+            duration_days: periodDays,
+            travel_region: null,
+            travel_country: null,
+            travel_purpose: travelPurpose,
+            travel_participants: participants.length,
+            total_premium: calculatedPremiums?.totalPremium || 0,
+            device: '모바일',
+            access_path: '투어밸리 모바일 사이트',
+          },
+          contractor: {
+            contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
+            name: participants[0]?.name || '',
+            phone: participants[0]?.phone || '',
+            email: getFullEmail(participants[0]) || null,
+          },
+          insured_persons: participants.map((p, idx) => {
+            const age = calculateAgeFromBirthDate(p.birthDate);
+            return {
+              sequence_number: idx + 1,
+              name: p.name,
+              resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
+              gender: p.gender,
+              age: age || 0,
+              plan_type: selectedPlan || '실속플랜',
+              premium: calculatedPremiums?.participants.find(cp => cp.id === p.id)?.premium || 0,
+              has_medical_expense: hasMedicalExpense ? 1 : 0,
+            };
+          }),
+          companions: [],
+          payment: {
+            payment_method: '기타결제',
+            payment_sub_method: '가상계좌',
+            amount: receiptPremium,
+            status: '대기',
+          },
+        };
+
+        const contractResponse = await fetch('/api/travel/register-contract', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(contractData),
+        });
+
+        const contractData_result = await contractResponse.json();
+
+        if (!contractData_result.success) {
+          alert(contractData_result.message || '계약 등록에 실패했습니다.');
+          return;
+        }
+
+        const contract_id = contractData_result.contract_id;
+
+        // 2. 가상계좌 발급 API 호출
+        const virtualAccountResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/payments/nicepay/virtual-account`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contract_id,
+            amount: receiptPremium,
+            buyerName: participants[0]?.name || '',
+            buyerEmail: getFullEmail(participants[0]) || '',
+            buyerTel: participants[0]?.phone || '',
+            bankCode: depositBank, // 은행 코드 (003, 004, 011 등)
+          }),
+        });
+
+        const virtualAccountData = await virtualAccountResponse.json();
+
+        if (virtualAccountData.success) {
+          alert('가상계좌가 발급되었습니다. 계좌번호는 문자로 발송됩니다.');
+          setShowPaymentScreen(false);
+          setShowCompletionScreen(true);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          alert(virtualAccountData.message || '가상계좌 발급에 실패했습니다.');
         }
       }
     } catch (error) {

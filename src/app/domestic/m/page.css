@@ -2289,7 +2289,8 @@
 }
 
 .domestic-step1-mobile .bank-transfer-details,
-.domestic-step1-mobile .manual-card-details {
+.domestic-step1-mobile .manual-card-details,
+.domestic-step1-mobile .virtual-account-details {
     margin-top: 20px;
     padding: 0;
     background: transparent;
@@ -2349,17 +2350,20 @@
 }
 
 .domestic-step1-mobile .bank-transfer-details .form-group,
-.domestic-step1-mobile .manual-card-details .form-group {
+.domestic-step1-mobile .manual-card-details .form-group,
+.domestic-step1-mobile .virtual-account-details .form-group {
     margin-bottom: 12px;
 }
 
 .domestic-step1-mobile .bank-transfer-details .form-group:last-child,
-.domestic-step1-mobile .manual-card-details .form-group:last-child {
+.domestic-step1-mobile .manual-card-details .form-group:last-child,
+.domestic-step1-mobile .virtual-account-details .form-group:last-child {
     margin-bottom: 0;
 }
 
 .domestic-step1-mobile .bank-transfer-details .form-group.form-group-vertical,
-.domestic-step1-mobile .manual-card-details .form-group.form-group-vertical {
+.domestic-step1-mobile .manual-card-details .form-group.form-group-vertical,
+.domestic-step1-mobile .virtual-account-details .form-group.form-group-vertical {
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 0;
@@ -2367,7 +2371,8 @@
 }
 
 .domestic-step1-mobile .bank-transfer-details .form-group.form-group-vertical label,
-.domestic-step1-mobile .manual-card-details .form-group.form-group-vertical label {
+.domestic-step1-mobile .manual-card-details .form-group.form-group-vertical label,
+.domestic-step1-mobile .virtual-account-details .form-group.form-group-vertical label {
     display: block;
     font-size: 11px;
     font-weight: 500;
@@ -2381,7 +2386,8 @@
 }
 
 .domestic-step1-mobile .bank-transfer-details .form-group.form-group-vertical input[type="text"],
-.domestic-step1-mobile .manual-card-details .form-group.form-group-vertical input[type="text"] {
+.domestic-step1-mobile .manual-card-details .form-group.form-group-vertical input[type="text"],
+.domestic-step1-mobile .virtual-account-details .form-group.form-group-vertical input[type="text"] {
     width: 100%;
     padding: 10px;
     min-height: 40px;
@@ -2397,7 +2403,8 @@
 }
 
 .domestic-step1-mobile .bank-transfer-details .form-group.form-group-vertical select,
-.domestic-step1-mobile .manual-card-details .form-group.form-group-vertical select {
+.domestic-step1-mobile .manual-card-details .form-group.form-group-vertical select,
+.domestic-step1-mobile .virtual-account-details .form-group.form-group-vertical select {
     width: 100%;
     padding: 10px;
     padding-right: 32px;
@@ -2511,7 +2518,8 @@
 }
 
 .domestic-step1-mobile .bank-transfer-details .form-group label,
-.domestic-step1-mobile .manual-card-details .form-group label {
+.domestic-step1-mobile .manual-card-details .form-group label,
+.domestic-step1-mobile .virtual-account-details .form-group label {
     display: block;
     font-size: 13px;
     font-weight: 600;
@@ -2521,7 +2529,8 @@
 
 .domestic-step1-mobile .bank-transfer-details .form-group input[type="text"],
 .domestic-step1-mobile .manual-card-details .form-group input[type="text"],
-.domestic-step1-mobile .manual-card-details .form-group input[type="number"] {
+.domestic-step1-mobile .manual-card-details .form-group input[type="number"],
+.domestic-step1-mobile .virtual-account-details .form-group input[type="text"] {
     width: 100%;
     padding: 12px 14px;
     border: 1px solid #ddd;
@@ -2534,7 +2543,8 @@
 
 .domestic-step1-mobile .bank-transfer-details .form-group input[type="text"]::placeholder,
 .domestic-step1-mobile .manual-card-details .form-group input[type="text"]::placeholder,
-.domestic-step1-mobile .manual-card-details .form-group input[type="number"]::placeholder {
+.domestic-step1-mobile .manual-card-details .form-group input[type="number"]::placeholder,
+.domestic-step1-mobile .virtual-account-details .form-group input[type="text"]::placeholder {
     color: #999;
 }
 

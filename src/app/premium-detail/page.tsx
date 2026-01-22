@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { isMobileDevice } from '@/utils/device';
 import PCPremiumDetailPage from './pc/page';
 import MobilePremiumDetailPage from './m/page';
 
@@ -8,14 +9,7 @@ export default function PremiumDetailPage() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-
-    return () => window.removeEventListener('resize', checkMobile);
+    setIsMobile(isMobileDevice());
   }, []);
 
   if (isMobile) {

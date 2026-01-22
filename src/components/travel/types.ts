@@ -2,7 +2,7 @@
 export type PlanType = '실속플랜' | '표준플랜' | '고급플랜' | '어린이플랜' | '어르신플랜1' | '어르신플랜2';
 export type Gender = '남자' | '여자';
 export type PaymentMethod = '나이스페이먼츠' | '네이버페이' | '카카오페이' | '기타결제';
-export type PaymentSubMethod = '무통장입금' | '수기카드';
+export type PaymentSubMethod = '무통장입금' | '가상계좌' | '수기카드';
 
 export interface PlanInfo {
   type: PlanType;

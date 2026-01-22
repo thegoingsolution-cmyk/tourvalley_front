@@ -118,6 +118,20 @@ export default function TravelInfoStep({
   const [hasSelectedDepartureDate, setHasSelectedDepartureDate] = useState(false);
   const [hasSelectedArrivalDate, setHasSelectedArrivalDate] = useState(false);
 
+  // 단체여행보험 팝업 열기
+  const openGroupInsurancePopup = () => {
+    const width = 870;
+    const height = 930;
+    const left = (window.screen.width - width) / 2;
+    const top = (window.screen.height - height) / 2;
+    
+    window.open(
+      '/group-insurance/domestic/popup',
+      'groupInsurancePopup',
+      `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
+    );
+  };
+
   // 보험료 계산 결과가 표시되면 해당 위치로 스크롤
   useEffect(() => {
     if (showPlanSelection && planSelectionRef.current) {
@@ -471,8 +485,12 @@ export default function TravelInfoStep({
               }}
             >
               <a 
-                href="/group-insurance" 
+                href="#" 
                 className="group-insurance-link"
+                onClick={(e) => {
+                  e.preventDefault();
+                  openGroupInsurancePopup();
+                }}
                 style={{
                   display: 'block',
                   width: '100%',
@@ -494,7 +512,21 @@ export default function TravelInfoStep({
                   transition: 'border 0.2s, color 0.2s'
                 }}
               >
-                단체여행자보험(사업자/법인) <span style={{ marginLeft: '4px' }}>›</span>
+                단체여행자보험(사업자/법인) <span 
+                  className="tour2023_arr"
+                  style={{
+                    display: 'inline-block',
+                    width: '10px',
+                    height: '10px',
+                    margin: '0 0 0 8px',
+                    borderBottom: '1px solid #1b37e1',
+                    borderRight: '1px solid #1b37e1',
+                    verticalAlign: 'middle',
+                    transform: 'rotate(-45deg)',
+                    WebkitTransform: 'rotate(-45deg)',
+                    msTransform: 'rotate(-45deg)',
+                  }}
+                ></span>
               </a>
               <p 
                 className="group-insurance-desc"

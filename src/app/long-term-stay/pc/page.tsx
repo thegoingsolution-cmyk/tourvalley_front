@@ -762,6 +762,16 @@ export default function PCLongTermStayPage() {
         return;
       }
     }
+    if (paymentMethod === '기타결제' && paymentSubMethod === '가상계좌') {
+      if (!depositBank) {
+        alert('입금은행을 선택해주세요.');
+        return;
+      }
+      if (!/^\d{3}$/.test(depositBank)) {
+        alert('가상계좌 은행코드를 다시 선택해주세요.');
+        return;
+      }
+    }
     if (paymentMethod === '기타결제' && paymentSubMethod === '수기카드') {
       if (!cardCategory) {
         alert('카드종류를 선택해주세요.');
@@ -1026,6 +1036,117 @@ export default function PCLongTermStayPage() {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
           alert(data.message || '계약 등록에 실패했습니다.');
+        }
+      }
+
+      // 가상계좌 결제 처리 (AUTHNICE 결제창 방식)
+      if (paymentMethod === '기타결제' && paymentSubMethod === '가상계좌') {
+        // 1. 계약 등록 (결제 대기 상태)
+        const contractData = {
+          contract: {
+            member_id: isLoggedIn && member ? member.id : null,
+            insurance_type: travelPurpose || '유학/어학연수',
+            departure_date: departureDateTime,
+            arrival_date: arrivalDateTime,
+            duration_months: 0,
+            duration_days: periodDays,
+            travel_region: null,
+            travel_country: travelCountry,
+            travel_purpose: travelPurpose,
+            travel_participants: participants.length,
+            total_premium: calculatedPremiums?.totalPremium || 0,
+            device: 'PC',
+            access_path: '투어밸리 사이트',
+          },
+          contractor: {
+            contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
+            name: participants[0]?.name || '',
+            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${participants[0].gender === '남자' ? '1' : '2'}******` : '',
+            mobile_phone: participants[0]?.phone || '',
+            email: participants[0]?.email1 && participants[0]?.email2 
+              ? `${participants[0].email1}@${participants[0].email2 === '직접입력' ? participants[0].customEmail : participants[0].email2}`
+              : '',
+          },
+          insured_persons: participants.map((p, idx) => {
+            const age = calculateAgeFromBirthDate(p.birthDate);
+            const nationalityType = p.nationality === '외국인' ? '외국인' : '내국인';
+            return {
+              sequence_number: idx + 1,
+              name: p.name,
+              english_name: p.englishName || null,
+              resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
+              gender: p.gender,
+              age: age || 0,
+              plan_type: selectedPlan || '실속플랜',
+              premium: calculatedPremiums?.participants.find(cp => cp.id === p.id)?.premium || 0,
+              has_medical_expense: hasMedicalExpense ? 1 : 0,
+              nationality_type: nationalityType,
+              nationality_continent: null,
+              nationality_country: null,
+            };
+          }),
+          companions: [],
+          payment: {
+            payment_method: '기타결제',
+            payment_sub_method: '가상계좌',
+            amount: receiptPremium,
+            status: '대기',
+          },
+        };
+
+        const contractResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/travel/register-contract`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(contractData),
+        });
+
+        const contractData_result = await contractResponse.json();
+
+        if (!contractData_result.success) {
+          alert(contractData_result.message || '계약 등록에 실패했습니다.');
+          return;
+        }
+
+        const contract_id = contractData_result.contract_id;
+
+        // 2. 가상계좌 결제창 호출 (AUTHNICE API 방식)
+        const paymentRequest = await requestNicepayPayment({
+          contract_id,
+          amount: receiptPremium,
+          orderId: contractData_result.contract_number,
+          goodsName: travelPurpose || '유학/어학연수',
+          buyerName: participants[0]?.name || '',
+          buyerEmail: participants[0]?.email1 && participants[0]?.email2 
+            ? `${participants[0].email1}@${participants[0].email2 === '직접입력' ? participants[0].customEmail : participants[0].email2}`
+            : '',
+          buyerTel: participants[0]?.phone || '',
+          returnUrl: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/payments/nicepay/callback`,
+          closeUrl: `${window.location.origin}/payment/close`,
+        });
+
+        if (paymentRequest.success) {
+          localStorage.setItem('pendingPayment', JSON.stringify({
+            contract_id,
+            payment_method: '기타결제',
+            payment_sub_method: '가상계좌',
+            amount: receiptPremium,
+            contractor_name: participants[0]?.name || '',
+          }));
+          try {
+            // 가상계좌 결제창 열기 (method: 'vbank', bankCode 포함)
+            await openNicepayWindow({
+              ...paymentRequest,
+              method: 'vbank',
+              bankCode: depositBank, // 은행 코드 (003, 004, 011 등)
+            });
+          } catch (error) {
+            console.error('가상계좌 결제창 열기 오류:', error);
+            alert(error instanceof Error ? error.message : '가상계좌 결제창을 여는 중 오류가 발생했습니다.');
+          }
+        } else {
+          alert(paymentRequest.message || '가상계좌 결제 요청에 실패했습니다.');
         }
       }
     } catch (error) {

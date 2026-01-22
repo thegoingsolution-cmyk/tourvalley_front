@@ -46,7 +46,10 @@ export default function CompletionStep({
               재가입할 때 그만큼 보험료를 아낄 수 있습니다.
             </div>
             <div className="promo-illustration">
-              <img src={getImagePath('/icons/icon_cash.png')} alt="무사고캐시" />
+              <img 
+                src={getImagePath('/images/cash.png')} 
+                alt="무사고캐시" 
+              />
             </div>
             <button
               type="button"

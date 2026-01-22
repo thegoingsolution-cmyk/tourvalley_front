@@ -2,13 +2,14 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { isMobileDevice } from '@/utils/device';
 
 export default function AccidentFreeCashPage() {
   const router = useRouter();
 
   useEffect(() => {
     // 모바일 여부 확인
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    const isMobile = isMobileDevice();
     
     if (isMobile) {
       router.replace('/accident-free-cash/m');

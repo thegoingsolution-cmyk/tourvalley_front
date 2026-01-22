@@ -88,12 +88,14 @@ export default function PaymentStep({
   onSubmit,
   className,
 }: PaymentStepProps) {
-  // 기타결제 선택 시 기본값으로 무통장입금 설정
-  useEffect(() => {
-    if (paymentMethod === '기타결제' && paymentSubMethod === null) {
-      onPaymentSubMethodChange('무통장입금');
+  // 무통장입금, 가상계좌, 수기카드 선택 시 paymentMethod를 '기타결제'로 설정
+  const handleSubMethodSelect = (subMethod: PaymentSubMethod) => {
+    onPaymentMethodChange('기타결제');
+    onPaymentSubMethodChange(subMethod);
+    if (subMethod === '가상계좌') {
+      onDepositBankChange('');
     }
-  }, [paymentMethod, paymentSubMethod, onPaymentSubMethodChange]);
+  };
 
   // 무통장입금 선택 시 기본값으로 우리은행 설정
   useEffect(() => {
@@ -126,7 +128,10 @@ export default function PaymentStep({
                   id="nicepay"
                   value="나이스페이먼츠"
                   checked={paymentMethod === '나이스페이먼츠'}
-                  onChange={() => onPaymentMethodChange('나이스페이먼츠')}
+                  onChange={() => {
+                    onPaymentMethodChange('나이스페이먼츠');
+                    onPaymentSubMethodChange(null);
+                  }}
                 />
               </label>
             </div>
@@ -144,7 +149,10 @@ export default function PaymentStep({
                   id="naverpay"
                   value="네이버페이"
                   checked={paymentMethod === '네이버페이'}
-                  onChange={() => onPaymentMethodChange('네이버페이')}
+                  onChange={() => {
+                    onPaymentMethodChange('네이버페이');
+                    onPaymentSubMethodChange(null);
+                  }}
                 />
               </label>
             </div>
@@ -162,58 +170,74 @@ export default function PaymentStep({
                   id="kakaopay"
                   value="카카오페이"
                   checked={paymentMethod === '카카오페이'}
-                  onChange={() => onPaymentMethodChange('카카오페이')}
+                  onChange={() => {
+                    onPaymentMethodChange('카카오페이');
+                    onPaymentSubMethodChange(null);
+                  }}
                 />
               </label>
             </div>
             <div className="payment-method-option">
-              <label htmlFor="other" className="payment-method-label">
+              <label htmlFor="bank-transfer" className="payment-method-label">
                 <img 
                   src="/icons/payment-other.png" 
-                  alt="기타결제" 
+                  alt="무통장입금" 
                   className="payment-method-icon"
                 />
-                <span>기타결제</span>
+                <span>무통장입금</span>
                 <input
                   type="radio"
                   name="paymentMethod"
-                  id="other"
-                  value="기타결제"
-                  checked={paymentMethod === '기타결제'}
-                  onChange={() => {
-                    onPaymentMethodChange('기타결제');
-                    onPaymentSubMethodChange('무통장입금');
-                  }}
+                  id="bank-transfer"
+                  value="무통장입금"
+                  checked={paymentMethod === '기타결제' && paymentSubMethod === '무통장입금'}
+                  onChange={() => handleSubMethodSelect('무통장입금')}
+                />
+              </label>
+            </div>
+            {receiptPremium >= 10000 && (
+              <div className="payment-method-option">
+                <label htmlFor="virtual-account" className="payment-method-label">
+                  <img 
+                    src="/icons/payment-other.png" 
+                    alt="가상계좌" 
+                    className="payment-method-icon"
+                  />
+                  <span>가상계좌</span>
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    id="virtual-account"
+                    value="가상계좌"
+                    checked={paymentMethod === '기타결제' && paymentSubMethod === '가상계좌'}
+                    onChange={() => handleSubMethodSelect('가상계좌')}
+                  />
+                </label>
+              </div>
+            )}
+            <div className="payment-method-option">
+              <label htmlFor="manual-card" className="payment-method-label">
+                <img 
+                  src="/icons/payment-other.png" 
+                  alt="수기카드" 
+                  className="payment-method-icon"
+                />
+                <span>수기카드</span>
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  id="manual-card"
+                  value="수기카드"
+                  checked={paymentMethod === '기타결제' && paymentSubMethod === '수기카드'}
+                  onChange={() => handleSubMethodSelect('수기카드')}
                 />
               </label>
             </div>
           </div>
 
-          {/* 기타결제 세부 방법 */}
+          {/* 무통장입금, 가상계좌, 수기카드 상세 정보 */}
           {paymentMethod === '기타결제' && (
             <>
-              <div className="payment-sub-methods-section">
-                <button
-                  type="button"
-                  className={`payment-sub-method-btn ${paymentSubMethod === '무통장입금' ? 'selected' : ''}`}
-                  onClick={() => onPaymentSubMethodChange('무통장입금')}
-                >
-                  <div className="payment-sub-method-btn-content">
-                    <div className="payment-sub-method-btn-title">무통장입금</div>
-                    <div className="payment-sub-method-btn-subtitle">(보험료입금 전용계좌)</div>
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  className={`payment-sub-method-btn ${paymentSubMethod === '수기카드' ? 'selected' : ''}`}
-                  onClick={() => onPaymentSubMethodChange('수기카드')}
-                >
-                  <div className="payment-sub-method-btn-content">
-                    <div className="payment-sub-method-btn-title">수기카드</div>
-                    <div className="payment-sub-method-btn-subtitle">(카드번호 입력결제)</div>
-                  </div>
-                </button>
-              </div>
 
               {/* 무통장입금 상세 정보 */}
               {paymentSubMethod === '무통장입금' && (
@@ -283,6 +307,40 @@ export default function PaymentStep({
                         ))}
                       </select>
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 가상계좌 상세 정보 */}
+              {paymentSubMethod === '가상계좌' && (
+                <div className="virtual-account-details">
+                  <div className="form-group form-group-vertical">
+                    <label>입금은행</label>
+                    <select
+                      value={depositBank}
+                      onChange={(e) => onDepositBankChange(e.target.value)}
+                    >
+                      <option value="">은행 선택</option>
+                      <option value="003">기업은행</option>
+                      <option value="004">국민은행</option>
+                      <option value="011">농협중앙회</option>
+                      <option value="020">우리은행</option>
+                      <option value="023">SC은행</option>
+                      <option value="031">대구은행</option>
+                      <option value="032">부산은행</option>
+                      <option value="034">광주은행</option>
+                      <option value="037">전북은행</option>
+                      <option value="039">경남은행</option>
+                      <option value="071">우체국</option>
+                      <option value="081">하나은행</option>
+                      <option value="088">신한은행</option>
+                      <option value="089">케이뱅크</option>
+                    </select>
+                  </div>
+                  <div style={{ marginTop: '20px' }}>
+                    <p style={{ color: '#666', fontSize: '14px', lineHeight: '1.6' }}>
+                      ※ 가상계좌는 결제하기 버튼을 클릭하시면 발급되며, 발급된 계좌번호는 문자로 발송됩니다.
+                    </p>
                   </div>
                 </div>
               )}

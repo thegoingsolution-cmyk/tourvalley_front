@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useParams } from 'next/navigation';
+import { isMobileDevice } from '@/utils/device';
 import QnaDetailPCPage from './pc/page';
 import QnaDetailMobilePage from './m/page';
 
@@ -9,14 +10,7 @@ function QnaDetailContent() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-
-    return () => window.removeEventListener('resize', checkMobile);
+    setIsMobile(isMobileDevice());
   }, []);
 
   if (isMobile) {

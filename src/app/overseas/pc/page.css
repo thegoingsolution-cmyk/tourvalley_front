@@ -2695,7 +2695,8 @@
 }
 
 .overseas-page-pc .bank-transfer-details,
-.overseas-page-pc .manual-card-details {
+.overseas-page-pc .manual-card-details,
+.overseas-page-pc .virtual-account-details {
   margin-top: 24px;
   padding: 0;
   background: transparent;
@@ -2755,19 +2756,22 @@
 }
 
 .overseas-page-pc .bank-transfer-details .form-group,
-.overseas-page-pc .manual-card-details .form-group {
+.overseas-page-pc .manual-card-details .form-group,
+.overseas-page-pc .virtual-account-details .form-group {
   margin-bottom: 16px;
 }
 
 .overseas-page-pc .bank-transfer-details .form-group:last-child,
-.overseas-page-pc .manual-card-details .form-group:last-child {
+.overseas-page-pc .manual-card-details .form-group:last-child,
+.overseas-page-pc .virtual-account-details .form-group:last-child {
   margin-bottom: 0;
 }
 
 
 /* 세로 배치 형태 (label 위, input 아래, input 높이 증가) */
 .overseas-page-pc .bank-transfer-details .form-group.form-group-vertical,
-.overseas-page-pc .manual-card-details .form-group.form-group-vertical {
+.overseas-page-pc .manual-card-details .form-group.form-group-vertical,
+.overseas-page-pc .virtual-account-details .form-group.form-group-vertical {
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 0;
@@ -2775,7 +2779,8 @@
 }
 
 .overseas-page-pc .bank-transfer-details .form-group.form-group-vertical label,
-.overseas-page-pc .manual-card-details .form-group.form-group-vertical label {
+.overseas-page-pc .manual-card-details .form-group.form-group-vertical label,
+.overseas-page-pc .virtual-account-details .form-group.form-group-vertical label {
   display: block;
   font-size: 11px;
   font-weight: 500;
@@ -2789,7 +2794,8 @@
 }
 
 .overseas-page-pc .bank-transfer-details .form-group.form-group-vertical input[type="text"],
-.overseas-page-pc .manual-card-details .form-group.form-group-vertical input[type="text"] {
+.overseas-page-pc .manual-card-details .form-group.form-group-vertical input[type="text"],
+.overseas-page-pc .virtual-account-details .form-group.form-group-vertical input[type="text"] {
   width: 100%;
   padding: 10px;
   min-height: 40px;
@@ -2805,7 +2811,8 @@
 }
 
 .overseas-page-pc .bank-transfer-details .form-group.form-group-vertical select,
-.overseas-page-pc .manual-card-details .form-group.form-group-vertical select {
+.overseas-page-pc .manual-card-details .form-group.form-group-vertical select,
+.overseas-page-pc .virtual-account-details .form-group.form-group-vertical select {
   width: 100%;
   padding: 10px;
   padding-right: 32px;
@@ -2925,7 +2932,8 @@
 }
 
 .overseas-page-pc .bank-transfer-details .form-group label,
-.overseas-page-pc .manual-card-details .form-group label {
+.overseas-page-pc .manual-card-details .form-group label,
+.overseas-page-pc .virtual-account-details .form-group label {
   display: block;
   font-size: 14px;
   font-weight: 600;
@@ -2936,7 +2944,8 @@
 
 .overseas-page-pc .bank-transfer-details .form-group input[type="text"],
 .overseas-page-pc .manual-card-details .form-group input[type="text"],
-.overseas-page-pc .manual-card-details .form-group input[type="number"] {
+.overseas-page-pc .manual-card-details .form-group input[type="number"],
+.overseas-page-pc .virtual-account-details .form-group input[type="text"] {
   width: 100%;
   padding: 12px 16px;
   border: 1px solid #ddd;
@@ -2950,7 +2959,8 @@
 
 .overseas-page-pc .bank-transfer-details .form-group input[type="text"]::placeholder,
 .overseas-page-pc .manual-card-details .form-group input[type="text"]::placeholder,
-.overseas-page-pc .manual-card-details .form-group input[type="number"]::placeholder {
+.overseas-page-pc .manual-card-details .form-group input[type="number"]::placeholder,
+.overseas-page-pc .virtual-account-details .form-group input[type="text"]::placeholder {
   color: #999;
 }
 
@@ -2961,8 +2971,8 @@
   font-weight: 500;
 }
 
-/* 기타 date-inputs, card-number-inputs (일반 스타일) - manual-card-details와 bank-transfer-details 제외 */
-.overseas-page-pc .date-inputs:not(.manual-card-details .date-inputs):not(.bank-transfer-details .date-inputs),
+/* 기타 date-inputs, card-number-inputs (일반 스타일) - manual-card-details와 bank-transfer-details, virtual-account-details 제외 */
+.overseas-page-pc .date-inputs:not(.manual-card-details .date-inputs):not(.bank-transfer-details .date-inputs):not(.virtual-account-details .date-inputs),
 .overseas-page-pc .card-number-inputs:not(.manual-card-details .card-number-inputs),
 .overseas-page-pc .resident-number-inputs {
   display: flex;
@@ -2970,7 +2980,7 @@
   gap: 8px;
 }
 
-.overseas-page-pc .date-inputs:not(.manual-card-details .date-inputs):not(.bank-transfer-details .date-inputs) select,
+.overseas-page-pc .date-inputs:not(.manual-card-details .date-inputs):not(.bank-transfer-details .date-inputs):not(.virtual-account-details .date-inputs) select,
 .overseas-page-pc .card-number-inputs:not(.manual-card-details .card-number-inputs) input,
 .overseas-page-pc .resident-number-inputs input {
   flex: 1;
@@ -3124,6 +3134,7 @@
 }
 
 .overseas-page-pc .view-details-btn {
+  width: 100%;
   padding: 12px 24px;
   background: #fff;
   border: 2px solid #2843e5;
@@ -3140,7 +3151,7 @@
 .overseas-page-pc .accident-free-cash-promo {
   margin: 40px 0;
   padding: 32px;
-  background: #fff9e6;
+  background: #fefbd0;
   border-radius: 12px;
   text-align: center;
 }
@@ -3170,8 +3181,9 @@
 }
 
 .overseas-page-pc .promo-illustration img {
-  max-width: 120px;
-  height: auto;
+  width: 180px;
+  height: 120px;
+  object-fit: contain;
 }
 
 .overseas-page-pc .piggy-bank-placeholder {
@@ -3196,22 +3208,30 @@
 .overseas-page-pc .completion-notes {
   margin: 40px 0;
   padding: 24px;
-  background: #f9f9f9;
+  background: #fff;
+  border: 1px solid #e6e8ed;
   border-radius: 8px;
 }
 
 .overseas-page-pc .completion-notes h3 {
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
+  font-size: 15px;
+  color: #5e5e5e;
+  text-align: left;
+  line-height: 130%;
+  letter-spacing: -1px;
   margin-bottom: 16px;
 }
 
 .overseas-page-pc .completion-notes ul {
   list-style: disc;
   padding-left: 24px;
-  line-height: 1.8;
-  color: #666;
+  font-size: 13px;
+  color: #9b9b9b;
+  text-align: left;
+  line-height: 120%;
+  letter-spacing: -0.8px;
+  width: 97%;
+  padding-top: 1px;
 }
 
 .overseas-page-pc .completion-notes li {

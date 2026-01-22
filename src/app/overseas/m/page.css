@@ -2290,7 +2290,8 @@
 }
 
 .overseas-step1-mobile .bank-transfer-details,
-.overseas-step1-mobile .manual-card-details {
+.overseas-step1-mobile .manual-card-details,
+.overseas-step1-mobile .virtual-account-details {
     margin-top: 20px;
     padding: 0;
     background: transparent;
@@ -2350,17 +2351,20 @@
 }
 
 .overseas-step1-mobile .bank-transfer-details .form-group,
-.overseas-step1-mobile .manual-card-details .form-group {
+.overseas-step1-mobile .manual-card-details .form-group,
+.overseas-step1-mobile .virtual-account-details .form-group {
     margin-bottom: 12px;
 }
 
 .overseas-step1-mobile .bank-transfer-details .form-group:last-child,
-.overseas-step1-mobile .manual-card-details .form-group:last-child {
+.overseas-step1-mobile .manual-card-details .form-group:last-child,
+.overseas-step1-mobile .virtual-account-details .form-group:last-child {
     margin-bottom: 0;
 }
 
 .overseas-step1-mobile .bank-transfer-details .form-group.form-group-vertical,
-.overseas-step1-mobile .manual-card-details .form-group.form-group-vertical {
+.overseas-step1-mobile .manual-card-details .form-group.form-group-vertical,
+.overseas-step1-mobile .virtual-account-details .form-group.form-group-vertical {
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 0;
@@ -2368,7 +2372,8 @@
 }
 
 .overseas-step1-mobile .bank-transfer-details .form-group.form-group-vertical label,
-.overseas-step1-mobile .manual-card-details .form-group.form-group-vertical label {
+.overseas-step1-mobile .manual-card-details .form-group.form-group-vertical label,
+.overseas-step1-mobile .virtual-account-details .form-group.form-group-vertical label {
     display: block;
     font-size: 11px;
     font-weight: 500;
@@ -2382,7 +2387,8 @@
 }
 
 .overseas-step1-mobile .bank-transfer-details .form-group.form-group-vertical input[type="text"],
-.overseas-step1-mobile .manual-card-details .form-group.form-group-vertical input[type="text"] {
+.overseas-step1-mobile .manual-card-details .form-group.form-group-vertical input[type="text"],
+.overseas-step1-mobile .virtual-account-details .form-group.form-group-vertical input[type="text"] {
     width: 100%;
     padding: 10px;
     min-height: 40px;
@@ -2398,7 +2404,8 @@
 }
 
 .overseas-step1-mobile .bank-transfer-details .form-group.form-group-vertical select,
-.overseas-step1-mobile .manual-card-details .form-group.form-group-vertical select {
+.overseas-step1-mobile .manual-card-details .form-group.form-group-vertical select,
+.overseas-step1-mobile .virtual-account-details .form-group.form-group-vertical select {
     width: 100%;
     padding: 10px;
     padding-right: 32px;
@@ -2512,7 +2519,8 @@
 }
 
 .overseas-step1-mobile .bank-transfer-details .form-group label,
-.overseas-step1-mobile .manual-card-details .form-group label {
+.overseas-step1-mobile .manual-card-details .form-group label,
+.overseas-step1-mobile .virtual-account-details .form-group label {
     display: block;
     font-size: 13px;
     font-weight: 600;
@@ -2522,7 +2530,8 @@
 
 .overseas-step1-mobile .bank-transfer-details .form-group input[type="text"],
 .overseas-step1-mobile .manual-card-details .form-group input[type="text"],
-.overseas-step1-mobile .manual-card-details .form-group input[type="number"] {
+.overseas-step1-mobile .manual-card-details .form-group input[type="number"],
+.overseas-step1-mobile .virtual-account-details .form-group input[type="text"] {
     width: 100%;
     padding: 12px 14px;
     border: 1px solid #ddd;
@@ -2535,7 +2544,8 @@
 
 .overseas-step1-mobile .bank-transfer-details .form-group input[type="text"]::placeholder,
 .overseas-step1-mobile .manual-card-details .form-group input[type="text"]::placeholder,
-.overseas-step1-mobile .manual-card-details .form-group input[type="number"]::placeholder {
+.overseas-step1-mobile .manual-card-details .form-group input[type="number"]::placeholder,
+.overseas-step1-mobile .virtual-account-details .form-group input[type="text"]::placeholder {
     color: #999;
 }
 

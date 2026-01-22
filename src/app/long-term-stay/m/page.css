@@ -1875,7 +1875,8 @@
 }
 
 .long-term-stay-mobile .bank-transfer-details,
-.long-term-stay-mobile .manual-card-details {
+.long-term-stay-mobile .manual-card-details,
+.long-term-stay-mobile .virtual-account-details {
     margin-top: 20px;
     padding: 0;
     background: transparent;
@@ -1935,17 +1936,20 @@
 }
 
 .long-term-stay-mobile .bank-transfer-details .form-group,
-.long-term-stay-mobile .manual-card-details .form-group {
+.long-term-stay-mobile .manual-card-details .form-group,
+.long-term-stay-mobile .virtual-account-details .form-group {
     margin-bottom: 12px;
 }
 
 .long-term-stay-mobile .bank-transfer-details .form-group:last-child,
-.long-term-stay-mobile .manual-card-details .form-group:last-child {
+.long-term-stay-mobile .manual-card-details .form-group:last-child,
+.long-term-stay-mobile .virtual-account-details .form-group:last-child {
     margin-bottom: 0;
 }
 
 .long-term-stay-mobile .bank-transfer-details .form-group.form-group-vertical,
-.long-term-stay-mobile .manual-card-details .form-group.form-group-vertical {
+.long-term-stay-mobile .manual-card-details .form-group.form-group-vertical,
+.long-term-stay-mobile .virtual-account-details .form-group.form-group-vertical {
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 0;
@@ -1953,7 +1957,8 @@
 }
 
 .long-term-stay-mobile .bank-transfer-details .form-group.form-group-vertical label,
-.long-term-stay-mobile .manual-card-details .form-group.form-group-vertical label {
+.long-term-stay-mobile .manual-card-details .form-group.form-group-vertical label,
+.long-term-stay-mobile .virtual-account-details .form-group.form-group-vertical label {
     display: block;
     font-size: 11px;
     font-weight: 500;
@@ -1967,7 +1972,8 @@
 }
 
 .long-term-stay-mobile .bank-transfer-details .form-group.form-group-vertical input[type="text"],
-.long-term-stay-mobile .manual-card-details .form-group.form-group-vertical input[type="text"] {
+.long-term-stay-mobile .manual-card-details .form-group.form-group-vertical input[type="text"],
+.long-term-stay-mobile .virtual-account-details .form-group.form-group-vertical input[type="text"] {
     width: 100%;
     padding: 10px;
     min-height: 40px;
@@ -1983,7 +1989,8 @@
 }
 
 .long-term-stay-mobile .bank-transfer-details .form-group.form-group-vertical select,
-.long-term-stay-mobile .manual-card-details .form-group.form-group-vertical select {
+.long-term-stay-mobile .manual-card-details .form-group.form-group-vertical select,
+.long-term-stay-mobile .virtual-account-details .form-group.form-group-vertical select {
     width: 100%;
     padding: 10px;
     padding-right: 32px;
@@ -2097,7 +2104,8 @@
 }
 
 .long-term-stay-mobile .bank-transfer-details .form-group label,
-.long-term-stay-mobile .manual-card-details .form-group label {
+.long-term-stay-mobile .manual-card-details .form-group label,
+.long-term-stay-mobile .virtual-account-details .form-group label {
     display: block;
     font-size: 13px;
     font-weight: 600;
@@ -2107,7 +2115,8 @@
 
 .long-term-stay-mobile .bank-transfer-details .form-group input[type="text"],
 .long-term-stay-mobile .manual-card-details .form-group input[type="text"],
-.long-term-stay-mobile .manual-card-details .form-group input[type="number"] {
+.long-term-stay-mobile .manual-card-details .form-group input[type="number"],
+.long-term-stay-mobile .virtual-account-details .form-group input[type="text"] {
     width: 100%;
     padding: 12px 14px;
     border: 1px solid #ddd;
@@ -2120,7 +2129,8 @@
 
 .long-term-stay-mobile .bank-transfer-details .form-group input[type="text"]::placeholder,
 .long-term-stay-mobile .manual-card-details .form-group input[type="text"]::placeholder,
-.long-term-stay-mobile .manual-card-details .form-group input[type="number"]::placeholder {
+.long-term-stay-mobile .manual-card-details .form-group input[type="number"]::placeholder,
+.long-term-stay-mobile .virtual-account-details .form-group input[type="text"]::placeholder {
     color: #999;
 }
 

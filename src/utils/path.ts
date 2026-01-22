@@ -67,7 +67,7 @@ export const getImagePath = (imagePath: string): string => {
   // basePath가 없으면 원본 경로 반환 (로컬 환경)
   if (!basePath) {
     if (typeof window !== 'undefined') {
-      console.log('[getImagePath] 로컬 환경 - basePath 없음', { imagePath });
+      // console.log('[getImagePath] 로컬 환경 - basePath 없음', { imagePath });
     }
     return imagePath;
   }

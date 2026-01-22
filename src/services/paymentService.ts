@@ -26,6 +26,7 @@ interface KakaoPayPaymentRequest {
   returnUrl: string;
 }
 
+
 // 나이스페이먼츠 결제창 호출 파라미터 가져오기
 export const requestNicepayPayment = async (data: NicepayPaymentRequest) => {
   try {
@@ -45,21 +46,26 @@ export const requestNicepayPayment = async (data: NicepayPaymentRequest) => {
   }
 };
 
+// 나이스페이먼츠 가상계좌 발급 요청
+
 // 나이스페이먼츠 결제창 호출 (AUTHNICE API 방식)
 export const openNicepayWindow = (params: any) => {
   return new Promise((resolve, reject) => {
     console.log('나이스페이 결제 시작');
     console.log('결제 파라미터:', params);
     
+    // 결제 방법 (card 또는 vbank)
+    // 나이스페이는 소문자 vbank를 요구함
+    const paymentMethod = params.method || 'card';
+    
     // 스크립트가 이미 로드되어 있는지 확인
-    // @ts-ignore
-    if (window.AUTHNICE) {
+    const authnice = (window as any).AUTHNICE;
+    if (authnice) {
       try {
         console.log('나이스페이 스크립트가 이미 로드되어 있습니다.');
-        // @ts-ignore
-        window.AUTHNICE.requestPay({
+        const requestParams: any = {
           clientId: params.clientKey,
-          method: 'card',
+          method: paymentMethod,
           orderId: params.orderId,
           amount: typeof params.amount === 'string' ? parseInt(params.amount, 10) : params.amount,
           goodsName: params.goodsName,
@@ -72,7 +78,36 @@ export const openNicepayWindow = (params: any) => {
             console.error('결제 오류:', result);
             reject(new Error(result.msg || '결제 중 오류가 발생했습니다.'));
           }
-        });
+        };
+        
+        // 가상계좌인 경우 은행 코드/예금주명/만료일 추가
+        if (paymentMethod === 'vbank') {
+          console.log('가상계좌 bankCode:', params.bankCode);
+          if (!params.bankCode) {
+            reject(new Error('가상계좌 은행코드가 없습니다.'));
+            return;
+          }
+          requestParams.bankCode = params.bankCode;
+          requestParams.vbankHolder = params.vbankHolder || params.buyerName || '';
+          
+          // 가상계좌 유효시간 설정 (7일 = 168시간)
+          // vbankValidHours와 vbankExpDate가 함께 요청되면 vbankValidHours가 우선함
+          // Default 값은 D+7일이지만 명시적으로 설정
+          requestParams.vbankValidHours = 168; // 7일 = 168시간
+          
+          // 에스크로 사용 여부는 선택사항 (필요시에만 설정)
+          // requestParams.useEscrow = true;
+          
+          console.log('가상계좌 파라미터 확인:', {
+            method: requestParams.method,
+            bankCode: requestParams.bankCode,
+            vbankHolder: requestParams.vbankHolder,
+            vbankValidHours: requestParams.vbankValidHours
+          });
+        }
+        
+        console.log('나이스페이 요청 파라미터:', requestParams);
+        authnice.requestPay(requestParams);
         resolve(true);
         return;
       } catch (error) {
@@ -88,14 +123,13 @@ export const openNicepayWindow = (params: any) => {
       console.log('나이스페이 스크립트가 로드 중입니다. 대기합니다...');
       
       const checkInterval = setInterval(() => {
-        // @ts-ignore
-        if (window.AUTHNICE) {
+        const authniceLoaded = (window as any).AUTHNICE;
+        if (authniceLoaded) {
           clearInterval(checkInterval);
           try {
-            // @ts-ignore
-            window.AUTHNICE.requestPay({
+            const requestParams: any = {
               clientId: params.clientKey,
-              method: 'card',
+              method: paymentMethod,
               orderId: params.orderId,
               amount: typeof params.amount === 'string' ? parseInt(params.amount, 10) : params.amount,
               goodsName: params.goodsName,
@@ -108,7 +142,34 @@ export const openNicepayWindow = (params: any) => {
                 console.error('결제 오류:', result);
                 reject(new Error(result.msg || '결제 중 오류가 발생했습니다.'));
               }
-            });
+            };
+            
+            // 가상계좌인 경우 은행 코드/예금주명/만료일 추가
+            if (paymentMethod === 'vbank') {
+              console.log('가상계좌 bankCode:', params.bankCode);
+              if (!params.bankCode) {
+                reject(new Error('가상계좌 은행코드가 없습니다.'));
+                return;
+              }
+              requestParams.bankCode = params.bankCode;
+              requestParams.vbankHolder = params.vbankHolder || params.buyerName || '';
+              
+              // 가상계좌 만료일 설정 (7일 후, YYMMDDHHMMSS 형식)
+              const expireDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+              const year = expireDate.getFullYear().toString().slice(-2);
+              const month = (expireDate.getMonth() + 1).toString().padStart(2, '0');
+              const day = expireDate.getDate().toString().padStart(2, '0');
+              const hours = expireDate.getHours().toString().padStart(2, '0');
+              const minutes = expireDate.getMinutes().toString().padStart(2, '0');
+              const seconds = expireDate.getSeconds().toString().padStart(2, '0');
+              requestParams.vbankExpDate = `${year}${month}${day}${hours}${minutes}${seconds}`;
+              
+              // 에스크로 사용 여부는 선택사항 (필요시에만 설정)
+              // requestParams.useEscrow = true;
+            }
+            
+            console.log('나이스페이 요청 파라미터:', requestParams);
+            authniceLoaded.requestPay(requestParams);
             resolve(true);
           } catch (error) {
             reject(error);
@@ -119,8 +180,7 @@ export const openNicepayWindow = (params: any) => {
       // 10초 후 타임아웃
       setTimeout(() => {
         clearInterval(checkInterval);
-        // @ts-ignore
-        if (!window.AUTHNICE) {
+        if (!(window as any).AUTHNICE) {
           reject(new Error('나이스페이먼츠 스크립트 로드 타임아웃'));
         }
       }, 10000);
@@ -140,15 +200,14 @@ export const openNicepayWindow = (params: any) => {
       
       // AUTHNICE 객체가 로드될 때까지 대기
       const checkInterval = setInterval(() => {
-        // @ts-ignore
-        if (window.AUTHNICE) {
+        const authniceLoaded = (window as any).AUTHNICE;
+        if (authniceLoaded) {
           clearInterval(checkInterval);
           try {
             console.log('나이스페이 AUTHNICE 객체 확인 완료, 결제창을 엽니다.');
-            // @ts-ignore
-            window.AUTHNICE.requestPay({
+            const requestParams: any = {
               clientId: params.clientKey,
-              method: 'card',
+              method: paymentMethod,
               orderId: params.orderId,
               amount: typeof params.amount === 'string' ? parseInt(params.amount, 10) : params.amount,
               goodsName: params.goodsName,
@@ -161,7 +220,34 @@ export const openNicepayWindow = (params: any) => {
                 console.error('결제 오류:', result);
                 reject(new Error(result.msg || '결제 중 오류가 발생했습니다.'));
               }
-            });
+            };
+            
+            // 가상계좌인 경우 은행 코드/예금주명/만료일 추가
+            if (paymentMethod === 'vbank') {
+              console.log('가상계좌 bankCode:', params.bankCode);
+              if (!params.bankCode) {
+                reject(new Error('가상계좌 은행코드가 없습니다.'));
+                return;
+              }
+              requestParams.bankCode = params.bankCode;
+              requestParams.vbankHolder = params.vbankHolder || params.buyerName || '';
+              
+              // 가상계좌 만료일 설정 (7일 후, YYMMDDHHMMSS 형식)
+              const expireDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+              const year = expireDate.getFullYear().toString().slice(-2);
+              const month = (expireDate.getMonth() + 1).toString().padStart(2, '0');
+              const day = expireDate.getDate().toString().padStart(2, '0');
+              const hours = expireDate.getHours().toString().padStart(2, '0');
+              const minutes = expireDate.getMinutes().toString().padStart(2, '0');
+              const seconds = expireDate.getSeconds().toString().padStart(2, '0');
+              requestParams.vbankExpDate = `${year}${month}${day}${hours}${minutes}${seconds}`;
+              
+              // 에스크로 사용 여부는 선택사항 (필요시에만 설정)
+              // requestParams.useEscrow = true;
+            }
+            
+            console.log('나이스페이 요청 파라미터:', requestParams);
+            authniceLoaded.requestPay(requestParams);
             resolve(true);
           } catch (error) {
             console.error('나이스페이 실행 중 오류:', error);
@@ -173,8 +259,7 @@ export const openNicepayWindow = (params: any) => {
       // 10초 후 타임아웃
       setTimeout(() => {
         clearInterval(checkInterval);
-        // @ts-ignore
-        if (!window.AUTHNICE) {
+        if (!(window as any).AUTHNICE) {
           reject(new Error('나이스페이먼츠 AUTHNICE 객체 로드 타임아웃'));
         }
       }, 10000);

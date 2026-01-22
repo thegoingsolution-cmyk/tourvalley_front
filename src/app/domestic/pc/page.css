@@ -2767,7 +2767,8 @@
 }
 
 .domestic-page-pc .bank-transfer-details,
-.domestic-page-pc .manual-card-details {
+.domestic-page-pc .manual-card-details,
+.domestic-page-pc .virtual-account-details {
   margin-top: 24px;
   padding: 0;
   background: transparent;
@@ -2827,19 +2828,22 @@
 }
 
 .domestic-page-pc .bank-transfer-details .form-group,
-.domestic-page-pc .manual-card-details .form-group {
+.domestic-page-pc .manual-card-details .form-group,
+.domestic-page-pc .virtual-account-details .form-group {
   margin-bottom: 16px;
 }
 
 .domestic-page-pc .bank-transfer-details .form-group:last-child,
-.domestic-page-pc .manual-card-details .form-group:last-child {
+.domestic-page-pc .manual-card-details .form-group:last-child,
+.domestic-page-pc .virtual-account-details .form-group:last-child {
   margin-bottom: 0;
 }
 
 
 /* 세로 배치 형태 (label 위, input 아래, input 높이 증가) */
 .domestic-page-pc .bank-transfer-details .form-group.form-group-vertical,
-.domestic-page-pc .manual-card-details .form-group.form-group-vertical {
+.domestic-page-pc .manual-card-details .form-group.form-group-vertical,
+.domestic-page-pc .virtual-account-details .form-group.form-group-vertical {
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 0;
@@ -2847,7 +2851,8 @@
 }
 
 .domestic-page-pc .bank-transfer-details .form-group.form-group-vertical label,
-.domestic-page-pc .manual-card-details .form-group.form-group-vertical label {
+.domestic-page-pc .manual-card-details .form-group.form-group-vertical label,
+.domestic-page-pc .virtual-account-details .form-group.form-group-vertical label {
   display: block;
   font-size: 11px;
   font-weight: 500;
@@ -2861,7 +2866,8 @@
 }
 
 .domestic-page-pc .bank-transfer-details .form-group.form-group-vertical input[type="text"],
-.domestic-page-pc .manual-card-details .form-group.form-group-vertical input[type="text"] {
+.domestic-page-pc .manual-card-details .form-group.form-group-vertical input[type="text"],
+.domestic-page-pc .virtual-account-details .form-group.form-group-vertical input[type="text"] {
   width: 100%;
   padding: 10px;
   min-height: 40px;
@@ -2877,7 +2883,8 @@
 }
 
 .domestic-page-pc .bank-transfer-details .form-group.form-group-vertical select,
-.domestic-page-pc .manual-card-details .form-group.form-group-vertical select {
+.domestic-page-pc .manual-card-details .form-group.form-group-vertical select,
+.domestic-page-pc .virtual-account-details .form-group.form-group-vertical select {
   width: 100%;
   padding: 10px;
   padding-right: 32px;
@@ -2997,7 +3004,8 @@
 }
 
 .domestic-page-pc .bank-transfer-details .form-group label,
-.domestic-page-pc .manual-card-details .form-group label {
+.domestic-page-pc .manual-card-details .form-group label,
+.domestic-page-pc .virtual-account-details .form-group label {
   display: block;
   font-size: 14px;
   font-weight: 600;
@@ -3008,7 +3016,8 @@
 
 .domestic-page-pc .bank-transfer-details .form-group input[type="text"],
 .domestic-page-pc .manual-card-details .form-group input[type="text"],
-.domestic-page-pc .manual-card-details .form-group input[type="number"] {
+.domestic-page-pc .manual-card-details .form-group input[type="number"],
+.domestic-page-pc .virtual-account-details .form-group input[type="text"] {
   width: 100%;
   padding: 12px 16px;
   border: 1px solid #ddd;
@@ -3022,7 +3031,8 @@
 
 .domestic-page-pc .bank-transfer-details .form-group input[type="text"]::placeholder,
 .domestic-page-pc .manual-card-details .form-group input[type="text"]::placeholder,
-.domestic-page-pc .manual-card-details .form-group input[type="number"]::placeholder {
+.domestic-page-pc .manual-card-details .form-group input[type="number"]::placeholder,
+.domestic-page-pc .virtual-account-details .form-group input[type="text"]::placeholder {
   color: #999;
 }
 
@@ -3033,8 +3043,8 @@
   font-weight: 500;
 }
 
-/* 기타 date-inputs, card-number-inputs (일반 스타일) - manual-card-details와 bank-transfer-details 제외 */
-.domestic-page-pc .date-inputs:not(.manual-card-details .date-inputs):not(.bank-transfer-details .date-inputs),
+/* 기타 date-inputs, card-number-inputs (일반 스타일) - manual-card-details와 bank-transfer-details, virtual-account-details 제외 */
+.domestic-page-pc .date-inputs:not(.manual-card-details .date-inputs):not(.bank-transfer-details .date-inputs):not(.virtual-account-details .date-inputs),
 .domestic-page-pc .card-number-inputs:not(.manual-card-details .card-number-inputs),
 .domestic-page-pc .resident-number-inputs {
   display: flex;
@@ -3042,7 +3052,7 @@
   gap: 8px;
 }
 
-.domestic-page-pc .date-inputs:not(.manual-card-details .date-inputs):not(.bank-transfer-details .date-inputs) select,
+.domestic-page-pc .date-inputs:not(.manual-card-details .date-inputs):not(.bank-transfer-details .date-inputs):not(.virtual-account-details .date-inputs) select,
 .domestic-page-pc .card-number-inputs:not(.manual-card-details .card-number-inputs) input,
 .domestic-page-pc .resident-number-inputs input {
   flex: 1;
@@ -3196,6 +3206,7 @@
 }
 
 .domestic-page-pc .view-details-btn {
+  width: 100%;
   padding: 12px 24px;
   background: #fff;
   border: 2px solid #2843e5;
@@ -3241,6 +3252,12 @@
   margin: 24px 0;
 }
 
+.domestic-page-pc .promo-illustration img {
+  width: 180px;
+  height: 120px;
+  object-fit: contain;
+}
+
 .domestic-page-pc .piggy-bank-placeholder {
   font-size: 64px;
 }
@@ -3263,22 +3280,30 @@
 .domestic-page-pc .completion-notes {
   margin: 40px 0;
   padding: 24px;
-  background: #f9f9f9;
+  background: #fff;
+  border: 1px solid #e6e8ed;
   border-radius: 8px;
 }
 
 .domestic-page-pc .completion-notes h3 {
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
+  font-size: 15px;
+  color: #5e5e5e;
+  text-align: left;
+  line-height: 130%;
+  letter-spacing: -1px;
   margin-bottom: 16px;
 }
 
 .domestic-page-pc .completion-notes ul {
   list-style: disc;
   padding-left: 24px;
-  line-height: 1.8;
-  color: #666;
+  font-size: 13px;
+  color: #9b9b9b;
+  text-align: left;
+  line-height: 120%;
+  letter-spacing: -0.8px;
+  width: 97%;
+  padding-top: 1px;
 }
 
 .domestic-page-pc .completion-notes li {
