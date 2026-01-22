@@ -2,9 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import Image from 'next/image';
-import { getImagePath } from '@/utils/path';
-import '@/app/contracts/pc/page.css';
+import './GiftCardExchangeModal.css';
 
 interface GiftCardExchangeModalProps {
   isOpen: boolean;
@@ -118,147 +116,141 @@ const GiftCardExchangeModal: React.FC<GiftCardExchangeModalProps> = ({
 
   const modalContent = (
     <div 
-      className="contract-page-pc tour2023_pcBox_Wrap" 
-      style={{ 
-        display: 'flex',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        width: '100vw',
-        height: '100vh',
-        background: 'rgba(0, 0, 0, 0.6)',
-        backdropFilter: 'blur(2px)',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999,
-        margin: 0,
-        padding: 0
-      }}
+      className="gift-card-modal-overlay"
       onClick={onClose}
     >
       <div 
-        className="tour2023_pcBox_Layer" 
+        className="gift-card-modal-container"
         onClick={(e) => e.stopPropagation()}
       >
-        <div 
-          className="tour2023_pc_layer tour2023_pcBox_plan"
-        >
-          <div className="tour2023_pcBox_top">
-            <p className="tour2023_pcBox_tit">문화상품권 전환신청</p>
-            <a className="close" href="javascript:void(0);" onClick={onClose}>
-              닫기
-            </a>
-          </div>
-          <div className="tour2023_plan">
-            <section className="scroll_box01">
-              <div className="tour2023_plan_prow_01">
-                <form name="mileageForm" method="POST">
-                  <div id="contentWrap">
-                    <section className="tourGuard_bg ag_center">
-                      <div className="tourGuard_Topbg01">
-                        <div className="prow_01">
-                          <div className="tourG_mat13 tourG_mab04 tour2023_title10">
-                            회원 마일리지 문화상품권 전환신청
-                          </div>
-                          <div className="tourGuard_form_tt mag5 tourG_mab03">
-                            <label htmlFor="available_mileage">사용가능 마일리지</label>
-                            <input
-                              type="text"
-                              id="available_mileage"
-                              maxLength={7}
-                              value={availableMileage.toLocaleString()}
-                              className="tourGuard_input_w02"
-                              readOnly
-                            />
-                            <div className="tourGuard_txt21">P</div>
-                          </div>
-                          <div className="tourGuard_form_tt mag5 tourG_mab03">
-                            <label htmlFor="gift_type">상품권 선택</label>
-                            <div className="tourGuard_bg_join tourGuard_input_cell tourGuard_input_cell01 tourGuard" style={{ marginRight: 0 }}>
-                              <span className="tourGuard_ps_box">
-                                <select
-                                  className="tourGuard_sel"
-                                  name="gift_type"
-                                  value={giftType}
-                                  onChange={(e) => {
-                                    setGiftType(e.target.value);
-                                    setAmount();
-                                  }}
-                                >
-                                  <option value="">선택</option>
-                                  <option value="CO10000">문화상품권 10,000원권(온라인)</option>
-                                  <option value="CM10000">문화상품권 10,000원권(모바일)</option>
-                                </select>
-                              </span>
-                            </div>
-                          </div>
-                          <div className="tourGuard_form_tt mag5 tourG_mab03">
-                            <label htmlFor="quantity">매수 선택</label>
-                            <div className="tourGuard_bg_join tourGuard_input_cell tourGuard_input_cell01 tourGuard" style={{ marginRight: 0 }}>
-                              <span className="tourGuard_ps_box">
-                                <select
-                                  className="tourGuard_sel"
-                                  name="quantity"
-                                  value={quantity}
-                                  onChange={(e) => {
-                                    setQuantity(Number(e.target.value));
-                                    setAmount();
-                                  }}
-                                >
-                                  {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                                    <option key={num} value={num}>
-                                      {num}
-                                    </option>
-                                  ))}
-                                </select>
-                              </span>
-                            </div>
-                          </div>
-                          <div className="tourGuard_form_tt mag5 tourG_mab03">
-                            <label htmlFor="tot_amount">금액</label>
-                            <input
-                              type="text"
-                              id="tot_amount"
-                              name="tot_amount"
-                              value={totalAmount.toLocaleString()}
-                              className="tourGuard_input_w02"
-                              readOnly
-                            />
-                            <div className="tourGuard_txt21">원</div>
-                          </div>
-                          <div className="tour2023_mileC_Wrap">
-                            <p className="tour2023_mileC_tt tourG_mab05">
-                              사용 후 남은 마일리지{' '}
-                              <span id="restMileage" className="tour2023_mileC_tt01">
-                                <b>{restMileage.toLocaleString()}P</b>
-                              </span>
-                            </p>
-                          </div>
-                          <div className="tourG_mat12 tourG_mab15 tourG_mab05">
-                            <a
-                              href="javascript:void(0);"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                handleSubmit();
-                              }}
-                              className="tourGuard_btn_b tour2023_btn01"
-                              style={{ pointerEvents: isSubmitting ? 'none' : 'auto', opacity: isSubmitting ? 0.6 : 1 }}
-                            >
-                              {isSubmitting ? '처리 중...' : '신청'}
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                  <input type="hidden" name="gift_cd" value={giftType} />
-                  <input type="hidden" name="tot_mileage" value={totalAmount} />
-                </form>
+        <div className="gift-card-modal-header">
+          <h2 className="gift-card-modal-title">문화상품권 전환신청</h2>
+          <button 
+            className="gift-card-modal-close"
+            onClick={onClose}
+            type="button"
+            aria-label="닫기"
+          >
+            닫기
+          </button>
+        </div>
+        
+        <div className="gift-card-modal-content">
+          <h3 className="gift-card-modal-section-title">
+            회원 마일리지 문화상품권 전환신청
+          </h3>
+          
+          <form name="mileageForm" method="POST" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+            {/* 사용가능 마일리지 */}
+            <div className="gift-card-form-field">
+              <label htmlFor="available_mileage" className="gift-card-form-label">
+                사용가능 마일리지
+              </label>
+              <div className="gift-card-form-input-wrapper">
+                <input
+                  type="text"
+                  id="available_mileage"
+                  maxLength={7}
+                  value={availableMileage.toLocaleString()}
+                  className="gift-card-form-input"
+                  readOnly
+                />
+                <span className="gift-card-form-unit">P</span>
               </div>
-            </section>
-          </div>
+            </div>
+
+            {/* 상품권 선택 */}
+            <div className="gift-card-form-field">
+              <label htmlFor="gift_type" className="gift-card-form-label">
+                상품권 선택
+              </label>
+              <div className="gift-card-form-input-wrapper">
+                <div className="gift-card-form-select-wrapper">
+                  <select
+                    className="gift-card-form-select"
+                    name="gift_type"
+                    id="gift_type"
+                    value={giftType}
+                    onChange={(e) => {
+                      setGiftType(e.target.value);
+                      setAmount();
+                    }}
+                  >
+                    <option value="">선택</option>
+                    <option value="CO10000">문화상품권 10,000원권(온라인)</option>
+                    <option value="CM10000">문화상품권 10,000원권(모바일)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* 매수 선택 */}
+            <div className="gift-card-form-field">
+              <label htmlFor="quantity" className="gift-card-form-label">
+                매수 선택
+              </label>
+              <div className="gift-card-form-input-wrapper">
+                <div className="gift-card-form-select-wrapper">
+                  <select
+                    className="gift-card-form-select"
+                    name="quantity"
+                    id="quantity"
+                    value={quantity}
+                    onChange={(e) => {
+                      setQuantity(Number(e.target.value));
+                      setAmount();
+                    }}
+                  >
+                    {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                      <option key={num} value={num}>
+                        {num}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* 금액 */}
+            <div className="gift-card-form-field">
+              <label htmlFor="tot_amount" className="gift-card-form-label">
+                금액
+              </label>
+              <div className="gift-card-form-input-wrapper">
+                <input
+                  type="text"
+                  id="tot_amount"
+                  name="tot_amount"
+                  value={totalAmount.toLocaleString()}
+                  className="gift-card-form-input"
+                  readOnly
+                />
+                <span className="gift-card-form-unit">원</span>
+              </div>
+            </div>
+
+            {/* 사용 후 남은 마일리지 */}
+            <div className="gift-card-remaining-mileage">
+              <p className="gift-card-remaining-mileage-text">
+                사용 후 남은 마일리지
+              </p>
+              <p className="gift-card-remaining-mileage-amount">
+                {restMileage.toLocaleString()}P
+              </p>
+            </div>
+
+            {/* 신청 버튼 */}
+            <button
+              type="submit"
+              className="gift-card-submit-button"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? '처리 중...' : '신청'}
+            </button>
+
+            <input type="hidden" name="gift_cd" value={giftType} />
+            <input type="hidden" name="tot_mileage" value={totalAmount} />
+          </form>
         </div>
       </div>
     </div>

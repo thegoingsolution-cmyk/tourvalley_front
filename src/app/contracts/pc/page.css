@@ -1123,13 +1123,14 @@
 
 .contract-page-pc .tour2023_mypageTop_menu {
   display: flex;
-  justify-content: center;
+  justify-content: stretch;
   gap: 0;
   border-bottom: 1px solid #e0e0e0;
 }
 
 .contract-page-pc .tour2023_mypageTop_w {
-  display: inline-block;
+  display: flex;
+  flex: 1;
   padding: 15px 30px;
   text-decoration: none;
   color: #666;
@@ -1138,10 +1139,11 @@
   border-bottom: 3px solid transparent;
   transition: all 0.3s;
   white-space: nowrap;
+  align-items: center;
+  justify-content: center;
 }
 
 .contract-page-pc .tour2023_mypageTop_m01_w01 {
-  min-width: 120px;
   text-align: center;
 }
 
@@ -1550,13 +1552,17 @@
 }
 
 .contract-page-pc .board_foot .paging li a {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 8px 12px;
   text-decoration: none;
   color: #666;
   border: 1px solid #ddd;
   border-radius: 4px;
   transition: all 0.2s;
+  min-width: 40px;
+  height: 36px;
 }
 
 .contract-page-pc .board_foot .paging li.on a {
@@ -1574,6 +1580,57 @@
 .contract-page-pc .board_foot .paging li.on a:hover {
   background: #1b37e1;
   border-color: #1b37e1;
+}
+
+/* 페이지네이션 네비게이션 버튼 스타일 */
+.contract-page-pc .board_foot .paging li a.paging-nav-first,
+.contract-page-pc .board_foot .paging li a.paging-nav-prev,
+.contract-page-pc .board_foot .paging li a.paging-nav-next,
+.contract-page-pc .board_foot .paging li a.paging-nav-last {
+  padding: 8px 10px;
+}
+
+.contract-page-pc .board_foot .paging li a.paging-nav-first img,
+.contract-page-pc .board_foot .paging li a.paging-nav-prev img,
+.contract-page-pc .board_foot .paging li a.paging-nav-next img,
+.contract-page-pc .board_foot .paging li a.paging-nav-last img {
+  display: block;
+  width: 12px;
+  height: 12px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.contract-page-pc .board_foot .paging li a.paging-nav-first:hover img,
+.contract-page-pc .board_foot .paging li a.paging-nav-prev:hover img,
+.contract-page-pc .board_foot .paging li a.paging-nav-next:hover img,
+.contract-page-pc .board_foot .paging li a.paging-nav-last:hover img {
+  opacity: 1;
+}
+
+/* 화살표 방향 */
+.contract-page-pc .board_foot .paging li a .paging-arrow-left {
+  transform: rotate(180deg);
+}
+
+.contract-page-pc .board_foot .paging li a .paging-arrow-right {
+  transform: rotate(0deg);
+}
+
+/* 이중 화살표 (첫/마지막 페이지) */
+.contract-page-pc .board_foot .paging li a .paging-double-arrow-left,
+.contract-page-pc .board_foot .paging li a .paging-double-arrow-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.contract-page-pc .board_foot .paging li a .paging-double-arrow-left img {
+  transform: rotate(180deg);
+}
+
+.contract-page-pc .board_foot .paging li a .paging-double-arrow-right img {
+  transform: rotate(0deg);
 }
 
 /* 무사고캐시/마일리지 테이블 스타일 (tour2023_ListB) */

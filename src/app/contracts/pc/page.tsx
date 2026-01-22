@@ -83,6 +83,26 @@ export default function PCContractPage() {
   const [cashList, setCashList] = useState<CashHistory[]>([]);
   const [cashInfo, setCashInfo] = useState<{ totalCash: number; expireCash: number }>({ totalCash: 0, expireCash: 0 });
   
+  // 무사고캐시 적립 가능한 계약 목록
+  interface EligibleContract {
+    id: number;
+    contract_number: string;
+    insurance_type: string;
+    departure_date: string;
+    arrival_date: string;
+    total_premium: number;
+    status: string;
+    created_at: string;
+    travel_region?: string | null;
+    travel_country?: string | null;
+    travel_purpose?: string | null;
+    eligibleCashAmount: number;
+    daysSinceEnd: number;
+    isEligible: boolean;
+  }
+  const [eligibleContracts, setEligibleContracts] = useState<EligibleContract[]>([]);
+  const [isAccumulating, setIsAccumulating] = useState<number | null>(null);
+  
   // 마일리지 데이터
   interface MileageHistory {
     id: number;
@@ -96,6 +116,13 @@ export default function PCContractPage() {
   const [mileageInfo, setMileageInfo] = useState<{ totalMileage: number }>({ totalMileage: 0 });
   const [mileageList, setMileageList] = useState<MileageHistory[]>([]);
   const [activeTab, setActiveTab] = useState<'contract' | 'cash' | 'mileage'>('contract');
+  
+  // 법인 고객인 경우 무사고캐시 탭이 없으므로 기본 탭을 'contract'로 설정
+  useEffect(() => {
+    if (isLoggedIn && member && member.member_type === '법인' && activeTab === 'cash') {
+      setActiveTab('contract');
+    }
+  }, [isLoggedIn, member, activeTab]);
   const [showGiftCardModal, setShowGiftCardModal] = useState<boolean>(false);
 
   // 로그인 타입: 'I' (개인) 또는 'C' (단체)
@@ -605,12 +632,84 @@ export default function PCContractPage() {
       } else if (activeTab === 'cash') {
         getCashInfo();
         getCashList();
+        getEligibleContracts();
       } else if (activeTab === 'mileage') {
         getMileageInfo();
         getMileageList();
       }
     }
   }, [isLoggedIn, member, inYear, activeTab, searchType]);
+
+  // 무사고캐시 적립 가능한 계약 목록 조회
+  const getEligibleContracts = async () => {
+    if (!isLoggedIn || !member || member.member_type !== '개인') return;
+
+    try {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${API_BASE_URL}/api/cash/eligible-contracts?member_id=${member.id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setEligibleContracts(data.contracts || []);
+        }
+      }
+    } catch (error) {
+      console.error('적립 가능한 계약 조회 오류:', error);
+      setEligibleContracts([]);
+    }
+  };
+
+  // 무사고캐시 적립
+  const handleAccumulateCash = async (contractId: number) => {
+    if (!isLoggedIn || !member) return;
+
+    if (!confirm('무사고캐시를 적립하시겠습니까?')) {
+      return;
+    }
+
+    setIsAccumulating(contractId);
+
+    try {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${API_BASE_URL}/api/cash/accumulate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          member_id: member.id,
+          contract_id: contractId,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert(`무사고캐시 ${data.cashAmount.toLocaleString()}원이 적립되었습니다.`);
+        // 데이터 새로고침
+        await Promise.all([
+          getCashInfo(),
+          getCashList(),
+          getEligibleContracts(),
+        ]);
+      } else {
+        alert(data.message || '무사고캐시 적립에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('무사고캐시 적립 오류:', error);
+      alert('무사고캐시 적립 중 오류가 발생했습니다.');
+    } finally {
+      setIsAccumulating(null);
+    }
+  };
 
   // 무사고캐시 내역 조회 기간 변경 시 리스트 다시 불러오기
   useEffect(() => {
@@ -1008,16 +1107,18 @@ export default function PCContractPage() {
             >
               가입/신청 내역
             </a>
-            <a 
-              href="#" 
-              className={`tour2023_mypageTop_w tour2023_mypageTop_m01_w01 tour2023_mypageTop_m01 ${activeTab === 'cash' ? 'on' : ''}`}
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveTab('cash');
-              }}
-            >
-              무사고캐시 내역
-            </a>
+            {member?.member_type === '개인' && (
+              <a 
+                href="#" 
+                className={`tour2023_mypageTop_w tour2023_mypageTop_m01_w01 tour2023_mypageTop_m01 ${activeTab === 'cash' ? 'on' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActiveTab('cash');
+                }}
+              >
+                무사고캐시 내역
+              </a>
+            )}
             <a 
               href="#" 
               className={`tour2023_mypageTop_w tour2023_mypageTop_m01_w01 tour2023_mypageTop_m01 ${activeTab === 'mileage' ? 'on' : ''}`}
@@ -1227,25 +1328,118 @@ export default function PCContractPage() {
                       })})()}
 
                       {/* 페이지네이션 */}
-                      <div className="board_foot" style={{ paddingBottom: '12px' }}>
-                        <ul className="paging">
-                          {Array.from({ length: contractPagination.totalPages }, (_, i) => i + 1).map((page) => (
-                            <li key={page} className={page === contractPagination.currentPage ? 'on' : ''}>
-                              <a 
-                                href="#" 
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  if (page !== contractPagination.currentPage) {
-                                    getContractList(page);
-                                  }
-                                }}
-                              >
-                                {page}
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                      {contractPagination.totalPages > 0 && (
+                        <div className="board_foot" style={{ paddingBottom: '12px' }}>
+                          <ul className="paging">
+                            {/* 첫 페이지로 이동 */}
+                            {contractPagination.currentPage > 1 && (
+                              <li>
+                                <a 
+                                  href="#" 
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    getContractList(1);
+                                  }}
+                                  className="paging-nav-first"
+                                  title="첫 페이지"
+                                >
+                                  <span className="paging-double-arrow-left">
+                                    <img src={getImagePath('/images/g_more.png')} alt="첫 페이지" />
+                                    <img src={getImagePath('/images/g_more.png')} alt="" />
+                                  </span>
+                                </a>
+                              </li>
+                            )}
+                            
+                            {/* 이전 페이지로 이동 */}
+                            {contractPagination.currentPage > 1 && (
+                              <li>
+                                <a 
+                                  href="#" 
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    getContractList(contractPagination.currentPage - 1);
+                                  }}
+                                  className="paging-nav-prev"
+                                  title="이전 페이지"
+                                >
+                                  <img src={getImagePath('/images/g_more.png')} alt="이전" className="paging-arrow-left" />
+                                </a>
+                              </li>
+                            )}
+
+                            {/* 페이지 번호들 (최대 5개) */}
+                            {(() => {
+                              const { currentPage, totalPages } = contractPagination;
+                              let startPage = Math.max(1, currentPage - 2);
+                              let endPage = Math.min(totalPages, startPage + 4);
+                              
+                              // 끝에서 5개가 안 될 경우 시작점 조정
+                              if (endPage - startPage < 4) {
+                                startPage = Math.max(1, endPage - 4);
+                              }
+
+                              const pages = [];
+                              for (let i = startPage; i <= endPage; i++) {
+                                pages.push(i);
+                              }
+
+                              return pages.map((page) => (
+                                <li key={page} className={page === currentPage ? 'on' : ''}>
+                                  <a 
+                                    href="#" 
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      if (page !== currentPage) {
+                                        getContractList(page);
+                                      }
+                                    }}
+                                  >
+                                    {page}
+                                  </a>
+                                </li>
+                              ));
+                            })()}
+
+                            {/* 다음 페이지로 이동 */}
+                            {contractPagination.currentPage < contractPagination.totalPages && (
+                              <li>
+                                <a 
+                                  href="#" 
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    getContractList(contractPagination.currentPage + 1);
+                                  }}
+                                  className="paging-nav-next"
+                                  title="다음 페이지"
+                                >
+                                  <img src={getImagePath('/images/g_more.png')} alt="다음" className="paging-arrow-right" />
+                                </a>
+                              </li>
+                            )}
+
+                            {/* 마지막 페이지로 이동 */}
+                            {contractPagination.currentPage < contractPagination.totalPages && (
+                              <li>
+                                <a 
+                                  href="#" 
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    getContractList(contractPagination.totalPages);
+                                  }}
+                                  className="paging-nav-last"
+                                  title="마지막 페이지"
+                                >
+                                  <span className="paging-double-arrow-right">
+                                    <img src={getImagePath('/images/g_more.png')} alt="마지막" />
+                                    <img src={getImagePath('/images/g_more.png')} alt="" />
+                                  </span>
+                                </a>
+                              </li>
+                            )}
+                          </ul>
+                        </div>
+                      )}
                     </>
                   )
                 ) : (
@@ -1355,25 +1549,118 @@ export default function PCContractPage() {
                       })()}
 
                       {/* 페이지네이션 */}
-                      <div className="board_foot" style={{ paddingBottom: '12px' }}>
-                        <ul className="paging">
-                          {Array.from({ length: eventContractPagination.totalPages }, (_, i) => i + 1).map((page) => (
-                            <li key={page} className={page === eventContractPagination.currentPage ? 'on' : ''}>
-                              <a 
-                                href="#" 
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  if (page !== eventContractPagination.currentPage) {
-                                    getEventContractList(page);
-                                  }
-                                }}
-                              >
-                                {page}
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                      {eventContractPagination.totalPages > 0 && (
+                        <div className="board_foot" style={{ paddingBottom: '12px' }}>
+                          <ul className="paging">
+                            {/* 첫 페이지로 이동 */}
+                            {eventContractPagination.currentPage > 1 && (
+                              <li>
+                                <a 
+                                  href="#" 
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    getEventContractList(1);
+                                  }}
+                                  className="paging-nav-first"
+                                  title="첫 페이지"
+                                >
+                                  <span className="paging-double-arrow-left">
+                                    <img src={getImagePath('/images/g_more.png')} alt="첫 페이지" />
+                                    <img src={getImagePath('/images/g_more.png')} alt="" />
+                                  </span>
+                                </a>
+                              </li>
+                            )}
+                            
+                            {/* 이전 페이지로 이동 */}
+                            {eventContractPagination.currentPage > 1 && (
+                              <li>
+                                <a 
+                                  href="#" 
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    getEventContractList(eventContractPagination.currentPage - 1);
+                                  }}
+                                  className="paging-nav-prev"
+                                  title="이전 페이지"
+                                >
+                                  <img src={getImagePath('/images/g_more.png')} alt="이전" className="paging-arrow-left" />
+                                </a>
+                              </li>
+                            )}
+
+                            {/* 페이지 번호들 (최대 5개) */}
+                            {(() => {
+                              const { currentPage, totalPages } = eventContractPagination;
+                              let startPage = Math.max(1, currentPage - 2);
+                              let endPage = Math.min(totalPages, startPage + 4);
+                              
+                              // 끝에서 5개가 안 될 경우 시작점 조정
+                              if (endPage - startPage < 4) {
+                                startPage = Math.max(1, endPage - 4);
+                              }
+
+                              const pages = [];
+                              for (let i = startPage; i <= endPage; i++) {
+                                pages.push(i);
+                              }
+
+                              return pages.map((page) => (
+                                <li key={page} className={page === currentPage ? 'on' : ''}>
+                                  <a 
+                                    href="#" 
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      if (page !== currentPage) {
+                                        getEventContractList(page);
+                                      }
+                                    }}
+                                  >
+                                    {page}
+                                  </a>
+                                </li>
+                              ));
+                            })()}
+
+                            {/* 다음 페이지로 이동 */}
+                            {eventContractPagination.currentPage < eventContractPagination.totalPages && (
+                              <li>
+                                <a 
+                                  href="#" 
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    getEventContractList(eventContractPagination.currentPage + 1);
+                                  }}
+                                  className="paging-nav-next"
+                                  title="다음 페이지"
+                                >
+                                  <img src={getImagePath('/images/g_more.png')} alt="다음" className="paging-arrow-right" />
+                                </a>
+                              </li>
+                            )}
+
+                            {/* 마지막 페이지로 이동 */}
+                            {eventContractPagination.currentPage < eventContractPagination.totalPages && (
+                              <li>
+                                <a 
+                                  href="#" 
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    getEventContractList(eventContractPagination.totalPages);
+                                  }}
+                                  className="paging-nav-last"
+                                  title="마지막 페이지"
+                                >
+                                  <span className="paging-double-arrow-right">
+                                    <img src={getImagePath('/images/g_more.png')} alt="마지막" />
+                                    <img src={getImagePath('/images/g_more.png')} alt="" />
+                                  </span>
+                                </a>
+                              </li>
+                            )}
+                          </ul>
+                        </div>
+                      )}
 
                       {/* 보험약관보기 */}
                       <div className="tourG_mat04">
@@ -1409,6 +1696,75 @@ export default function PCContractPage() {
               </a>
 
               <div className="tourG_line05 tourG_mat11 tourG_mab10"></div>
+
+              {/* 무사고캐시 적립 가능한 계약 목록 */}
+              {member?.member_type === '개인' && eligibleContracts.length > 0 && (
+                <>
+                  <div className="tourG_mat04 tourG_mab04 tour2023_title10">무사고캐시 적립 가능한 계약</div>
+                  <div className="tourG_mab05">
+                    <table className="tour2023_ListB" border={1} cellSpacing={0}>
+                      <caption></caption>
+                      <colgroup>
+                        <col width="15%" />
+                        <col width="20%" />
+                        <col width="15%" />
+                        <col width="15%" />
+                        <col width="15%" />
+                        <col width="20%" />
+                      </colgroup>
+                      <tbody>
+                        <tr>
+                          <td className="sName tour2023_ListB_bg">계약번호</td>
+                          <td className="sName tour2023_ListB_bg">보험종목</td>
+                          <td className="sName tour2023_ListB_bg">보험기간</td>
+                          <td className="sName tour2023_ListB_bg">보험료</td>
+                          <td className="sName tour2023_ListB_bg">적립금액</td>
+                          <td className="sName tour2023_ListB_bg">적립</td>
+                        </tr>
+                        {eligibleContracts.map((contract) => {
+                          const formatDate = (dateStr: string) => {
+                            if (!dateStr) return '-';
+                            const date = new Date(dateStr);
+                            return date.toLocaleDateString('ko-KR');
+                          };
+
+                          return (
+                            <tr key={contract.id}>
+                              <td>{contract.contract_number}</td>
+                              <td>{contract.insurance_type}</td>
+                              <td>
+                                {formatDate(contract.departure_date)} ~ {formatDate(contract.arrival_date)}
+                              </td>
+                              <td>{contract.total_premium ? contract.total_premium.toLocaleString() + '원' : '-'}</td>
+                              <td style={{ color: '#1b37e1', fontWeight: '600' }}>
+                                {contract.eligibleCashAmount.toLocaleString()}원
+                              </td>
+                              <td>
+                                <button
+                                  type="button"
+                                  onClick={() => handleAccumulateCash(contract.id)}
+                                  disabled={isAccumulating === contract.id}
+                                  className="tourGuard_btn_b tour2023_btn01"
+                                  style={{
+                                    padding: '6px 16px',
+                                    fontSize: '13px',
+                                    minWidth: '80px',
+                                    opacity: isAccumulating === contract.id ? 0.6 : 1,
+                                    cursor: isAccumulating === contract.id ? 'not-allowed' : 'pointer',
+                                  }}
+                                >
+                                  {isAccumulating === contract.id ? '적립 중...' : '적립하기'}
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="tourG_line05 tourG_mat11 tourG_mab10"></div>
+                </>
+              )}
 
               {/* 무사고캐시내역 조회 */}
               <div className="tourGuard_form_tt mag5 tourG_mab05">

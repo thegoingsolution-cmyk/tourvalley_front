@@ -21,9 +21,17 @@ export default function MobileContractPage() {
   const [searchType, setSearchType] = useState<'contract' | 'event'>('contract');
   const [inYear, setInYear] = useState<number>(1);
   const [mileageInYear, setMileageInYear] = useState<number>(1);
-  const [activeTab, setActiveTab] = useState<'contract' | 'mileage'>('contract');
+  const [cashInYear, setCashInYear] = useState<number>(1);
+  const [activeTab, setActiveTab] = useState<'contract' | 'cash' | 'mileage'>('contract');
   const [showGiftCardModal, setShowGiftCardModal] = useState<boolean>(false);
   const [showServiceModal, setShowServiceModal] = useState(false);
+  
+  // 법인 고객인 경우 무사고캐시 탭이 없으므로 기본 탭을 'contract'로 설정
+  useEffect(() => {
+    if (isLoggedIn && member && member.member_type === '법인' && activeTab === 'cash') {
+      setActiveTab('contract');
+    }
+  }, [isLoggedIn, member, activeTab]);
 
   // 계약 목록 데이터
   interface Contract {
@@ -84,6 +92,43 @@ export default function MobileContractPage() {
   }
   const [mileageInfo, setMileageInfo] = useState<{ totalMileage: number }>({ totalMileage: 0 });
   const [mileageList, setMileageList] = useState<MileageHistory[]>([]);
+  
+  // 무사고캐시 데이터
+  interface CashHistory {
+    id: number;
+    type: string;
+    amount: number;
+    balance: number;
+    reason: string | null;
+    reason_detail: string | null;
+    created_at: string;
+  }
+  const [cashList, setCashList] = useState<CashHistory[]>([]);
+  const [cashInfo, setCashInfo] = useState<{ totalCash: number; expireCash: number }>({ totalCash: 0, expireCash: 0 });
+  
+  // 무사고캐시 적립 가능한 계약 목록
+  interface EligibleContract {
+    id: number;
+    contract_number: string;
+    insurance_type: string;
+    departure_date: string;
+    arrival_date: string;
+    total_premium: number;
+    status: string;
+    created_at: string;
+    travel_region?: string | null;
+    travel_country?: string | null;
+    travel_purpose?: string | null;
+    eligibleCashAmount: number;
+    daysSinceEnd: number;
+    isEligible: boolean;
+  }
+  const [eligibleContracts, setEligibleContracts] = useState<EligibleContract[]>([]);
+  const [isAccumulating, setIsAccumulating] = useState<number | null>(null);
+  
+  // 무사고캐시 상세 모달
+  const [selectedCashDetail, setSelectedCashDetail] = useState<CashHistory | null>(null);
+  const [showCashDetailModal, setShowCashDetailModal] = useState<boolean>(false);
 
   // 로그인 타입 (비로그인 사용자용)
   const [loginType, setLoginType] = useState<'I' | 'C'>('I');
@@ -508,6 +553,10 @@ export default function MobileContractPage() {
         } else if (searchType === 'event') {
           getEventContractList(1);
         }
+      } else if (activeTab === 'cash') {
+        getCashInfo();
+        getCashList();
+        getEligibleContracts();
       } else if (activeTab === 'mileage') {
         getMileageInfo();
         getMileageList();
@@ -515,12 +564,153 @@ export default function MobileContractPage() {
     }
   }, [isLoggedIn, member, inYear, activeTab, searchType]);
 
+  // 로그인한 유저용: 무사고캐시 정보 조회 (금액, 소멸예정 캐시)
+  const getCashInfo = async () => {
+    if (!isLoggedIn || !member) return;
+
+    try {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${API_BASE_URL}/api/cash/info?member_id=${member.id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setCashInfo({
+            totalCash: data.totalCash || 0,
+            expireCash: data.expireCash || 0,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('무사고캐시 정보 조회 오류:', error);
+    }
+  };
+
+  // 로그인한 유저용: 무사고캐시 내역 조회
+  const getCashList = async () => {
+    if (!isLoggedIn || !member) return;
+
+    try {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${API_BASE_URL}/api/cash/list?member_id=${member.id}&inyear=${cashInYear}&block_type=C&str_cur_page=1`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('API 호출 실패');
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setCashList(data.cashList || []);
+      } else {
+        setCashList([]);
+      }
+    } catch (error) {
+      console.error('무사고캐시 내역 조회 오류:', error);
+      setCashList([]);
+    }
+  };
+
+  // 무사고캐시 내역 조회 기간 변경 핸들러
+  const handleCashInYearChange = (value: number) => {
+    setCashInYear(value);
+  };
+
   // 마일리지 내역 조회 기간 변경 시
   useEffect(() => {
     if (isLoggedIn && member && activeTab === 'mileage') {
       getMileageList();
     }
   }, [mileageInYear]);
+
+  // 무사고캐시 적립 가능한 계약 목록 조회
+  const getEligibleContracts = async () => {
+    if (!isLoggedIn || !member || member.member_type !== '개인') return;
+
+    try {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${API_BASE_URL}/api/cash/eligible-contracts?member_id=${member.id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setEligibleContracts(data.contracts || []);
+        }
+      }
+    } catch (error) {
+      console.error('적립 가능한 계약 조회 오류:', error);
+      setEligibleContracts([]);
+    }
+  };
+
+  // 무사고캐시 적립
+  const handleAccumulateCash = async (contractId: number) => {
+    if (!isLoggedIn || !member) return;
+
+    if (!confirm('무사고캐시를 적립하시겠습니까?')) {
+      return;
+    }
+
+    setIsAccumulating(contractId);
+
+    try {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${API_BASE_URL}/api/cash/accumulate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          member_id: member.id,
+          contract_id: contractId,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert(`무사고캐시 ${data.cashAmount.toLocaleString()}원이 적립되었습니다.`);
+        // 데이터 새로고침
+        await Promise.all([
+          getCashInfo(),
+          getCashList(),
+          getEligibleContracts(),
+        ]);
+      } else {
+        alert(data.message || '무사고캐시 적립에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('무사고캐시 적립 오류:', error);
+      alert('무사고캐시 적립 중 오류가 발생했습니다.');
+    } finally {
+      setIsAccumulating(null);
+    }
+  };
+
+  // 무사고캐시 내역 조회 기간 변경 시
+  useEffect(() => {
+    if (isLoggedIn && member && activeTab === 'cash') {
+      getCashList();
+    }
+  }, [cashInYear]);
 
   // 비로그인 사용자 화면 렌더링
   const renderNonLoggedInView = () => (
@@ -823,6 +1013,18 @@ export default function MobileContractPage() {
           >
             가입/신청 내역
           </a>
+          {member?.member_type === '개인' && (
+            <a 
+              href="#" 
+              className={`tour2023_mypageTop_w tour2023_mypageTop_m01_w02 tour2023_mypageTop_m01 ${activeTab === 'cash' ? 'on' : ''}`}
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveTab('cash');
+              }}
+            >
+              무사고캐시 내역
+            </a>
+          )}
           <a 
             href="#" 
             className={`tour2023_mypageTop_w tour2023_mypageTop_m01_w02 tour2023_mypageTop_m01 ${activeTab === 'mileage' ? 'on' : ''}`}
@@ -1189,6 +1391,194 @@ export default function MobileContractPage() {
           </>
         )}
 
+        {/* 무사고캐시 내역 탭 내용 */}
+        {activeTab === 'cash' && (
+          <>
+            {/* 무사고캐시 정보 */}
+            <section className="tour2023_cashBox01 tourG_mat14 tourG_mab05">
+              <div className="tour2023_cashBox_in">
+                <p className="tour2023_cash_txt01 tourG_mab04">
+                  <b>고객님의 무사고캐시는 <span className="tour2023_cash_txt02">{cashInfo.totalCash.toLocaleString()}원</span>입니다.</b>
+                </p>
+                <p className="tour2023_cash_txt03">투어밸리 무사고캐시는 여행자보험에 재가입하는 경우 할인쿠폰으로 사용하실 수 있습니다.</p>
+              </div>
+            </section>
+            <a 
+              href="javascript:void(0);" 
+              onClick={() => {/* TODO: 소멸예정 캐시 팝업 */}}
+            >
+              <span className="tour2023_cash_txt04">소멸예정 캐시 {cashInfo.expireCash.toLocaleString()}원&nbsp;&gt;</span>
+            </a>
+
+            {/* 무사고캐시 적립 가능한 계약 목록 */}
+            {member?.member_type === '개인' && eligibleContracts.length > 0 && (
+              <>
+                <div className="tourG_mat04 tourG_mab04 tour2023_title10">무사고캐시 적립 가능한 계약</div>
+                <div className="tourG_mab05" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                  <table className="tour2023_ListB_mobile" border={1} cellSpacing={0} style={{ minWidth: '600px' }}>
+                    <caption></caption>
+                    <colgroup>
+                      <col width="20%" />
+                      <col width="20%" />
+                      <col width="15%" />
+                      <col width="15%" />
+                      <col width="30%" />
+                    </colgroup>
+                    <tbody>
+                      <tr>
+                        <td className="sName tour2023_ListB_bg">계약번호</td>
+                        <td className="sName tour2023_ListB_bg">보험종목</td>
+                        <td className="sName tour2023_ListB_bg">보험료</td>
+                        <td className="sName tour2023_ListB_bg">적립금액</td>
+                        <td className="sName tour2023_ListB_bg">적립</td>
+                      </tr>
+                      {eligibleContracts.map((contract) => {
+                        const premium = contract.total_premium ? Math.floor(parseFloat(String(contract.total_premium))) : 0;
+                        return (
+                          <tr key={contract.id}>
+                            <td style={{ fontSize: '12px' }}>{contract.contract_number}</td>
+                            <td>{contract.insurance_type}</td>
+                            <td>{premium > 0 ? premium.toLocaleString() + '원' : '-'}</td>
+                            <td style={{ color: '#1b37e1', fontWeight: '600' }}>
+                              {contract.eligibleCashAmount.toLocaleString()}원
+                            </td>
+                          <td>
+                            <button
+                              type="button"
+                              onClick={() => handleAccumulateCash(contract.id)}
+                              disabled={isAccumulating === contract.id}
+                              className="tour2023_btn06"
+                              style={{
+                                padding: '4px 8px',
+                                fontSize: '11px',
+                                minWidth: '60px',
+                                whiteSpace: 'nowrap',
+                                opacity: isAccumulating === contract.id ? 0.6 : 1,
+                                cursor: isAccumulating === contract.id ? 'not-allowed' : 'pointer',
+                              }}
+                            >
+                              {isAccumulating === contract.id ? '적립 중...' : '적립하기'}
+                            </button>
+                          </td>
+                        </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="tourG_line05 tourG_mat11 tourG_mab10"></div>
+              </>
+            )}
+
+            {/* 무사고캐시내역 조회 */}
+            <div className="tourGuard_form_tt mag5 tourG_mab04 tourG_mat10">
+              <label htmlFor="">무사고캐시내역 조회</label>
+              <div className="tourGuard_bg_join tourGuard_input_cell tourGuard_input_cell01 tourGuard" style={{ marginRight: 0 }}>
+                <span className="tourGuard_ps_box">
+                  <select 
+                    className="tourGuard_sel" 
+                    id="cashYear"
+                    value={cashInYear}
+                    onChange={(e) => handleCashInYearChange(Number(e.target.value))}
+                  >
+                    <option value={1}>최근 1년이내</option>
+                    <option value={2}>최근 2년이내</option>
+                  </select>
+                </span>
+              </div>
+            </div>
+
+            {/* 무사고캐시 적립 및 사용내역 제목 */}
+            <div className="tourG_mat04 tourG_mab04 tour2023_title10">무사고캐시 적립 및 사용내역</div>
+
+            {/* 무사고캐시 내역 리스트 */}
+            <div id="cashList" className="tourG_mab03">
+              {cashList.length === 0 ? (
+                <>
+                  <p className="tour2023_title02">무사고캐시 내역</p>
+                  <div className="tourG_line05 tourG_mat07 tourG_mab01"></div>
+                  <p className="tour2023_mypageBox">
+                    <span className="tour2023_title14">무사고캐시 적립 내역이 없습니다.</span>
+                  </p>
+                </>
+              ) : (
+                <table className="tour2023_ListB_mobile" border={1} cellSpacing={0}>
+                  <caption></caption>
+                  <colgroup>
+                    <col width="22%" />
+                    <col width="28%" />
+                    <col width="25%" />
+                    <col width="25%" />
+                  </colgroup>
+                  <tbody>
+                    <tr>
+                      <td className="sName tour2023_ListB_bg">일자</td>
+                      <td className="sName tour2023_ListB_bg">내역</td>
+                      <td className="sName tour2023_ListB_bg">캐시</td>
+                      <td className="sName tour2023_ListB_bg">잔여캐시</td>
+                    </tr>
+                    {cashList.map((cash) => {
+                      const amount = Math.floor((Math.abs(cash.amount) || 0) / 10) * 10;
+                      const isPositive = cash.type === '충전';
+                      const formatCashDate = (dateStr: string) => {
+                        if (!dateStr) return '-';
+                        const date = new Date(dateStr);
+                        const year = date.getFullYear();
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const day = String(date.getDate()).padStart(2, '0');
+                        return `${year}.${month}.${day}`;
+                      };
+
+                      return (
+                        <tr 
+                          key={cash.id}
+                          onClick={() => {
+                            setSelectedCashDetail(cash);
+                            setShowCashDetailModal(true);
+                          }}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          <td style={{ fontSize: '11px' }}>{formatCashDate(cash.created_at)}</td>
+                          <td style={{ fontSize: '11px', textAlign: 'left', paddingLeft: '8px' }}>
+                            {cash.reason || '-'}
+                          </td>
+                          <td style={{ 
+                            color: isPositive ? '#1b37e1' : '#ff4444', 
+                            fontWeight: '600',
+                            fontSize: '11px'
+                          }}>
+                            {isPositive ? '+' : '-'}
+                            {amount.toLocaleString()}원
+                          </td>
+                          <td style={{ fontSize: '11px' }}>
+                            {cash.balance ? cash.balance.toLocaleString() + '원' : '-'}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            {/* 안내 문구 */}
+            <div className="tour2023_txt01 tour2023_grey tourG_mleft04 tourG_mab04 tourG_mat14" style={{ marginTop: 20 }}>
+              <ul className="tourGuard_inline tour2023_blue">
+                <li className="tourGuard_inline_t01">※</li>
+                <li className="tourGuard_inline_t02">무사고캐시의 적립가능 기간은 보험기간 종료 후 1년입니다.</li>
+              </ul>
+              <ul className="tourGuard_inline tour2023_blue">
+                <li className="tourGuard_inline_t01">※</li>
+                <li className="tourGuard_inline_t02">무사고캐시 적립가능 보험상품은 해외여행보험, 국내여행보험입니다.</li>
+              </ul>
+              <ul className="tourGuard_inline tour2023_blue">
+                <li className="tourGuard_inline_t01">※</li>
+                <li className="tourGuard_inline_t02">무사고캐시는 개인가입자에 한해 적립하실 수 있습니다. (법인/단체 제외)</li>
+              </ul>
+            </div>
+          </>
+        )}
+
         {/* 마일리지 내역 탭 내용 */}
         {activeTab === 'mileage' && (
           <>
@@ -1335,6 +1725,106 @@ export default function MobileContractPage() {
             ]);
           }}
         />
+      )}
+      
+      {/* 무사고캐시 상세 모달 */}
+      {showCashDetailModal && selectedCashDetail && (
+        <div 
+          className="tour2023_guide_Wrap" 
+          style={{ display: 'block' }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowCashDetailModal(false);
+            }
+          }}
+        >
+          <div className="tour2023_guide_Layer">
+            <div className="tour2023_guide_Box prow_02">
+              <div className="tour2023_guide_txt01">무사고캐시 상세내역</div>
+              <div className="tour2023_guide_txt02" style={{ textAlign: 'left', padding: '20px 0' }}>
+                {(() => {
+                  const amount = Math.floor((Math.abs(selectedCashDetail.amount) || 0) / 10) * 10;
+                  const isPositive = selectedCashDetail.type === '충전';
+                  const expireDate = (() => {
+                    if (!selectedCashDetail.created_at) return '-';
+                    const date = new Date(selectedCashDetail.created_at);
+                    date.setFullYear(date.getFullYear() + 1);
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    return `${year}.${month}.${day}`;
+                  })();
+
+                  const formatCashDate = (dateStr: string) => {
+                    if (!dateStr) return '-';
+                    const date = new Date(dateStr);
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const hour = String(date.getHours()).padStart(2, '0');
+                    const minute = String(date.getMinutes()).padStart(2, '0');
+                    return `${year}.${month}.${day} ${hour}:${minute}`;
+                  };
+
+                  return (
+                    <div style={{ lineHeight: '1.8' }}>
+                      <div style={{ marginBottom: '15px' }}>
+                        <strong style={{ display: 'inline-block', width: '90px', color: '#666' }}>일자:</strong>
+                        <span>{formatCashDate(selectedCashDetail.created_at)}</span>
+                      </div>
+                      <div style={{ marginBottom: '15px' }}>
+                        <strong style={{ display: 'inline-block', width: '90px', color: '#666' }}>유형:</strong>
+                        <span>{selectedCashDetail.type}</span>
+                      </div>
+                      <div style={{ marginBottom: '15px' }}>
+                        <strong style={{ display: 'inline-block', width: '90px', color: '#666' }}>금액:</strong>
+                        <span style={{ 
+                          color: isPositive ? '#1b37e1' : '#ff4444', 
+                          fontWeight: '600',
+                          fontSize: '16px'
+                        }}>
+                          {isPositive ? '+' : '-'}{amount.toLocaleString()}원
+                        </span>
+                      </div>
+                      <div style={{ marginBottom: '15px' }}>
+                        <strong style={{ display: 'inline-block', width: '90px', color: '#666' }}>잔여캐시:</strong>
+                        <span style={{ fontWeight: '600' }}>
+                          {selectedCashDetail.balance ? selectedCashDetail.balance.toLocaleString() + '원' : '-'}
+                        </span>
+                      </div>
+                      <div style={{ marginBottom: '15px' }}>
+                        <strong style={{ display: 'inline-block', width: '90px', color: '#666' }}>사유:</strong>
+                        <span>{selectedCashDetail.reason || '-'}</span>
+                      </div>
+                      {selectedCashDetail.reason_detail && (
+                        <div style={{ marginBottom: '15px' }}>
+                          <strong style={{ display: 'inline-block', width: '90px', color: '#666' }}>상세사유:</strong>
+                          <span>{selectedCashDetail.reason_detail}</span>
+                        </div>
+                      )}
+                      <div style={{ marginBottom: '15px' }}>
+                        <strong style={{ display: 'inline-block', width: '90px', color: '#666' }}>만료일자:</strong>
+                        <span>{expireDate}</span>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+              <div>
+                <a 
+                  href="javascript:void(0);" 
+                  className="btn_b tour2023_btn15_gray"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setShowCashDetailModal(false);
+                  }}
+                >
+                  닫기
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

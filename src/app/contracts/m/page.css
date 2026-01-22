@@ -799,36 +799,25 @@ address {
   position: relative;
   color: #fff;
   width: 100%;
-  display: inline-flex;
-  justify-content: space-between;
+  display: flex;
+  justify-content: stretch;
   border-bottom: 1px solid #dae1e6;
   border-top: 1px solid #dae1e6;
 }
 
-/* 탭 메뉴 구분선 (2개 탭이므로 중앙에 하나만) */
-.tour2023_mypageTop_menu:before {
-  content: '';
-  position: absolute;
-  display: inline-block;
-  width: 1px;
-  height: 25px;
-  top: 18px;
-  left: 50%;
-  z-index: 1;
-  background-color: #dae1e6;
-}
-
 /* 탭 버튼 기본 스타일 */
 .tour2023_mypageTop_w {
-  display: inline-block;
+  display: flex;
+  flex: 1;
   text-decoration: none;
   transition: all 0.3s;
   white-space: nowrap;
+  align-items: center;
+  justify-content: center;
 }
 
 .tour2023_mypageTop_m01 {
   font-size: 18px;
-  padding-top: 19px;
   height: 58px;
   color: #b8b9bb!important;
   background-color: #fff;
@@ -841,7 +830,6 @@ address {
 /* 활성화된 탭 스타일 */
 .tour2023_mypageTop_m01.on {
   font-size: 18px;
-  padding-top: 19px;
   height: 60px;
   color: #fff!important;
   background-color: #1b37e1;
@@ -851,10 +839,7 @@ address {
   font-family: 'NanumSquareNeoTTF-dEb';
 }
 
-/* 탭 버튼 너비 (2개 탭 - 50:50) */
-.tour2023_mypageTop_m01_w02 {
-  width: 49.9%;
-}
+/* 탭 버튼 너비는 flex: 1로 자동 조정됨 (부모에서 상속) */
 
 /* 마일리지 목록 스타일 */
 .tour2023_mileList_Wrap {
@@ -1220,4 +1205,104 @@ address {
 
 .tourG_mab04 {
   margin-bottom: 15px;
+}
+
+/* 모바일 무사고캐시/마일리지 테이블 스타일 */
+.tour2023_ListB_mobile {
+  width: 100%;
+  border: 0;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 11px;
+}
+
+.tour2023_ListB_mobile td {
+  padding: 10px 4px;
+  text-align: center;
+  border: 1px solid #e0e0e0;
+  word-break: break-word;
+  vertical-align: middle;
+  line-height: 1.4;
+}
+
+.tour2023_ListB_mobile td.sName {
+  background-color: #f5f7fb;
+  font-weight: 600;
+  color: #333;
+  font-size: 11px;
+  padding: 8px 4px;
+}
+
+.tour2023_ListB_mobile td.tour2023_ListB_bg {
+  background-color: #f5f7fb;
+}
+
+.tour2023_ListB_mobile tbody tr {
+  transition: background-color 0.2s;
+}
+
+.tour2023_ListB_mobile tbody tr:active {
+  background-color: #f0f4f8;
+}
+
+/* 무사고캐시 박스 스타일 */
+.tour2023_cashBox01 {
+  width: 100%;
+  display: inline-flex;
+  justify-content: space-between;
+  border: 1px solid #c3c6ce;
+  background: #fff;
+  position: relative;
+  border-radius: 8px;
+  height: auto;
+  text-align: left;
+  box-sizing: border-box;
+  padding: 15px 12px 10px 20px;
+}
+
+.tour2023_cashBox_in {
+  position: relative;
+  width: 100%;
+  padding: 12px 8px 18px 8px;
+}
+
+.tour2023_cash_txt01 {
+  font-size: 18px;
+  color: #333;
+  text-align: center;
+  line-height: 130%;
+  letter-spacing: -0.8px;
+  vertical-align: top;
+}
+
+.tour2023_cash_txt02 {
+  font-size: 17px;
+  color: #fe4600;
+  font-weight: bold;
+  text-align: center;
+  line-height: 130%;
+  letter-spacing: -0.4px;
+  vertical-align: top;
+}
+
+.tour2023_cash_txt03 {
+  font-size: 14px;
+  color: #1b37e1;
+  text-align: left;
+  line-height: 130%;
+  letter-spacing: -1px;
+  vertical-align: top;
+  display: inline-block;
+}
+
+.tour2023_cash_txt04 {
+  font-size: 15px;
+  color: #333;
+  text-align: right;
+  line-height: 130%;
+  letter-spacing: -1px;
+  vertical-align: top;
+  text-decoration: underline;
+  display: inline-block;
+  width: 95%;
 }
