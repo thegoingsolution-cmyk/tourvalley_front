@@ -176,6 +176,7 @@ export default function ParticipantInfoStep({
         <div className="form-card">
           <div className="form-header">
             {/* <h1 className="form-title">{insuranceType}</h1> */}
+            <h1 className="form-title"></h1>
             <StepIndicator currentStep={2} />
           </div>
 
