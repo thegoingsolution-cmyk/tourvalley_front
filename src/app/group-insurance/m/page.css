@@ -2823,6 +2823,14 @@
     flex-direction: column !important;
 }
 
+.payment-form-card {
+    padding: 20px !important;
+}
+
+.contract-form-card {
+    padding: 20px !important;
+}
+
 .group-insurance-mobile .form-header {
     display: none !important; /* 모바일에서는 숨김 */
 }

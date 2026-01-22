@@ -1117,8 +1117,8 @@
 /* 상단 탭 메뉴 */
 .contract-page-pc #tour2023_mypageTop {
   position: relative;
-  width: 100%;
-  margin-bottom: 20px;
+  width: calc(100% + 64px); /* 좌우 padding 상쇄 (32px * 2) */
+  margin: -32px -32px 20px -32px; /* 위, 좌, 우 padding 상쇄 */
 }
 
 .contract-page-pc .tour2023_mypageTop_menu {

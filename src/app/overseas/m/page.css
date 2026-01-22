@@ -868,6 +868,14 @@
     position: relative;
 }
 
+.payment-form-card {
+    padding: 20px !important;
+}
+
+.contract-form-card {
+    padding: 20px !important;
+}
+
 /* Form Header */
 .form-header {
     display: none; /* 모바일에서는 숨김 */

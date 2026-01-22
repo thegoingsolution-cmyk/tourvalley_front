@@ -667,7 +667,11 @@
 /* 안내 문구 */
 .tour2023_txt01 {
   font-size: 13px;
-  line-height: 20px;
+  text-align: left;
+  line-height: 130%;
+  letter-spacing: -1px;
+  display: inline-block;
+  width: 100%;
 }
 
 .tour2023_txt02 {
@@ -1305,4 +1309,82 @@ address {
   text-decoration: underline;
   display: inline-block;
   width: 95%;
+}
+
+/* 모달 스타일 */
+.tour2023_guide_Wrap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tour2023_guide_Layer {
+  position: relative;
+  background: #fff;
+  border-radius: 10px;
+  max-width: 90%;
+  width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  margin: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
+}
+
+.tour2023_guide_Box {
+  padding: 30px 20px;
+  text-align: center;
+}
+
+.tour2023_guide_txt01 {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+  font-family: 'NanumSquareNeoTTF-cBd';
+}
+
+.tour2023_guide_txt02 {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.8;
+  text-align: left;
+}
+
+.tour2023_btn15_gray {
+  display: inline-block;
+  padding: 12px 30px;
+  background: #6c757d;
+  color: #fff;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  margin-top: 20px;
+}
+
+.tour2023_btn15_gray:hover {
+  background: #5a6268;
+}
+
+.tour2023_btn15_gray:active {
+  background: #545b62;
+}
+
+/* 모달이 열릴 때 body 스크롤 고정 */
+body.modal-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
 }

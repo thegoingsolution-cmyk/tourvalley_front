@@ -102,6 +102,7 @@ export default function MobileContractPage() {
     reason: string | null;
     reason_detail: string | null;
     created_at: string;
+    expire_date?: string;
   }
   const [cashList, setCashList] = useState<CashHistory[]>([]);
   const [cashInfo, setCashInfo] = useState<{ totalCash: number; expireCash: number }>({ totalCash: 0, expireCash: 0 });
@@ -129,6 +130,31 @@ export default function MobileContractPage() {
   // 무사고캐시 상세 모달
   const [selectedCashDetail, setSelectedCashDetail] = useState<CashHistory | null>(null);
   const [showCashDetailModal, setShowCashDetailModal] = useState<boolean>(false);
+
+  // 소멸예정 캐시 모달
+  const [showExpireCashModal, setShowExpireCashModal] = useState<boolean>(false);
+  const [expireCashList, setExpireCashList] = useState<CashHistory[]>([]);
+
+  // 모달이 열릴 때 body 스크롤 고정
+  useEffect(() => {
+    if (showCashDetailModal || showExpireCashModal) {
+      // 현재 스크롤 위치 저장
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.classList.add('modal-open');
+      
+      return () => {
+        // 모달이 닫힐 때 스크롤 위치 복원
+        document.body.classList.remove('modal-open');
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [showCashDetailModal, showExpireCashModal]);
 
   // 로그인 타입 (비로그인 사용자용)
   const [loginType, setLoginType] = useState<'I' | 'C'>('I');
@@ -619,6 +645,55 @@ export default function MobileContractPage() {
     } catch (error) {
       console.error('무사고캐시 내역 조회 오류:', error);
       setCashList([]);
+    }
+  };
+
+  // 소멸예정 캐시 목록 조회
+  const fetchExpireCashList = async () => {
+    if (!isLoggedIn || !member) return;
+
+    try {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${API_BASE_URL}/api/cash/list?member_id=${member.id}&inyear=1&block_type=C&str_cur_page=1`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('API 호출 실패');
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        // 소멸예정 캐시 필터링 (만료일이 있고, 아직 만료되지 않은 항목)
+        const now = new Date();
+        const expireList = (data.cashList || []).filter((cash: CashHistory) => {
+          if (!cash.created_at) return false;
+          const createdDate = new Date(cash.created_at);
+          const expireDate = new Date(createdDate);
+          expireDate.setFullYear(expireDate.getFullYear() + 1);
+          // 만료일이 현재보다 미래인 경우만 (충전 타입만)
+          return cash.type === '충전' && expireDate > now;
+        }).map((cash: CashHistory) => {
+          // 만료일 계산
+          const createdDate = new Date(cash.created_at);
+          const expireDate = new Date(createdDate);
+          expireDate.setFullYear(expireDate.getFullYear() + 1);
+          return {
+            ...cash,
+            expire_date: expireDate.toISOString(),
+          };
+        });
+        setExpireCashList(expireList);
+      } else {
+        setExpireCashList([]);
+      }
+    } catch (error) {
+      console.error('소멸예정 캐시 목록 조회 오류:', error);
+      setExpireCashList([]);
     }
   };
 
@@ -1405,7 +1480,11 @@ export default function MobileContractPage() {
             </section>
             <a 
               href="javascript:void(0);" 
-              onClick={() => {/* TODO: 소멸예정 캐시 팝업 */}}
+              onClick={async (e) => {
+                e.preventDefault();
+                await fetchExpireCashList();
+                setShowExpireCashModal(true);
+              }}
             >
               <span className="tour2023_cash_txt04">소멸예정 캐시 {cashInfo.expireCash.toLocaleString()}원&nbsp;&gt;</span>
             </a>
@@ -1679,10 +1758,8 @@ export default function MobileContractPage() {
       {/* 심의번호 */}
       <div className="bgcolor_white prow_01 ptb20 essential_Wrap" style={{ textAlign: 'center' }}>
         <span className="tour2023_txt02 tour2023_grey">
-          <span>
-            ※ 본 광고는 광고심의기준을 준수하였으며, 유효기간은 심의일로부터 1년입니다.<br />
-            준법감시필 제2025-광고T-002(2025.04.07-2026-04.06)
-          </span>
+          ※ 본 광고는 광고심의기준을 준수하였으며, 유효기간은 심의일로부터 1년입니다.<br />
+          준법감시필 제2025-광고T-002(2025.04.07-2026-04.06)
         </span>
       </div>
     </>
@@ -1817,6 +1894,105 @@ export default function MobileContractPage() {
                   onClick={(e) => {
                     e.preventDefault();
                     setShowCashDetailModal(false);
+                  }}
+                >
+                  닫기
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 소멸예정 캐시 모달 */}
+      {showExpireCashModal && (
+        <div 
+          className="tour2023_guide_Wrap" 
+          style={{ display: 'block' }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowExpireCashModal(false);
+            }
+          }}
+        >
+          <div className="tour2023_guide_Layer">
+            <div className="tour2023_guide_Box prow_02">
+              <div className="tour2023_guide_txt01">소멸예정 캐시</div>
+              <div className="tour2023_guide_txt02" style={{ textAlign: 'left', padding: '20px 0' }}>
+                {cashInfo.expireCash > 0 ? (
+                  <div style={{ lineHeight: '1.8' }}>
+                    <div style={{ marginBottom: '20px', fontSize: '14px', color: '#666' }}>
+                      총 소멸예정 캐시: <strong style={{ color: '#ff4444', fontSize: '16px' }}>{cashInfo.expireCash.toLocaleString()}원</strong>
+                    </div>
+                    <div style={{ borderTop: '1px solid #eee', paddingTop: '15px' }}>
+                      {expireCashList.map((cash, index) => {
+                        const formatCashDate = (dateStr: string) => {
+                          if (!dateStr) return '-';
+                          const date = new Date(dateStr);
+                          const year = date.getFullYear();
+                          const month = String(date.getMonth() + 1).padStart(2, '0');
+                          const day = String(date.getDate()).padStart(2, '0');
+                          const hour = String(date.getHours()).padStart(2, '0');
+                          const minute = String(date.getMinutes()).padStart(2, '0');
+                          return `${year}.${month}.${day} ${hour}:${minute}`;
+                        };
+
+                        const formatExpireDate = (dateStr: string) => {
+                          if (!dateStr) return '-';
+                          const date = new Date(dateStr);
+                          const year = date.getFullYear();
+                          const month = String(date.getMonth() + 1).padStart(2, '0');
+                          const day = String(date.getDate()).padStart(2, '0');
+                          return `${year}.${month}.${day}`;
+                        };
+
+                        const amount = Math.floor((Math.abs(cash.amount) || 0) / 10) * 10;
+                        const expireDate = cash.expire_date ? formatExpireDate(cash.expire_date) : '-';
+
+                        return (
+                          <div key={cash.id || index} style={{ 
+                            marginBottom: '20px', 
+                            paddingBottom: '20px',
+                            borderBottom: index < expireCashList.length - 1 ? '1px solid #f0f0f0' : 'none'
+                          }}>
+                            <div style={{ marginBottom: '10px' }}>
+                              <strong style={{ display: 'inline-block', width: '90px', color: '#666' }}>적립일:</strong>
+                              <span>{formatCashDate(cash.created_at)}</span>
+                            </div>
+                            <div style={{ marginBottom: '10px' }}>
+                              <strong style={{ display: 'inline-block', width: '90px', color: '#666' }}>금액:</strong>
+                              <span style={{ color: '#1b37e1', fontWeight: '600', fontSize: '16px' }}>
+                                +{amount.toLocaleString()}원
+                              </span>
+                            </div>
+                            <div style={{ marginBottom: '10px' }}>
+                              <strong style={{ display: 'inline-block', width: '90px', color: '#666' }}>만료일:</strong>
+                              <span style={{ color: '#ff4444', fontWeight: '600' }}>{expireDate}</span>
+                            </div>
+                            {cash.reason && (
+                              <div style={{ marginBottom: '10px' }}>
+                                <strong style={{ display: 'inline-block', width: '90px', color: '#666' }}>사유:</strong>
+                                <span>{cash.reason}</span>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ textAlign: 'center', padding: '20px 0', color: '#999' }}>
+                    소멸예정 캐시가 없습니다.
+                  </div>
+                )}
+              </div>
+              <div>
+                <a 
+                  href="javascript:void(0);" 
+                  className="btn_b tour2023_btn15_gray"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setShowExpireCashModal(false);
                   }}
                 >
                   닫기

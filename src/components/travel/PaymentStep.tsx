@@ -107,7 +107,7 @@ export default function PaymentStep({
   return (
     <section className={`form-section ${className || ''}`}>
       <div className="form-container">
-        <div className="form-card">
+        <div className="form-card payment-form-card">
           <div className="form-header">
             <h1 className="form-title">보험료 결제</h1>
           </div>

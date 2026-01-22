@@ -943,6 +943,14 @@
   position: relative;
 }
 
+.payment-form-card {
+    padding: 20px !important;
+}
+
+.contract-form-card {
+    padding: 20px !important;
+}
+
 /* Form Header */
 .long-term-stay-mobile .form-header-mobile {
   display: flex;
