@@ -1,0 +1,320 @@
+/* Estimate Step1 Mobile Page Styles */
+
+.estimate-step1-page.mobile {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+.estimate-step1-page.mobile .main_bg01 {
+  flex: 1;
+  padding: 20px 15px 40px;
+}
+
+.estimate-step1-page.mobile .container_w {
+  width: 100%;
+}
+
+.estimate-step1-page.mobile .container_box_w {
+  width: 100%;
+}
+
+.estimate-step1-page.mobile .container_box {
+  width: 100%;
+}
+
+/* Step Indicator */
+.estimate-step1-page.mobile .tour2023_step_w {
+  margin-bottom: 20px;
+}
+
+.estimate-step1-page.mobile .tour2023_step_line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  padding: 0 10px;
+}
+
+.estimate-step1-page.mobile .tour2023_step_line:before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #e0e0e0;
+  z-index: 0;
+}
+
+.estimate-step1-page.mobile .tour2023_step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  background: #fff;
+  padding: 0 5px;
+}
+
+.estimate-step1-page.mobile .tour2023_step01 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.estimate-step1-page.mobile .tour2023_step_num {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.estimate-step1-page.mobile .tour2023_step.on .tour2023_step_num {
+  background: #1b37e1;
+}
+
+.estimate-step1-page.mobile .tour2023_step_num01 {
+  font-size: 16px;
+  font-weight: bold;
+  color: #999;
+}
+
+.estimate-step1-page.mobile .tour2023_step.on .tour2023_step_num01 {
+  color: #fff;
+}
+
+.estimate-step1-page.mobile .tour2023_step_txt {
+  font-size: 12px;
+  color: #999;
+}
+
+.estimate-step1-page.mobile .tour2023_step.on .tour2023_step_txt {
+  color: #1b37e1;
+  font-weight: bold;
+}
+
+/* Title */
+.estimate-step1-page.mobile .tour2023_title17 {
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+/* Tab Menu */
+.estimate-step1-page.mobile .menu_wrap_tab {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 25px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.estimate-step1-page.mobile .menu_tab {
+  flex: 1;
+  text-align: center;
+  padding: 12px 0;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s;
+}
+
+.estimate-step1-page.mobile .menu_tab.on {
+  border-bottom-color: #1b37e1;
+}
+
+.estimate-step1-page.mobile .menu_tab a {
+  display: block;
+  font-size: 14px;
+  color: #666;
+  text-decoration: none;
+}
+
+.estimate-step1-page.mobile .menu_tab.on a {
+  color: #1b37e1;
+  font-weight: bold;
+}
+
+/* Form */
+.estimate-step1-page.mobile .tourGuard_Info {
+  margin-bottom: 25px;
+}
+
+.estimate-step1-page.mobile .tourGuard_form_tt {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.estimate-step1-page.mobile .tourGuard_form_tt label {
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+}
+
+.estimate-step1-page.mobile .tourGuard_input_w01 {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.estimate-step1-page.mobile .tourGuard_input_w01:focus {
+  border-color: #1b37e1;
+}
+
+.estimate-step1-page.mobile .tourGuard_input_cell {
+  display: block;
+  width: 100%;
+}
+
+.estimate-step1-page.mobile .tourGuard_input_cell02 {
+  width: 100%;
+}
+
+.estimate-step1-page.mobile .tourGuard_ps_box {
+  display: block;
+}
+
+.estimate-step1-page.mobile .tourGuard_sel,
+.estimate-step1-page.mobile .tourGuard_sel07 {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  background: #fff;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.estimate-step1-page.mobile .tourGuard_sel:focus,
+.estimate-step1-page.mobile .tourGuard_sel07:focus {
+  border-color: #1b37e1;
+}
+
+.estimate-step1-page.mobile .tourG_line {
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 15px;
+}
+
+/* Button */
+.estimate-step1-page.mobile .tourGuard_btn_b {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  background: #1b37e1;
+  color: #fff;
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.estimate-step1-page.mobile .tourGuard_btn_b:hover {
+  background: #1529c4;
+}
+
+.estimate-step1-page.mobile .tour2023_btn01 {
+  background: #1b37e1;
+}
+
+/* Reference Section */
+.estimate-step1-page.mobile .tourG_box_know {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 25px;
+}
+
+.estimate-step1-page.mobile .tourG_know_tit {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.estimate-step1-page.mobile .tourG_know_s {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.estimate-step1-page.mobile .know_dot {
+  width: 5px;
+  height: 5px;
+  background: #666;
+  border-radius: 50%;
+  margin-top: 7px;
+  flex-shrink: 0;
+}
+
+.estimate-step1-page.mobile .tourG_know_txt {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.6;
+  flex: 1;
+}
+
+.estimate-step1-page.mobile .tour2023_blue {
+  color: #1b37e1;
+  font-weight: bold;
+}
+
+/* Utility Classes */
+.estimate-step1-page.mobile .prow_01 {
+  padding: 15px 0;
+}
+
+.estimate-step1-page.mobile .tourG_mat10 {
+  margin-top: 30px;
+}
+
+.estimate-step1-page.mobile .tourG_mat13 {
+  margin-top: 30px;
+}
+
+.estimate-step1-page.mobile .tourG_mab02 {
+  margin-bottom: 30px;
+}
+
+.estimate-step1-page.mobile .tourG_mab03 {
+  margin-bottom: 10px;
+}
+
+.estimate-step1-page.mobile .tourG_mab05 {
+  margin-bottom: 15px;
+}
+
+.estimate-step1-page.mobile .tourG_mab09 {
+  margin-bottom: 5px;
+}
+
+.estimate-step1-page.mobile .tourG_mat08 {
+  margin-top: 8px;
+}
+
+.estimate-step1-page.mobile .tourG_pat02 {
+  padding-top: 25px;
+}
+
+.estimate-step1-page.mobile .mag5 {
+  margin: 5px 0;
+}
+

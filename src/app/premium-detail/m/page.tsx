@@ -88,10 +88,10 @@ function MobilePremiumDetailContent() {
                                 window.open(`/coverage-detail?planType=${participant.planType}&hasMedicalExpense=${hasMedicalExpense}`, '_blank');
                               }}
                             >
-                              {participant.planType}
+                              {participant.planType || '-'}
                             </button>
                           </td>
-                          <td>{participant.premium.toLocaleString()}원</td>
+                          <td>{typeof participant.premium === 'number' ? participant.premium.toLocaleString() : '0'}원</td>
                         </tr>
                       ))}
                     </tbody>

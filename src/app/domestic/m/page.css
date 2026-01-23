@@ -844,6 +844,7 @@
     width: 100%;
     margin-bottom: 0;
     overflow: visible;
+    padding: 20px 0;
 }
 
 .domestic-step1-mobile .form-container {
@@ -855,10 +856,6 @@
     background: #ffffff;
     border-radius: 16px;
     padding: 0;
-    padding-top: 20px;
-    padding-bottom: 20px;
-    padding-left: 0;
-    padding-right: 0;
     box-shadow: none;
     overflow: visible;
     min-height: 0;

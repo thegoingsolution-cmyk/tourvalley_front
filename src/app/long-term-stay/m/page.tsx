@@ -859,7 +859,7 @@ function MobileLongTermStayContent() {
         }
       }
 
-      // 가상계좌 결제 처리
+      // 가상계좌 결제 처리 (결제창 Server 승인 모델)
       if (paymentMethod === '기타결제' && paymentSubMethod === '가상계좌') {
         // 1. 계약 등록 (결제 대기 상태)
         const contractData = {
@@ -930,33 +930,42 @@ function MobileLongTermStayContent() {
 
         const contract_id = contractData_result.contract_id;
 
-        // 2. 가상계좌 발급 API 호출
-        const virtualAccountResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/payments/nicepay/virtual-account`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            contract_id,
-            amount: receiptPremium,
-            buyerName: participants[0]?.name || '',
-            buyerEmail: participants[0]?.email1 && participants[0]?.email2 
-              ? `${participants[0].email1}@${participants[0].email2 === '직접입력' ? participants[0].customEmail : participants[0].email2}`
-              : '',
-            buyerTel: participants[0]?.phone || '',
-            bankCode: depositBank, // 은행 코드 (003, 004, 011 등)
-          }),
+        // 2. 결제창 호출 (AUTHNICE Server 승인 모델)
+        const paymentRequest = await requestNicepayPayment({
+          contract_id,
+          amount: receiptPremium,
+          orderId: contractData_result.contract_number,
+          goodsName: travelPurpose || '유학/어학연수',
+          buyerName: participants[0]?.name || '',
+          buyerEmail: participants[0]?.email1 && participants[0]?.email2 
+            ? `${participants[0].email1}@${participants[0].email2 === '직접입력' ? participants[0].customEmail : participants[0].email2}`
+            : '',
+          buyerTel: participants[0]?.phone || '',
+          returnUrl: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/payments/nicepay/callback`,
+          closeUrl: `${window.location.origin}/payment/close`,
         });
 
-        const virtualAccountData = await virtualAccountResponse.json();
-
-        if (virtualAccountData.success) {
-          alert('가상계좌가 발급되었습니다. 계좌번호는 문자로 발송됩니다.');
-          setShowPaymentScreen(false);
-          setShowCompletionScreen(true);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (paymentRequest.success) {
+          localStorage.setItem('pendingPayment', JSON.stringify({
+            contract_id,
+            payment_method: '기타결제',
+            payment_sub_method: '가상계좌',
+            amount: receiptPremium,
+            contractor_name: participants[0]?.name || '',
+          }));
+          try {
+            await openNicepayWindow({
+              ...paymentRequest,
+              method: 'vbank',
+              bankCode: depositBank,
+              vbankHolder: participants[0]?.name || '',
+            });
+          } catch (error) {
+            console.error('가상계좌 결제창 열기 오류:', error);
+            alert(error instanceof Error ? error.message : '가상계좌 결제창을 여는 중 오류가 발생했습니다.');
+          }
         } else {
-          alert(virtualAccountData.message || '가상계좌 발급에 실패했습니다.');
+          alert(paymentRequest.message || '가상계좌 결제 요청에 실패했습니다.');
         }
       }
     } catch (error) {
@@ -1097,12 +1106,10 @@ function MobileLongTermStayContent() {
 
       {/* STEP 2: 가입정보 입력 */}
       {showParticipantForm && !showStep2_1 && !showStep3 && !showCompletionScreen && (
-        <>
-          <div className="prow_01">
-            <div className="tour2023_BWrap tourG_mat13 tourG_mab05">
-              <p className="tour2023_title01">{getTitle()}</p>
-              <MobileStepIndicator currentStep={getCurrentStep()} />
-            </div>
+        <div className="prow_01">
+          <div className="tour2023_BWrap tourG_mat13 tourG_mab05">
+            <p className="tour2023_title01">{getTitle()}</p>
+            <MobileStepIndicator currentStep={getCurrentStep()} />
           </div>
           
           <ParticipantInfoStep
@@ -1130,7 +1137,7 @@ function MobileLongTermStayContent() {
             birthDate={birthDate}
             gender={gender === 'M' ? 'male' : 'female'}
           />
-        </>
+        </div>
       )}
 
       {!showStep2_1 && !showStep3 && !showCompletionScreen && (

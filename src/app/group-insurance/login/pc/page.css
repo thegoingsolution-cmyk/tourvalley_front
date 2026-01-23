@@ -1,0 +1,125 @@
+.gi-login-page-pc {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f5f7fb;
+}
+
+.gi-login-content-pc {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px 60px;
+}
+
+.gi-login-container-pc {
+  width: 100%;
+  max-width: 860px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 28px 30px 36px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.gi-tab-header {
+  display: flex;
+  border: 1px solid #1a1a1a;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 22px;
+}
+
+.gi-tab-btn {
+  flex: 1;
+  padding: 12px 14px;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  background: #fff;
+  color: #111;
+  cursor: pointer;
+}
+
+.gi-tab-btn.active {
+  background: #0a5bff;
+  color: #fff;
+}
+
+.gi-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 420px;
+}
+
+.gi-form-field {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 12px 14px;
+  background: #fff;
+}
+
+.gi-form-label {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.gi-form-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: #333;
+  padding: 0;
+  background: transparent;
+}
+
+.gi-form-input::placeholder {
+  color: #bbb;
+}
+
+.gi-form-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #666;
+}
+
+.gi-primary-btn {
+  width: 100%;
+  height: 50px;
+  border: none;
+  border-radius: 6px;
+  background: #0a5bff;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 6px;
+}
+
+.gi-primary-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.gi-guest-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 520px;
+}
+
+.gi-guest-box {
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 14px 16px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #333;
+  background: #fff;
+}

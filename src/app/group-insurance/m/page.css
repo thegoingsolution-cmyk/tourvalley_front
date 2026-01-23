@@ -1,7 +1,7 @@
 /* Container Styles - domestic/m/page.css 기반 */
-/* .group-insurance-mobile - 하단 padding 제거됨 */
+/* .group-insurance-mobile - ?�단 padding ?�거??*/
 
-/* 탭 메뉴 스타일 - test.css 9872-9914 라인 */
+/* ??메뉴 ?��???- test.css 9872-9914 ?�인 */
 .menu_wrap_tab {
     position: relative;
     display: flex;
@@ -124,7 +124,123 @@
     line-height: 20px;
 }
 
-/* 여백 유틸리티 */
+.tour2023_step_line:before {
+    content: '';
+    position: absolute;
+    display: inline-block;
+    width: 120px;
+    height: 1px;
+    top: 10px;
+    right: 19px;
+    margin: 0px 0 0px 0px;
+    border-bottom: 1px solid #d5d5d5;
+    vertical-align: middle;
+    transform: rotate(0deg);
+    z-index: 0;
+}
+
+.tour2023_step_line.tour {
+    position: relative;
+}
+
+/* 참고?�세???�션 */
+.tourG_box_know {
+    position: relative;
+    border: 1px solid #e6e8ed;
+    padding: 21px 14px 52px 20px;
+    background: #fff;
+    box-sizing: border-box;
+    transition: max-height 0.2s ease;
+}
+
+.tourG_box_know.is-collapsed {
+    overflow: visible;
+}
+
+.tourG_box_know.is-expanded {
+    overflow: visible;
+}
+
+.tourG_know_tit {
+    font-size: 15px;
+    color: #008000;
+    text-align: left;
+    line-height: 130%;
+    letter-spacing: -1px;
+    font-weight: 300;
+    margin-bottom: 6px;
+}
+
+.tourG_know_red {
+    color: #d60000;
+}
+
+.tourG_know_s {
+    display: flex;
+    align-items: flex-start;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tourG_box_know .tourG_mat08 {
+    margin-top: 10px;
+}
+
+.tourG_box_know .tourG_mab09 {
+    margin-bottom: 10px;
+}
+
+.tourG_know_s li {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tourG_know_s li.know_dot {
+    display: inline-block;
+    width: 3px;
+    height: 3px;
+    background-color: #a7a7a7;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    margin-left: 0px;
+    margin-top: 7px;
+    vertical-align: top;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.tourG_know_txt {
+    font-size: 13px;
+    color: #9b9b9b;
+    text-align: left;
+    line-height: 120%;
+    letter-spacing: -0.8px;
+    width: 97%;
+    padding-top: 1px;
+    flex: 1;
+    font-weight: 300;
+}
+
+.tourG_know_more {
+    position: absolute;
+    right: 12px;
+    bottom: 10px;
+    background: #fff;
+    border: 0;
+    color: #1b37e1;
+    font-size: 12px;
+    padding: 2px 6px;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.tourG_pat02 {
+    padding-top: 30px;
+}
+
+/* ?�백 ?�틸리티 */
 .tourG_mat02 { margin-top: 10px!important; }
 .tourG_mat04 { margin-top: 20px!important; }
 .tourG_mat06 { margin-top: 15px!important; }
@@ -155,12 +271,12 @@
     box-sizing: border-box;
 }
 
-/* 배경 색상 */
+/* 배경 ?�상 */
 .bgcolor_white {
     background-color: #fff;
 }
 
-/* tour2023_BWrap 스타일 */
+/* tour2023_BWrap ?��???*/
 .tour2023_BWrap {
     background: #fff;
     padding: 0;
@@ -181,10 +297,10 @@
     line-height: 1.4;
     font-family: 'NanumSquareNeoTTF-dEb';
     margin: 0;
-    min-width: 0; /* flex item이 축소될 수 있도록 */
-    overflow: visible; /* 두 줄 표시를 위해 visible로 변경 */
-    text-overflow: clip; /* 말줄임표 제거 */
-    white-space: normal; /* 두 줄 표시를 위해 normal로 변경 */
+    min-width: 0; /* flex item??축소?????�도�?*/
+    overflow: visible; /* ??�??�시�??�해 visible�?변�?*/
+    text-overflow: clip; /* 말줄?�표 ?�거 */
+    white-space: normal; /* ??�??�시�??�해 normal�?변�?*/
 }
 
 .tour2023_title09 {
@@ -194,7 +310,7 @@
     font-family: 'NanumSquareNeoTTF-bRg';
 }
 
-/* 심의번호 영역 */
+/* ?�의번호 ?�역 */
 .essential_Wrap {
     padding: 20px 0;
     margin-top: 40px;
@@ -224,7 +340,7 @@
     color: #808181;
 }
 
-/* Form Styles - GroupTravelInfoStep 컴포넌트용 */
+/* Form Styles - GroupTravelInfoStep 컴포?�트??*/
 .tourGuard_Info {
     width: 100%;
 }
@@ -335,7 +451,7 @@
     left: 20px;
     color: #9797a3;
     font-size: 12px;
-    font-family: 'Malgun Gothic','맑은고딕',dotum,'돋움',AppleGothic,sans-serif;
+    font-family: 'Malgun Gothic','맑�?고딕',dotum,'?��?',AppleGothic,sans-serif;
     letter-spacing: -0.8px;
 }
 
@@ -656,7 +772,7 @@
     z-index: 1;
 }
 
-/* 가입자 입력 모달 스타일 */
+/* 가?�자 ?�력 모달 ?��???*/
 .participant-input-modal {
     max-width: 100%;
     width: 100%;
@@ -856,14 +972,14 @@
     background-color: #e04d00;
 }
 
-/* 가입하기 버튼용 섹션 스타일 (푸터 위에 배치) */
+/* 가?�하�?버튼???�션 ?��???(?�터 ?�에 배치) */
 .join-button-section {
     width: 100%;
     background: #fff;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
 }
 
-/* 반응형 */
+/* 반응??*/
 @media (max-width: 768px) {
     .menu_wrap_tab .menu_tab a {
         font-size: 16px;
@@ -874,7 +990,7 @@
     }
 }
 
-/* 엑셀로 등록하기 버튼 스타일 (estimate/step2/pc/page.css와 동일) */
+/* ?��?�??�록?�기 버튼 ?��???(estimate/step2/pc/page.css?�??�일) */
 .excel-upload-btn {
     padding: 12px 20px;
     background: #fff;
@@ -903,7 +1019,187 @@
    Modal Styles (ExcelUploadModal)
    ======================================== */
 
-.modal-overlay {
+.excel-upload-page {
+    min-height: 100vh;
+    padding: 0 0 40px;
+    display: block;
+    background: #fff;
+}
+
+.excel-upload-page .modal-content {
+    max-width: none;
+    width: 100%;
+    max-height: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.excel-upload-page .tour2023_header_line {
+    border-bottom: 1px solid #eaebef;
+}
+
+.excel-upload-page .tour2023_header_inner {
+    position: relative;
+    padding: 15px 5%;
+}
+
+.excel-upload-page .tourTop_title {
+    display: block;
+    font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #000;
+    line-height: 25px;
+    text-align: center;
+}
+
+.excel-upload-page .tour2023_header_inner .close {
+    position: absolute;
+    right: 5%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    background: url(/icons/ico_btn_close_bl.png) no-repeat 50% 50%;
+    background-size: contain;
+    text-indent: -9999px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.excel-upload-page .tprow_01 {
+    padding: 0 5%;
+}
+
+.excel-upload-page .tour2023_limit_state {
+    position: relative;
+    display: block;
+    text-align: left;
+    box-sizing: border-box;
+    padding: 30px 30px 10px 30px;
+}
+
+.excel-upload-page .tour2023_pcBox_txt07 {
+    font-size: 15px;
+    letter-spacing: -1px;
+    line-height: 135%;
+    color: #666;
+    font-weight: 400;
+}
+
+.excel-upload-page .tour2023_pcBox_txt11 {
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -1.8px;
+    line-height: 100%;
+    padding: 35px 0 14px 0;
+}
+
+.excel-upload-page .tourGuard_btn_b .icon_download {
+    background: url(/images/icon_download.png) no-repeat center 0;
+    width: 33px;
+    height: 23px;
+    background-size: 85%;
+    display: inline-block;
+    vertical-align: middle;
+    position: absolute;
+    right: 15px;
+    top: 20px;
+    opacity: 0.95;
+}
+
+.excel-upload-page .tour2023_pc_ta {
+    width: 100%;
+    border-collapse: collapse;
+    border: solid 1px #d8d8d8;
+    margin: 15px 0;
+}
+
+.excel-upload-page .tour2023_pc_ta td {
+    position: relative;
+    padding: 9px 17px;
+    border-bottom: solid 1px #d8d8d8;
+    font-size: 15px;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 132%;
+    box-sizing: border-box;
+}
+
+.excel-upload-page .tour2023_pc_td01 {
+    border-right: solid 1px #d8d8d8;
+}
+
+.excel-upload-page .tour2023_pc_insu {
+    position: relative;
+    width: 100%;
+    display: inline-flex;
+}
+
+.excel-upload-page .btn_b {
+    display: inline-block;
+    text-decoration: none;
+}
+
+.excel-upload-page .tour2023PC_btn05 {
+    font-size: 18px;
+    letter-spacing: -1px;
+    padding: 16px 0 0 23px;
+    height: 57px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-sizing: border-box;
+    border: 1px solid #fe5700;
+    color: #fe5700 !important;
+    text-align: center;
+}
+
+.excel-upload-page .tour2023PC_btn06 {
+    font-size: 16px;
+    padding-top: 13px;
+    letter-spacing: -1px;
+    width: 40%;
+    height: 50px;
+    background-color: #eef0fc;
+    border-radius: 8px;
+    box-sizing: border-box;
+    color: #4d60d6 !important;
+    text-align: center;
+    border: 1px solid #4d60d6;
+}
+
+.excel-upload-page .tour2023PC_btn07 {
+    width: 60%;
+    font-size: 16px;
+    padding-top: 13px;
+    height: 50px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-sizing: border-box;
+    color: #686868 !important;
+    text-align: center;
+    position: relative;
+    display: inline-block;
+    border: 1px solid #b7b7b7;
+    margin-left: 5px;
+}
+
+.excel-upload-page .tourG_mat13 {
+    margin-top: 40px !important;
+}
+
+.excel-upload-page .tour2023_btn07 {
+    width: 100%;
+    font-size: 22px;
+    color: #fff !important;
+    padding-top: 15px;
+    height: 60px;
+    box-sizing: border-box;
+    text-align: center;
+    letter-spacing: -1.5px;
+    background-color: #fe5700;
+    border-radius: 0;
+}.modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -1271,7 +1567,7 @@
     text-decoration: underline;
 }
 
-/* Plan Selection Guide (해외장기체류보험용) */
+/* Plan Selection Guide (?�외?�기체류보험?? */
 .plan-selection-guide {
     margin-bottom: 20px;
     padding: 16px;
@@ -1339,11 +1635,11 @@
 }
 
 /* ========================================
-   Participant Form Styles (GroupParticipantInfoStep용)
-   ParticipantInfoStep과 동일한 디자인
+   Participant Form Styles (GroupParticipantInfoStep??
+   ParticipantInfoStep�??�일???�자??
    ======================================== */
 
-/* group-insurance-mobile 스코프 내에서만 적용 */
+/* group-insurance-mobile ?�코???�에?�만 ?�용 */
 .group-insurance-mobile .participant-form-row {
     position: relative;
     height: 65px;
@@ -1379,7 +1675,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-family: 'Malgun Gothic','맑은고딕',dotum,'돋움',AppleGothic,sans-serif;
+    font-family: 'Malgun Gothic','맑�?고딕',dotum,'?��?',AppleGothic,sans-serif;
     letter-spacing: -0.8px;
 }
 
@@ -1504,7 +1800,7 @@
     box-sizing: border-box;
 }
 
-/* 인증받기 버튼 스타일 */
+/* ?�증받기 버튼 ?��???*/
 .group-insurance-mobile .verify-btn {
     padding: 0 16px;
     background-color: #eef0fc;
@@ -1610,7 +1906,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 10000; /* 하단 고정 버튼(z-index: 1000)보다 위에 표시 */
+    z-index: 10000; /* ?�단 고정 버튼(z-index: 1000)보다 ?�에 ?�시 */
     padding: 20px;
     box-sizing: border-box;
 }
@@ -1671,7 +1967,7 @@
     overflow-y: auto;
 }
 
-/* ConsentModal의 modal-title은 제목이 더 길어서 다른 스타일 적용 */
+/* ConsentModal??modal-title?�??�목????길어???�른 ?��????�용 */
 .group-insurance-mobile .modal-content:has(.tour2023_limit_state) .modal-title {
     font-family: 'NanumSquareNeoTTF-cBd';
     font-size: 14px;
@@ -1685,20 +1981,71 @@
     word-break: keep-all;
 }
 
-/* ConsentModal의 modal-header 간격 조정 */
+/* ConsentModal??modal-header 간격 조정 */
 .group-insurance-mobile .modal-content:has(.tour2023_limit_state) .modal-header {
     padding: 10px 16px;
     min-height: auto;
+    position: relative;
+    align-items: center;
 }
 
-/* ConsentModal의 modal-body 간격 조정 */
+/* ConsentModal의 modal-close-btn 수직 정렬 조정 */
+.group-insurance-mobile .modal-content:has(.tour2023_limit_state) .modal-close-btn {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;
+}
+
+/* ConsentModal??modal-body 간격 조정 */
 .group-insurance-mobile .modal-content:has(.tour2023_limit_state) .modal-body {
     padding: 0;
 }
 
-/* tour2023_limit_state 컨테이너 */
+/* tour2023_limit_state 컨테?�너 */
 .group-insurance-mobile .tour2023_limit_state {
     padding: 12px 16px;
+}
+
+/* tour2023_pcBox_txt10 텍스트 스타일 */
+.tour2023_pcBox_txt10 {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #333;
+    margin: 0 0 16px 0;
+}
+
+/* btn_b 기본 스타일 */
+.btn_b {
+    display: inline-block;
+    text-decoration: none;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+/* btn_b.tour2023PC_btn04 확인 버튼 (주황색) */
+.btn_b.tour2023PC_btn04 {
+    font-family: 'NanumSquareNeoTTF-bRg';
+    width: 100%;
+    font-size: 18px;
+    letter-spacing: -0.5px;
+    padding-top: 15px;
+    height: 56px;
+    background-color: #fe5700;
+    border-radius: 7px;
+    box-sizing: border-box;
+    color: #fff !important;
+    text-align: center;
+    position: relative;
+    display: inline-block;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+}
+
+.btn_b.tour2023PC_btn04:hover {
+    background-color: #e54e00;
 }
 
 .group-insurance-mobile .tourG_mat06 {
@@ -1717,7 +2064,7 @@
     margin-bottom: 12px;
 }
 
-/* tourG_agree 리스트 */
+/* tourG_agree 리스??*/
 .group-insurance-mobile .tourG_agree {
     list-style: none;
     margin: 0;
@@ -1750,7 +2097,7 @@
     color: #333;
 }
 
-/* 전체동의 체크박스 커스텀 스타일 적용 */
+/* ?�체?�의 체크박스 커스?�??��????�용 */
 .group-insurance-mobile .tourG_cir.tourG_chk label[for="all_agree"] {
     position: relative;
     padding-left: 28px;
@@ -1795,14 +2142,14 @@
     font-weight: 400;
 }
 
-/* tourG_line02 구분선 */
+/* tourG_line02 구분??*/
 .group-insurance-mobile .tourG_line02 {
     height: 1px;
     background-color: #e0e0e0;
     margin: 10px 0;
 }
 
-/* tourG_more 정보보기 아이콘 */
+/* tourG_more ?�보보기 ?�이�?*/
 .group-insurance-mobile .tourG_more {
     width: 18px;
     height: 18px;
@@ -1816,7 +2163,7 @@
     flex-shrink: 0;
 }
 
-/* tourGuard_btn_b 버튼 기본 (tour2023_btn01과 함께 사용되는 경우만 적용) */
+/* tourGuard_btn_b 버튼 기본 (tour2023_btn01�??�께 ?�용?�는 경우�??�용) */
 .group-insurance-mobile .tourGuard_btn_b:not(.tour2023_btn01) {
     width: 100%;
     display: inline-block;
@@ -1830,7 +2177,7 @@
     border: none;
 }
 
-/* tour2023_btn06_gray 약관보기 버튼 (회색) */
+/* tour2023_btn06_gray ?��?보기 버튼 (?�색) */
 .group-insurance-mobile .tour2023_btn06_gray {
     color: #666 !important;
     border: 1px solid #ddd;
@@ -1863,7 +2210,7 @@
     margin-left: 6px;
 }
 
-/* tourGuard_btn01 확인 버튼 (파란색) */
+/* tourGuard_btn01 ?�인 버튼 (?��??? */
 .group-insurance-mobile .tourGuard_btn01 {
     font-family: 'NanumSquareNeoTTF-bRg';
     background-color: #2843e5;
@@ -1894,7 +2241,7 @@
     margin-bottom: 0;
 }
 
-/* 안내문(tour2023_txt01) 부분의 여백 - CSS 충돌 방지를 위해 명시적으로 정의 */
+/* ?�내�?tour2023_txt01) 부분의 ?�백 - CSS 충돌 방�?�??�해 명시?�으�??�의 */
 .group-insurance-mobile .tour2023_txt01.tourG_mleft04 {
     margin-top: 30px !important;
     margin-bottom: 30px !important;
@@ -2802,7 +3149,6 @@
     width: 100% !important;
     margin-bottom: 0 !important;
     overflow: visible !important;
-    padding: 0 20px !important;
 }
 
 .group-insurance-mobile .form-container {
@@ -2813,14 +3159,14 @@
 .group-insurance-mobile .form-card {
     background: #ffffff !important;
     border-radius: 16px !important;
-    padding: 20px !important;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
     overflow: visible !important;
     min-height: 0 !important;
     max-height: none !important;
     height: auto !important;
     display: flex !important;
     flex-direction: column !important;
+    padding: 20px !important;
+    box-sizing: border-box !important;
 }
 
 .payment-form-card {
@@ -2832,7 +3178,7 @@
 }
 
 .group-insurance-mobile .form-header {
-    display: none !important; /* 모바일에서는 숨김 */
+    display: none !important; /* 모바?�에?�는 ?��? */
 }
 
 .group-insurance-mobile .form-title {
@@ -2968,7 +3314,7 @@
 }
 
 /* ========================================
-   심의번호 섹션 스타일 - estimate/m/step1과 동일
+   ?�의번호 ?�션 ?��???- estimate/m/step1�??�일
    ======================================== */
 
 .group-insurance-mobile .tour2023_txt02 {
@@ -2980,4 +3326,416 @@
     font-weight: 300;
     color: #666;
     padding: 0;
+}
+
+
+
+
+
+
+
+/* Calculate Final Button */
+.calculate-final-btn {
+    width: 100%;
+    padding: 16px;
+    background: #2843e5;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background 0.2s;
+}
+
+.calculate-final-btn:hover:not(:disabled) {
+    background: #1e33c4;
+}
+
+.calculate-final-btn:disabled,
+.calculate-final-btn.calculated {
+    background: #ccc;
+    cursor: not-allowed;
+    color: #999;
+}
+
+/* Premium Summary */
+.premium-summary {
+    margin-top: 20px;
+    padding: 16px;
+    background: #eef2fc;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.premium-detail-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.premium-participant-count {
+    font-size: 14px;
+    color: #333;
+}
+
+.premium-detail-link {
+    display: inline-block;
+    text-align: center;
+    padding: 8px 14px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #2843e5;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.premium-detail-link:hover {
+    background: #f0f4ff;
+    border-color: #2843e5;
+}
+
+.premium-total {
+    text-align: right;
+    font-size: 16px;
+    color: #333;
+    flex: 1;
+    min-width: 100%;
+    margin-top: 8px;
+}
+
+.premium-amount {
+    font-size: 22px;
+    font-weight: 700;
+    color: #2843e5;
+}
+
+/* Apply Button */
+.apply-btn {
+    width: 100%;
+    padding: 16px;
+    background: #f15a24;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background 0.2s;
+}
+
+.apply-btn:hover {
+    background: #d94a1a;
+}
+
+/* ========================================
+   ConsentModalMobile Styles - 하단 슬라이드업 모달
+   ======================================== */
+
+.consent-modal-mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.consent-modal-mobile-content {
+    width: 100%;
+    max-width: 100%;
+    max-height: 90vh;
+    background: #fff;
+    border-radius: 20px 20px 0 0;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(100%);
+    transition: transform 0.3s ease-out;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+.consent-modal-mobile-content.visible {
+    transform: translateY(0);
+}
+
+.consent-modal-mobile-header {
+    position: relative;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e0e0e0;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 70px;
+}
+
+.consent-modal-mobile-handle {
+    width: 40px;
+    height: 4px;
+    background: #ddd;
+    border-radius: 2px;
+    margin-bottom: 12px;
+    flex-shrink: 0;
+}
+
+.consent-modal-mobile-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #3e3e3e;
+    margin: 0;
+    text-align: center;
+    line-height: 1.4;
+    word-break: keep-all;
+    flex: 1;
+}
+
+.consent-modal-mobile-close-btn {
+    position: absolute;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    z-index: 1;
+}
+
+.consent-modal-mobile-close-btn:hover {
+    color: #333;
+}
+
+.consent-modal-mobile-body {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0;
+}
+
+/* ConsentModalMobile 내부 스타일 */
+.consent-modal-mobile-content .tour2023_limit_state {
+    padding: 16px 20px 24px;
+}
+
+.consent-modal-mobile-content .tourG_mat06 {
+    margin-top: 0;
+}
+
+.consent-modal-mobile-content .tourG_mat07 {
+    margin-top: 12px;
+}
+
+.consent-modal-mobile-content .tourG_mat12 {
+    margin-top: 16px;
+}
+
+.consent-modal-mobile-content .tourG_mab02 {
+    margin-bottom: 12px;
+}
+
+.consent-modal-mobile-content .tourG_mab03 {
+    margin-bottom: 10px;
+}
+
+.consent-modal-mobile-content .tourG_mab04 {
+    margin-bottom: 15px;
+}
+
+.consent-modal-mobile-content .tourG_mab05 {
+    margin-bottom: 20px;
+}
+
+.consent-modal-mobile-content .tourG_agree {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.consent-modal-mobile-content .tourG_agree li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 0;
+}
+
+.consent-modal-mobile-content .tourG_cir.tourG_chk {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.consent-modal-mobile-content .tourG_cir.tourG_chk input[type="checkbox"] {
+    display: none;
+}
+
+.consent-modal-mobile-content .tourG_cir.tourG_chk label {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 15px;
+    color: #333;
+}
+
+.consent-modal-mobile-content .tourG_cir.tourG_chk label[for="all_agree_mobile"] {
+    position: relative;
+    padding-left: 28px;
+}
+
+.consent-modal-mobile-content .tourG_cir.tourG_chk label[for="all_agree_mobile"]::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    background-image: url('/icons/checkbox-icon.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.3;
+    transition: all 0.2s;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+.consent-modal-mobile-content .tourG_cir.tourG_chk input[type="checkbox"]:checked + label[for="all_agree_mobile"]::before {
+    background-image: url('/icons/chk_ov.png');
+    background-size: 65%;
+    border: 1px solid #2c3fb3;
+    background-color: #2c3fb3;
+    opacity: 1;
+}
+
+.consent-modal-mobile-content .tourGuard_txt06 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+}
+
+.consent-modal-mobile-content .tourGuard_txt04 {
+    font-size: 14px;
+    color: #666;
+    font-weight: 400;
+}
+
+.consent-modal-mobile-content .tourG_line02 {
+    height: 1px;
+    background-color: #e0e0e0;
+    margin: 10px 0;
+}
+
+.consent-modal-mobile-content .tourG_more {
+    width: 18px;
+    height: 18px;
+    margin-left: 8px;
+    display: inline-block;
+    cursor: pointer;
+    background-image: url('/images/g_more.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    flex-shrink: 0;
+}
+
+.consent-modal-mobile-content .tourGuard_btn_b:not(.tour2023_btn01) {
+    width: 100%;
+    display: inline-block;
+    text-align: center;
+    padding: 14px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+}
+
+.consent-modal-mobile-content .tour2023_btn06_gray {
+    color: #666 !important;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 14px;
+    font-size: 15px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.consent-modal-mobile-content .tour2023_btn06_gray:hover {
+    background-color: #ebebeb;
+}
+
+.consent-modal-mobile-content .tour2023_arr01 {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-left: 5px solid #666;
+    border-top: 3px solid transparent;
+    border-bottom: 3px solid transparent;
+    margin-left: 6px;
+}
+
+.consent-modal-mobile-content .tourGuard_btn01 {
+    font-family: 'NanumSquareNeoTTF-bRg';
+    background-color: #2843e5;
+    color: #fff !important;
+    font-size: 18px;
+    letter-spacing: -0.5px;
+    padding-top: 15px;
+    height: 56px;
+    border-radius: 7px;
+    box-sizing: border-box;
+    width: 100%;
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+}
+
+.consent-modal-mobile-content .tourGuard_btn01:hover {
+    background-color: #1e33c4;
 }

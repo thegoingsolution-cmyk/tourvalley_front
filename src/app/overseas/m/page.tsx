@@ -863,7 +863,7 @@ function MobileOverseasStep1Content() {
         }
       }
 
-      // 가상계좌 결제 처리
+      // 가상계좌 결제 처리 (결제창 Server 승인 모델)
       if (paymentMethod === '기타결제' && paymentSubMethod === '가상계좌') {
         // 1. 계약 등록 (결제 대기 상태)
         const contractData = {
@@ -932,31 +932,40 @@ function MobileOverseasStep1Content() {
 
         const contract_id = contractData_result.contract_id;
 
-        // 2. 가상계좌 발급 API 호출
-        const virtualAccountResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/payments/nicepay/virtual-account`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            contract_id,
-            amount: receiptPremium,
-            buyerName: participants[0]?.name || '',
-            buyerEmail: getFullEmail(participants[0]) || '',
-            buyerTel: participants[0]?.phone || '',
-            bankCode: depositBank, // 은행 코드 (003, 004, 011 등)
-          }),
+        // 2. 결제창 호출 (AUTHNICE Server 승인 모델)
+        const paymentRequest = await requestNicepayPayment({
+          contract_id,
+          amount: receiptPremium,
+          orderId: contractData_result.contract_number,
+          goodsName: '해외여행보험',
+          buyerName: participants[0]?.name || '',
+          buyerEmail: getFullEmail(participants[0]) || '',
+          buyerTel: participants[0]?.phone || '',
+          returnUrl: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/payments/nicepay/callback`,
+          closeUrl: `${window.location.origin}/payment/close`,
         });
 
-        const virtualAccountData = await virtualAccountResponse.json();
-
-        if (virtualAccountData.success) {
-          alert('가상계좌가 발급되었습니다. 계좌번호는 문자로 발송됩니다.');
-          setShowPaymentScreen(false);
-          setShowCompletionScreen(true);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (paymentRequest.success) {
+          localStorage.setItem('pendingPayment', JSON.stringify({
+            contract_id,
+            payment_method: '기타결제',
+            payment_sub_method: '가상계좌',
+            amount: receiptPremium,
+            contractor_name: participants[0]?.name || '',
+          }));
+          try {
+            await openNicepayWindow({
+              ...paymentRequest,
+              method: 'vbank',
+              bankCode: depositBank,
+              vbankHolder: participants[0]?.name || '',
+            });
+          } catch (error) {
+            console.error('가상계좌 결제창 열기 오류:', error);
+            alert(error instanceof Error ? error.message : '가상계좌 결제창을 여는 중 오류가 발생했습니다.');
+          }
         } else {
-          alert(virtualAccountData.message || '가상계좌 발급에 실패했습니다.');
+          alert(paymentRequest.message || '가상계좌 결제 요청에 실패했습니다.');
         }
       }
     } catch (error) {
@@ -1102,42 +1111,40 @@ function MobileOverseasStep1Content() {
 
       {/* STEP 2: 가입정보 입력 화면 */}
       {showParticipantForm && !showStep2_1 && !showStep3 && !showCompletionScreen && (
-        <>
+        <div className="prow_01">
           {/* 상단 타이틀 가입단계 */}
-          <div className="prow_01">
-            <div className="tour2023_BWrap tourG_mat13 tourG_mab05">
-              <p className="tour2023_title01">{getTitle()}</p>
-              {/* 가입 단계 */}
-              <MobileStepIndicator currentStep={getCurrentStep()} />
-            </div>
+          <div className="tour2023_BWrap tourG_mat13 tourG_mab05">
+            <p className="tour2023_title01">{getTitle()}</p>
+            {/* 가입 단계 */}
+            <MobileStepIndicator currentStep={getCurrentStep()} />
           </div>
           
           <ParticipantInfoStep
             insuranceType={getTitle()}
-          participants={participants}
-          calculatedPremiums={calculatedPremiums}
-          hasMedicalExpense={hasMedicalExpense}
-          isCalculating={isCalculating}
-          participantCount={participantCount}
-          onParticipantsChange={setParticipants}
-          onCalculatedPremiumsChange={setCalculatedPremiums}
-          onCalculate={handleCalculateParticipants}
-          onApply={() => {
-            setShowParticipantForm(false);
-            setShowStep2_1(true);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          onExcelUpload={() => setShowExcelModal(true)}
-          departureDate={departureDate}
-          departureTime={departureTime}
-          arrivalDate={arrivalDate}
-          arrivalTime={arrivalTime}
-          selectedPlan={selectedPlan}
-          calculateAgeFromBirthDate={calculateAgeFromBirthDate}
-          birthDate={birthDate}
-          gender={gender === 'M' ? 'male' : 'female'}
-        />
-        </>
+            participants={participants}
+            calculatedPremiums={calculatedPremiums}
+            hasMedicalExpense={hasMedicalExpense}
+            isCalculating={isCalculating}
+            participantCount={participantCount}
+            onParticipantsChange={setParticipants}
+            onCalculatedPremiumsChange={setCalculatedPremiums}
+            onCalculate={handleCalculateParticipants}
+            onApply={() => {
+              setShowParticipantForm(false);
+              setShowStep2_1(true);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onExcelUpload={() => setShowExcelModal(true)}
+            departureDate={departureDate}
+            departureTime={departureTime}
+            arrivalDate={arrivalDate}
+            arrivalTime={arrivalTime}
+            selectedPlan={selectedPlan}
+            calculateAgeFromBirthDate={calculateAgeFromBirthDate}
+            birthDate={birthDate}
+            gender={gender === 'M' ? 'male' : 'female'}
+          />
+        </div>
       )}
 
       {/* 하단 고정버튼 (STEP 2-1, STEP 3, 완료 화면에서는 숨김) */}

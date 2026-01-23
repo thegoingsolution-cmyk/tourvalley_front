@@ -1,0 +1,992 @@
+/* Estimate Step2 PC Page Styles */
+
+.estimate-step2-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f5f7fb;
+  overflow: visible;
+}
+
+/* Main 컨텐츠 영역 - step1과 동일 */
+.estimate-step2-page .estimate-content-pc {
+  flex: 1;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 40px 20px 60px;
+  min-height: auto;
+  background-size: 4900px auto;
+  background-position: 58.2% -800px;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  overflow: visible;
+  max-height: none;
+  height: auto;
+}
+
+/* Form Section - step1과 동일 */
+.estimate-step2-page .form-section {
+  position: relative;
+  z-index: 100;
+  width: 100%;
+  max-width: 480px;
+  margin-bottom: 0;
+  overflow: visible;
+  padding: 0 !important;
+}
+
+.estimate-step2-page .form-section:last-of-type {
+  margin-bottom: 0;
+}
+
+.estimate-step2-page .form-container {
+  width: 100%;
+  overflow: visible;
+}
+
+.estimate-step2-page .form-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 22px;
+  padding-bottom: 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: visible;
+  min-height: 0;
+  max-height: none;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 101;
+  isolation: isolate;
+}
+
+/* 오른쪽 고정 버튼 - step1과 동일 */
+.estimate-step2-page .container_box_w {
+  position: relative;
+  width: 605px;
+  margin: 0 auto;
+  min-height: 0;
+  height: 0;
+}
+
+/* Form Header - step1과 동일 */
+.estimate-step2-page .form-header {
+  position: relative;
+  display: inline-flex;
+  justify-content: space-between;
+  width: 100%;
+  vertical-align: top;
+  height: 40px;
+  padding-bottom: 0;
+  border-bottom: none;
+  align-items: center;
+  gap: 0;
+}
+
+/* tourG_mab05 */
+.estimate-step2-page .tourG_mab05 {
+  margin-bottom: 30px;
+}
+
+/* tourG_mat13 */
+.estimate-step2-page .tourG_mat13 {
+  margin-top: 10px;
+}
+
+/* tour2023_title01 - step1과 동일 */
+.estimate-step2-page .tour2023_title01 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #000;
+  text-align: center;
+  margin-bottom: 0;
+  margin-top: 0;
+  line-height: 40px;
+  height: 40px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 0;
+}
+
+/* form-title도 tour2023_title01와 동일하게 */
+.estimate-step2-page .form-title {
+  font-size: 23px;
+  font-weight: bold;
+  color: #000;
+  text-align: center;
+  margin-bottom: 0;
+  margin-top: 0;
+  line-height: 40px;
+  height: 40px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 0;
+}
+
+/* Step Indicator - step1과 동일 */
+.estimate-step2-page .tour2023_step_w {
+  position: absolute;
+  text-align: right;
+  right: 0;
+  top: 5px;
+  height: 40px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.estimate-step2-page .tour2023_step {
+  position: relative;
+  display: inline-flex;
+  justify-content: flex-end;
+  width: 54px;
+  height: 40px;
+  text-align: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.estimate-step2-page .tour2023_step ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.estimate-step2-page .tour2023_step01 {
+  position: relative;
+  text-align: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.estimate-step2-page .tour2023_step .tour2023_step_num {
+  width: 20px;
+  height: 20px;
+  background: #d1d1d1;
+  border-radius: 100px;
+  text-align: center;
+  vertical-align: middle;
+  display: inline-block;
+}
+
+.estimate-step2-page .tour2023_step .tour2023_step_txt {
+  font-size: 13px;
+  color: #c1c1c1;
+  text-align: center;
+  line-height: 135%;
+  letter-spacing: -2px;
+  margin-top: 3px;
+  z-index: 2;
+}
+
+.estimate-step2-page .tour2023_step.on .tour2023_step_num {
+  width: 20px;
+  height: 20px;
+  background: #2c3fb3;
+  border-radius: 100px;
+  text-align: center;
+  vertical-align: middle;
+  display: inline-block;
+}
+
+.estimate-step2-page .tour2023_step.on .tour2023_step_txt {
+  font-size: 13px;
+  color: #2c3fb3;
+  text-align: center;
+  line-height: 135%;
+  letter-spacing: -1.4px;
+  margin-top: 3px;
+  z-index: 2;
+}
+
+.estimate-step2-page .tour2023_step_num01 {
+  color: #fff;
+  font-size: 15px;
+  font-weight: 900;
+  display: inline-block;
+  text-align: center;
+  vertical-align: top;
+  margin-top: 0px;
+  z-index: 2;
+  line-height: 20px;
+}
+
+.estimate-step2-page .tour2023_step_line:before {
+  content: '';
+  position: absolute;
+  display: inline-block;
+  width: 120px;
+  height: 1px;
+  top: 10px;
+  right: 19px;
+  margin: 0px 0 0px 0px;
+  border-bottom: 1px solid #d5d5d5;
+  vertical-align: middle;
+  transform: rotate(0deg);
+  z-index: 0;
+}
+
+.estimate-step2-page .tour2023_step_line.tour {
+  position: relative;
+}
+
+/* Agreement Section */
+.estimate-step2-page .tour2023_title10 {
+  font-family: 'NanumSquareNeoTTF-dEb';
+  font-size: 21px;
+  color: #202020;
+  letter-spacing: -2.2px;
+  text-align: left;
+  display: inline-block;
+  margin: 15px 0 10px 3px;
+  width: 100%;
+}
+
+.estimate-step2-page .content_agree_rdo {
+  position: relative;
+  display: inline-block;
+  text-align: left;
+  width: 100%;
+  margin: 8px 0 13px 0;
+}
+
+.estimate-step2-page .tour2023_estimate_rdo {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.estimate-step2-page .tour2023_estimate_rdo input[type="radio"] {
+  position: absolute;
+  display: block;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  vertical-align: top;
+  border-radius: 0;
+  appearance: none !important;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.estimate-step2-page .tour2023_estimate_rdo input[type="radio"] + label {
+  display: inline-block;
+  font-size: 16px;
+  color: #b8b9bb !important;
+  padding: 0px 5px 0px 37px;
+  vertical-align: top;
+  letter-spacing: -0.8px;
+  text-align: left;
+  cursor: pointer;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+
+.estimate-step2-page .tour2023_estimate_rdo input[type="radio"] + label::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: 0px;
+  left: 5px;
+  width: 24px;
+  height: 24px;
+  background: url("/icons/icon_rdo.png") center center no-repeat;
+  background-size: contain;
+}
+
+.estimate-step2-page .tour2023_estimate_rdo input[type="radio"]:checked + label {
+  color: #4d60d6 !important;
+  padding: 0px 5px 0px 37px;
+  box-sizing: border-box;
+}
+
+.estimate-step2-page .tour2023_estimate_rdo input[type="radio"]:checked + label::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: 0px;
+  left: 5px;
+  width: 24px;
+  height: 24px;
+  background: url("/icons/icon_rdo_ov.png") center center no-repeat;
+  background-size: contain;
+}
+
+/* 피보험자 리스트 라디오 버튼 스타일 */
+.estimate-step2-page .tour2023_estimate_rdo01 {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.estimate-step2-page .tour2023_estimate_rdo01 input[type="radio"] {
+  position: absolute;
+  display: block;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  vertical-align: top;
+  border-radius: 0;
+  appearance: none !important;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.estimate-step2-page .tour2023_estimate_rdo01 input[type="radio"] + label {
+  display: inline-block;
+  font-size: 15px;
+  color: #b8b9bb !important;
+  padding: 0px 5px 0px 37px;
+  vertical-align: top;
+  letter-spacing: -0.8px;
+  text-align: left;
+  cursor: pointer;
+  line-height: 1.5;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+.estimate-step2-page .tour2023_estimate_rdo01 input[type="radio"] + label::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: 0px;
+  left: 5px;
+  width: 24px;
+  height: 24px;
+  background: url("/icons/icon_rdo.png") center center no-repeat;
+  background-size: contain;
+}
+
+.estimate-step2-page .tour2023_estimate_rdo01 input[type="radio"]:checked + label {
+  color: #4d60d6 !important;
+  padding: 0px 5px 0px 37px;
+  box-sizing: border-box;
+}
+
+.estimate-step2-page .tour2023_estimate_rdo01 input[type="radio"]:checked + label::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: 0px;
+  left: 5px;
+  width: 24px;
+  height: 24px;
+  background: url("/icons/icon_rdo_ov.png") center center no-repeat;
+  background-size: contain;
+}
+
+.estimate-step2-page .tour2023_estimate_rdo01_w {
+  display: flex;
+  gap: 15px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  align-items: center;
+}
+
+/* 엑셀로 등록하기 버튼 스타일 (ParticipantInfoStep과 동일) */
+.estimate-step2-page .excel-upload-btn {
+  padding: 12px 20px;
+  background: #fff;
+  border: 2px solid #28a745;
+  border-radius: 8px;
+  font-size: 16px;
+  color: #28a745;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.estimate-step2-page .excel-upload-btn:hover {
+  background: #f0fff4;
+}
+
+.estimate-step2-page .excel-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* ========================================
+   Modal Styles (ExcelUploadModal)
+   ======================================== */
+
+.estimate-step2-page .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.estimate-step2-page .modal-content {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 480px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.estimate-step2-page .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.estimate-step2-page .modal-title {
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
+  font-size: 22px;
+  color: #3e3e3e;
+  letter-spacing: -0.5px;
+  line-height: 100%;
+  text-align: center;
+  padding-top: 27px;
+  height: 70px;
+  box-sizing: border-box;
+  margin: 0;
+  flex: 1;
+}
+
+.estimate-step2-page .modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 32px;
+  color: #999;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.estimate-step2-page .modal-close-btn:hover {
+  color: #333;
+}
+
+.estimate-step2-page .modal-body {
+  padding: 24px;
+}
+
+.estimate-step2-page .modal-description {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+/* Excel Upload Modal */
+.estimate-step2-page .excel-download-btn {
+  width: 100%;
+  padding: 12px;
+  background: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 24px;
+  transition: background 0.2s;
+}
+
+.estimate-step2-page .excel-download-btn:hover {
+  background: #218838;
+}
+
+.estimate-step2-page .excel-example-table {
+  margin: 24px 0;
+  overflow-x: auto;
+}
+
+.estimate-step2-page .excel-example-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.estimate-step2-page .excel-example-table th,
+.estimate-step2-page .excel-example-table td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: center;
+  font-size: 14px;
+}
+
+.estimate-step2-page .excel-example-table th {
+  background: #f9f9f9;
+  font-weight: 600;
+  color: #333;
+}
+
+.estimate-step2-page .excel-notes {
+  margin: 24px 0;
+  padding: 16px;
+  background: #fff3cd;
+  border-radius: 8px;
+}
+
+.estimate-step2-page .excel-notes ul {
+  margin: 0;
+  padding-left: 20px;
+  line-height: 1.8;
+  color: #856404;
+  font-size: 14px;
+}
+
+.estimate-step2-page .file-upload-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #eee;
+}
+
+.estimate-step2-page .file-upload-section h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.estimate-step2-page .file-upload-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.estimate-step2-page .file-select-btn {
+  padding: 10px 20px;
+  background: #fff;
+  border: 2px solid #2843e5;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #2843e5;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.estimate-step2-page .file-select-btn:hover {
+  background: #f0f4ff;
+}
+
+.estimate-step2-page .file-selected-info {
+  flex: 1;
+  padding: 10px 12px;
+  background: #f9f9f9;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #666;
+  min-width: 0;
+}
+
+.estimate-step2-page .file-upload-submit-btn {
+  width: 100%;
+  padding: 14px;
+  background: #2843e5;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.estimate-step2-page .file-upload-submit-btn:hover:not(:disabled) {
+  background: #1e33c4;
+}
+
+.estimate-step2-page .file-upload-submit-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  color: #999;
+}
+
+.estimate-step2-page .content_agree_Box {
+  border: 1px solid #e8e8e8;
+}
+
+.estimate-step2-page .content_agree_Box01 {
+  padding: 15px;
+  font-size: 13px;
+  color: #8e8e8e;
+  line-height: 160%;
+  text-align: left;
+  margin: 0;
+  font-weight: normal;
+}
+
+.estimate-step2-page .content_agree_Box01 br {
+  line-height: 160%;
+}
+
+/* Button Wrapper */
+.estimate-step2-page .tour2023_btn_ww {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.estimate-step2-page .tour2023_btn_ww01 {
+  width: 40%;
+}
+
+.estimate-step2-page .tour2023_btn_ww02 {
+  width: 58%;
+}
+
+.estimate-step2-page .tourGuard_btn_b {
+  display: block;
+  width: 100%;
+  padding: 18px;
+  background: #2c3fb3;
+  color: #fff;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.estimate-step2-page .tour2023_btn01 {
+  background: #2c3fb3;
+  color: #fff;
+}
+
+.estimate-step2-page .tour2023_btn01:hover:not(:disabled) {
+  background: #1e33c4;
+}
+
+.estimate-step2-page .tourGuard_btn_b:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  color: #999;
+}
+
+.estimate-step2-page .tour2023_btn06_gray01 {
+  background: #f5f5f5;
+  color: #666;
+  border: 1px solid #ddd;
+}
+
+.estimate-step2-page .tour2023_btn06_gray01:hover {
+  background: #e8e8e8;
+  color: #333;
+}
+
+/* 오른쪽 고정 버튼 - step1과 동일 */
+.estimate-step2-page .container_box_w .fixedRight_b01 {
+  position: absolute;
+  top: 0px;
+  left: 562px;
+  width: 107px;
+  height: 90px;
+  background: #fade21;
+  border-radius: 10px;
+  box-shadow: 7px 7px 10px rgb(0 0 0 / 5%);
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  z-index: 100;
+}
+
+.estimate-step2-page .container_box_w .fixedRight_b02 {
+  position: absolute;
+  display: inline-block;
+  text-align: left;
+  top: 100px;
+  left: 562px;
+  width: 107px;
+  height: 58px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 7px 7px 10px rgb(0 0 0 / 5%);
+  cursor: pointer;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.estimate-step2-page .fixedRight_txt01 {
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
+  font-size: 14px;
+  letter-spacing: -1.2px;
+  color: #333;
+  line-height: 100%;
+  box-sizing: border-box;
+  text-decoration: none;
+  text-align: center;
+  display: block;
+  margin-top: 8px;
+}
+
+.estimate-step2-page .fixedRight_txt02 {
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
+  font-size: 13px;
+  letter-spacing: -0.4px;
+  color: #333;
+  line-height: 120%;
+  box-sizing: border-box;
+  text-decoration: none;
+  text-align: left;
+  display: inline-block;
+  margin-left: 4px;
+  margin-top: 14px;
+}
+
+.estimate-step2-page .icon_cash {
+  display: block;
+  width: 44px;
+  height: 43px;
+  background: url(/icons/icon_cash.png) no-repeat 0 0/contain;
+  margin: 13px 0 0 33px;
+}
+
+.estimate-step2-page .icon_cash .icon_cash01 {
+  display: block;
+  box-sizing: border-box;
+  text-align: center;
+  margin: 0 auto;
+  padding: 10px 0 0 0;
+}
+
+.estimate-step2-page .icon_menu {
+  display: inline-block;
+  width: 19px;
+  height: 19px;
+  background: url(/icons/icon_menu.png) no-repeat 0 0/contain;
+  vertical-align: top;
+  margin: 20px 0 0 17px;
+  text-align: left;
+}
+
+.estimate-step2-page .icon_menu .icon_menu01 {
+  display: inline-block;
+  box-sizing: border-box;
+  text-align: center;
+  margin: 0 auto;
+  padding: 10px 0 0 0;
+}
+
+/* Form Fields - ParticipantInfoStep과 동일한 스타일 */
+.estimate-step2-page .tourGuard_Info {
+  margin-bottom: 30px;
+}
+
+.estimate-step2-page .tourGuard_form_tt {
+  position: relative;
+  height: 65px;
+  border: 1px solid #c3c6ce;
+  border-radius: 15px;
+  background: #fff;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.estimate-step2-page .tourGuard_form_tt input[type="text"],
+.estimate-step2-page .tourGuard_form_tt input[type="tel"] {
+  height: 32px;
+  padding-left: 10px;
+  border: 0;
+  color: #000;
+  font-size: 18px;
+  letter-spacing: 0px;
+  caret-color: #222;
+  display: inline-block;
+  vertical-align: text-top;
+  padding-top: 0px;
+  margin-top: 23px;
+  margin-left: 10px;
+  background: transparent;
+}
+
+.estimate-step2-page .tourGuard_form_tt input[type="text"]::placeholder,
+.estimate-step2-page .tourGuard_form_tt input[type="tel"]::placeholder {
+  color: #dddddd;
+  text-shadow: initial;
+}
+
+.estimate-step2-page .tourGuard_form_tt input[type="text"]:-ms-input-placeholder,
+.estimate-step2-page .tourGuard_form_tt input[type="tel"]:-ms-input-placeholder {
+  color: #dddddd;
+  text-shadow: initial;
+}
+
+/* tourGuard_form_tt의 직접 자식 label (이름, 생년월일 등) */
+.estimate-step2-page .tourGuard_form_tt > label {
+  position: absolute;
+  top: 6px;
+  left: 20px;
+  color: #9797a3;
+  font-size: 12px;
+  font-family: 'Malgun Gothic','맑은 고딕',dotum,'돋움',AppleGothic,sans-serif;
+  letter-spacing: -0.8px;
+}
+
+.estimate-step2-page .tourGuard_input_w01 {
+  width: 38%;
+}
+
+.estimate-step2-page .tourGuard_txt03 {
+  display: inline-block;
+  font-size: 18px;
+  color: #333;
+  margin: 0 10px;
+  vertical-align: middle;
+  line-height: 32px;
+}
+
+.estimate-step2-page .tourGuard_input_cell08 {
+  width: 30%;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.estimate-step2-page .tourGuard_input_cell09 {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.estimate-step2-page .tourGuard_ps_box {
+  position: relative;
+}
+
+.estimate-step2-page .tourGuard_ps_box select,
+.estimate-step2-page .tourGuard_sel {
+  width: 100%;
+  height: 32px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 18px;
+  color: #000;
+  padding: 0 10px;
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+}
+
+/* tourG_line 스타일 - domestic/pc/page.css와 동일한 구분선 */
+.estimate-step2-page .tourGuard_form_tt.tourG_line:after {
+  content: '';
+  position: absolute;
+  display: inline-block;
+  width: 47px;
+  height: 50px;
+  top: -4px;
+  left: 40%;
+  margin: 0px 0 0px 0px;
+  border-bottom: 1px solid #d5d7dd;
+  vertical-align: middle;
+  transform: rotate(297deg);
+  z-index: 0;
+}
+
+/* Utility Classes */
+.estimate-step2-page .mag5 {
+  margin: 10px 0;
+}
+
+.estimate-step2-page .tourG_mab03 {
+  margin-bottom: 10px;
+}
+
+.estimate-step2-page .tourG_mab05 {
+  margin-bottom: 20px;
+}
+
+.estimate-step2-page .tourG_mat04 {
+  margin-top: 20px;
+}
+
+.estimate-step2-page .tourG_mab02 {
+  margin-bottom: 35px;
+}
+
+.estimate-step2-page .tour2023_txt01 {
+  font-size: 13px;
+  text-align: left;
+  line-height: 130%;
+  letter-spacing: -1px;
+  display: inline-block;
+  width: 100%;
+}
+
+/* Responsive - step1과 동일 */
+@media (max-width: 1600px) {
+  .estimate-step2-page .estimate-content-pc {
+    background-position: 58.2% -600px;
+    background-size: 3600px auto;
+  }
+}
+
+@media (max-width: 1366px) {
+  .estimate-step2-page .estimate-content-pc {
+    background-position: 58.2% -400px;
+    background-size: 3000px auto;
+  }
+  
+  .estimate-step2-page .form-section {
+    z-index: 200;
+  }
+  
+  .estimate-step2-page .form-card {
+    z-index: 201;
+  }
+}
+
+@media (max-width: 768px) {
+  .estimate-step2-page .tour2023_title10 {
+    font-size: 20px;
+  }
+
+  .estimate-step2-page .tour2023_btn_ww {
+    flex-direction: column;
+  }
+
+  .estimate-step2-page .tour2023_btn_ww01,
+  .estimate-step2-page .tour2023_btn_ww02 {
+    width: 100%;
+  }
+
+  /* 모바일에서는 고정 버튼 숨김 */
+  .estimate-step2-page .container_box_w .fixedRight_b01,
+  .estimate-step2-page .container_box_w .fixedRight_b02 {
+    display: none;
+  }
+}
+

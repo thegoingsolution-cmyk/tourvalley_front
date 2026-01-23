@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import MobileStepIndicator from './StepIndicator';
 import { sendVerificationCode, verifyCode } from '@/services/smsService';
+import { MemberInfo } from '@/contexts/AuthContext';
+import { CorporateInfo, ContactInfo } from '@/services/authService';
 
 export interface GroupInfo {
   businessNumber1: string; // 사업자번호 첫 번째 부분 (3자리)
@@ -19,15 +21,24 @@ export interface GroupInfo {
 
 interface GroupParticipantInfoStepProps {
   insuranceType: string;
+  member?: MemberInfo | null;
+  corporateInfo?: CorporateInfo | null;
+  contacts?: ContactInfo[];
   onApply: (groupInfo: GroupInfo) => void;
 }
 
 export default function GroupParticipantInfoStep({
   insuranceType,
+  member,
+  corporateInfo,
+  contacts = [],
   onApply,
 }: GroupParticipantInfoStepProps) {
   // "단체여행자보험 - " 부분 제거
   const displayInsuranceType = insuranceType.replace(/^단체여행자보험\s*-\s*/, '');
+  const isLoggedIn = member && member.member_type !== '개인';
+  const hasMultipleContacts = contacts.length > 1;
+  
   const [groupInfo, setGroupInfo] = useState<GroupInfo>({
     businessNumber1: '',
     businessNumber2: '',
@@ -44,6 +55,57 @@ export default function GroupParticipantInfoStep({
   const [verificationSent, setVerificationSent] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
   const [remainingTime, setRemainingTime] = useState(0);
+
+  // 회원 정보가 있으면 초기값으로 설정
+  useEffect(() => {
+    if (isLoggedIn && corporateInfo) {
+      // 사업자번호 분리 (예: "123-45-67890" -> ["123", "45", "67890"])
+      const businessNumber = corporateInfo.business_number.replace(/-/g, '');
+      const businessNumber1 = businessNumber.substring(0, 3);
+      const businessNumber2 = businessNumber.substring(3, 5);
+      const businessNumber3 = businessNumber.substring(5, 10);
+
+      // 기본 담당자 선택 (대표 담당자 또는 첫 번째 담당자)
+      const primaryContact = contacts.find(c => c.is_primary) || contacts[0];
+      const defaultContactPerson = primaryContact?.contact_name || '';
+      const defaultPhone = primaryContact?.mobile_phone || member?.mobile_phone || '';
+      
+      // 이메일 분리 (담당자 이메일 우선, 없으면 회원 이메일 사용)
+      const emailToUse = primaryContact?.email || member?.email || '';
+      let email1 = '';
+      let email2 = '';
+      let customEmail = '';
+      
+      if (emailToUse) {
+        const emailParts = emailToUse.split('@');
+        if (emailParts.length === 2) {
+          email1 = emailParts[0];
+          const domain = emailParts[1];
+          // 도메인이 선택 목록에 있는지 확인
+          const commonDomains = ['gmail.com', 'naver.com', 'daum.net', 'nate.com', 'hotmail.com'];
+          if (commonDomains.includes(domain)) {
+            email2 = domain;
+          } else {
+            email2 = '직접입력';
+            customEmail = domain;
+          }
+        }
+      }
+
+      setGroupInfo({
+        businessNumber1,
+        businessNumber2,
+        businessNumber3,
+        groupName: corporateInfo.company_name || '',
+        contactPerson: defaultContactPerson,
+        email1,
+        email2,
+        customEmail,
+        phone: defaultPhone,
+        isVerified: true, // 회원 로그인 시 인증 생략
+      });
+    }
+  }, [isLoggedIn, corporateInfo, member, contacts]);
 
   // 인증번호 타이머
   useEffect(() => {
@@ -153,7 +215,8 @@ export default function GroupParticipantInfoStep({
       alert('휴대폰 번호를 입력해주세요.');
       return;
     }
-    if (!groupInfo.isVerified) {
+    // 회원 로그인 시에는 인증 생략
+    if (!isLoggedIn && !groupInfo.isVerified) {
       alert('휴대폰 인증을 완료해주세요.');
       return;
     }
@@ -166,7 +229,7 @@ export default function GroupParticipantInfoStep({
     <div className="prow_01">
       <div className="tour2023_BWrap tourG_mat13 tourG_mab05">
         <p className="tour2023_title01" style={{ margin: 0, minWidth: 0 }}>
-          <span style={{ fontSize: '18px' }}>사업자 및 법인정보</span>
+          <span style={{ fontSize: '18px' }}>법인단체 정보</span>
           {/* <br />
           <span className="tour2023_title09">{displayInsuranceType}</span> */}
         </p>
@@ -178,7 +241,7 @@ export default function GroupParticipantInfoStep({
       <div className="tourGuard_Info">
         {/* 사업자번호 */}
         <div className="tourGuard_form_tt mag5 tourG_mab03">
-          <label>사업자번호</label>
+          <label>사업자번호(고유번호증)</label>
           <div className="business-number-inputs" style={{ display: 'flex', alignItems: 'stretch', gap: '8px', width: '100%' }}>
             <input
               type="text"
@@ -220,7 +283,7 @@ export default function GroupParticipantInfoStep({
 
         {/* 단체명 */}
         <div className="tourGuard_form_tt mag5 tourG_mab03">
-          <label>단체명</label>
+          <label>법인단체명</label>
           <input
             type="text"
             id="group_name"
@@ -236,16 +299,74 @@ export default function GroupParticipantInfoStep({
         {/* 담당자명 */}
         <div className="tourGuard_form_tt mag5 tourG_mab03">
           <label>담당자명</label>
-          <input
-            type="text"
-            id="group_contact_person"
-            name="group_contact_person"
-            className="tourGuard_input_w01"
-            value={groupInfo.contactPerson}
-            onChange={(e) => setGroupInfo({ ...groupInfo, contactPerson: e.target.value })}
-            placeholder="담당자명"
-            style={{ width: '100%' }}
-          />
+          {hasMultipleContacts ? (
+            <select
+              id="group_contact_person"
+              name="group_contact_person"
+              className="tourGuard_input_w01"
+              value={groupInfo.contactPerson}
+              onChange={(e) => {
+                const selectedContact = contacts.find(c => c.contact_name === e.target.value);
+                if (selectedContact) {
+                  // 담당자 이메일 처리
+                  let newEmail1 = groupInfo.email1;
+                  let newEmail2 = groupInfo.email2;
+                  let newCustomEmail = groupInfo.customEmail;
+                  
+                  if (selectedContact.email) {
+                    const emailParts = selectedContact.email.split('@');
+                    if (emailParts.length === 2) {
+                      newEmail1 = emailParts[0];
+                      const domain = emailParts[1];
+                      const commonDomains = ['gmail.com', 'naver.com', 'daum.net', 'nate.com', 'hotmail.com'];
+                      if (commonDomains.includes(domain)) {
+                        newEmail2 = domain;
+                        newCustomEmail = '';
+                      } else {
+                        newEmail2 = '직접입력';
+                        newCustomEmail = domain;
+                      }
+                    }
+                  }
+                  
+                  setGroupInfo({ 
+                  ...groupInfo, 
+                  contactPerson: e.target.value,
+                  phone: selectedContact.mobile_phone || groupInfo.phone,
+                  email1: newEmail1,
+                  email2: newEmail2,
+                  customEmail: newCustomEmail
+                });
+                } else {
+                  setGroupInfo({ 
+                    ...groupInfo, 
+                    contactPerson: e.target.value,
+                    phone: groupInfo.phone
+                  });
+                }
+              }}
+              style={{ width: '100%' }}
+            >
+              <option value="">담당자 선택</option>
+              {contacts.map((contact) => (
+                <option key={contact.id} value={contact.contact_name}>
+                  {contact.contact_name}
+                  {contact.is_primary ? ' (대표)' : ''}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <input
+              type="text"
+              id="group_contact_person"
+              name="group_contact_person"
+              className="tourGuard_input_w01"
+              value={groupInfo.contactPerson}
+              onChange={(e) => setGroupInfo({ ...groupInfo, contactPerson: e.target.value })}
+              placeholder="담당자명"
+              style={{ width: '100%' }}
+            />
+          )}
         </div>
 
         {/* 이메일 주소 */}
@@ -309,20 +430,29 @@ export default function GroupParticipantInfoStep({
                 value={groupInfo.phone}
                 onChange={(e) => setGroupInfo({ ...groupInfo, phone: e.target.value.replace(/\D/g, '') })}
                 placeholder="숫자만 입력해주세요."
+                readOnly={!!isLoggedIn}
+                style={isLoggedIn ? { backgroundColor: '#f5f5f5', cursor: 'not-allowed' } : {}}
               />
-              <button
-                type="button"
-                className="verify-btn"
-                onClick={handleSendVerification}
-              >
-                인증받기
-              </button>
+              {!isLoggedIn && (
+                <button
+                  type="button"
+                  className="verify-btn"
+                  onClick={handleSendVerification}
+                >
+                  인증받기
+                </button>
+              )}
+              {isLoggedIn && (
+                <span style={{ fontSize: '12px', color: '#666', marginLeft: '8px' }}>
+                  (회원 인증 완료)
+                </span>
+              )}
             </div>
           </div>
         </div>
 
-        {/* 인증번호 입력 필드 */}
-        {verificationSent && !groupInfo.isVerified && (
+        {/* 인증번호 입력 필드 - 비회원일 때만 표시 */}
+        {!isLoggedIn && verificationSent && !groupInfo.isVerified && (
           <div className="participant-form-row mag5 tourG_mab03">
             <div className="participant-form-group-item full-width">
               <label>인증번호</label>

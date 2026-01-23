@@ -10,6 +10,8 @@ interface MobilePlanSelectionProps {
   hasMedicalExpense: boolean;
   onMedicalExpenseChange: (value: boolean) => void;
   insuranceType?: string;
+  contractBreakdownText?: string;
+  onContractDetailClick?: () => void;
   // 해외장기체류보험용 props
   currencyPlan?: '원화' | '외화';
   onCurrencyPlanChange?: (plan: '원화' | '외화') => void;
@@ -24,6 +26,8 @@ export default function MobilePlanSelection({
   hasMedicalExpense,
   onMedicalExpenseChange,
   insuranceType,
+  contractBreakdownText,
+  onContractDetailClick,
   currencyPlan,
   onCurrencyPlanChange,
   travelCountry,
@@ -241,6 +245,48 @@ export default function MobilePlanSelection({
                 </div>
                 <div className="plan-price">{plan.premium.toLocaleString()}원</div>
               </div>
+              {contractBreakdownText && (
+                <div
+                  className="contract-breakdown"
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    fontSize: '13px',
+                    textAlign: 'left',
+                    backgroundColor: '#f2f2f2',
+                    padding: '6px 8px',
+                    borderRadius: '4px',
+                    marginTop: '6px',
+                    marginBottom: '16px',
+                    gap: '8px',
+                  }}
+                >
+                  <span style={{ flex: 1, textAlign: 'center' }}>{contractBreakdownText}</span>
+                  {onContractDetailClick && (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onContractDetailClick();
+                      }}
+                      style={{
+                        fontSize: '12px',
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        border: '1px solid #cfcfcf',
+                        background: '#fff',
+                        color: '#333',
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      상세보기
+                    </button>
+                  )}
+                </div>
+              )}
               <div className="plan-coverages">
                 {plan.coverages.map((coverage, idx) => (
                   <div key={idx} className="coverage-item">

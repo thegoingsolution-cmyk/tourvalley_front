@@ -264,7 +264,7 @@ export default function MobileGroupTravelInfoStep({
                 onInputButtonClick && onInputButtonClick();
               }}
             >
-              {hasGroupParticipants ? '수정' : '입력'}
+              {hasGroupParticipants ? '자세히보기' : '입력'}
             </a>
           </div>
         </div>

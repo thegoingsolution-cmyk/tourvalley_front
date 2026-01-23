@@ -1039,7 +1039,7 @@ export default function PCLongTermStayPage() {
         }
       }
 
-      // 가상계좌 결제 처리 (AUTHNICE 결제창 방식)
+      // 가상계좌 결제 처리 (결제창 Server 승인 모델)
       if (paymentMethod === '기타결제' && paymentSubMethod === '가상계좌') {
         // 1. 계약 등록 (결제 대기 상태)
         const contractData = {
@@ -1111,7 +1111,7 @@ export default function PCLongTermStayPage() {
 
         const contract_id = contractData_result.contract_id;
 
-        // 2. 가상계좌 결제창 호출 (AUTHNICE API 방식)
+        // 2. 결제창 호출 (AUTHNICE Server 승인 모델)
         const paymentRequest = await requestNicepayPayment({
           contract_id,
           amount: receiptPremium,
@@ -1135,11 +1135,11 @@ export default function PCLongTermStayPage() {
             contractor_name: participants[0]?.name || '',
           }));
           try {
-            // 가상계좌 결제창 열기 (method: 'vbank', bankCode 포함)
             await openNicepayWindow({
               ...paymentRequest,
               method: 'vbank',
-              bankCode: depositBank, // 은행 코드 (003, 004, 011 등)
+              bankCode: depositBank,
+              vbankHolder: participants[0]?.name || '',
             });
           } catch (error) {
             console.error('가상계좌 결제창 열기 오류:', error);

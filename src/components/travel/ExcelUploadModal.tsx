@@ -19,6 +19,7 @@ interface ExcelUploadModalProps {
   onUpload?: (participants: Participant[], startId: number) => void;
   excelTemplatePath?: string;
   currentParticipants?: Participant[]; // 기존 참가자 목록 (ID 계산용)
+  variant?: 'modal' | 'page';
 }
 
 export default function ExcelUploadModal({
@@ -27,6 +28,7 @@ export default function ExcelUploadModal({
   onUpload,
   excelTemplatePath = '/excel/sample_insured_ssn.xls',
   currentParticipants = [],
+  variant = 'modal',
 }: ExcelUploadModalProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -191,94 +193,210 @@ export default function ExcelUploadModal({
     }
   };
 
-  return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2 className="modal-title">엑셀 등록하기</h2>
-          <button
-            className="modal-close-btn"
-            onClick={onClose}
-          >
-            ×
-          </button>
-        </div>
+  const fileNameLabel = selectedFile ? selectedFile.name : '선택된 파일 없음';
+  const uploadButtonLabel = isProcessing ? '처리 중...' : '파일 업로드 하기';
 
-        <div className="modal-body">
-          <p className="modal-description">
-            엑셀 파일을 이용하여 가입자를 쉽게 등록할 수 있습니다.<br />
-            아래 양식을 다운로드하여 작성 후 업로드해주세요.
-          </p>
-
-          <button
-            className="excel-download-btn"
-            onClick={handleDownload}
-          >
-            Excel양식 파일받기
-          </button>
-
-          <div className="excel-example-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>이름</th>
-                  <th>성별</th>
-                  <th>생년월일(8자리)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>홍길동</td>
-                  <td>남</td>
-                  <td>19950101</td>
-                </tr>
-                <tr>
-                  <td>홍길녀</td>
-                  <td>여</td>
-                  <td>20010305</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div className="excel-notes">
-            <ul>
-              <li>- 반드시 피보험자 전체리스트를 업로드 해주셔야 합니다.(개인)</li>
-              <li>- 대표가입자(피보험자)를 제외한 동반가입자(피보험자) 리스트를 업로드해야 합니다.(단체)</li>
-              <li>- 외국인은 외국인 등록번호가 있는 사람만 가입이 가능합니다.</li>
-            </ul>
-          </div>
-
-          <div className="file-upload-section">
-            <h3>파일 업로드</h3>
-            <div className="file-upload-controls">
-              <input
-                type="file"
-                id="excel-file-input"
-                accept=".xlsx,.xls"
-                style={{ display: 'none' }}
-                onChange={handleFileSelect}
-              />
-              <button
-                className="file-select-btn"
-                onClick={() => document.getElementById('excel-file-input')?.click()}
+  if (variant === 'page') {
+    return (
+      <div className="excel-upload-page">
+        <div id="isbwrapper">
+          <header id="header">
+            <div className="tour2023_header_inner tour2023_header_line">
+              <span className="tourTop_title">엑셀 등록하기</span>
+              <a
+                className="close"
+                href="javascript:void(0);"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onClose();
+                }}
               >
-                파일선택
-              </button>
-              <div className="file-selected-info">
-                {selectedFile ? selectedFile.name : '선택된 파일 없음'}
+                닫기
+              </a>
+            </div>
+          </header>
+          <div>
+            <div className="tprow_01">
+              <div className="tour2023_limit_state">
+                <p className="tour2023_pcBox_txt07">
+                  엑셀 파일을 이용하여 가입자(피보험자)를 쉽게 등록할 수 있습니다. 아래 Excel양식을 다운로드하여 사용하시기 바랍니다.
+                </p>
+                <div className="tourG_mat04">
+                  <a
+                    href="javascript:void(0);"
+                    className="tourGuard_btn_b tour2023PC_btn05"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleDownload();
+                    }}
+                  >
+                    Excel양식 파일받기<span className="icon_download"></span>
+                  </a>
+                </div>
+                <div className="tourG_mat13">
+                  <p className="tour2023_pcBox_txt07">- 이름, 주민번호를 정확히 입력해주시기 바랍니다.(예시)</p>
+                  <table className="tour2023_pc_ta">
+                    <thead>
+                      <tr>
+                        <td className="tour2023_pc_td01">이름</td>
+                        <td className="tour2023_pc_td01">성별</td>
+                        <td>생년월일(8자리)</td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="tour2023_pc_td01">홍길동</td>
+                        <td className="tour2023_pc_td01">남</td>
+                        <td>19950101</td>
+                      </tr>
+                      <tr>
+                        <td className="tour2023_pc_td01">홍길녀</td>
+                        <td className="tour2023_pc_td01">여</td>
+                        <td>20010305</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <p className="tour2023_pcBox_txt07">- 반드시 피보험자 전체리스트를 업로드 해주셔야 합니다.</p>
+                  <p className="tour2023_pcBox_txt07">- 외국인은 외국인 등록번호가 있는 경우 보험가입이 가능합니다(외국인 등록번호가 없는 경우 가입불가)</p>
+                  <p className="tour2023_pcBox_txt11">파일 업로드</p>
+                  <div className="tour2023_pc_insu">
+                    <a
+                      href="javascript:void(0);"
+                      className="btn_b tour2023PC_btn06"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        document.getElementById('excel-file-input')?.click();
+                      }}
+                    >
+                      파일선택
+                    </a>
+                    <span className="btn_b tour2023PC_btn07" style={{ cursor: 'auto' }}>
+                      {fileNameLabel}
+                    </span>
+                    <input
+                      type="file"
+                      id="excel-file-input"
+                      accept=".xlsx,.xls"
+                      style={{ display: 'none' }}
+                      onChange={handleFileSelect}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-            <button
-              className="file-upload-submit-btn"
-              onClick={handleUpload}
-              disabled={isProcessing || !selectedFile}
-            >
-              {isProcessing ? '처리 중...' : '파일 업로드 하기'}
-            </button>
+            <section id="tour2023_fixedBanner">
+              <div className="tour2023_bottom_btn">
+                <a
+                  href="javascript:void(0);"
+                  className="tour2023_btn_b tour2023_btn07"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleUpload();
+                  }}
+                  aria-disabled={isProcessing || !selectedFile}
+                >
+                  {uploadButtonLabel}
+                </a>
+              </div>
+            </section>
           </div>
         </div>
       </div>
+    );
+  }
+
+  const modalContent = (
+    <div className="modal-content" onClick={variant === 'modal' ? (e) => e.stopPropagation() : undefined}>
+      <div className="modal-header">
+        <h2 className="modal-title">엑셀 등록하기</h2>
+        <button
+          className="modal-close-btn"
+          onClick={onClose}
+        >
+          ×
+        </button>
+      </div>
+
+      <div className="modal-body">
+        <p className="modal-description">
+          엑셀 파일을 이용하여 가입자를 쉽게 등록할 수 있습니다.<br />
+          아래 양식을 다운로드하여 작성 후 업로드해주세요.
+        </p>
+
+        <button
+          className="excel-download-btn"
+          onClick={handleDownload}
+        >
+          Excel양식 파일받기
+        </button>
+
+        <div className="excel-example-table">
+          <table>
+            <thead>
+              <tr>
+                <th>이름</th>
+                <th>성별</th>
+                <th>생년월일(8자리)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>홍길동</td>
+                <td>남</td>
+                <td>19950101</td>
+              </tr>
+              <tr>
+                <td>홍길녀</td>
+                <td>여</td>
+                <td>20010305</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div className="excel-notes">
+          <ul>
+            <li>- 반드시 피보험자 전체리스트를 업로드 해주셔야 합니다.(개인)</li>
+            <li>- 대표가입자(피보험자)를 제외한 동반가입자(피보험자) 리스트를 업로드해야 합니다.(단체)</li>
+            <li>- 외국인은 외국인 등록번호가 있는 사람만 가입이 가능합니다.</li>
+          </ul>
+        </div>
+
+        <div className="file-upload-section">
+          <h3>파일 업로드</h3>
+          <div className="file-upload-controls">
+            <input
+              type="file"
+              id="excel-file-input"
+              accept=".xlsx,.xls"
+              style={{ display: 'none' }}
+              onChange={handleFileSelect}
+            />
+            <button
+              className="file-select-btn"
+              onClick={() => document.getElementById('excel-file-input')?.click()}
+            >
+              파일선택
+            </button>
+            <div className="file-selected-info">
+              {fileNameLabel}
+            </div>
+          </div>
+          <button
+            className="file-upload-submit-btn"
+            onClick={handleUpload}
+            disabled={isProcessing || !selectedFile}
+          >
+            {uploadButtonLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      {modalContent}
     </div>
   );
 }

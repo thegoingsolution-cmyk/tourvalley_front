@@ -30,6 +30,7 @@ interface KakaoPayPaymentRequest {
 // 나이스페이먼츠 결제창 호출 파라미터 가져오기
 export const requestNicepayPayment = async (data: NicepayPaymentRequest) => {
   try {
+    console.log('나이스페이 결제 요청1:', data);
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/payments/nicepay/request`, {
       method: 'POST',
       headers: {
@@ -47,6 +48,46 @@ export const requestNicepayPayment = async (data: NicepayPaymentRequest) => {
 };
 
 // 나이스페이먼츠 가상계좌 발급 요청
+
+const buildVbankExpireDate = () => {
+  const expireDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  const year = expireDate.getFullYear().toString().slice(-2);
+  const month = (expireDate.getMonth() + 1).toString().padStart(2, '0');
+  const day = expireDate.getDate().toString().padStart(2, '0');
+  const hours = expireDate.getHours().toString().padStart(2, '0');
+  const minutes = expireDate.getMinutes().toString().padStart(2, '0');
+  const seconds = expireDate.getSeconds().toString().padStart(2, '0');
+  return `${year}${month}${day}${hours}${minutes}${seconds}`;
+};
+
+const applyVbankParams = (requestParams: any, params: any) => {
+  console.log('가상계좌 bankCode:', params.bankCode);
+  if (!params.bankCode) {
+    throw new Error('가상계좌 은행코드가 없습니다.');
+  }
+
+  requestParams.bankCode = params.bankCode;
+  // 일부 SDK 버전은 bankCd 키를 사용합니다. 둘 다 전달해 호환성을 확보합니다.
+  requestParams.bankCd = params.bankCode;
+  requestParams.vbankHolder = params.vbankHolder || params.buyerName || '';
+
+  // 가상계좌 유효시간/만료일 설정 (둘 다 전달, 유효시간 우선)
+  requestParams.vbankValidHours = 168;
+  requestParams.vbankExpDate = buildVbankExpireDate();
+
+  // 가맹점 설정에서 에스크로 사용인 경우 기본값을 true로 설정
+  requestParams.useEscrow = params.useEscrow ?? true;
+
+  console.log('가상계좌 파라미터 확인:', {
+    method: requestParams.method,
+    bankCode: requestParams.bankCode,
+    bankCd: requestParams.bankCd,
+    vbankHolder: requestParams.vbankHolder,
+    vbankValidHours: requestParams.vbankValidHours,
+    vbankExpDate: requestParams.vbankExpDate,
+    useEscrow: requestParams.useEscrow,
+  });
+};
 
 // 나이스페이먼츠 결제창 호출 (AUTHNICE API 방식)
 export const openNicepayWindow = (params: any) => {
@@ -82,28 +123,12 @@ export const openNicepayWindow = (params: any) => {
         
         // 가상계좌인 경우 은행 코드/예금주명/만료일 추가
         if (paymentMethod === 'vbank') {
-          console.log('가상계좌 bankCode:', params.bankCode);
-          if (!params.bankCode) {
-            reject(new Error('가상계좌 은행코드가 없습니다.'));
+          try {
+            applyVbankParams(requestParams, params);
+          } catch (error) {
+            reject(error);
             return;
           }
-          requestParams.bankCode = params.bankCode;
-          requestParams.vbankHolder = params.vbankHolder || params.buyerName || '';
-          
-          // 가상계좌 유효시간 설정 (7일 = 168시간)
-          // vbankValidHours와 vbankExpDate가 함께 요청되면 vbankValidHours가 우선함
-          // Default 값은 D+7일이지만 명시적으로 설정
-          requestParams.vbankValidHours = 168; // 7일 = 168시간
-          
-          // 에스크로 사용 여부는 선택사항 (필요시에만 설정)
-          // requestParams.useEscrow = true;
-          
-          console.log('가상계좌 파라미터 확인:', {
-            method: requestParams.method,
-            bankCode: requestParams.bankCode,
-            vbankHolder: requestParams.vbankHolder,
-            vbankValidHours: requestParams.vbankValidHours
-          });
         }
         
         console.log('나이스페이 요청 파라미터:', requestParams);
@@ -146,26 +171,12 @@ export const openNicepayWindow = (params: any) => {
             
             // 가상계좌인 경우 은행 코드/예금주명/만료일 추가
             if (paymentMethod === 'vbank') {
-              console.log('가상계좌 bankCode:', params.bankCode);
-              if (!params.bankCode) {
-                reject(new Error('가상계좌 은행코드가 없습니다.'));
+              try {
+                applyVbankParams(requestParams, params);
+              } catch (error) {
+                reject(error);
                 return;
               }
-              requestParams.bankCode = params.bankCode;
-              requestParams.vbankHolder = params.vbankHolder || params.buyerName || '';
-              
-              // 가상계좌 만료일 설정 (7일 후, YYMMDDHHMMSS 형식)
-              const expireDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-              const year = expireDate.getFullYear().toString().slice(-2);
-              const month = (expireDate.getMonth() + 1).toString().padStart(2, '0');
-              const day = expireDate.getDate().toString().padStart(2, '0');
-              const hours = expireDate.getHours().toString().padStart(2, '0');
-              const minutes = expireDate.getMinutes().toString().padStart(2, '0');
-              const seconds = expireDate.getSeconds().toString().padStart(2, '0');
-              requestParams.vbankExpDate = `${year}${month}${day}${hours}${minutes}${seconds}`;
-              
-              // 에스크로 사용 여부는 선택사항 (필요시에만 설정)
-              // requestParams.useEscrow = true;
             }
             
             console.log('나이스페이 요청 파라미터:', requestParams);
@@ -224,26 +235,12 @@ export const openNicepayWindow = (params: any) => {
             
             // 가상계좌인 경우 은행 코드/예금주명/만료일 추가
             if (paymentMethod === 'vbank') {
-              console.log('가상계좌 bankCode:', params.bankCode);
-              if (!params.bankCode) {
-                reject(new Error('가상계좌 은행코드가 없습니다.'));
+              try {
+                applyVbankParams(requestParams, params);
+              } catch (error) {
+                reject(error);
                 return;
               }
-              requestParams.bankCode = params.bankCode;
-              requestParams.vbankHolder = params.vbankHolder || params.buyerName || '';
-              
-              // 가상계좌 만료일 설정 (7일 후, YYMMDDHHMMSS 형식)
-              const expireDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-              const year = expireDate.getFullYear().toString().slice(-2);
-              const month = (expireDate.getMonth() + 1).toString().padStart(2, '0');
-              const day = expireDate.getDate().toString().padStart(2, '0');
-              const hours = expireDate.getHours().toString().padStart(2, '0');
-              const minutes = expireDate.getMinutes().toString().padStart(2, '0');
-              const seconds = expireDate.getSeconds().toString().padStart(2, '0');
-              requestParams.vbankExpDate = `${year}${month}${day}${hours}${minutes}${seconds}`;
-              
-              // 에스크로 사용 여부는 선택사항 (필요시에만 설정)
-              // requestParams.useEscrow = true;
             }
             
             console.log('나이스페이 요청 파라미터:', requestParams);

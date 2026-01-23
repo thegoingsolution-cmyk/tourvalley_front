@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { Participant } from '@/components/travel/types';
-import ExcelUploadModal from '@/components/travel/ExcelUploadModal';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import '../m/page.css';
@@ -19,9 +18,8 @@ interface InsuredData {
 }
 
 export default function ParticipantInputPage() {
-  const [participantCount, setParticipantCount] = useState(2);
+  const [participantCount, setParticipantCount] = useState(0);
   const [insuredList, setInsuredList] = useState<InsuredData[]>([]);
-  const [showExcelModal, setShowExcelModal] = useState(false);
   const [travelType, setTravelType] = useState<'DS' | 'FS' | 'FL'>('DS');
 
   // URL 파라미터에서 탭 정보 읽기
@@ -51,6 +49,13 @@ export default function ParticipantInputPage() {
           if (count) {
             setParticipantCount(parseInt(count, 10));
           }
+        }
+      }
+
+      if (event.data && event.data.type === 'EXCEL_UPLOAD') {
+        const { participants } = event.data;
+        if (participants && Array.isArray(participants) && participants.length > 0) {
+          handleExcelUpload(participants, 1);
         }
       }
     };
@@ -133,6 +138,11 @@ export default function ParticipantInputPage() {
 
   // 확인 버튼 클릭
   const handleConfirm = () => {
+    if (participantCount < 1) {
+      alert('가입인원을 선택해주세요.');
+      return;
+    }
+
     // 유효성 검사
     for (let i = 0; i < insuredList.length; i++) {
       const insured = insuredList[i];
@@ -202,9 +212,9 @@ export default function ParticipantInputPage() {
           <form name="inputForm" method="POST">
             <section className="tourGuard_bg ag_center prow_01">
               <div className="tourGuard_Topbg01">
-                {/* 기존 가입 이력 불러오기 버튼 */}
+                {/* 기존 가입 이력 불러오기 버튼
                 <div className="tourG_mab10 tourG_mat14">
-                  <a 
+                  <a
                     href="javascript:void(0);"
                     onClick={(e) => {
                       e.preventDefault();
@@ -223,6 +233,7 @@ export default function ParticipantInputPage() {
                     기존 가입 이력 불러오기<span className="tour2023_arr02"></span>
                   </a>
                 </div>
+                */}
 
                 {/* 가입자 수 선택 */}
                 <div className="tourGuard_form_tt mag5 tourG_mab03">
@@ -236,6 +247,9 @@ export default function ParticipantInputPage() {
                         value={participantCount}
                         onChange={(e) => setParticipantCount(Number(e.target.value))}
                       >
+                        <option value={0} disabled>
+                          가입인원을 선택하세요
+                        </option>
                         {Array.from({ length: 250 }, (_, i) => i + 1).map((num) => (
                           <option key={num} value={num}>
                             {num}명
@@ -255,7 +269,17 @@ export default function ParticipantInputPage() {
                   <button
                     type="button"
                     className="excel-upload-btn"
-                    onClick={() => setShowExcelModal(true)}
+                    onClick={() => {
+                      const width = 520;
+                      const height = 760;
+                      const left = (window.screen.width / 2) - (width / 2);
+                      const top = (window.screen.height / 2) - (height / 2);
+                      window.open(
+                        '/group-insurance/participant-input/excel-upload',
+                        'excelUpload',
+                        `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+                      );
+                    }}
                   >
                     <img 
                       src="/images/excel-icon.png" 
@@ -517,14 +541,6 @@ export default function ParticipantInputPage() {
       </div>
 
       <Footer isMobile={true} />
-
-      {/* 엑셀 업로드 모달 */}
-      <ExcelUploadModal
-        isOpen={showExcelModal}
-        onClose={() => setShowExcelModal(false)}
-        onUpload={handleExcelUpload}
-        currentParticipants={[]}
-      />
     </div>
   );
 }

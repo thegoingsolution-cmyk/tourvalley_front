@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { requestNicepayPayment, openNicepayWindow, processNaverPayPayment, processKakaoPayPayment } from '@/services/paymentService';
 import { useAuth } from '@/contexts/AuthContext';
+import { getCorporateMemberInfo, CorporateInfo, ContactInfo } from '@/services/authService';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import MobileStepIndicator from '@/components/mobiletravel/StepIndicator';
@@ -18,14 +19,16 @@ import CompletionStep from '@/components/travel/CompletionStep';
 import ExcelUploadModal from '@/components/travel/ExcelUploadModal';
 import DangerousActivityModal from '@/components/travel/DangerousActivityModal';
 import RestrictedCountryModal from '@/components/travel/RestrictedCountryModal';
-import ConsentModal from '@/components/travel/ConsentModal';
+import ConsentModalMobile from '@/components/mobiletravel/ConsentModalMobile';
 import { PlanType, PlanInfo, Participant, CalculatedPremiums, PaymentMethod, PaymentSubMethod } from '@/components/travel/types';
 import './page.css';
 
 function MobileGroupInsuranceContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { member, isLoggedIn } = useAuth();
+  const { member, isLoggedIn, login: authLogin } = useAuth();
+  const [isGuestApply, setIsGuestApply] = useState(false);
+  const isCorporateMember = (isLoggedIn && member && member.member_type !== '개인') || isGuestApply;
 
   // 탭 상태 (DS: 국내여행, FS: 해외여행, FL: 해외장기체류)
   const [activeTab, setActiveTab] = useState<'DS' | 'FS' | 'FL'>('DS');
@@ -54,6 +57,8 @@ function MobileGroupInsuranceContent() {
   const [groupParticipantsData, setGroupParticipantsData] = useState<Participant[]>([]);
   const [groupInsuredData, setGroupInsuredData] = useState<any[]>([]); // InsuredData 형식으로 저장
   const [groupInfo, setGroupInfo] = useState<GroupInfo | null>(null); // 그룹 정보 (사업자정보, 담당자 등)
+  const [corporateInfo, setCorporateInfo] = useState<CorporateInfo | null>(null); // 법인 정보
+  const [corporateContacts, setCorporateContacts] = useState<ContactInfo[]>([]); // 법인 담당자 목록
   const [participantPremiumsByPlan, setParticipantPremiumsByPlan] = useState<Record<string, Array<{ id: number; name: string; gender: string; birthDate: string; planType: string; premium: number }>>>({});
   
   // 보험료 계산 관련 상태
@@ -63,6 +68,173 @@ function MobileGroupInsuranceContent() {
   const [hasMedicalExpense, setHasMedicalExpense] = useState(true);
   const [isCalculating, setIsCalculating] = useState(false);
   const [currencyPlan, setCurrencyPlan] = useState<'원화' | '외화'>('원화');
+  const [isNoticeExpanded, setIsNoticeExpanded] = useState(false);
+
+  const expandedNoticeExtraItemsByType: Record<'DS' | 'FS' | 'FL', React.ReactNode[]> = {
+    DS: [
+      <>
+        라이나손해보험의 국내여행보험 상품입니다.
+      </>,
+      <>
+        보험기간은 최대 1개월 이고 여행, 체험학습, 연수,<br />
+        출장, 교육 등으로 대한민국 국내에서 여행을 떠나실<br />
+        때 가입하는 보험입니다
+      </>,
+      <>
+        <span className="tourG_know_red">스키(스노보드), 래프팅</span>, 스쿠버다이빙, 행글라이딩,<br />
+        패러글라이딩, 스카이다이빙, 수상스키, 자동차, 오<br />
+        토바이 경주, 번지점프, 빙벽, 암벽등반, 제트스키를<br />
+        목적으로 하는 여행은 국내 여행보험에 가입하실 수<br />
+        없습니다.
+      </>,
+      <>
+        휴대품손해 약관 변경 안내 (2020년 5월)<br />
+        휴대품손해에서 이동동신단말기<span className="tourG_know_red">(휴대폰 등 공단말기<br />
+        포함)</span>은 보상하지 않습니다.
+      </>,
+      <>
+        국내여행보험의 주계약은 상해사망 및 후유장해이며<br />
+        그외에는 선택특약입니다. 선택특약은 해당특약 가입<br />
+        시에만 보상받으실 수 있습니다.
+      </>,
+      <>
+        국내여행보험은 보험나이? 100세까지 가입하실 수 있<br />
+        습니다.
+      </>,
+      <>
+        상법 제732조에 따라 15세 미만의 경우 사망에 대해<br />
+        서는 보장하지 않습니다.(후유장해 보상).
+      </>,
+      <>
+        <span className="tourG_know_red">(비례보상)실손의료비,  배상책임, 휴대품손해</span>를 보<br />
+        상하는 상품은 <span className="tourG_know_red">2개 이상의 보험에 가입</span>하더라도<br />
+        <span className="tourG_know_red">중복  보상되지 않고 비례보상</span> 됩니다.
+      </>,
+      <>
+        가입 전 알아두실 사항 및 보장내용에 관한 자세한 사<br />
+        항은 해당약관을 참조하시기 바랍니다.
+      </>,
+    ],
+    FS: [
+      <>
+        라이나손해보험의 해외여행보험 상품입니다
+      </>,
+      <>
+        출장, 연수, 주재원, 답사, 여행 등의 목적으로 최대 3개월<br />
+        까지 해외로 나가는 경우 가입하는 보험입니다. (3개월이<br />
+        넘는 경우 해외장기체류보험)
+      </>,
+      <>
+        이미 출국하셨거나 해외에 거주하는 경우에는 여행보험에<br />
+        가입하실 수 없습니다.
+      </>,
+      <>
+        휴대품손해에서 <span className="tourG_know_red">휴대품 1개(1조 또는 1쌍)의 보상한도는<br />
+        20만원</span>입니다. 단, <span className="tourG_know_red">이동통신단말기(휴대폰 등)의 보상한<br />
+        도는 10만원</span>입니다. (2020년 1월 약관 개정)
+      </>,
+      <>
+        해외여행보험의 주계약은 상해사망 및 후유장해이며 그<br />
+        외에는 선택특약입니다. 선택특약은 해당특약 가입시에만<br />
+        보상받으실 수 있습니다.
+      </>,
+      <>
+        해외여행보험은 보험나이? 100세까지 가입하실 수 있습<br />
+        니다.
+      </>,
+      <>
+        배상책임, 휴대품손해는 자기부담금 각 1만원입니다.
+      </>,
+      <>
+        상법 제732조에 따라 15세 미만의 경우 사망에 대해서는<br />
+        보장하지 않습니다.(후유장해 보상)
+      </>,
+      <>
+        <span className="tourG_know_red">(비례보상)실손의료비, 중대사고 구조송환비용, 배상책임, 휴대품손해</span>를 보상하는 상품은<br />
+        <span className="tourG_know_red">2개 이상의 보험에 가입</span>하더라도 <span className="tourG_know_red">중복 보상되지 않고 비례보상</span> 됩니다.
+      </>,
+      <>
+        코로나 치료비는 질병의료비 담보에서 보상이 가능합니다.
+      </>,
+      <>
+        가입 전 알아두실 사항 및 보장내용에 관한 자세한 사항은<br />
+        해당약관을 참조하시기 바랍니다
+      </>,
+    ],
+    FL: [
+      <>
+        메리츠화재의 해외장기체류보험 상품입니다
+      </>,
+      <>
+        출장, 연수, 주재원, 답사, 여행 등의 목적으로 3개월을<br />
+        초과하여 해외로 나가는 경우 가입하는 보험입니다. (3<br />
+        개월 이하는 해외여행보험)
+      </>,
+      <>
+        보험기간은 최대 1년이며 만기시 갱신가능합니다.
+      </>,
+      <>
+        이미 출국하셨거나 해외에 거주하는 경우에는 해외장기<br />
+        체류보험에 가입하실 수 없습니다.
+      </>,
+      <>
+        해외장기체류보험의 주계약은 상해사망 및 후유장해이며<br />
+        그외에는 선택특약입니다. 선택특약은 해당특약 가입시<br />
+        에만 보상받으실 수 있습니다.
+      </>,
+      <>
+        상법 제732조에 따라 15세 미만의 경우 사망에 대해서는<br />
+        보장하지 않습니다.(후유장해 보상)
+      </>,
+      <>
+        <span className="tourG_know_red">(비례보상)실손의료비, 중대사고 구조송환비용, 배상책임</span>을 보상하는 상품은<br />
+        <span className="tourG_know_red">2개 이상의 보험에 가입</span>하더라도 <span className="tourG_know_red">중복 보상되지 않고 비례보상</span> 됩니다.
+      </>,
+      <>
+        코로나 치료비는 질병의료비 담보에서 보상이 가능합니다.
+      </>,
+      <>
+        가입 전 알아두실 사항 및 보장내용에 관한 자세한 사항은<br />
+        해당약관을 참조하시기 바랍니다
+      </>,
+    ],
+  };
+
+  const collapsedNoticeItemsByType: Record<'DS' | 'FS' | 'FL', React.ReactNode[]> = {
+    DS: [
+      <>
+        보험기간은 최대 1개월 이고 여행, 체험학습, 연수,<br />
+        출장, 교육 등으로 대한민국 국내에서 여행(행사진행)을 떠나실 때 가입하는 보험입니다.
+      </>,
+      <>
+        휴대품손해 약관 변경 안내 (2020년 5월)<br />
+        휴대품손해에서 이동동신단말기
+        <span style={{ color: '#ff0000' }}>(휴대폰 등 공단말기 포함)</span>
+        은 보상하지 않습니다.
+      </>,
+      <>라이나손해보험의 국내여행보험 상품입니다.</>,
+    ],
+    FS: [
+      <>
+        출장, 연수, 주재원, 답사, 여행 등의 목적으로 최대 3개월까지 해외로 나가는 경우 가입하는 보험입니다. (3개월이 넘는 경우 해외장기체류보험)
+      </>,
+      <>
+        이미 출국하셨거나 해외에 거주하는 경우에는 해외여행보험에 가입하실 수 없습니다.
+      </>,
+      <>
+        휴대품손해에서 휴대품 1개(1조 또는 1쌍)의 보상한도는 20만원입니다. 단, 이동통신단말기(휴대폰 등)의 보상한도는 10만원입니다. (2020년 1월 약관 개정).
+      </>,
+      <>라이나손해보험의 해외여행보험 상품입니다</>,
+    ],
+    FL: [
+      <>
+        출장, 연수, 주재원, 답사, 여행 등의 목적으로 3개월을 초과하여 해외로 나가는 경우 가입하는 보험입니다. (3개월 이하는 해외여행보험)
+      </>,
+      <>보험기간은 최대 1년이며 만기시 갱신가능합니다.</>,
+      <>이미 출국하셨거나 해외에 거주하는 경우에는 해외장기체류보험에 가입하실 수 없습니다.</>,
+      <>메리츠화재의 해외장기체류보험 상품입니다</>,
+    ],
+  };
   
   // 가입자 정보 입력 화면 관련 상태
   const [showParticipantForm, setShowParticipantForm] = useState(false);
@@ -129,6 +301,18 @@ function MobileGroupInsuranceContent() {
   
   const planSelectionRef = useRef<HTMLDivElement>(null);
 
+  const createEmptyParticipant = (id: number): Participant => ({
+    id,
+    name: '',
+    nationality: '내국인',
+    birthDate: '',
+    gender: '남자',
+    email1: '',
+    email2: '',
+    phone: '',
+    isVerified: false,
+  });
+
   // 여행국가 목록 불러오기
   useEffect(() => {
     if (activeTab === 'DS') {
@@ -163,15 +347,18 @@ function MobileGroupInsuranceContent() {
       if (event.data && event.data.type === 'PARTICIPANT_INPUT_CONFIRM') {
         const { participants: newParticipants, participantCount: newCount, insuredData } = event.data;
         
-        // 그룹 가입자 데이터 저장
-        setGroupParticipantsData(newParticipants);
-        setGroupParticipantCount(String(newCount));
-        setHasGroupParticipants(true);
-        if (insuredData) {
+        const hasInsuredData = Array.isArray(insuredData) && insuredData.length > 0;
+
+        if (hasInsuredData) {
+          // 그룹 가입자 데이터 저장 (피보험자 정보는 별도 저장)
+          setGroupParticipantsData(newParticipants);
+          setGroupParticipantCount(String(newCount));
+          setHasGroupParticipants(true);
           setGroupInsuredData(insuredData);
+          return;
         }
-        
-        // 기존 participants에 추가
+
+        // insuredData가 없을 때만 participants에 반영
         const startId = participants.length > 0
           ? Math.max(...participants.map(p => p.id)) + 1
           : 1;
@@ -191,6 +378,116 @@ function MobileGroupInsuranceContent() {
       window.removeEventListener('message', handleMessage);
     };
   }, [participants]);
+
+  useEffect(() => {
+    const storedDraft = sessionStorage.getItem('groupInsuranceDraft');
+    if (!storedDraft) return;
+
+    try {
+      const parsed = JSON.parse(storedDraft);
+      if (parsed.activeTab && (parsed.activeTab === 'DS' || parsed.activeTab === 'FS' || parsed.activeTab === 'FL')) {
+        setActiveTab(parsed.activeTab);
+      }
+      if (parsed.departureDate) setDepartureDate(parsed.departureDate);
+      if (parsed.departureTime) setDepartureTime(parsed.departureTime);
+      if (parsed.arrivalDate) setArrivalDate(parsed.arrivalDate);
+      if (parsed.arrivalTime) setArrivalTime(parsed.arrivalTime);
+      if (parsed.travelCountry !== undefined) setTravelCountry(parsed.travelCountry);
+      if (parsed.travelPurpose !== undefined) setTravelPurpose(parsed.travelPurpose);
+      if (parsed.travelPurposeLong !== undefined) setTravelPurposeLong(parsed.travelPurposeLong);
+      if (parsed.birthDate !== undefined) setBirthDate(parsed.birthDate);
+      if (parsed.gender !== undefined) setGender(parsed.gender);
+      if (parsed.groupParticipantCount !== undefined) setGroupParticipantCount(parsed.groupParticipantCount);
+    } catch (error) {
+      console.error('임시 저장 데이터 복원 오류:', error);
+    } finally {
+      sessionStorage.removeItem('groupInsuranceDraft');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!showParticipantForm || isCorporateMember || hasGroupParticipants) return;
+
+    const desiredCount = parseInt(groupParticipantCount, 10);
+    if (!Number.isFinite(desiredCount) || desiredCount < 1) return;
+
+    setParticipantCount(desiredCount > 1 ? 2 : 1);
+    setParticipants((prev) => {
+      const next = [...prev];
+      if (next.length < desiredCount) {
+        let nextId = Math.max(0, ...next.map((p) => p.id)) + 1;
+        for (let i = next.length; i < desiredCount; i++) {
+          next.push(createEmptyParticipant(nextId));
+          nextId += 1;
+        }
+        return next;
+      }
+      if (next.length > desiredCount) {
+        return next.slice(0, desiredCount);
+      }
+      return next;
+    });
+  }, [showParticipantForm, isCorporateMember, groupParticipantCount, hasGroupParticipants]);
+
+  useEffect(() => {
+    if (!hasGroupParticipants) return;
+    setParticipantCount(1);
+    setParticipants((prev) => (prev.length > 1 ? [prev[0]] : prev));
+  }, [hasGroupParticipants]);
+
+  // 로그인/비회원 가입신청 완료 신호 받기
+  useEffect(() => {
+    const handleJoinContinue = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) {
+        return;
+      }
+
+      if (event.data && event.data.type === 'GROUP_INSURANCE_JOIN_CONTINUE') {
+        if (event.data.member) {
+          authLogin(event.data.member);
+        }
+        setShowParticipantForm(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+
+    window.addEventListener('message', handleJoinContinue);
+    return () => {
+      window.removeEventListener('message', handleJoinContinue);
+    };
+  }, [authLogin]);
+
+  useEffect(() => {
+    const shouldContinue = sessionStorage.getItem('groupInsuranceJoinContinue');
+    const isGuestApplyFlag = sessionStorage.getItem('groupInsuranceGuestApply');
+    if (shouldContinue === '1') {
+      sessionStorage.removeItem('groupInsuranceJoinContinue');
+      if (isGuestApplyFlag === '1') {
+        sessionStorage.removeItem('groupInsuranceGuestApply');
+        setIsGuestApply(true);
+      }
+      setShowParticipantForm(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, []);
+
+  // 법인 회원 정보 로드
+  useEffect(() => {
+    const loadCorporateInfo = async () => {
+      if (isLoggedIn && member && member.member_type !== '개인') {
+        try {
+          const result = await getCorporateMemberInfo(member.id);
+          if (result.success && result.corporate && result.contacts) {
+            setCorporateInfo(result.corporate);
+            setCorporateContacts(result.contacts);
+          }
+        } catch (error) {
+          console.error('법인 정보 조회 오류:', error);
+        }
+      }
+    };
+    loadCorporateInfo();
+  }, [isLoggedIn, member]);
 
   // 탭 변경 핸들러
   const handleTabChange = (tab: 'DS' | 'FS' | 'FL') => {
@@ -255,6 +552,30 @@ function MobileGroupInsuranceContent() {
       return null;
     }
   };
+
+  const contractBreakdownText = (() => {
+    if (!hasGroupParticipants || groupInsuredData.length === 0) return '';
+    const counts = { adult: 0, senior: 0, child: 0 };
+
+    for (const insured of groupInsuredData) {
+      const age = calculateAgeFromBirthDate(insured.birthDate);
+      if (age === null) continue;
+      if (age < 15) {
+        counts.child += 1;
+      } else if (age <= 70) {
+        counts.adult += 1;
+      } else {
+        counts.senior += 1;
+      }
+    }
+
+    const parts: string[] = [];
+    if (counts.adult > 0) parts.push(`성인 ${counts.adult}명`);
+    if (counts.senior > 0) parts.push(`어르신 ${counts.senior}명`);
+    if (counts.child > 0) parts.push(`어린이 ${counts.child}명`);
+
+    return parts.length > 0 ? parts.join(', ') : '';
+  })();
 
   // 이메일 전체 주소 가져오기
   const getFullEmail = (participant: Participant): string => {
@@ -1324,11 +1645,10 @@ function MobileGroupInsuranceContent() {
           <div className="tour2023_BWrap tourG_mat13 tourG_mab05">
             <p className="tour2023_title01">
               단체여행자보험<br />
-              <span className="tour2023_title09">(사업자/법인)</span>
+              <span className="tour2023_title09">(법인/단체)</span>
             </p>
-            <div style={{ flexShrink: 0 }}>
-              <MobileStepIndicator currentStep={getCurrentStep()} />
-            </div>
+            {/* 가입 단계 */}
+            <MobileStepIndicator currentStep={getCurrentStep()} />
           </div>
 
           {/* 탭 메뉴 */}
@@ -1394,6 +1714,29 @@ function MobileGroupInsuranceContent() {
               const height = 700;
               const left = (window.screen.width - width) / 2;
               const top = (window.screen.height - height) / 2;
+
+              if (hasGroupParticipants) {
+                const detailParticipants = groupInsuredData.map((insured, index) => ({
+                  id: index + 1,
+                  name: insured.name,
+                  gender: insured.gender === 'W' ? '여자' : '남자',
+                  birthDate: insured.birthDate,
+                }));
+                const detailData = {
+                  participants: detailParticipants,
+                  insuredData: groupInsuredData,
+                  participantCount: groupParticipantCount,
+                  tab: activeTab,
+                };
+                localStorage.setItem('premiumDetailData', JSON.stringify(detailData));
+
+                window.open(
+                  '/premium-detail-simple',
+                  'premiumDetailSimple',
+                  `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+                );
+                return;
+              }
               
               const popup = window.open(
                 `/group-insurance/participant-input?tab=${activeTab}`,
@@ -1450,6 +1793,41 @@ function MobileGroupInsuranceContent() {
             </a>
           </div>
 
+          <section className="tourG_pat02" style={{ paddingBottom: '20px' }}>
+            <div className={`tourG_box_know ${isNoticeExpanded ? 'is-expanded' : 'is-collapsed'}`}>
+              {collapsedNoticeItemsByType[activeTab].map((item, index) => (
+                <ul
+                  key={`collapsed-${activeTab}-${index}`}
+                  className={`tourG_know_s ${index === 0 ? 'tourG_mat08' : ''} tourG_mab09`}
+                >
+                  <li className="know_dot"></li>
+                  <li className="tourG_know_txt">{item}</li>
+                </ul>
+              ))}
+              {isNoticeExpanded && (
+                <>
+                  <p className="tourG_know_tit">※ 알아두세요</p>
+                  {expandedNoticeExtraItemsByType[activeTab].map((item, index) => (
+                    <ul
+                      key={`expanded-${activeTab}-${index}`}
+                      className="tourG_know_s tourG_mab09"
+                    >
+                      <li className="know_dot"></li>
+                      <li className="tourG_know_txt">{item}</li>
+                    </ul>
+                  ))}
+                </>
+              )}
+              <button
+                type="button"
+                className="tourG_know_more"
+                onClick={() => setIsNoticeExpanded((prev) => !prev)}
+              >
+                {isNoticeExpanded ? '- 접기' : '+ 더보기'}
+              </button>
+            </div>
+          </section>
+
           {/* 플랜 선택 영역 */}
           <div ref={planSelectionRef}>
             {showPlanSelection && planInfo && (
@@ -1470,6 +1848,43 @@ function MobileGroupInsuranceContent() {
                 hasMedicalExpense={hasMedicalExpense}
                 onMedicalExpenseChange={setHasMedicalExpense}
                 insuranceType={getTitle()}
+                contractBreakdownText={contractBreakdownText}
+                onContractDetailClick={() => {
+                  const width = 500;
+                  const height = 700;
+                  const left = (window.screen.width - width) / 2;
+                  const top = (window.screen.height - height) / 2;
+
+                  const detailParticipants = (calculatedPremiums?.participants || []).map((p, index) => ({
+                    id: index + 1,
+                    name: p.name,
+                    gender: p.gender,
+                    birthDate: p.birthDate,
+                    planType: p.planType,
+                    premium: p.premium,
+                  }));
+
+                  const fallbackParticipants = groupInsuredData.map((insured, index) => ({
+                    id: index + 1,
+                    name: insured.name,
+                    gender: insured.gender === 'W' ? '여자' : '남자',
+                    birthDate: insured.birthDate,
+                    planType: selectedPlan || '',
+                    premium: 0,
+                  }));
+
+                  localStorage.setItem('premiumDetailData', JSON.stringify({
+                    participants: detailParticipants.length > 0 ? detailParticipants : fallbackParticipants,
+                    totalPremium: calculatedPremiums?.totalPremium ?? 0,
+                    hasMedicalExpense,
+                  }));
+
+                  window.open(
+                    '/premium-detail',
+                    'premiumDetail',
+                    `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+                  );
+                }}
                 travelCountry={activeTab !== 'DS' ? travelCountry : undefined}
                 travelPurpose={activeTab === 'FL' ? travelPurposeLong : undefined}
               />
@@ -1480,9 +1895,12 @@ function MobileGroupInsuranceContent() {
       )}
 
       {/* STEP 2: 가입자 정보 입력 화면 - 그룹 보험용 */}
-      {showParticipantForm && !showStep2_1 && !showStep3 && !showCompletionScreen && hasGroupParticipants && (
+      {showParticipantForm && !showStep2_1 && !showStep3 && !showCompletionScreen && isCorporateMember && (
         <GroupParticipantInfoStep
           insuranceType={getTitle()}
+          member={isLoggedIn && member && member.member_type !== '개인' ? member : null}
+          corporateInfo={corporateInfo}
+          contacts={corporateContacts}
           onApply={(info: GroupInfo) => {
             // 그룹 정보 저장
             setGroupInfo(info);
@@ -1494,10 +1912,11 @@ function MobileGroupInsuranceContent() {
       )}
 
       {/* STEP 2: 가입자 정보 입력 화면 - 개인 가입용 */}
-      {showParticipantForm && !showStep2_1 && !showStep3 && !showCompletionScreen && !hasGroupParticipants && (
+      {showParticipantForm && !showStep2_1 && !showStep3 && !showCompletionScreen && !isCorporateMember && (
         <div className="prow_01">
           <div className="tour2023_BWrap tourG_mat13 tourG_mab05">
-            <p className="tour2023_title01">{getTitle()}</p>
+            {/* <p className="tour2023_title01">{getTitle()}</p> */}
+            <p className="tour2023_title01"></p>
             <MobileStepIndicator currentStep={getCurrentStep()} />
           </div>
 
@@ -1534,22 +1953,24 @@ function MobileGroupInsuranceContent() {
 
       {/* STEP 2-1: 위험활동 확인 및 여행목적 선택 화면 */}
       {showStep2_1 && !showStep3 && !showCompletionScreen && (
-        <RiskActivityStep
-          insuranceType={getTitle()}
-          hasDangerousActivity={hasDangerousActivity}
-          travelPurpose={travelPurpose}
-          onDangerousActivityChange={setHasDangerousActivity}
-          onTravelPurposeChange={setTravelPurpose}
-          onShowDangerousActivityModal={() => setShowDangerousActivityModal(true)}
-          isOverseas={activeTab !== 'DS'}
-          isCurrentlyAbroad={isCurrentlyAbroad}
-          hasRestrictedCountry={hasRestrictedCountry}
-          onCurrentlyAbroadChange={setIsCurrentlyAbroad}
-          onRestrictedCountryChange={setHasRestrictedCountry}
-          onShowRestrictedCountryModal={() => setShowRestrictedCountryModal(true)}
-          isLongTermStay={activeTab === 'FL'}
-          onNext={handleProceedToStep3}
-        />
+        <div className="prow_01">
+          <RiskActivityStep
+            insuranceType={getTitle()}
+            hasDangerousActivity={hasDangerousActivity}
+            travelPurpose={travelPurpose}
+            onDangerousActivityChange={setHasDangerousActivity}
+            onTravelPurposeChange={setTravelPurpose}
+            onShowDangerousActivityModal={() => setShowDangerousActivityModal(true)}
+            isOverseas={activeTab !== 'DS'}
+            isCurrentlyAbroad={isCurrentlyAbroad}
+            hasRestrictedCountry={hasRestrictedCountry}
+            onCurrentlyAbroadChange={setIsCurrentlyAbroad}
+            onRestrictedCountryChange={setHasRestrictedCountry}
+            onShowRestrictedCountryModal={() => setShowRestrictedCountryModal(true)}
+            isLongTermStay={activeTab === 'FL'}
+            onNext={handleProceedToStep3}
+          />
+        </div>
       )}
 
       {/* 위험활동 확인 모달 */}
@@ -1567,7 +1988,7 @@ function MobileGroupInsuranceContent() {
       )}
 
       {/* 동의서 모달 */}
-      <ConsentModal
+      <ConsentModalMobile
         isOpen={showConsentModal}
         onClose={() => setShowConsentModal(false)}
         onConfirm={() => {
@@ -1638,6 +2059,7 @@ function MobileGroupInsuranceContent() {
               }
             }}
             onShowPayment={() => setShowPaymentScreen(true)}
+            companyName={hasGroupParticipants ? (groupInfo?.groupName || corporateInfo?.company_name) : undefined}
           />
           
           {/* 결제 화면 */}
@@ -1740,8 +2162,26 @@ function MobileGroupInsuranceContent() {
               href="javascript:void(0);"
               onClick={(e) => {
                 e.preventDefault();
-                setShowParticipantForm(true);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                if (isLoggedIn) {
+                  setShowParticipantForm(true);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  return;
+                }
+
+                sessionStorage.setItem('groupInsuranceDraft', JSON.stringify({
+                  activeTab,
+                  departureDate,
+                  departureTime,
+                  arrivalDate,
+                  arrivalTime,
+                  travelCountry,
+                  travelPurpose,
+                  travelPurposeLong,
+                  birthDate,
+                  gender,
+                  groupParticipantCount,
+                }));
+                window.location.href = '/group-insurance/login';
               }}
               className="tour2023_btn_b tour2023_btn_join"
             >

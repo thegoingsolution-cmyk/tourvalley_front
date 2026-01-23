@@ -1,0 +1,10 @@
+/* Estimate Step2 Mobile Page Styles */
+
+.estimate-step2-page-mobile {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  padding: 20px;
+}
+

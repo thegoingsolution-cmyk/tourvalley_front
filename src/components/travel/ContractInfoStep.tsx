@@ -25,6 +25,7 @@ interface ContractInfoStepProps {
   onReceiptPremiumChange: (value: number) => void;
   onContractConfirmedChange: (confirmed: boolean) => void;
   onShowPayment: () => void;
+  companyName?: string; // 법인단체명 (단체 보험인 경우)
 }
 
 export default function ContractInfoStep({
@@ -47,6 +48,7 @@ export default function ContractInfoStep({
   onReceiptPremiumChange,
   onContractConfirmedChange,
   onShowPayment,
+  companyName,
 }: ContractInfoStepProps) {
   const [isAccidentFreeCashModalOpen, setIsAccidentFreeCashModalOpen] = useState(false);
 
@@ -98,7 +100,7 @@ export default function ContractInfoStep({
     <>
     <section className={`form-section ${contractConfirmed ? 'has-payment-step' : ''}`}>
       <div className="form-container">
-        <div className="form-card">
+        <div className="form-card contract-form-card">
           <div className="form-header">
             {/* <h1 className="form-title">{insuranceType}</h1> */}
             <h1 className="form-title"></h1>
@@ -245,9 +247,15 @@ export default function ContractInfoStep({
                 <div>{calculatedPremiums?.totalPremium.toLocaleString() || 0}원</div>
               </div>
               <div className="contract-info-item">
-                <label>계약자/취급자</label>
+                <label>포괄계약자(취급자)</label>
                 <div>(주)빨주노초파남보</div>
               </div>
+              {companyName && (
+                <div className="contract-info-item">
+                  <label>법인단체명</label>
+                  <div>{companyName}</div>
+                </div>
+              )}
               <div className="contract-info-item">
                 <label>대표 가입자</label>
                 <div className="participant-info-details">
