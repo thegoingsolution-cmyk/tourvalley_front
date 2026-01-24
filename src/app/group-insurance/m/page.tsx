@@ -470,6 +470,40 @@ function MobileGroupInsuranceContent() {
     };
   }, [authLogin]);
 
+  // 페이지를 떠날 때 플래그 설정 (브라우저를 닫거나 다른 도메인으로 이동할 때)
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      // 로그인 플로우가 아닌 경우에만 플래그 설정
+      const shouldContinue = sessionStorage.getItem('groupInsuranceJoinContinue');
+      const isGuestApplyFlag = sessionStorage.getItem('groupInsuranceGuestApply');
+      const isLoginFlow = shouldContinue === '1' || isGuestApplyFlag === '1';
+      
+      if (!isLoginFlow) {
+        sessionStorage.setItem('groupInsurancePageLeft', '1');
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
+  // 컴포넌트가 unmount될 때 플래그 설정 (같은 사이트 내 다른 페이지로 이동할 때)
+  useEffect(() => {
+    return () => {
+      // 로그인 플로우가 아닌 경우에만 플래그 설정
+      const shouldContinue = sessionStorage.getItem('groupInsuranceJoinContinue');
+      const isGuestApplyFlag = sessionStorage.getItem('groupInsuranceGuestApply');
+      const isLoginFlow = shouldContinue === '1' || isGuestApplyFlag === '1';
+      
+      if (!isLoginFlow) {
+        sessionStorage.setItem('groupInsurancePageLeft', '1');
+      }
+    };
+  }, []);
+
   useEffect(() => {
     // 페이지 진입 시 세션 스토리지 초기화 (로그인/비회원 가입신청 플로우 제외)
     const shouldContinue = sessionStorage.getItem('groupInsuranceJoinContinue');
@@ -477,6 +511,9 @@ function MobileGroupInsuranceContent() {
     
     // 로그인/비회원 가입신청 플로우가 아닌 경우에만 세션 데이터 초기화
     const isLoginFlow = shouldContinue === '1' || isGuestApplyFlag === '1';
+    
+    // 다른 페이지에서 돌아온 경우 확인
+    const pageLeft = sessionStorage.getItem('groupInsurancePageLeft') === '1';
     
     // 복원된 데이터가 있는지 확인 (로그인 플로우에서 복원한 데이터 보호)
     const dataRestored = sessionStorage.getItem('groupInsuranceDataRestored') === '1';
@@ -488,13 +525,45 @@ function MobileGroupInsuranceContent() {
       shouldContinue,
       isGuestApplyFlag,
       isLoginFlow,
+      pageLeft,
       dataRestored,
       hasRestoredData,
-      willClear: !isLoginFlow && !dataRestored && !hasRestoredData
+      willClear: (!isLoginFlow && !dataRestored && !hasRestoredData) || pageLeft
     });
     
-    // 로그인 플로우가 아니고, 복원 플래그도 없고, 복원된 데이터도 없는 경우에만 초기화
-    if (!isLoginFlow && !dataRestored && !hasRestoredData) {
+    // 다른 페이지에서 돌아온 경우 무조건 초기화 (로그인 플로우 제외)
+    if (pageLeft && !isLoginFlow) {
+      // 페이지 이탈 플래그 제거
+      sessionStorage.removeItem('groupInsurancePageLeft');
+      
+      // 최초 진입 또는 일반 진입 시 세션 스토리지 완전 초기화
+      sessionStorage.removeItem('groupParticipantsData');
+      sessionStorage.removeItem('groupParticipantCount');
+      sessionStorage.removeItem('groupInsuredData');
+      sessionStorage.removeItem('hasGroupParticipants');
+      sessionStorage.removeItem('planInfo');
+      sessionStorage.removeItem('participantPremiumsByPlan');
+      sessionStorage.removeItem('selectedPlan');
+      sessionStorage.removeItem('calculatedPremiums');
+      sessionStorage.removeItem('showPlanSelection');
+      sessionStorage.removeItem('groupInsuranceDraft');
+      sessionStorage.removeItem('groupInsuranceDataRestored');
+      
+      // 상태도 초기화
+      setGroupParticipantsData([]);
+      setGroupParticipantCount('');
+      setGroupInsuredData([]);
+      setHasGroupParticipants(false);
+      setPlanInfo(null);
+      setParticipantPremiumsByPlan({});
+      setSelectedPlan(null);
+      setCalculatedPremiums(null);
+      setShowPlanSelection(false);
+      
+      console.log('세션 스토리지 초기화 완료 (다른 페이지에서 돌아옴)');
+    } 
+    // 로그인 플로우가 아니고 복원 플래그도 없고 복원된 데이터도 없는 경우 초기화
+    else if (!isLoginFlow && !dataRestored && !hasRestoredData) {
       // 최초 진입 또는 일반 진입 시 세션 스토리지 완전 초기화
       sessionStorage.removeItem('groupParticipantsData');
       sessionStorage.removeItem('groupParticipantCount');
