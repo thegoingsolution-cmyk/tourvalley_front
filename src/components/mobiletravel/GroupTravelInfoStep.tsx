@@ -234,12 +234,26 @@ export default function MobileGroupTravelInfoStep({
               placeholder="피보험자수"
               value={participantCount}
               className="tourGuard_input_w05"
-              onInput={hasGroupParticipants ? undefined : handleParticipantCountInput}
               onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onInputButtonClick && onInputButtonClick();
+              }}
+              onFocus={(e) => {
+                e.preventDefault();
+                e.target.blur();
+                onInputButtonClick && onInputButtonClick();
+              }}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onInputButtonClick && onInputButtonClick();
+              }}
+              onKeyDown={(e) => {
                 e.preventDefault();
                 onInputButtonClick && onInputButtonClick();
               }}
-              readOnly={hasGroupParticipants}
+              readOnly={true}
               style={{
                 height: '32px',
                 paddingLeft: '10px',
@@ -250,6 +264,9 @@ export default function MobileGroupTravelInfoStep({
                 marginTop: '0',
                 marginLeft: '0',
                 cursor: 'pointer',
+                userSelect: 'none',
+                WebkitUserSelect: 'none',
+                touchAction: 'manipulation',
               }}
             />
             <span className="member_txt" style={{ color: '#000', marginLeft: '55px', lineHeight: '1', display: 'flex', alignItems: 'center' }}>명</span>

@@ -36,7 +36,9 @@ export default function GroupParticipantInfoStep({
 }: GroupParticipantInfoStepProps) {
   // "단체여행자보험 - " 부분 제거
   const displayInsuranceType = insuranceType.replace(/^단체여행자보험\s*-\s*/, '');
-  const isLoggedIn = member && member.member_type !== '개인';
+  const isLoggedIn = !!member;
+  const isCorporateMember = member && member.member_type !== '개인';
+  const isIndividualMember = member && member.member_type === '개인';
   const hasMultipleContacts = contacts.length > 1;
   
   const [groupInfo, setGroupInfo] = useState<GroupInfo>({
@@ -58,54 +60,118 @@ export default function GroupParticipantInfoStep({
 
   // 회원 정보가 있으면 초기값으로 설정
   useEffect(() => {
-    if (isLoggedIn && corporateInfo) {
-      // 사업자번호 분리 (예: "123-45-67890" -> ["123", "45", "67890"])
-      const businessNumber = corporateInfo.business_number.replace(/-/g, '');
-      const businessNumber1 = businessNumber.substring(0, 3);
-      const businessNumber2 = businessNumber.substring(3, 5);
-      const businessNumber3 = businessNumber.substring(5, 10);
+    if (isLoggedIn) {
+      if (isCorporateMember && corporateInfo) {
+        // 법인 회원인 경우
+        // 사업자번호 분리 (예: "123-45-67890" -> ["123", "45", "67890"])
+        const businessNumber = corporateInfo.business_number.replace(/-/g, '');
+        const businessNumber1 = businessNumber.substring(0, 3);
+        const businessNumber2 = businessNumber.substring(3, 5);
+        const businessNumber3 = businessNumber.substring(5, 10);
 
-      // 기본 담당자 선택 (대표 담당자 또는 첫 번째 담당자)
-      const primaryContact = contacts.find(c => c.is_primary) || contacts[0];
-      const defaultContactPerson = primaryContact?.contact_name || '';
-      const defaultPhone = primaryContact?.mobile_phone || member?.mobile_phone || '';
-      
-      // 이메일 분리 (담당자 이메일 우선, 없으면 회원 이메일 사용)
-      const emailToUse = primaryContact?.email || member?.email || '';
-      let email1 = '';
-      let email2 = '';
-      let customEmail = '';
-      
-      if (emailToUse) {
-        const emailParts = emailToUse.split('@');
-        if (emailParts.length === 2) {
-          email1 = emailParts[0];
-          const domain = emailParts[1];
-          // 도메인이 선택 목록에 있는지 확인
-          const commonDomains = ['gmail.com', 'naver.com', 'daum.net', 'nate.com', 'hotmail.com'];
-          if (commonDomains.includes(domain)) {
-            email2 = domain;
-          } else {
-            email2 = '직접입력';
-            customEmail = domain;
+        // 기본 담당자 선택 (대표 담당자 또는 첫 번째 담당자)
+        const primaryContact = contacts.find(c => c.is_primary) || contacts[0];
+        const defaultContactPerson = primaryContact?.contact_name || '';
+        const defaultPhone = primaryContact?.mobile_phone || member?.mobile_phone || '';
+        
+        // 이메일 분리 (담당자 이메일 우선, 없으면 회원 이메일 사용)
+        const emailToUse = primaryContact?.email || member?.email || '';
+        let email1 = '';
+        let email2 = '';
+        let customEmail = '';
+        
+        if (emailToUse) {
+          const emailParts = emailToUse.split('@');
+          if (emailParts.length === 2) {
+            email1 = emailParts[0];
+            const domain = emailParts[1];
+            // 도메인이 선택 목록에 있는지 확인
+            const commonDomains = ['gmail.com', 'naver.com', 'daum.net', 'nate.com', 'hotmail.com'];
+            if (commonDomains.includes(domain)) {
+              email2 = domain;
+            } else {
+              email2 = '직접입력';
+              customEmail = domain;
+            }
           }
         }
-      }
 
-      setGroupInfo({
-        businessNumber1,
-        businessNumber2,
-        businessNumber3,
-        groupName: corporateInfo.company_name || '',
-        contactPerson: defaultContactPerson,
-        email1,
-        email2,
-        customEmail,
-        phone: defaultPhone,
-        isVerified: true, // 회원 로그인 시 인증 생략
-      });
+        setGroupInfo({
+          businessNumber1,
+          businessNumber2,
+          businessNumber3,
+          groupName: corporateInfo.company_name || '',
+          contactPerson: defaultContactPerson,
+          email1,
+          email2,
+          customEmail,
+          phone: defaultPhone,
+          isVerified: true, // 회원 로그인 시 인증 생략
+        });
+      } else if (isIndividualMember) {
+        // 개인 회원인 경우
+        const defaultPhone = member?.mobile_phone || '';
+        
+        // 이메일 분리
+        let email1 = '';
+        let email2 = '';
+        let customEmail = '';
+        
+        // 이메일 처리: member.email이 전체 주소이거나, email + email_domain으로 분리되어 있을 수 있음
+        let fullEmail = '';
+        if (member?.email) {
+          // email 필드에 @가 포함되어 있으면 전체 주소
+          if (member.email.includes('@')) {
+            fullEmail = member.email;
+          } else if (member.email_domain) {
+            // email과 email_domain이 분리되어 있는 경우
+            fullEmail = `${member.email}@${member.email_domain}`;
+          } else {
+            // email만 있고 domain이 없는 경우
+            fullEmail = member.email;
+          }
+        }
+        
+        if (fullEmail) {
+          const emailParts = fullEmail.split('@');
+          if (emailParts.length === 2) {
+            email1 = emailParts[0];
+            const domain = emailParts[1];
+            // 도메인이 선택 목록에 있는지 확인
+            const commonDomains = ['gmail.com', 'naver.com', 'daum.net', 'nate.com', 'hotmail.com'];
+            if (commonDomains.includes(domain)) {
+              email2 = domain;
+            } else {
+              email2 = '직접입력';
+              customEmail = domain;
+            }
+          }
+        }
+        
+        console.log('개인 회원 이메일 세팅:', {
+          memberEmail: member?.email,
+          memberEmailDomain: member?.email_domain,
+          fullEmail,
+          email1,
+          email2,
+          customEmail
+        });
+
+        setGroupInfo({
+          businessNumber1: '',
+          businessNumber2: '',
+          businessNumber3: '',
+          groupName: '',
+          contactPerson: member?.name || '',
+          email1,
+          email2,
+          customEmail,
+          phone: defaultPhone,
+          isVerified: true, // 회원 로그인 시 인증 생략
+        });
+      }
     }
-  }, [isLoggedIn, corporateInfo, member, contacts]);
+  }, [isLoggedIn, isCorporateMember, isIndividualMember, corporateInfo, member, contacts]);
 
   // 인증번호 타이머
   useEffect(() => {
@@ -194,15 +260,14 @@ export default function GroupParticipantInfoStep({
 
   const handleApply = () => {
     // 필수 필드 검증
+    // 사업자번호가 입력된 경우 올바른 형식인지 확인
     const businessNumber = groupInfo.businessNumber1 + groupInfo.businessNumber2 + groupInfo.businessNumber3;
-    if (businessNumber.length !== 10) {
+    if (businessNumber.length > 0 && businessNumber.length !== 10) {
       alert('사업자번호를 올바르게 입력해주세요.');
       return;
     }
-    if (!groupInfo.groupName) {
-      alert('단체명을 입력해주세요.');
-      return;
-    }
+    
+    // 공통 필수 필드
     if (!groupInfo.contactPerson) {
       alert('담당자명을 입력해주세요.');
       return;
@@ -229,7 +294,9 @@ export default function GroupParticipantInfoStep({
     <div className="prow_01">
       <div className="tour2023_BWrap tourG_mat13 tourG_mab05">
         <p className="tour2023_title01" style={{ margin: 0, minWidth: 0 }}>
-          <span style={{ fontSize: '18px' }}>법인단체 정보</span>
+          <span style={{ fontSize: '18px' }}>
+            {isCorporateMember ? '법인단체 정보' : '가입자 정보'}
+          </span>
           {/* <br />
           <span className="tour2023_title09">{displayInsuranceType}</span> */}
         </p>
@@ -239,7 +306,7 @@ export default function GroupParticipantInfoStep({
       </div>
 
       <div className="tourGuard_Info">
-        {/* 사업자번호 */}
+        {/* 사업자번호 - 모든 회원에게 표시 (개인 회원은 직접 입력) */}
         <div className="tourGuard_form_tt mag5 tourG_mab03">
           <label>사업자번호(고유번호증)</label>
           <div className="business-number-inputs" style={{ display: 'flex', alignItems: 'stretch', gap: '8px', width: '100%' }}>
@@ -281,7 +348,7 @@ export default function GroupParticipantInfoStep({
           </div>
         </div>
 
-        {/* 단체명 */}
+        {/* 단체명 - 모든 회원에게 표시 (개인 회원은 직접 입력) */}
         <div className="tourGuard_form_tt mag5 tourG_mab03">
           <label>법인단체명</label>
           <input

@@ -355,21 +355,34 @@ function MobileGroupInsuranceContent() {
           setGroupParticipantCount(String(newCount));
           setHasGroupParticipants(true);
           setGroupInsuredData(insuredData);
+          
+          // sessionStorage에도 저장하여 페이지 리다이렉트 시에도 유지
+          sessionStorage.setItem('groupParticipantsData', JSON.stringify(newParticipants));
+          sessionStorage.setItem('groupParticipantCount', String(newCount));
+          sessionStorage.setItem('groupInsuredData', JSON.stringify(insuredData));
+          sessionStorage.setItem('hasGroupParticipants', '1');
+          
+          console.log('피보험자 데이터 저장:', {
+            participantsCount: newParticipants.length,
+            insuredDataCount: insuredData.length,
+            participantCount: newCount
+          });
           return;
         }
 
         // insuredData가 없을 때만 participants에 반영
-        const startId = participants.length > 0
-          ? Math.max(...participants.map(p => p.id)) + 1
-          : 1;
-        
-        const participantsWithCorrectIds = newParticipants.map((p: Participant, index: number) => ({
-          ...p,
-          id: startId + index,
-        }));
+        setParticipants((prevParticipants) => {
+          const startId = prevParticipants.length > 0
+            ? Math.max(...prevParticipants.map(p => p.id)) + 1
+            : 1;
+          
+          const participantsWithCorrectIds = newParticipants.map((p: Participant, index: number) => ({
+            ...p,
+            id: startId + index,
+          }));
 
-        const updatedParticipants = [...participants, ...participantsWithCorrectIds];
-        setParticipants(updatedParticipants);
+          return [...prevParticipants, ...participantsWithCorrectIds];
+        });
       }
     };
 
@@ -377,7 +390,7 @@ function MobileGroupInsuranceContent() {
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, [participants]);
+  }, []);
 
   useEffect(() => {
     const storedDraft = sessionStorage.getItem('groupInsuranceDraft');
@@ -458,16 +471,166 @@ function MobileGroupInsuranceContent() {
   }, [authLogin]);
 
   useEffect(() => {
+    // 페이지 진입 시 세션 스토리지 초기화 (로그인/비회원 가입신청 플로우 제외)
     const shouldContinue = sessionStorage.getItem('groupInsuranceJoinContinue');
     const isGuestApplyFlag = sessionStorage.getItem('groupInsuranceGuestApply');
-    if (shouldContinue === '1') {
+    
+    // 로그인/비회원 가입신청 플로우가 아닌 경우에만 세션 데이터 초기화
+    const isLoginFlow = shouldContinue === '1' || isGuestApplyFlag === '1';
+    
+    // 복원된 데이터가 있는지 확인 (로그인 플로우에서 복원한 데이터 보호)
+    const dataRestored = sessionStorage.getItem('groupInsuranceDataRestored') === '1';
+    const hasRestoredData = sessionStorage.getItem('hasGroupParticipants') === '1' && 
+                           sessionStorage.getItem('groupParticipantsData') &&
+                           sessionStorage.getItem('groupInsuredData');
+    
+    console.log('페이지 진입 시 초기화 체크:', {
+      shouldContinue,
+      isGuestApplyFlag,
+      isLoginFlow,
+      dataRestored,
+      hasRestoredData,
+      willClear: !isLoginFlow && !dataRestored && !hasRestoredData
+    });
+    
+    // 로그인 플로우가 아니고, 복원 플래그도 없고, 복원된 데이터도 없는 경우에만 초기화
+    if (!isLoginFlow && !dataRestored && !hasRestoredData) {
+      // 최초 진입 또는 일반 진입 시 세션 스토리지 완전 초기화
+      sessionStorage.removeItem('groupParticipantsData');
+      sessionStorage.removeItem('groupParticipantCount');
+      sessionStorage.removeItem('groupInsuredData');
+      sessionStorage.removeItem('hasGroupParticipants');
+      sessionStorage.removeItem('planInfo');
+      sessionStorage.removeItem('participantPremiumsByPlan');
+      sessionStorage.removeItem('selectedPlan');
+      sessionStorage.removeItem('calculatedPremiums');
+      sessionStorage.removeItem('showPlanSelection');
+      sessionStorage.removeItem('groupInsuranceDraft');
+      sessionStorage.removeItem('groupInsuranceDataRestored');
+      
+      // 상태도 초기화
+      setGroupParticipantsData([]);
+      setGroupParticipantCount('');
+      setGroupInsuredData([]);
+      setHasGroupParticipants(false);
+      setPlanInfo(null);
+      setParticipantPremiumsByPlan({});
+      setSelectedPlan(null);
+      setCalculatedPremiums(null);
+      setShowPlanSelection(false);
+      
+      console.log('세션 스토리지 초기화 완료 (최초 진입)');
+    } else {
+      // 로그인/비회원 가입신청 플로우인 경우
       sessionStorage.removeItem('groupInsuranceJoinContinue');
       if (isGuestApplyFlag === '1') {
         sessionStorage.removeItem('groupInsuranceGuestApply');
         setIsGuestApply(true);
       }
-      setShowParticipantForm(true);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      // 저장된 피보험자 데이터 복원
+      const storedHasGroupParticipants = sessionStorage.getItem('hasGroupParticipants');
+      let hasRestoredParticipants = false;
+      
+      const allRelevantKeys = Object.keys(sessionStorage).filter(key => 
+        key.includes('group') || 
+        key.includes('participant') || 
+        key.includes('plan') || 
+        key.includes('calculated') ||
+        key.includes('Insurance')
+      );
+      
+      console.log('로그인 후 데이터 복원 시도:', {
+        storedHasGroupParticipants,
+        allSessionKeys: allRelevantKeys,
+        groupParticipantsData: sessionStorage.getItem('groupParticipantsData') ? '있음' : '없음',
+        groupInsuredData: sessionStorage.getItem('groupInsuredData') ? '있음' : '없음',
+        groupParticipantCount: sessionStorage.getItem('groupParticipantCount')
+      });
+      
+      if (storedHasGroupParticipants === '1') {
+        try {
+          const storedParticipants = sessionStorage.getItem('groupParticipantsData');
+          const storedCount = sessionStorage.getItem('groupParticipantCount');
+          const storedInsuredData = sessionStorage.getItem('groupInsuredData');
+          
+          console.log('피보험자 데이터 확인:', {
+            hasStoredParticipants: !!storedParticipants,
+            hasStoredInsuredData: !!storedInsuredData,
+            storedCount,
+            storedParticipantsLength: storedParticipants ? JSON.parse(storedParticipants).length : 0,
+            storedInsuredDataLength: storedInsuredData ? JSON.parse(storedInsuredData).length : 0
+          });
+          
+          if (storedParticipants && storedInsuredData) {
+            setGroupParticipantsData(JSON.parse(storedParticipants));
+            if (storedCount) {
+              setGroupParticipantCount(storedCount);
+            }
+            setGroupInsuredData(JSON.parse(storedInsuredData));
+            setHasGroupParticipants(true);
+            hasRestoredParticipants = true;
+            
+            // 복원 완료 플래그 설정 (초기화 방지)
+            sessionStorage.setItem('groupInsuranceDataRestored', '1');
+            
+            console.log('피보험자 데이터 복원:', {
+              participantsCount: JSON.parse(storedParticipants).length,
+              insuredDataCount: JSON.parse(storedInsuredData).length,
+              participantCount: storedCount
+            });
+          } else {
+            console.warn('피보험자 데이터가 sessionStorage에 없습니다:', {
+              storedParticipants: !!storedParticipants,
+              storedInsuredData: !!storedInsuredData
+            });
+          }
+          
+          // 보험료 계산 데이터 복원
+          const storedPlanInfo = sessionStorage.getItem('planInfo');
+          const storedParticipantPremiumsByPlan = sessionStorage.getItem('participantPremiumsByPlan');
+          const storedSelectedPlan = sessionStorage.getItem('selectedPlan');
+          const storedCalculatedPremiums = sessionStorage.getItem('calculatedPremiums');
+          const storedShowPlanSelection = sessionStorage.getItem('showPlanSelection');
+          
+          if (storedPlanInfo && storedParticipantPremiumsByPlan && storedCalculatedPremiums) {
+            setPlanInfo(JSON.parse(storedPlanInfo));
+            setParticipantPremiumsByPlan(JSON.parse(storedParticipantPremiumsByPlan));
+            if (storedSelectedPlan) {
+              setSelectedPlan(storedSelectedPlan as PlanType);
+            }
+            setCalculatedPremiums(JSON.parse(storedCalculatedPremiums));
+            if (storedShowPlanSelection === '1') {
+              setShowPlanSelection(true);
+            }
+            console.log('보험료 계산 데이터 복원:', {
+              planInfo: Object.keys(JSON.parse(storedPlanInfo)).length,
+              participantPremiumsByPlan: Object.keys(JSON.parse(storedParticipantPremiumsByPlan)).length,
+              calculatedPremiums: JSON.parse(storedCalculatedPremiums).participants.length
+            });
+          }
+        } catch (error) {
+          console.error('피보험자 데이터 복원 오류:', error);
+        }
+      } else {
+        console.warn('피보험자 데이터가 sessionStorage에 없습니다:', {
+          storedHasGroupParticipants,
+          hasGroupParticipantsData: !!sessionStorage.getItem('groupParticipantsData'),
+          hasGroupInsuredData: !!sessionStorage.getItem('groupInsuredData')
+        });
+      }
+      
+      // 피보험자 데이터가 복원되었으면 GroupParticipantInfoStep으로 이동 (법인 회원인 경우)
+      // 개인 회원이거나 데이터가 없으면 일반 가입자 정보 입력 화면으로 이동
+      if (hasRestoredParticipants) {
+        // 법인 회원이거나 비회원 가입신청인 경우 GroupParticipantInfoStep으로 이동
+        // (isCorporateMember는 useEffect 이후에 업데이트되므로, 로그인 상태를 확인)
+        setShowParticipantForm(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        setShowParticipantForm(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
   }, []);
 
@@ -717,12 +880,49 @@ function MobileGroupInsuranceContent() {
       const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
       const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
 
-      const baseCoverages = [
-        { label: '상해사망/후유장해', amount: '3,000만원' },
-        { label: '상해의료비', amount: '100만원' },
-        { label: '질병사망', amount: '100만원' },
-        { label: '배상책임', amount: '1,000만원' },
-      ];
+      // 보험 타입에 따른 coverages 정의
+      const isDomestic = activeTab === 'DS';
+      let baseCoverages: { label: string; amount: string }[] = [];
+      let economyCoverages: { label: string; amount: string }[] = [];
+      let premiumCoverages: { label: string; amount: string }[] = [];
+
+      if (isDomestic) {
+        // 국내여행보험용 coverages
+        baseCoverages = [
+          { label: '상해사망/후유장해', amount: '3,000만원' },
+          { label: '상해의료비', amount: '100만원' },
+          { label: '질병사망', amount: '100만원' },
+          { label: '배상책임', amount: '1,000만원' },
+        ];
+        economyCoverages = [
+          { label: '상해사망/후유장해', amount: '3,000만원' },
+          { label: '상해의료비', amount: '100만원' },
+          { label: '배상책임', amount: '1,000만원' },
+        ];
+        premiumCoverages = baseCoverages; // 국내여행보험은 고급플랜도 표준과 동일
+      } else {
+        // 해외여행보험용 coverages
+        baseCoverages = [
+          { label: '상해사망/후유장해', amount: '1억' },
+          { label: '상해입원의료비', amount: '1000만원' },
+          { label: '상해통원의료비', amount: '10만원' },
+          { label: '질병입원의료비', amount: '1,000만원' },
+          { label: '질병통원의료비', amount: '10만원' },
+          { label: '휴대폼손해(휴대폰은 보상제외)', amount: '50만원' },
+        ];
+        economyCoverages = [
+          { label: '상해사망/후유장해', amount: '1억' },
+          { label: '상해입원의료비', amount: '1000만원' },
+          { label: '상해통원의료비', amount: '10만원' },
+          { label: '휴대폼손해(휴대폰은 보상제외)', amount: '50만원' },
+        ];
+        premiumCoverages = [
+          { label: '상해사망', amount: '3억' },
+          { label: '해외의료비(상해)', amount: '1억' },
+          { label: '해외의료비(질병)', amount: '1억' },
+          { label: '휴대폰손해', amount: '200만원' },
+        ];
+      }
 
       const plans: Record<string, PlanInfo> = {};
       const newParticipantPremiumsByPlan: Record<string, Array<{ id: number; name: string; gender: string; birthDate: string; planType: string; premium: number }>> = {};
@@ -784,10 +984,19 @@ function MobileGroupInsuranceContent() {
         }
 
         if (!hasError && totalPremium > 0) {
+          // 플랜 타입에 따른 coverages 선택
+          let coverages: { label: string; amount: string }[];
+          if (planType === '실속플랜') {
+            coverages = economyCoverages;
+          } else if (planType === '고급플랜' && !isDomestic) {
+            coverages = premiumCoverages;
+          } else {
+            coverages = baseCoverages;
+          }
           plans[planType] = {
             type: planType,
             premium: totalPremium,
-            coverages: baseCoverages,
+            coverages: coverages,
           };
           newParticipantPremiumsByPlan[planType] = participantPremiums;
         }
@@ -834,6 +1043,12 @@ function MobileGroupInsuranceContent() {
   const handleCalculate = async () => {
     // 그룹 가입자 데이터가 있는 경우
     if (hasGroupParticipants && groupParticipantsData.length > 0) {
+      // groupInsuredData가 없으면 피보험자 정보를 먼저 입력하도록 안내
+      if (groupInsuredData.length === 0) {
+        alert('피보험자 정보를 먼저 입력해주세요.');
+        return;
+      }
+      
       // 그룹 가입자용 검증
       if (!departureDate || !arrivalDate) {
         alert('출발일과 도착일을 입력해주세요.');
@@ -865,12 +1080,50 @@ function MobileGroupInsuranceContent() {
         const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
         const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
 
-        const baseCoverages = [
-          { label: '상해사망/후유장해', amount: '3,000만원' },
-          { label: '상해의료비', amount: '100만원' },
-          { label: '질병사망', amount: '100만원' },
-          { label: '배상책임', amount: '1,000만원' },
-        ];
+        // 보험 타입에 따른 coverages 정의
+        const isDomestic = activeTab === 'DS';
+        let baseCoverages: { label: string; amount: string }[] = [];
+        let economyCoverages: { label: string; amount: string }[] = [];
+        let premiumCoverages: { label: string; amount: string }[] = [];
+
+        if (isDomestic) {
+          // 국내여행보험용 coverages
+          baseCoverages = [
+            { label: '상해사망/후유장해', amount: '1억' },
+            { label: '상해입원의료비', amount: '1000만원' },
+            { label: '상해통원의료비', amount: '10만원' },
+            { label: '질병입원의료비', amount: '1,000만원' },
+            { label: '질병통원의료비', amount: '10만원' },
+            { label: '휴대폼손해(휴대폰은 보상제외)', amount: '50만원' },
+          ];
+          economyCoverages = [
+            { label: '상해사망/후유장해', amount: '1억' },
+            { label: '상해입원의료비', amount: '1000만원' },
+            { label: '상해통원의료비', amount: '10만원' },
+            { label: '휴대폼손해(휴대폰은 보상제외)', amount: '50만원' },
+          ];
+          premiumCoverages = baseCoverages; // 국내여행보험은 고급플랜도 표준과 동일
+        } else {
+          // 해외여행보험용 coverages
+          baseCoverages = [
+            { label: '상해사망', amount: '2억' },
+            { label: '해외의료비(상해)', amount: '5,000만원' },
+            { label: '해외의료비(질병)', amount: '5,000만원' },
+            { label: '휴대폰손해', amount: '100만원' },
+          ];
+          economyCoverages = [
+            { label: '상해사망', amount: '1억' },
+            { label: '해외의료비(상해)', amount: '2,000만원' },
+            { label: '해외의료비(질병)', amount: '2,000만원' },
+            { label: '휴대폰손해', amount: '50만원' },
+          ];
+          premiumCoverages = [
+            { label: '상해사망', amount: '3억' },
+            { label: '해외의료비(상해)', amount: '1억' },
+            { label: '해외의료비(질병)', amount: '1억' },
+            { label: '휴대폰손해', amount: '150만원' },
+          ];
+        }
 
         const plans: Record<string, PlanInfo> = {};
 
@@ -939,10 +1192,19 @@ function MobileGroupInsuranceContent() {
           }
 
           if (!hasError && totalPremium > 0) {
+            // 플랜 타입에 따른 coverages 선택
+            let coverages: { label: string; amount: string }[];
+            if (planType === '실속플랜') {
+              coverages = economyCoverages;
+            } else if (planType === '고급플랜' && !isDomestic) {
+              coverages = premiumCoverages;
+            } else {
+              coverages = baseCoverages;
+            }
             plans[planType] = {
               type: planType,
               premium: totalPremium, // 모든 가입자의 보험료 합산
-              coverages: baseCoverages,
+              coverages: coverages,
             };
             newParticipantPremiumsByPlan[planType] = participantPremiums;
           }
@@ -962,10 +1224,18 @@ function MobileGroupInsuranceContent() {
         // calculatedPremiums 설정 (첫 번째 플랜의 보험료로 초기화)
         if (plans[firstPlan] && newParticipantPremiumsByPlan[firstPlan]) {
           const roundedTotalPremium = Math.floor(plans[firstPlan].premium / 10) * 10;
-          setCalculatedPremiums({
+          const calculatedPremiumsData = {
             participants: newParticipantPremiumsByPlan[firstPlan],
             totalPremium: roundedTotalPremium,
-          });
+          };
+          setCalculatedPremiums(calculatedPremiumsData);
+          
+          // sessionStorage에도 저장
+          sessionStorage.setItem('planInfo', JSON.stringify(plans));
+          sessionStorage.setItem('participantPremiumsByPlan', JSON.stringify(newParticipantPremiumsByPlan));
+          sessionStorage.setItem('selectedPlan', firstPlan);
+          sessionStorage.setItem('calculatedPremiums', JSON.stringify(calculatedPremiumsData));
+          sessionStorage.setItem('showPlanSelection', '1');
         }
         
         setShowPlanSelection(true);
@@ -1037,12 +1307,49 @@ function MobileGroupInsuranceContent() {
       const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
       const genderValue = getGenderFromBirthDate(birthDate, gender);
 
-      const baseCoverages = [
-        { label: '상해사망/후유장해', amount: '3,000만원' },
-        { label: '상해의료비', amount: '100만원' },
-        { label: '질병사망', amount: '100만원' },
-        { label: '배상책임', amount: '1,000만원' },
-      ];
+      // 보험 타입에 따른 coverages 정의
+      const isDomestic = activeTab === 'DS';
+      let baseCoverages: { label: string; amount: string }[] = [];
+      let economyCoverages: { label: string; amount: string }[] = [];
+      let premiumCoverages: { label: string; amount: string }[] = [];
+
+      if (isDomestic) {
+        // 국내여행보험용 coverages
+        baseCoverages = [
+          { label: '상해사망/후유장해', amount: '3,000만원' },
+          { label: '상해의료비', amount: '100만원' },
+          { label: '질병사망', amount: '100만원' },
+          { label: '배상책임', amount: '1,000만원' },
+        ];
+        economyCoverages = [
+          { label: '상해사망/후유장해', amount: '3,000만원' },
+          { label: '상해의료비', amount: '100만원' },
+          { label: '배상책임', amount: '1,000만원' },
+        ];
+        premiumCoverages = baseCoverages; // 국내여행보험은 고급플랜도 표준과 동일
+      } else {
+        // 해외여행보험용 coverages
+        baseCoverages = [
+          { label: '상해사망/후유장해', amount: '1억' },
+          { label: '상해입원의료비', amount: '1000만원' },
+          { label: '상해통원의료비', amount: '10만원' },
+          { label: '질병입원의료비', amount: '1,000만원' },
+          { label: '질병통원의료비', amount: '10만원' },
+          { label: '휴대폼손해(휴대폰은 보상제외)', amount: '50만원' },
+        ];
+        economyCoverages = [
+          { label: '상해사망/후유장해', amount: '1억' },
+          { label: '상해입원의료비', amount: '1000만원' },
+          { label: '상해통원의료비', amount: '10만원' },
+          { label: '휴대폼손해(휴대폰은 보상제외)', amount: '50만원' },
+        ];
+        premiumCoverages = [
+          { label: '상해사망', amount: '3억' },
+          { label: '해외의료비(상해)', amount: '1억' },
+          { label: '해외의료비(질병)', amount: '1억' },
+          { label: '휴대폰손해', amount: '200만원' },
+        ];
+      }
 
       const plans: Record<string, PlanInfo> = {};
 
@@ -1069,10 +1376,19 @@ function MobileGroupInsuranceContent() {
           const data = await response.json();
 
           if (data.success) {
+            // 플랜 타입에 따른 coverages 선택
+            let coverages: { label: string; amount: string }[];
+            if (planType === '실속플랜') {
+              coverages = economyCoverages;
+            } else if (planType === '고급플랜' && !isDomestic) {
+              coverages = premiumCoverages;
+            } else {
+              coverages = baseCoverages;
+            }
             plans[planType] = {
               type: planType,
               premium: data.premium,
-              coverages: baseCoverages,
+              coverages: coverages,
             };
           }
         } catch (error) {
@@ -1245,8 +1561,7 @@ function MobileGroupInsuranceContent() {
         }
       } else if (paymentSubMethod === '수기카드') {
         if (!cardNumber1 || !cardNumber2 || !cardNumber3 || !cardNumber4 ||
-            !cardExpiryMonth || !cardExpiryYear || !cardholderName || !cardholderResidentNumber ||
-            approvalYear === 0 || approvalMonth === 0 || approvalDay === 0) {
+            !cardExpiryMonth || !cardExpiryYear || !cardholderName || !cardholderResidentNumber) {
           alert('카드 정보를 모두 입력해주세요.');
           return;
         }
@@ -1501,7 +1816,7 @@ function MobileGroupInsuranceContent() {
             payment_method: paymentMethod || '기타결제',
             payment_sub_method: paymentSubMethod || null,
             amount: receiptPremium,
-            status: paymentSubMethod === '무통장입금' ? '대기' : '완료',
+            status: (paymentSubMethod === '무통장입금' || paymentSubMethod === '수기카드' || paymentSubMethod === '가상계좌') ? '대기' : '완료',
             depositor_name: paymentSubMethod === '무통장입금' ? depositorName : null,
             bank_name: paymentSubMethod === '무통장입금' ? depositBank : null,
             account_number: paymentSubMethod === '무통장입금' ? (depositBank === '우리은행' ? '1005-604-481542' : '301-0337-8596-01') : null,
@@ -1512,11 +1827,28 @@ function MobileGroupInsuranceContent() {
             card_expiry_year: paymentSubMethod === '수기카드' ? cardExpiryYear : null,
             cardholder_name: paymentSubMethod === '수기카드' ? cardholderName : null,
             cardholder_resident_number: paymentSubMethod === '수기카드' ? cardholderResidentNumber : null,
-            approval_date: paymentSubMethod === '수기카드' ? `${approvalYear}-${String(approvalMonth).padStart(2, '0')}-${String(approvalDay).padStart(2, '0')}` : null,
+            approval_date: paymentSubMethod === '수기카드' ? (approvalYear && approvalMonth && approvalDay ? `${approvalYear}-${String(approvalMonth).padStart(2, '0')}-${String(approvalDay).padStart(2, '0')}` : null) : null,
             normal_premium: normalPremium,
             receipt_premium: receiptPremium,
           },
         };
+
+        // 수기카드 데이터 확인용 로그
+        if (paymentSubMethod === '수기카드') {
+          console.log('수기카드 결제 데이터:', {
+            payment_method: paymentMethod,
+            payment_sub_method: paymentSubMethod,
+            card_type: cardType,
+            card_category: cardCategory,
+            card_number: `${cardNumber1}-${cardNumber2}-${cardNumber3}-${cardNumber4}`,
+            card_expiry_month: cardExpiryMonth,
+            card_expiry_year: cardExpiryYear,
+            cardholder_name: cardholderName,
+            cardholder_resident_number: cardholderResidentNumber,
+            normal_premium: normalPremium,
+            receipt_premium: receiptPremium,
+          });
+        }
 
         const response = await fetch('/api/travel/register-contract', {
           method: 'POST',
@@ -1849,33 +2181,51 @@ function MobileGroupInsuranceContent() {
                 onMedicalExpenseChange={setHasMedicalExpense}
                 insuranceType={getTitle()}
                 contractBreakdownText={contractBreakdownText}
-                onContractDetailClick={() => {
+                hideMedicalExpenseOption={true}
+                onContractDetailClick={(clickedPlanType) => {
                   const width = 500;
                   const height = 700;
                   const left = (window.screen.width - width) / 2;
                   const top = (window.screen.height - height) / 2;
 
-                  const detailParticipants = (calculatedPremiums?.participants || []).map((p, index) => ({
-                    id: index + 1,
-                    name: p.name,
-                    gender: p.gender,
-                    birthDate: p.birthDate,
-                    planType: p.planType,
-                    premium: p.premium,
-                  }));
+                  // 클릭한 플랜의 데이터 가져오기
+                  const clickedPlanParticipants = participantPremiumsByPlan[clickedPlanType] || [];
+                  const clickedPlanPremium = planInfo && planInfo[clickedPlanType] 
+                    ? Math.floor(planInfo[clickedPlanType].premium / 10) * 10 
+                    : 0;
 
-                  const fallbackParticipants = groupInsuredData.map((insured, index) => ({
-                    id: index + 1,
-                    name: insured.name,
-                    gender: insured.gender === 'W' ? '여자' : '남자',
-                    birthDate: insured.birthDate,
-                    planType: selectedPlan || '',
-                    premium: 0,
-                  }));
+                  // 클릭한 플랜의 참가자 데이터 생성
+                  const detailParticipants = clickedPlanParticipants.length > 0
+                    ? clickedPlanParticipants.map((p, index) => ({
+                        id: index + 1,
+                        name: p.name,
+                        gender: p.gender,
+                        birthDate: p.birthDate,
+                        planType: clickedPlanType,
+                        premium: p.premium,
+                      }))
+                    : (hasGroupParticipants 
+                        ? groupInsuredData.map((insured, index) => ({
+                            id: index + 1,
+                            name: insured.name,
+                            gender: insured.gender === 'W' ? '여자' : '남자',
+                            birthDate: insured.birthDate,
+                            planType: clickedPlanType,
+                            premium: 0,
+                          }))
+                        : participants.map((p, index) => ({
+                            id: index + 1,
+                            name: p.name,
+                            gender: p.gender,
+                            birthDate: p.birthDate,
+                            planType: clickedPlanType,
+                            premium: 0,
+                          }))
+                      );
 
                   localStorage.setItem('premiumDetailData', JSON.stringify({
-                    participants: detailParticipants.length > 0 ? detailParticipants : fallbackParticipants,
-                    totalPremium: calculatedPremiums?.totalPremium ?? 0,
+                    participants: detailParticipants,
+                    totalPremium: clickedPlanPremium,
                     hasMedicalExpense,
                   }));
 
@@ -1894,11 +2244,11 @@ function MobileGroupInsuranceContent() {
         </div>
       )}
 
-      {/* STEP 2: 가입자 정보 입력 화면 - 그룹 보험용 */}
-      {showParticipantForm && !showStep2_1 && !showStep3 && !showCompletionScreen && isCorporateMember && (
+      {/* STEP 2: 가입자 정보 입력 화면 - 그룹 보험용 (법인/개인 모두) */}
+      {showParticipantForm && !showStep2_1 && !showStep3 && !showCompletionScreen && (
         <GroupParticipantInfoStep
           insuranceType={getTitle()}
-          member={isLoggedIn && member && member.member_type !== '개인' ? member : null}
+          member={isLoggedIn && member ? member : null}
           corporateInfo={corporateInfo}
           contacts={corporateContacts}
           onApply={(info: GroupInfo) => {
@@ -1911,8 +2261,8 @@ function MobileGroupInsuranceContent() {
         />
       )}
 
-      {/* STEP 2: 가입자 정보 입력 화면 - 개인 가입용 */}
-      {showParticipantForm && !showStep2_1 && !showStep3 && !showCompletionScreen && !isCorporateMember && (
+      {/* STEP 2: 가입자 정보 입력 화면 - 개인 가입용 (사용 안 함) */}
+      {false && showParticipantForm && !showStep2_1 && !showStep3 && !showCompletionScreen && !isCorporateMember && (
         <div className="prow_01">
           <div className="tour2023_BWrap tourG_mat13 tourG_mab05">
             {/* <p className="tour2023_title01">{getTitle()}</p> */}
@@ -2031,6 +2381,24 @@ function MobileGroupInsuranceContent() {
             </div>
           </div>
           
+          {(() => {
+            // ContractInfoStep 렌더링 전 상태 확인
+            console.log('ContractInfoStep 렌더링 전 전체 상태:', {
+              hasGroupParticipants,
+              groupParticipantsDataLength: groupParticipantsData.length,
+              groupInsuredDataLength: groupInsuredData.length,
+              hasGroupInfo: !!groupInfo,
+              participantsLength: participants.length,
+              calculatedPremiums: calculatedPremiums ? {
+                participantsCount: calculatedPremiums.participants.length,
+                totalPremium: calculatedPremiums.totalPremium
+              } : null,
+              isCorporateMember,
+              isLoggedIn
+            });
+            return null;
+          })()}
+          
           <ContractInfoStep
             insuranceType={getTitle()}
             insuranceCompany="메리츠화재"
@@ -2040,7 +2408,57 @@ function MobileGroupInsuranceContent() {
             arrivalTime={arrivalTime}
             travelPurpose={travelPurpose}
             travelCountry={travelCountry}
-            participants={hasGroupParticipants ? groupParticipantsData : participants}
+            participants={(() => {
+              console.log('ContractInfoStep - participants 결정 전 상태:', {
+                hasGroupParticipants,
+                groupParticipantsDataLength: groupParticipantsData.length,
+                groupInsuredDataLength: groupInsuredData.length,
+                hasGroupInfo: !!groupInfo,
+                participantsLength: participants.length,
+                isCorporateMember,
+                isLoggedIn
+              });
+              
+              // 피보험자 데이터가 있으면 우선 사용 (개인/법인 모두)
+              if (hasGroupParticipants && groupParticipantsData.length > 0) {
+                console.log('ContractInfoStep - 피보험자 데이터 사용:', {
+                  hasGroupParticipants,
+                  groupParticipantsDataLength: groupParticipantsData.length,
+                  data: groupParticipantsData
+                });
+                return groupParticipantsData;
+              }
+              
+              // groupInfo가 있고 피보험자 데이터가 없는 경우 (개인/법인 회원이 GroupParticipantInfoStep만 입력한 경우)
+              if (groupInfo) {
+                console.log('ContractInfoStep - groupInfo 사용:', {
+                  contactPerson: groupInfo.contactPerson,
+                  phone: groupInfo.phone,
+                  email1: groupInfo.email1,
+                  email2: groupInfo.email2,
+                  groupParticipantsDataLength: groupParticipantsData.length
+                });
+                return [{
+                  id: 1,
+                  name: groupInfo.contactPerson || '',
+                  nationality: '내국인',
+                  birthDate: '',
+                  gender: '남자',
+                  email1: groupInfo.email1 || '',
+                  email2: groupInfo.email2 || '',
+                  customEmail: groupInfo.customEmail || '',
+                  phone: groupInfo.phone || '',
+                  isVerified: groupInfo.isVerified || false,
+                }];
+              }
+              
+              // 기본 participants 사용
+              console.log('ContractInfoStep - 기본 participants 사용:', {
+                participantsLength: participants.length,
+                data: participants
+              });
+              return participants;
+            })()}
             calculatedPremiums={calculatedPremiums}
             hasMedicalExpense={hasMedicalExpense}
             receiptPremium={receiptPremium}
@@ -2059,7 +2477,11 @@ function MobileGroupInsuranceContent() {
               }
             }}
             onShowPayment={() => setShowPaymentScreen(true)}
-            companyName={hasGroupParticipants ? (groupInfo?.groupName || corporateInfo?.company_name) : undefined}
+            companyName={
+              (hasGroupParticipants || (isCorporateMember && groupInfo)) 
+                ? (groupInfo?.groupName || corporateInfo?.company_name) 
+                : undefined
+            }
           />
           
           {/* 결제 화면 */}
@@ -2181,6 +2603,53 @@ function MobileGroupInsuranceContent() {
                   gender,
                   groupParticipantCount,
                 }));
+                
+                // 피보험자 데이터가 있으면 sessionStorage에 저장 (로그인 후 복원을 위해)
+                console.log('가입하기 버튼 클릭 - 데이터 저장 시도:', {
+                  hasGroupParticipants,
+                  groupParticipantsDataLength: groupParticipantsData.length,
+                  groupInsuredDataLength: groupInsuredData.length,
+                  groupParticipantCount,
+                  hasPlanInfo: !!planInfo,
+                  hasCalculatedPremiums: !!calculatedPremiums
+                });
+                
+                if (hasGroupParticipants && groupParticipantsData.length > 0 && groupInsuredData.length > 0) {
+                  sessionStorage.setItem('groupParticipantsData', JSON.stringify(groupParticipantsData));
+                  sessionStorage.setItem('groupParticipantCount', String(groupParticipantCount));
+                  sessionStorage.setItem('groupInsuredData', JSON.stringify(groupInsuredData));
+                  sessionStorage.setItem('hasGroupParticipants', '1');
+                  
+                  // 보험료 계산 데이터도 저장
+                  if (planInfo) {
+                    sessionStorage.setItem('planInfo', JSON.stringify(planInfo));
+                  }
+                  if (Object.keys(participantPremiumsByPlan).length > 0) {
+                    sessionStorage.setItem('participantPremiumsByPlan', JSON.stringify(participantPremiumsByPlan));
+                  }
+                  if (selectedPlan) {
+                    sessionStorage.setItem('selectedPlan', selectedPlan);
+                  }
+                  if (calculatedPremiums) {
+                    sessionStorage.setItem('calculatedPremiums', JSON.stringify(calculatedPremiums));
+                  }
+                  if (showPlanSelection) {
+                    sessionStorage.setItem('showPlanSelection', '1');
+                  }
+                  
+                  console.log('피보험자 데이터 저장 완료:', {
+                    participantsCount: groupParticipantsData.length,
+                    insuredDataCount: groupInsuredData.length,
+                    participantCount: groupParticipantCount
+                  });
+                } else {
+                  console.warn('피보험자 데이터가 없어서 저장하지 않음:', {
+                    hasGroupParticipants,
+                    groupParticipantsDataLength: groupParticipantsData.length,
+                    groupInsuredDataLength: groupInsuredData.length
+                  });
+                }
+                
                 window.location.href = '/group-insurance/login';
               }}
               className="tour2023_btn_b tour2023_btn_join"

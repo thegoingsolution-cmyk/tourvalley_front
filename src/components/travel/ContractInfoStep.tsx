@@ -239,7 +239,7 @@ export default function ContractInfoStep({
                   >
                     자세히보기
                   </button>
-                  {calculatedPremiums?.participants.length || 0}명
+                  {calculatedPremiums?.participants.length || participants.length || 0}명
                 </div>
               </div>
               <div className="contract-info-item contract-info-item-divider">
@@ -262,7 +262,11 @@ export default function ContractInfoStep({
                   <div>{participants[0]?.name || ''}</div>
                   <div>{participants[0]?.birthDate && participants[0]?.gender ? formatResidentNumber(participants[0].birthDate, participants[0].gender) : ''}</div>
                   <div>{participants[0]?.phone ? `${participants[0].phone.substring(0, 3)}-${participants[0].phone.substring(3, 7)}-${participants[0].phone.substring(7)}` : ''}</div>
-                  <div>{participants[0]?.email1 && participants[0]?.email2 ? `${participants[0].email1}@${participants[0].email2}` : ''}</div>
+                  <div>
+                    {participants[0]?.email1 && participants[0]?.email2 
+                      ? `${participants[0].email1}@${participants[0].email2 === '직접입력' ? (participants[0].customEmail || '') : participants[0].email2}`
+                      : ''}
+                  </div>
                 </div>
               </div>
             </div>

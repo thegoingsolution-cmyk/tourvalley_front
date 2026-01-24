@@ -11,12 +11,13 @@ interface MobilePlanSelectionProps {
   onMedicalExpenseChange: (value: boolean) => void;
   insuranceType?: string;
   contractBreakdownText?: string;
-  onContractDetailClick?: () => void;
+  onContractDetailClick?: (planType: PlanType) => void;
   // 해외장기체류보험용 props
   currencyPlan?: '원화' | '외화';
   onCurrencyPlanChange?: (plan: '원화' | '외화') => void;
   travelCountry?: string;
   travelPurpose?: string; // 여행목적 (워킹홀리데이인 경우 통화 플랜 선택 숨김)
+  hideMedicalExpenseOption?: boolean; // 국내실손의료비 보장 옵션 숨김 여부
 }
 
 export default function MobilePlanSelection({
@@ -32,6 +33,7 @@ export default function MobilePlanSelection({
   onCurrencyPlanChange,
   travelCountry,
   travelPurpose,
+  hideMedicalExpenseOption = false,
 }: MobilePlanSelectionProps) {
   const [exchangeRate, setExchangeRate] = useState<{ rate: number; date: string; currency: string } | null>(null);
   const [supportedCurrency, setSupportedCurrency] = useState<'USD' | 'EUR'>('USD');
@@ -146,8 +148,8 @@ export default function MobilePlanSelection({
           </span>
         </div>
       )}
-      {/* 국내실손의료비 보장 옵션 (해외장기체류보험 제외) */}
-      {!isLongTermStay && (
+      {/* 국내실손의료비 보장 옵션 (해외장기체류보험 제외, hideMedicalExpenseOption이 false일 때만 표시) */}
+      {!isLongTermStay && !hideMedicalExpenseOption && (
         <div className="medical-expense-option">
           <div className="medical-expense-header">
             <span className="question-icon">?</span>
@@ -269,7 +271,7 @@ export default function MobilePlanSelection({
                       type="button"
                       onClick={(event) => {
                         event.stopPropagation();
-                        onContractDetailClick();
+                        onContractDetailClick(planType as PlanType);
                       }}
                       style={{
                         fontSize: '12px',
@@ -295,7 +297,19 @@ export default function MobilePlanSelection({
                   </div>
                 ))}
               </div>
-              <a href="#" className="coverage-detail-link">보장 상세보기 &gt;</a>
+              {onContractDetailClick && (
+                <a 
+                  href="#" 
+                  className="coverage-detail-link"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    onContractDetailClick(planType as PlanType);
+                  }}
+                >
+                  보장 상세보기 &gt;
+                </a>
+              )}
             </div>
           );
         })}
