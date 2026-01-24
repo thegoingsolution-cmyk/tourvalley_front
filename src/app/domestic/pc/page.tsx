@@ -715,6 +715,7 @@ export default function PCDomesticPage() {
             const age = calculateAgeFromBirthDate(p.birthDate);
             // 국적 정보 변환
             const nationalityType = p.nationality === '외국인' ? '외국인' : '내국인';
+            const calculatedParticipant = calculatedPremiums?.participants.find(cp => cp.id === p.id);
             return {
               sequence_number: idx + 1,
               name: p.name,
@@ -722,8 +723,8 @@ export default function PCDomesticPage() {
               resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
               gender: p.gender,
               age: age || 0,
-              plan_type: selectedPlan || '실속플랜',
-              premium: calculatedPremiums?.participants.find(cp => cp.id === p.id)?.premium || 0,
+              plan_type: calculatedParticipant?.planType || selectedPlan || '실속플랜',
+              premium: calculatedParticipant?.premium || 0,
               has_medical_expense: hasMedicalExpense ? 1 : 0,
               nationality_type: nationalityType,
               nationality_continent: null, // 일반 경로에서는 외국인 대륙 정보를 수집하지 않음
@@ -861,6 +862,7 @@ export default function PCDomesticPage() {
             const age = calculateAgeFromBirthDate(p.birthDate);
             // 국적 정보 변환
             const nationalityType = p.nationality === '외국인' ? '외국인' : '내국인';
+            const calculatedParticipant = calculatedPremiums?.participants.find(cp => cp.id === p.id);
             return {
               sequence_number: idx + 1,
               name: p.name,
@@ -868,8 +870,8 @@ export default function PCDomesticPage() {
               resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
               gender: p.gender,
               age: age || 0,
-              plan_type: selectedPlan || '실속플랜',
-              premium: calculatedPremiums?.participants.find(cp => cp.id === p.id)?.premium || 0,
+              plan_type: calculatedParticipant?.planType || selectedPlan || '실속플랜',
+              premium: calculatedParticipant?.premium || 0,
               has_medical_expense: hasMedicalExpense ? 1 : 0,
               nationality_type: nationalityType,
               nationality_continent: null, // 일반 경로에서는 외국인 대륙 정보를 수집하지 않음

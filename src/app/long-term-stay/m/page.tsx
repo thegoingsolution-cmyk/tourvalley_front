@@ -680,14 +680,15 @@ function MobileLongTermStayContent() {
           },
           insured_persons: participants.map((p, idx) => {
             const age = calculateAgeFromBirthDate(p.birthDate);
+            const calculatedParticipant = calculatedPremiums?.participants.find(cp => cp.id === p.id);
             return {
               sequence_number: idx + 1,
               name: p.name,
               resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
               gender: p.gender,
               age: age || 0,
-              plan_type: selectedPlan || '실속플랜',
-              premium: calculatedPremiums?.participants.find(cp => cp.id === p.id)?.premium || 0,
+              plan_type: calculatedParticipant?.planType || selectedPlan || '실속플랜',
+              premium: calculatedParticipant?.premium || 0,
               has_medical_expense: hasMedicalExpense ? 1 : 0,
             };
           }),
@@ -807,14 +808,15 @@ function MobileLongTermStayContent() {
           },
           insured_persons: participants.map((p, idx) => {
             const age = calculateAgeFromBirthDate(p.birthDate);
+            const calculatedParticipant = calculatedPremiums?.participants.find(cp => cp.id === p.id);
             return {
               sequence_number: idx + 1,
               name: p.name,
               resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
               gender: p.gender,
               age: age || 0,
-              plan_type: selectedPlan || '실속플랜',
-              premium: calculatedPremiums?.participants.find(cp => cp.id === p.id)?.premium || 0,
+              plan_type: calculatedParticipant?.planType || selectedPlan || '실속플랜',
+              premium: calculatedParticipant?.premium || 0,
               has_medical_expense: hasMedicalExpense ? 1 : 0,
             };
           }),

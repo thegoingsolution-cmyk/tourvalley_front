@@ -54,7 +54,7 @@ export default function MobileContractPage() {
     totalPages: number;
     totalCount: number;
     pageSize: number;
-  }>({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 3 });
+  }>({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
 
   // 행사보험 계약 목록 데이터
   interface EventContract {
@@ -438,7 +438,7 @@ export default function MobileContractPage() {
 
     try {
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-      const response = await fetch(`${API_BASE_URL}/api/contracts/list?member_id=${member.id}&inyear=${inYear}&block_type=C&str_cur_page=${page}&pageSize=3`, {
+      const response = await fetch(`${API_BASE_URL}/api/contracts/list?member_id=${member.id}&inyear=${inYear}&block_type=C&str_cur_page=${page}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -452,26 +452,26 @@ export default function MobileContractPage() {
 
       const data = await response.json();
       if (data.success) {
+        // 백엔드에서 받은 데이터를 최대 3개로 제한 (UI 표시용)
         const contractsData = data.contracts || [];
         const limitedContracts = contractsData.slice(0, 3);
         setContracts(limitedContracts);
         
-        const totalCount = data.pagination?.totalCount || 0;
-        const totalPages = Math.ceil(totalCount / 3);
+        // 페이지네이션 정보는 백엔드에서 받은 값을 그대로 사용 (백엔드는 pageSize=10으로 계산)
         setContractPagination({
           currentPage: data.pagination?.currentPage || page,
-          totalPages: totalPages,
-          totalCount: totalCount,
-          pageSize: 3
+          totalPages: data.pagination?.totalPages || 0,
+          totalCount: data.pagination?.totalCount || 0,
+          pageSize: data.pagination?.pageSize || 10
         });
       } else {
         setContracts([]);
-        setContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 3 });
+        setContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
       }
     } catch (error) {
       console.error('계약 목록 조회 오류:', error);
       setContracts([]);
-      setContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 3 });
+      setContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
     }
   };
 
@@ -1215,9 +1215,9 @@ export default function MobileContractPage() {
 
                       const getInsuranceCompany = (insuranceType: string) => {
                         const longTermTypes = ['유학/어학연수', '해외출장/주재원/교환교수', '워킹홀리데이'];
-                        if (insuranceType === '국내여행') {
+                        if (insuranceType === '국내여행보험') {
                           return '라이나손해 국내여행보험';
-                        } else if (insuranceType === '해외여행') {
+                        } else if (insuranceType === '해외여행보험') {
                           return '라이나손해 해외여행보험';
                         } else if (longTermTypes.includes(insuranceType)) {
                           return '메리츠화재 해외장기체류보험';

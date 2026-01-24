@@ -1676,8 +1676,8 @@ function MobileGroupInsuranceContent() {
             access_path: '투어밸리 모바일 사이트',
           },
           contractor: hasGroupParticipants && groupInfo ? {
-            // 그룹 보험인 경우 법인 정보 사용
-            contractor_type: '법인',
+            // 그룹 보험인 경우 - 회원 타입에 따라 결정
+            contractor_type: (isLoggedIn && member && member.member_type !== '개인') ? '법인' : '개인',
             name: groupInfo.contactPerson || '', // 담당자명 → contractors.name
             resident_number: null,
             company_name: groupInfo.groupName || '', // 단체명 → contractors.company_name
@@ -1848,8 +1848,8 @@ function MobileGroupInsuranceContent() {
             access_path: '투어밸리 모바일 사이트',
           },
           contractor: hasGroupParticipants && groupInfo ? {
-            // 그룹 보험인 경우 법인 정보 사용
-            contractor_type: '법인',
+            // 그룹 보험인 경우 - 회원 타입에 따라 결정
+            contractor_type: (isLoggedIn && member && member.member_type !== '개인') ? '법인' : '개인',
             name: groupInfo.contactPerson || '', // 담당자명 → contractors.name
             resident_number: null,
             company_name: groupInfo.groupName || '', // 단체명 → contractors.company_name

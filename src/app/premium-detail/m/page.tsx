@@ -18,31 +18,88 @@ function MobilePremiumDetailContent() {
   const [totalPremium, setTotalPremium] = useState(0);
   const [hasMedicalExpense, setHasMedicalExpense] = useState(true);
 
+  // 데이터 정규화 함수 (다양한 데이터 소스에서 일관된 형식으로 변환)
+  const normalizeParticipants = (participants: any[]): Array<{
+    id: number;
+    name: string;
+    gender: string;
+    birthDate: string;
+    planType: string;
+    premium: number;
+  }> => {
+    if (!Array.isArray(participants)) return [];
+    
+    return participants.map((p: any, index: number) => ({
+      id: p.id || index + 1,
+      name: p.name || '',
+      gender: p.gender || '남자',
+      birthDate: p.birthDate || p.birth_date || '',
+      planType: p.planType || p.plan_type || '',
+      premium: typeof p.premium === 'number' ? p.premium : (typeof p.premium === 'string' ? parseFloat(p.premium) || 0 : 0),
+    }));
+  };
+
   useEffect(() => {
-    const data = searchParams.get('data');
-    if (data) {
-      try {
-        const parsed = JSON.parse(decodeURIComponent(data));
-        setParticipants(parsed.participants || []);
-        setTotalPremium(parsed.totalPremium || 0);
-        setHasMedicalExpense(parsed.hasMedicalExpense ?? true);
-      } catch (error) {
-        console.error('데이터 파싱 오류:', error);
-      }
+    const contractId = searchParams.get('contractId');
+    
+    if (contractId) {
+      // 계약 ID로 피보험자 정보 조회
+      fetchParticipants(contractId);
     } else {
-      const stored = localStorage.getItem('premiumDetailData');
-      if (stored) {
+      // 기존 방식: URL 파라미터나 localStorage에서 데이터 가져오기
+      const data = searchParams.get('data');
+      if (data) {
         try {
-          const parsed = JSON.parse(stored);
-          setParticipants(parsed.participants || []);
-          setTotalPremium(parsed.totalPremium || 0);
-          setHasMedicalExpense(parsed.hasMedicalExpense ?? true);
+          const parsed = JSON.parse(decodeURIComponent(data));
+          const normalizedParticipants = normalizeParticipants(parsed.participants || []);
+          setParticipants(normalizedParticipants);
+          setTotalPremium(parsed.totalPremium || parsed.total_premium || 0);
+          setHasMedicalExpense(parsed.hasMedicalExpense ?? parsed.has_medical_expense ?? true);
         } catch (error) {
           console.error('데이터 파싱 오류:', error);
+        }
+      } else {
+        const stored = localStorage.getItem('premiumDetailData');
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored);
+            const normalizedParticipants = normalizeParticipants(parsed.participants || []);
+            setParticipants(normalizedParticipants);
+            setTotalPremium(parsed.totalPremium || parsed.total_premium || 0);
+            setHasMedicalExpense(parsed.hasMedicalExpense ?? parsed.has_medical_expense ?? true);
+          } catch (error) {
+            console.error('데이터 파싱 오류:', error);
+          }
         }
       }
     }
   }, [searchParams]);
+
+  const fetchParticipants = async (contractId: string) => {
+    try {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${API_BASE_URL}/api/contracts/${contractId}/participants`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setParticipants(data.participants || []);
+          setTotalPremium(data.totalPremium || 0);
+          setHasMedicalExpense(data.hasMedicalExpense ?? true);
+        }
+      } else {
+        console.error('피보험자 정보 조회 실패');
+      }
+    } catch (error) {
+      console.error('피보험자 정보 조회 오류:', error);
+    }
+  };
 
   return (
     <div className="premium-detail-page-mobile">
@@ -91,7 +148,7 @@ function MobilePremiumDetailContent() {
                               {participant.planType || '-'}
                             </button>
                           </td>
-                          <td>{typeof participant.premium === 'number' ? participant.premium.toLocaleString() : '0'}원</td>
+                          <td>{typeof participant.premium === 'number' && participant.premium > 0 ? participant.premium.toLocaleString() : '0'}원</td>
                         </tr>
                       ))}
                     </tbody>
@@ -106,7 +163,7 @@ function MobilePremiumDetailContent() {
                     총 가입자: <strong>{participants.length}명</strong>
                   </div>
                   <div className="summary-item">
-                    총 보험료: <strong>{totalPremium.toLocaleString()}원</strong>
+                    총 보험료: <strong>{Math.floor(totalPremium || 0).toLocaleString()}원</strong>
                   </div>
                 </div>
               </div>

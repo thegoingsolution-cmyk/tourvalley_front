@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import './page.css';
 
 export default function ContractDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const contractId = params.id as string;
   const [contractDetail, setContractDetail] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -103,7 +104,7 @@ export default function ContractDetailPage() {
 
   const getInsuranceCompany = (insuranceType: string) => {
     const longTermTypes = ['유학/어학연수', '해외출장/주재원/교환교수', '워킹홀리데이'];
-    if (insuranceType === '국내여행') {
+    if (insuranceType === '국내여행보험') {
       return '라이나손해 국내여행보험';
     } else if (insuranceType === '해외여행') {
       return '라이나손해 해외여행보험';
@@ -175,17 +176,20 @@ export default function ContractDetailPage() {
               <span className="tour2023_txt10">
                 <a 
                   href="#" 
-                  onClick={(e) => { e.preventDefault(); alert('가입인원 상세보기'); }}
+                  onClick={(e) => { 
+                    e.preventDefault(); 
+                    router.push(`/premium-detail?contractId=${contractId}`);
+                  }}
                   className="tour2023_btn_b02 tour2023_btn08"
                 >
                   자세히보기
                 </a>
-                1명
+                {contractDetail.travelParticipants || 1}명
               </span>
             </li>
             <li className="tour2023_conList">
               <span className="tour2023_txt09">합계 보험료</span>
-              <span className="tour2023_txt10">{Math.floor(contractDetail.totalPremium / 10) * 10} 원</span>
+              <span className="tour2023_txt10">{Math.floor(contractDetail.totalPremium || 0).toLocaleString()} 원</span>
             </li>
             <li className="tour2023_conList">
               <span className="tour2023_txt09">무사고캐시</span>
@@ -193,7 +197,7 @@ export default function ContractDetailPage() {
             </li>
             <li className="tour2023_conList">
               <span className="tour2023_txt09">결제보험료</span>
-              <span className="tour2023_txt10">{Math.floor(contractDetail.totalPremium / 10) * 10} 원</span>
+              <span className="tour2023_txt10">{Math.floor(contractDetail.totalPremium || 0).toLocaleString()} 원</span>
             </li>
           </ul>
           
@@ -201,7 +205,11 @@ export default function ContractDetailPage() {
           <ul className="tour2023_conList_Wrap">
             <li className="tour2023_conList">
               <span className="tour2023_txt09">계약자/취급자</span>
-              <span className="tour2023_txt10">(주)빨주노초파남보</span>
+              <span className="tour2023_txt10">
+                {contractDetail.contractorType === '법인' && contractDetail.contractorCompanyName
+                  ? contractDetail.contractorCompanyName
+                  : '(주)빨주노초파남보'}
+              </span>
             </li>
             <li className="tour2023_conList">
               <span className="tour2023_txt09">대표 가입자</span>
@@ -218,11 +226,11 @@ export default function ContractDetailPage() {
           <ul className="tour2023_conList_Wrap">
             <li className="tour2023_conList">
               <span className="tour2023_txt09">결제방법</span>
-              <span className="tour2023_txt10">무통장입금</span>
+              <span className="tour2023_txt10">{contractDetail.paymentMethod || '무통장입금'}</span>
             </li>
             <li className="tour2023_conList">
               <span className="tour2023_txt09">결제여부</span>
-              <span className="tour2023_txt10">결제완료</span>
+              <span className="tour2023_txt10">{contractDetail.paymentStatus || '미결제'}</span>
             </li>
             <li className="tour2023_conList">
               <span className="tour2023_txt09">진행단계</span>
