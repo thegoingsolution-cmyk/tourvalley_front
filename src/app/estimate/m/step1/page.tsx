@@ -31,13 +31,18 @@ const parseDate = (dateString: string): Date | null => {
 export default function MobileStep1Page() {
   const router = useRouter();
   
-  // 오늘 날짜를 기본값으로 설정
+  // 오늘 날짜를 기본값으로 설정 (Korea timezone)
   const today = new Date();
-  const formattedDate = today.toISOString().split('T')[0];
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  const formattedDate = `${year}-${month}-${day}`;
   
   // 현재 시간 + 2시간을 기본값으로 설정 (24시까지)
+  // 예: 오후 10시 5분이면 +2시간 = 24시, 오후 11시 3분이면 +2시간 = 01시
   const currentHour = today.getHours();
   const calculatedHour = currentHour + 2;
+  // 24시가 되면 24로 유지, 25시 이상이면 1시부터 시작 (0시는 없음)
   const defaultHour = calculatedHour === 24 ? 24 : (calculatedHour > 24 ? calculatedHour % 24 || 24 : calculatedHour);
 
   const [startDate, setStartDate] = useState(formattedDate);

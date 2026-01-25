@@ -26,13 +26,18 @@ function MobileDomesticStep1Content() {
   const router = useRouter();
   const { member, isLoggedIn } = useAuth();
 
-  // Get today's date in YYYY-MM-DD format
+  // Get today's date in YYYY-MM-DD format (Korea timezone)
   const today = new Date();
-  const formattedDate = today.toISOString().split('T')[0];
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  const formattedDate = `${year}-${month}-${day}`;
   
   // Get current hour + 2 hours (default time)
+  // 예: 오후 10시 5분이면 +2시간 = 24시, 오후 11시 3분이면 +2시간 = 01시
   const currentHour = today.getHours();
   const calculatedHour = currentHour + 2;
+  // 24시가 되면 24로 유지, 25시 이상이면 1시부터 시작 (0시는 없음)
   const defaultHour = calculatedHour === 24 ? 24 : (calculatedHour > 24 ? calculatedHour % 24 || 24 : calculatedHour);
 
   const [departureDate, setDepartureDate] = useState(formattedDate);

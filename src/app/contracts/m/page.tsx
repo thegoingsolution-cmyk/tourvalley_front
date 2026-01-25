@@ -1307,24 +1307,115 @@ export default function MobileContractPage() {
                     })()}
 
                     {/* 페이지네이션 */}
-                    {contractPagination.totalPages > 1 && (
+                    {contractPagination.totalPages > 0 && (
                       <div className="board_foot" style={{ paddingBottom: '12px' }}>
                         <ul className="paging">
-                          {Array.from({ length: contractPagination.totalPages }, (_, i) => i + 1).map((page) => (
-                            <li key={page} className={page === contractPagination.currentPage ? 'on' : ''}>
+                          {/* 첫 페이지로 이동 */}
+                          {contractPagination.currentPage > 1 && (
+                            <li>
                               <a 
                                 href="#" 
                                 onClick={(e) => {
                                   e.preventDefault();
-                                  if (page !== contractPagination.currentPage) {
-                                    getContractList(page);
-                                  }
+                                  getContractList(1);
                                 }}
+                                className="paging-nav-first"
+                                title="첫 페이지"
                               >
-                                {page}
+                                <span className="paging-double-arrow-left">
+                                  <img src={getImagePath('/images/g_more.png')} alt="첫 페이지" />
+                                  <img src={getImagePath('/images/g_more.png')} alt="" />
+                                </span>
                               </a>
                             </li>
-                          ))}
+                          )}
+                          
+                          {/* 이전 페이지로 이동 */}
+                          {contractPagination.currentPage > 1 && (
+                            <li>
+                              <a 
+                                href="#" 
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  getContractList(contractPagination.currentPage - 1);
+                                }}
+                                className="paging-nav-prev"
+                                title="이전 페이지"
+                              >
+                                <img src={getImagePath('/images/g_more.png')} alt="이전" className="paging-arrow-left" />
+                              </a>
+                            </li>
+                          )}
+
+                          {/* 페이지 번호들 (최대 3개) */}
+                          {(() => {
+                            const { currentPage, totalPages } = contractPagination;
+                            let startPage = Math.max(1, currentPage - 1);
+                            let endPage = Math.min(totalPages, startPage + 2);
+                            
+                            // 끝에서 3개가 안 될 경우 시작점 조정
+                            if (endPage - startPage < 2) {
+                              startPage = Math.max(1, endPage - 2);
+                            }
+
+                            const pages = [];
+                            for (let i = startPage; i <= endPage; i++) {
+                              pages.push(i);
+                            }
+
+                            return pages.map((page) => (
+                              <li key={page} className={page === currentPage ? 'on' : ''}>
+                                <a 
+                                  href="#" 
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    if (page !== currentPage) {
+                                      getContractList(page);
+                                    }
+                                  }}
+                                >
+                                  {page}
+                                </a>
+                              </li>
+                            ));
+                          })()}
+
+                          {/* 다음 페이지로 이동 */}
+                          {contractPagination.currentPage < contractPagination.totalPages && (
+                            <li>
+                              <a 
+                                href="#" 
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  getContractList(contractPagination.currentPage + 1);
+                                }}
+                                className="paging-nav-next"
+                                title="다음 페이지"
+                              >
+                                <img src={getImagePath('/images/g_more.png')} alt="다음" className="paging-arrow-right" />
+                              </a>
+                            </li>
+                          )}
+
+                          {/* 마지막 페이지로 이동 */}
+                          {contractPagination.currentPage < contractPagination.totalPages && (
+                            <li>
+                              <a 
+                                href="#" 
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  getContractList(contractPagination.totalPages);
+                                }}
+                                className="paging-nav-last"
+                                title="마지막 페이지"
+                              >
+                                <span className="paging-double-arrow-right">
+                                  <img src={getImagePath('/images/g_more.png')} alt="마지막" />
+                                  <img src={getImagePath('/images/g_more.png')} alt="" />
+                                </span>
+                              </a>
+                            </li>
+                          )}
                         </ul>
                       </div>
                     )}
@@ -1438,24 +1529,115 @@ export default function MobileContractPage() {
                     })()}
 
                     {/* 페이지네이션 */}
-                    {eventContractPagination.totalPages > 1 && (
+                    {eventContractPagination.totalPages > 0 && (
                       <div className="board_foot" style={{ paddingBottom: '12px' }}>
                         <ul className="paging">
-                          {Array.from({ length: eventContractPagination.totalPages }, (_, i) => i + 1).map((page) => (
-                            <li key={page} className={page === eventContractPagination.currentPage ? 'on' : ''}>
+                          {/* 첫 페이지로 이동 */}
+                          {eventContractPagination.currentPage > 1 && (
+                            <li>
                               <a 
                                 href="#" 
                                 onClick={(e) => {
                                   e.preventDefault();
-                                  if (page !== eventContractPagination.currentPage) {
-                                    getEventContractList(page);
-                                  }
+                                  getEventContractList(1);
                                 }}
+                                className="paging-nav-first"
+                                title="첫 페이지"
                               >
-                                {page}
+                                <span className="paging-double-arrow-left">
+                                  <img src={getImagePath('/images/g_more.png')} alt="첫 페이지" />
+                                  <img src={getImagePath('/images/g_more.png')} alt="" />
+                                </span>
                               </a>
                             </li>
-                          ))}
+                          )}
+                          
+                          {/* 이전 페이지로 이동 */}
+                          {eventContractPagination.currentPage > 1 && (
+                            <li>
+                              <a 
+                                href="#" 
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  getEventContractList(eventContractPagination.currentPage - 1);
+                                }}
+                                className="paging-nav-prev"
+                                title="이전 페이지"
+                              >
+                                <img src={getImagePath('/images/g_more.png')} alt="이전" className="paging-arrow-left" />
+                              </a>
+                            </li>
+                          )}
+
+                          {/* 페이지 번호들 (최대 3개) */}
+                          {(() => {
+                            const { currentPage, totalPages } = eventContractPagination;
+                            let startPage = Math.max(1, currentPage - 1);
+                            let endPage = Math.min(totalPages, startPage + 2);
+                            
+                            // 끝에서 3개가 안 될 경우 시작점 조정
+                            if (endPage - startPage < 2) {
+                              startPage = Math.max(1, endPage - 2);
+                            }
+
+                            const pages = [];
+                            for (let i = startPage; i <= endPage; i++) {
+                              pages.push(i);
+                            }
+
+                            return pages.map((page) => (
+                              <li key={page} className={page === currentPage ? 'on' : ''}>
+                                <a 
+                                  href="#" 
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    if (page !== currentPage) {
+                                      getEventContractList(page);
+                                    }
+                                  }}
+                                >
+                                  {page}
+                                </a>
+                              </li>
+                            ));
+                          })()}
+
+                          {/* 다음 페이지로 이동 */}
+                          {eventContractPagination.currentPage < eventContractPagination.totalPages && (
+                            <li>
+                              <a 
+                                href="#" 
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  getEventContractList(eventContractPagination.currentPage + 1);
+                                }}
+                                className="paging-nav-next"
+                                title="다음 페이지"
+                              >
+                                <img src={getImagePath('/images/g_more.png')} alt="다음" className="paging-arrow-right" />
+                              </a>
+                            </li>
+                          )}
+
+                          {/* 마지막 페이지로 이동 */}
+                          {eventContractPagination.currentPage < eventContractPagination.totalPages && (
+                            <li>
+                              <a 
+                                href="#" 
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  getEventContractList(eventContractPagination.totalPages);
+                                }}
+                                className="paging-nav-last"
+                                title="마지막 페이지"
+                              >
+                                <span className="paging-double-arrow-right">
+                                  <img src={getImagePath('/images/g_more.png')} alt="마지막" />
+                                  <img src={getImagePath('/images/g_more.png')} alt="" />
+                                </span>
+                              </a>
+                            </li>
+                          )}
                         </ul>
                       </div>
                     )}

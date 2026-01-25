@@ -27,15 +27,22 @@ const parseDate = (dateString: string): Date | null => {
 };
 
 export default function MobileEventInsurancePage() {
+  // Get today's date in YYYY-MM-DD format (Korea timezone)
   const today = new Date();
-  const todayString = today.toISOString().split('T')[0]; // YYYY-MM-DD 형식
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  const todayString = `${year}-${month}-${day}`;
 
-  // 현재 시간 + 2시간 계산 (00~23시 형식)
+  // Get current hour + 2 hours (default time)
+  // 예: 오후 10시 5분이면 +2시간 = 24시, 오후 11시 3분이면 +2시간 = 01시
   const getDefaultHour = () => {
     const now = new Date();
     const currentHour = now.getHours();
-    const nextHour = (currentHour + 2) % 24; // 24시 넘으면 0시로
-    return String(nextHour).padStart(2, '0');
+    const calculatedHour = currentHour + 2;
+    // 24시가 되면 24로 유지, 25시 이상이면 1시부터 시작 (0시는 없음)
+    const defaultHour = calculatedHour === 24 ? 24 : (calculatedHour > 24 ? calculatedHour % 24 || 24 : calculatedHour);
+    return String(defaultHour).padStart(2, '0');
   };
 
   const [formData, setFormData] = useState({
