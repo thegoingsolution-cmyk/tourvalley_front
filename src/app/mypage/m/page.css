@@ -3,7 +3,6 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f5f5f5;
 }
 
 .mypage-content-mobile {
@@ -448,3 +447,459 @@
   color: #999;
 }
 
+/* test.css 스타일 추가 */
+.prow_01 {
+  padding-left: 4.68%;
+  padding-right: 4.68%;
+}
+
+.tourG_mat13 {
+  margin-top: 40px !important;
+}
+
+.tourG_mab04 {
+  margin-bottom: 15px !important;
+}
+
+.tourG_mab03 {
+  margin-bottom: 10px !important;
+}
+
+.tourG_mat10 {
+  margin-top: 35px;
+}
+
+.tourG_mat07 {
+  margin-top: 10px;
+}
+
+.tourG_mat05 {
+  margin-top: 25px;
+}
+
+.tourG_mab02 {
+  margin-bottom: 35px;
+}
+
+.tourG_mat14 {
+  margin-top: 50px !important;
+}
+
+.tourG_Wrap {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.tour2023_flex {
+  position: relative;
+  width: 100%;
+  display: inline-flex;
+  justify-content: space-between;
+}
+
+.tour2023_flex01 {
+  position: relative;
+  width: 95%;
+  display: inline-flex;
+  justify-content: space-between;
+}
+
+.tour2023_joinTit01 {
+  font-family: 'NanumSquareNeoTTF-dEb';
+  font-size: 25px;
+  color: #202020;
+  letter-spacing: -0.8px;
+  text-align: left;
+  display: inline-block;
+  margin-left: 4px;
+  line-height: 105%;
+}
+
+.tour2023_blue {
+  color: #1b37e1 !important;
+}
+
+.tour2023_txt39 {
+  font-size: 15px;
+  color: #545454;
+  text-align: right;
+  line-height: 130%;
+  letter-spacing: -1px;
+  vertical-align: top;
+  text-decoration: underline;
+  display: inline-block;
+  margin: 6px 0px 0 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.tourGuard_Info {
+  position: relative;
+  margin: 11px 0 15px 0;
+}
+
+.tourGuard_form_tt {
+  position: relative;
+  min-height: 65px;
+  height: auto;
+  border: 1px solid #c3c6ce;
+  border-radius: 15px;
+  background: #fff;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 0 10px;
+  margin-bottom: 10px;
+}
+
+.tourGuard_form_tt label {
+  position: absolute;
+  top: 6px;
+  left: 20px;
+  color: #9797a3;
+  font-size: 12px;
+  font-family: 'Malgun Gothic', '맑은고딕', dotum, '돋움', AppleGothic, sans-serif;
+  letter-spacing: -0.8px;
+}
+
+.tourGuard_form_tt input[type="text"],
+.tourGuard_form_tt input[type="tel"],
+.tourGuard_form_tt input[type="password"] {
+  height: 32px;
+  padding: 0 10px;
+  border: 0;
+  color: #000;
+  font-size: 18px;
+  letter-spacing: 0px;
+  caret-color: #222;
+  display: inline-block;
+  vertical-align: middle;
+  margin-top: 23px;
+  margin-left: 0;
+  background: transparent;
+  flex: 1;
+  min-width: 0;
+}
+
+.tourGuard_form_tt input[type="text"]::placeholder,
+.tourGuard_form_tt input[type="tel"]::placeholder,
+.tourGuard_form_tt input[type="password"]::placeholder {
+  color: #dddddd;
+  text-shadow: initial;
+}
+
+.tourGuard_form_tt input[type="text"]:-ms-input-placeholder,
+.tourGuard_form_tt input[type="tel"]:-ms-input-placeholder,
+.tourGuard_form_tt input[type="password"]:-ms-input-placeholder {
+  color: #dddddd;
+  text-shadow: initial;
+}
+
+.tourGuard_form_tt input[disabled],
+.tourGuard_form_tt input[readonly] {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.tourGuard_form_tt .tourGuard_input_w01 {
+  width: 38% !important;
+  flex: 0 0 38%;
+}
+
+.tourGuard_form_tt .tourGuard_input_w02 {
+  width: 90% !important;
+  flex: 0 0 90%;
+}
+
+.tourGuard_form_tt .tourGuard_txt03 {
+  position: relative;
+  display: inline-block;
+  font-size: 20px;
+  margin: 23px 6px 0 6px;
+  vertical-align: middle;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.tourGuard_form_tt .tourGuard_input_cell08 {
+  width: 30% !important;
+  flex: 0 0 30%;
+}
+
+.tourGuard_form_tt .tourGuard_input_cell09 {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  height: 32px;
+  padding-right: 10px;
+  margin-top: 23px;
+}
+
+.tourGuard_form_tt .tourGuard_ps_box {
+  width: 100%;
+  display: inline-block;
+  height: 32px;
+}
+
+.tourGuard_form_tt .tourGuard_sel {
+  width: 100%;
+  padding: 0 10px !important;
+  border: none;
+  background: #fff;
+  height: 32px;
+  font-size: 18px;
+  color: #000;
+  margin-top: 0;
+  border-radius: 4px;
+}
+
+.tourG_rdo_area {
+  font-size: 0px;
+  width: 42%;
+  margin-right: 0;
+  vertical-align: middle;
+  text-align: center;
+  position: relative;
+  display: inline-flex;
+}
+
+.tourG_rdo_area label {
+  position: absolute;
+  top: 6px;
+  left: 20px;
+  color: #9797a3;
+  font-size: 12px;
+  font-family: 'Malgun Gothic', '맑은고딕', dotum, '돋움', AppleGothic, sans-serif;
+  letter-spacing: -0.8px;
+}
+
+.tourG_inp_rdo {
+  position: relative;
+  width: 40%;
+  display: inline-block;
+  overflow-wrap: normal;
+  word-break: normal;
+  vertical-align: middle;
+  align-items: center;
+  text-align: center;
+  background: transparent;
+}
+
+.tourG_inp_rdo input {
+  position: absolute;
+  display: block;
+  width: 1px;
+  height: 1px;
+  margin: 0px;
+  padding: 0px;
+  border: 0px;
+  background: none;
+  background: transparent;
+}
+
+.tourG_inp_rdo input + label {
+  width: 100%;
+  height: 32px;
+  display: inline-block;
+  text-align: left;
+  font-size: 17px;
+  vertical-align: middle;
+  letter-spacing: -0.8px;
+  color: #dddddd;
+  box-sizing: border-box;
+  margin: 22px 0 0 0;
+}
+
+.tourG_inp_rdo input:checked + label {
+  color: #0000ff;
+  font-weight: 500;
+}
+
+.one_line0 {
+  border-left: 0px !important;
+}
+
+.tourG_line:after {
+  content: '';
+  position: absolute;
+  display: inline-block;
+  width: 47px;
+  height: 50px;
+  top: -4px;
+  left: 40%;
+  margin: 0px 0 0px 0px;
+  border-bottom: 1px solid #d5d7dd;
+  vertical-align: middle;
+  transform: rotate(297deg);
+  z-index: 1;
+}
+
+.tour2023_title16 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 17px;
+  line-height: 130%;
+  color: #202020;
+  letter-spacing: -0.5px;
+  text-align: left;
+  display: inline-block;
+}
+
+.tour2023_agree {
+  position: relative;
+  clear: both;
+  text-align: left;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tour2023_agree .cir {
+  display: flex;
+  align-items: center;
+}
+
+.tour2023_cir {
+  position: relative;
+  display: inline-block;
+  z-index: 10;
+  height: 23px;
+  margin-bottom: 5px;
+}
+
+.tour2023_cir input {
+  position: absolute;
+  top: -1px;
+  left: 3px;
+  z-index: 9;
+}
+
+.tour2023_cir label {
+  text-align: left;
+  color: #333;
+  padding: 2px 0 0 0;
+  vertical-align: top;
+  display: inline-block;
+  margin-top: 0px;
+  cursor: pointer;
+}
+
+.tour2023_cir label span {
+  color: #2c2c2c;
+}
+
+.tour2023_cir.tour2023_chk input {
+  border-radius: 12px;
+  border: 1px solid #dfdfdf;
+  height: 22px;
+  width: 22px;
+  vertical-align: middle;
+  background: transparent;
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  position: relative;
+}
+
+.tour2023_cir.tour2023_chk input:checked {
+  background-color: #1b37e1;
+  background-image: url(/icons/chk_ov.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+  border-color: #1b37e1;
+}
+
+.tourGuard_txt24 {
+  font-size: 15px;
+  letter-spacing: -1.8px;
+  line-height: 100%;
+  vertical-align: top;
+  display: inline-block;
+  margin-left: 31px;
+}
+
+.tourG_mleft05 {
+  margin-left: 32px;
+}
+
+.tour2023_btn_ww {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  width: 100%;
+  gap: 10px;
+}
+
+.tour2023_btn_ww01 {
+  width: 40%;
+  display: flex;
+  align-items: stretch;
+}
+
+.tour2023_btn_ww02 {
+  width: 58%;
+  display: flex;
+  align-items: stretch;
+}
+
+.tourGuard_btn_b {
+  position: relative;
+  display: block;
+  width: 100%;
+  text-decoration: none;
+}
+
+.tour2023_btn06_gray01 {
+  font-size: 21px;
+  letter-spacing: -1px;
+  padding: 0;
+  height: 60px;
+  line-height: 60px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-sizing: border-box;
+  border: 1px solid #b8b9bb;
+  color: #666666 !important;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  width: 100%;
+}
+
+.tour2023_btn01 {
+  font-size: 21px;
+  padding: 0;
+  height: 60px;
+  line-height: 60px;
+  background-color: #2c3fb3;
+  border-radius: 10px;
+  box-sizing: border-box;
+  color: #fff !important;
+  text-align: center;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tour2023_btn01:disabled {
+  background-color: #b8b9bb;
+  cursor: not-allowed;
+}
+
+.mag5 {
+  margin: 0;
+}

@@ -161,6 +161,15 @@ export default function MobileMyPage() {
     return phone;
   };
 
+  // 사업자번호 포맷팅
+  const formatBusinessNumber = (num: string) => {
+    const cleaned = num.replace(/\D/g, '');
+    if (cleaned.length === 10) {
+      return cleaned.replace(/(\d{3})(\d{2})(\d{5})/, '$1-$2-$3');
+    }
+    return num;
+  };
+
   // 전화번호 입력 처리
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\D/g, '');
@@ -372,239 +381,253 @@ export default function MobileMyPage() {
       <Header isMobile={true} />
       
       <main className="mypage-content-mobile">
-        <div className="mypage-container-mobile">
-          {/* 헤더 */}
-          <div className="mypage-header-mobile">
-            <h1 className="mypage-title-mobile">
-              회원정보<span className="title-highlight">변경</span>
-            </h1>
-            <button 
-              type="button" 
-              className="withdraw-link-mobile"
-              onClick={handleWithdraw}
-            >
-              회원탈퇴 &gt;
-            </button>
-          </div>
+        <div className="prow_01">
+          <div className="tourG_mat13">
+            {/* 헤더 */}
+            <div className="tour2023_flex">
+              <p className="tour2023_joinTit01 tourG_mab04">회원정보<span className="tour2023_blue">변경</span></p>
+              <button 
+                type="button" 
+                className="tour2023_txt39"
+                onClick={handleWithdraw}
+              >
+                회원탈퇴 &gt;
+              </button>
+            </div>
 
           {isCorporate ? (
             /* 법인회원 폼 */
-            <form onSubmit={handleCorporateSubmit} className="mypage-form-mobile">
-              {/* 아이디 (수정불가) */}
-              <div className="form-field-mobile">
-                <label className="form-label-mobile">아이디</label>
-                <input
-                  type="text"
-                  value={member?.username || ''}
-                  className="form-input-mobile readonly"
-                  readOnly
-                  disabled
-                />
-              </div>
-
-              {/* 비밀번호 */}
-              <div className="form-field-mobile">
-                <label className="form-label-mobile">비밀번호</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="변경할 비밀번호를 입력해주세요"
-                  className="form-input-mobile password-input"
-                  autoComplete="new-password"
-                />
-              </div>
-
-              {/* 비밀번호 재확인 */}
-              <div className="form-field-mobile">
-                <label className="form-label-mobile">비밀번호 재확인</label>
-                <input
-                  type="password"
-                  value={passwordConfirm}
-                  onChange={(e) => setPasswordConfirm(e.target.value)}
-                  placeholder="비밀번호 재확인"
-                  className="form-input-mobile"
-                  autoComplete="new-password"
-                />
-              </div>
-
-              {/* 법인단체명 (수정불가) */}
-              <div className="form-field-mobile">
-                <label className="form-label-mobile">법인단체명</label>
-                <input
-                  type="text"
-                  value={corporateInfo?.company_name || ''}
-                  className="form-input-mobile readonly"
-                  readOnly
-                  disabled
-                />
-              </div>
-
-              {/* 사업자번호 (수정불가) */}
-              <div className="form-field-mobile">
-                <label className="form-label-mobile">사업자번호</label>
-                <div className="business-number-display-mobile">
-                  {corporateInfo?.business_number ? (
-                    <>
-                      <span className="business-part">{corporateInfo.business_number.substring(0, 3)}</span>
-                      <span className="business-divider">—</span>
-                      <span className="business-part">{corporateInfo.business_number.substring(3, 5)}</span>
-                      <span className="business-divider">—</span>
-                      <span className="business-part">{corporateInfo.business_number.substring(5)}</span>
-                    </>
-                  ) : ''}
+            <form name="memberForm" id="memberForm" method="post" onSubmit={handleCorporateSubmit}>
+              <section className="tourGuard_Info">
+                {/* 아이디 (수정불가) */}
+                <div className="tourGuard_form_tt mag5 tourG_mab03">
+                  <label>아이디</label>
+                  <input
+                    type="text"
+                    value={member?.username || ''}
+                    className="tourGuard_input_w02"
+                    readOnly
+                    disabled
+                  />
                 </div>
-              </div>
 
-              {/* 담당자 정보 */}
-              {contacts.map((contact, index) => (
-                <div key={index} className="contact-section-mobile">
-                  {index === 0 && <div className="contact-divider-mobile" />}
-                  
-                  {/* 담당자명 */}
-                  <div className="form-field-mobile">
-                    <label className="form-label-mobile">담당자명</label>
-                    <input
-                      type="text"
-                      value={contact.contact_name}
-                      onChange={(e) => handleContactChange(index, 'contact_name', e.target.value)}
-                      placeholder="담당자명을 입력해주세요"
-                      className="form-input-mobile"
-                    />
-                  </div>
+                {/* 비밀번호 */}
+                <div className="tourGuard_form_tt mag5 tourG_mab03">
+                  <label>비밀번호</label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="8-20자 영문, 숫자, 특수문자 일부 사용가능"
+                    className="tourGuard_input_w02"
+                    autoComplete="new-password"
+                  />
+                </div>
 
-                  {/* 부서 */}
-                  <div className="form-field-mobile">
-                    <label className="form-label-mobile">부서</label>
-                    <input
-                      type="text"
-                      value={contact.department}
-                      onChange={(e) => handleContactChange(index, 'department', e.target.value)}
-                      placeholder="부서를 입력해주세요"
-                      className="form-input-mobile"
-                    />
-                  </div>
+                {/* 비밀번호 재확인 */}
+                <div className="tourGuard_form_tt mag5 tourG_mab03">
+                  <label>비밀번호 재확인</label>
+                  <input
+                    type="password"
+                    value={passwordConfirm}
+                    onChange={(e) => setPasswordConfirm(e.target.value)}
+                    placeholder="비밀번호 재확인"
+                    className="tourGuard_input_w02"
+                    autoComplete="new-password"
+                  />
+                </div>
 
-                  {/* 직급/직책 */}
-                  <div className="form-field-mobile">
-                    <label className="form-label-mobile">직급/직책</label>
-                    <input
-                      type="text"
-                      value={contact.position}
-                      onChange={(e) => handleContactChange(index, 'position', e.target.value)}
-                      placeholder="직급/직책을 입력해주세요"
-                      className="form-input-mobile"
-                    />
-                  </div>
+                {/* 법인단체명 (수정불가) */}
+                <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_mat10">
+                  <label>법인단체명</label>
+                  <input
+                    type="text"
+                    value={corporateInfo?.company_name || ''}
+                    className="tourGuard_input_w02"
+                    readOnly
+                    disabled
+                  />
+                </div>
 
-                  {/* 이메일 주소 */}
-                  <div className="form-field-mobile">
-                    <label className="form-label-mobile">이메일 주소</label>
-                    <div className="email-input-group-mobile">
+                {/* 사업자번호 (수정불가) */}
+                <div className="tourGuard_form_tt mag5 tourG_mab03">
+                  <label>사업자번호</label>
+                  <input
+                    type="text"
+                    value={corporateInfo?.business_number ? formatBusinessNumber(corporateInfo.business_number) : ''}
+                    className="tourGuard_input_w02"
+                    readOnly
+                    disabled
+                  />
+                </div>
+
+                {/* 담당자 정보 */}
+                {contacts.map((contact, index) => (
+                  <div key={index}>
+                    {index === 0 && <div className="tourG_line" style={{ margin: '20px 0' }} />}
+                    
+                    {/* 담당자명 */}
+                    <div className="tourGuard_form_tt mag5 tourG_mab03">
+                      <label>담당자명</label>
                       <input
                         type="text"
+                        value={contact.contact_name}
+                        onChange={(e) => handleContactChange(index, 'contact_name', e.target.value)}
+                        placeholder="담당자명을 입력해주세요"
+                        className="tourGuard_input_w02"
+                      />
+                    </div>
+
+                    {/* 부서 */}
+                    <div className="tourGuard_form_tt mag5 tourG_mab03">
+                      <label>부서</label>
+                      <input
+                        type="text"
+                        value={contact.department}
+                        onChange={(e) => handleContactChange(index, 'department', e.target.value)}
+                        placeholder="부서를 입력해주세요"
+                        className="tourGuard_input_w02"
+                      />
+                    </div>
+
+                    {/* 직급/직책 */}
+                    <div className="tourGuard_form_tt mag5 tourG_mab03">
+                      <label>직급/직책</label>
+                      <input
+                        type="text"
+                        value={contact.position}
+                        onChange={(e) => handleContactChange(index, 'position', e.target.value)}
+                        placeholder="직급/직책을 입력해주세요"
+                        className="tourGuard_input_w02"
+                      />
+                    </div>
+
+                    {/* 이메일 주소 */}
+                    <div className="tourGuard_form_tt mag5 tourG_mab03">
+                      <label>이메일 주소</label>
+                      <input
+                        type="text"
+                        id={`email1_${index}`}
                         value={contact.email}
                         onChange={(e) => handleContactChange(index, 'email', e.target.value)}
-                        placeholder="이메일"
-                        className="form-input-mobile email-id-mobile"
+                        placeholder="아이디"
+                        className="tourGuard_input_w01"
+                        maxLength={20}
                       />
-                      <span className="email-at-mobile">@</span>
+                      <div className="tourGuard_txt03" style={{ position: 'relative', left: 0 }}>@</div>
                       <input
                         type="text"
+                        id={`email2_${index}`}
                         value={contact.emailDomain}
                         onChange={(e) => handleContactChange(index, 'emailDomain', e.target.value)}
                         placeholder="도메인"
-                        className="form-input-mobile email-domain-mobile"
+                        className="tourGuard_input_w01"
+                        maxLength={20}
                         readOnly={contact.emailDomainSelect !== '직접입력'}
                       />
+                      <div className="tourGuard_input_cell08 tourGuard_input_cell09 tourGuard" style={{ width: '30%' }}>
+                        <span className="tourGuard_ps_box">
+                          <select
+                            className="tourGuard_sel"
+                            value={contact.emailDomainSelect}
+                            onChange={(e) => handleContactChange(index, 'emailDomainSelect', e.target.value)}
+                          >
+                            {emailDomains.map((domain) => (
+                              <option key={domain} value={domain}>
+                                {domain === '직접입력' ? '선택' : domain}
+                              </option>
+                            ))}
+                          </select>
+                        </span>
+                      </div>
                     </div>
-                    <select
-                      value={contact.emailDomainSelect}
-                      onChange={(e) => handleContactChange(index, 'emailDomainSelect', e.target.value)}
-                      className="form-select-mobile"
-                    >
-                      {emailDomains.map((domain) => (
-                        <option key={domain} value={domain}>
-                          {domain === '직접입력' ? '선택' : domain}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
 
-                  {/* 휴대폰 번호 */}
-                  <div className="form-field-mobile">
-                    <label className="form-label-mobile">휴대폰 번호</label>
-                    <input
-                      type="tel"
-                      value={contact.mobile_phone}
-                      onChange={(e) => handleContactChange(index, 'mobile_phone', e.target.value)}
-                      placeholder="휴대폰 번호를 입력해주세요"
-                      className="form-input-mobile"
-                    />
+                    {/* 휴대폰 번호 */}
+                    <div className="tourGuard_form_tt mag5 tourG_mab03">
+                      <label>휴대폰 번호</label>
+                      <input
+                        type="tel"
+                        value={contact.mobile_phone}
+                        onChange={(e) => handleContactChange(index, 'mobile_phone', e.target.value)}
+                        placeholder="숫자만 입력해주세요."
+                        className="tourGuard_input_w02"
+                        maxLength={11}
+                      />
+                    </div>
                   </div>
+                ))}
+
+                {/* 담당자 추가 버튼 */}
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+                  <button 
+                    type="button" 
+                    className="tour2023_btn_b01 tour2023_btn11"
+                    onClick={handleAddContact}
+                    style={{ border: '1px solid #1b37e1', borderRadius: '4px', background: '#fff', color: '#1b37e1', padding: '8px 14px', fontSize: '13px', fontWeight: 500, cursor: 'pointer' }}
+                  >
+                    담당자추가 +
+                  </button>
                 </div>
-              ))}
 
-              {/* 담당자 추가 버튼 */}
-              <div className="add-contact-wrapper-mobile">
-                <button 
-                  type="button" 
-                  className="add-contact-btn-mobile"
-                  onClick={handleAddContact}
-                >
-                  담당자추가 +
-                </button>
-              </div>
-
-              {/* 수신 여부 */}
-              <div className="receive-options-mobile">
-                <div className="receive-row-mobile">
-                  <span className="receive-label-mobile">이메일</span>
-                  <div className="receive-buttons-mobile">
-                    <label className="receive-option-mobile">
+                {/* 수신 여부 */}
+                <div className="tour2023_flex01 tourG_mat10">
+                  <p className="tour2023_title16">이메일</p>
+                  <ul className="tour2023_agree">
+                    <li className="tour2023_cir tour2023_chk">
                       <input
                         type="radio"
-                        name="emailReceive"
+                        name="receive_mail_yn"
+                        id={`receive_mail_y_${isCorporate ? 'corp' : 'per'}`}
                         checked={emailReceive}
                         onChange={() => setEmailReceive(true)}
                       />
-                      <span className={`receive-btn-mobile ${emailReceive ? 'active' : ''}`}>수신</span>
-                    </label>
-                    <label className="receive-option-mobile">
+                      <label htmlFor={`receive_mail_y_${isCorporate ? 'corp' : 'per'}`}>
+                        <span className="tourGuard_txt24"> 수신</span>
+                      </label>
+                    </li>
+                    <li className="tour2023_cir tour2023_chk tourG_mleft05">
                       <input
                         type="radio"
-                        name="emailReceive"
+                        name="receive_mail_yn"
+                        id={`receive_mail_n_${isCorporate ? 'corp' : 'per'}`}
                         checked={!emailReceive}
                         onChange={() => setEmailReceive(false)}
                       />
-                      <span className={`receive-btn-mobile ${!emailReceive ? 'active' : ''}`}>미수신</span>
-                    </label>
-                  </div>
+                      <label htmlFor={`receive_mail_n_${isCorporate ? 'corp' : 'per'}`}>
+                        <span className="tourGuard_txt24"> 미수신</span>
+                      </label>
+                    </li>
+                  </ul>
                 </div>
-                <div className="receive-row-mobile">
-                  <span className="receive-label-mobile">SMS</span>
-                  <div className="receive-buttons-mobile">
-                    <label className="receive-option-mobile">
+                <div className="tour2023_flex01 tourG_mat07">
+                  <p className="tour2023_title16">SMS</p>
+                  <ul className="tour2023_agree">
+                    <li className="tour2023_cir tour2023_chk">
                       <input
                         type="radio"
-                        name="smsReceive"
+                        name="receive_sms_yn"
+                        id={`receive_sms_y_${isCorporate ? 'corp' : 'per'}`}
                         checked={smsReceive}
                         onChange={() => setSmsReceive(true)}
                       />
-                      <span className={`receive-btn-mobile ${smsReceive ? 'active' : ''}`}>수신</span>
-                    </label>
-                    <label className="receive-option-mobile">
+                      <label htmlFor={`receive_sms_y_${isCorporate ? 'corp' : 'per'}`}>
+                        <span className="tourGuard_txt24"> 수신</span>
+                      </label>
+                    </li>
+                    <li className="tour2023_cir tour2023_chk tourG_mleft05">
                       <input
                         type="radio"
-                        name="smsReceive"
+                        name="receive_sms_yn"
+                        id={`receive_sms_n_${isCorporate ? 'corp' : 'per'}`}
                         checked={!smsReceive}
                         onChange={() => setSmsReceive(false)}
                       />
-                      <span className={`receive-btn-mobile ${!smsReceive ? 'active' : ''}`}>미수신</span>
-                    </label>
-                  </div>
+                      <label htmlFor={`receive_sms_n_${isCorporate ? 'corp' : 'per'}`}>
+                        <span className="tourGuard_txt24"> 미수신</span>
+                      </label>
+                    </li>
+                  </ul>
                 </div>
-              </div>
 
               {/* 포괄계약 신청 */}
               <div className="comprehensive-contract-section-mobile">
@@ -640,231 +663,259 @@ export default function MobileMyPage() {
                   <p className="contact-info">- 메일주소 : tourvalley@insvalley.com</p>
                 </div>
 
-                <button type="button" className="agreement-link-btn-mobile">
+                <button 
+                  type="button" 
+                  className="agreement-link-btn-mobile"
+                  onClick={() => router.push('/agreement')}
+                >
                   단체 및 포괄계약 업무 협정서 보기
                   <span className="arrow">›</span>
                 </button>
               </div>
 
-              {/* 버튼 */}
-              <div className="form-buttons-mobile">
-                <button 
-                  type="button" 
-                  className="btn-secondary-mobile"
-                  onClick={handleGoHome}
-                >
-                  처음으로
-                </button>
-                <button 
-                  type="submit" 
-                  className="btn-primary-mobile"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? '처리 중...' : '회원정보변경'}
-                </button>
-              </div>
+                {/* 버튼 */}
+                <section className="tour2023_btn_ww tourG_mat05">
+                  <div className="tour2023_btn_ww01">
+                    <a href="#" onClick={(e) => { e.preventDefault(); handleGoHome(); }} className="tourGuard_btn_b tour2023_btn06_gray01">처음으로</a>
+                  </div>
+                  <div className="tour2023_btn_ww02">
+                    <button 
+                      type="submit" 
+                      className="tourGuard_btn_b tour2023_btn01"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? '처리 중...' : '회원정보변경'}
+                    </button>
+                  </div>
+                </section>
+              </section>
             </form>
           ) : (
             /* 개인회원 폼 */
-            <form onSubmit={handlePersonalSubmit} className="mypage-form-mobile">
-              {/* 아이디 (수정불가) */}
-              <div className="form-field-mobile">
-                <label className="form-label-mobile">아이디</label>
-                <input
-                  type="text"
-                  value={member?.username || ''}
-                  className="form-input-mobile readonly"
-                  readOnly
-                  disabled
-                />
-              </div>
-
-              {/* 비밀번호 */}
-              <div className="form-field-mobile">
-                <label className="form-label-mobile">비밀번호</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="변경할 비밀번호를 입력해주세요"
-                  className="form-input-mobile password-input"
-                  autoComplete="new-password"
-                />
-              </div>
-
-              {/* 비밀번호 재확인 */}
-              <div className="form-field-mobile">
-                <label className="form-label-mobile">비밀번호 재확인</label>
-                <input
-                  type="password"
-                  value={passwordConfirm}
-                  onChange={(e) => setPasswordConfirm(e.target.value)}
-                  placeholder="비밀번호 재확인"
-                  className="form-input-mobile"
-                  autoComplete="new-password"
-                />
-              </div>
-
-              {/* 이름 (수정불가) */}
-              <div className="form-field-mobile">
-                <label className="form-label-mobile">이름</label>
-                <input
-                  type="text"
-                  value={member?.name || ''}
-                  className="form-input-mobile readonly"
-                  readOnly
-                  disabled
-                />
-              </div>
-
-              {/* 생년월일 / 성별 (수정불가) */}
-              <div className="form-field-row-mobile">
-                <div className="form-field-half-mobile">
-                  <label className="form-label-mobile">생년월일</label>
+            <form name="memberForm" id="memberForm" method="post" onSubmit={handlePersonalSubmit}>
+              <section className="tourGuard_Info">
+                {/* 아이디 (수정불가) */}
+                <div className="tourGuard_form_tt mag5 tourG_mab03">
+                  <label>아이디</label>
                   <input
                     type="text"
-                    value={member?.birth_date || ''}
-                    className="form-input-mobile readonly"
+                    value={member?.username || ''}
+                    className="tourGuard_input_w02"
                     readOnly
                     disabled
                   />
                 </div>
-                <div className="form-field-half-mobile gender-field-mobile">
-                  <label className="form-label-mobile">성별</label>
-                  <div className="gender-buttons-mobile">
-                    <button
-                      type="button"
-                      className={`gender-btn-mobile ${member?.gender === '남자' ? 'active' : ''}`}
-                      disabled
-                    >
-                      남자
-                    </button>
-                    <button
-                      type="button"
-                      className={`gender-btn-mobile ${member?.gender === '여자' ? 'active' : ''}`}
-                      disabled
-                    >
-                      여자
-                    </button>
+
+                {/* 비밀번호 */}
+                <div className="tourGuard_form_tt mag5 tourG_mab03">
+                  <label>비밀번호</label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="8-20자 영문, 숫자, 특수문자 일부 사용가능"
+                    className="tourGuard_input_w02"
+                    autoComplete="new-password"
+                  />
+                </div>
+
+                {/* 비밀번호 재확인 */}
+                <div className="tourGuard_form_tt mag5 tourG_mab03">
+                  <label>비밀번호 재확인</label>
+                  <input
+                    type="password"
+                    value={passwordConfirm}
+                    onChange={(e) => setPasswordConfirm(e.target.value)}
+                    placeholder="비밀번호 재확인"
+                    className="tourGuard_input_w02"
+                    autoComplete="new-password"
+                  />
+                </div>
+
+                {/* 이름 (수정불가) */}
+                <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_mat10">
+                  <label>이름</label>
+                  <input
+                    type="text"
+                    value={member?.name || ''}
+                    className="tourGuard_input_w02"
+                    readOnly
+                    disabled
+                    style={{ imeMode: 'active' }}
+                  />
+                </div>
+
+                {/* 생년월일 / 성별 (수정불가) */}
+                <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line">
+                  <label>생년월일</label>
+                  <input
+                    type="text"
+                    value={member?.birth_date || ''}
+                    className="tourGuard_input_w01"
+                    readOnly
+                    disabled
+                    maxLength={8}
+                  />
+                  <div className="tourG_rdo_area">
+                    <label>성별</label>
+                    <span className="tourG_inp_rdo">
+                      <input
+                        type="radio"
+                        name="gender_cd"
+                        id="gender_man"
+                        value="M"
+                        checked={member?.gender === '남자'}
+                        disabled
+                      />
+                      <label htmlFor="gender_man">남자</label>
+                    </span>
+                    <span className="tourG_inp_rdo">
+                      <input
+                        type="radio"
+                        name="gender_cd"
+                        id="gender_woman"
+                        value="W"
+                        checked={member?.gender === '여자'}
+                        disabled
+                      />
+                      <label htmlFor="gender_woman" className="one_line0">여자</label>
+                    </span>
                   </div>
                 </div>
-              </div>
 
-              {/* 이메일 주소 */}
-              <div className="form-field-mobile">
-                <label className="form-label-mobile">이메일 주소</label>
-                <div className="email-input-group-mobile">
+                {/* 이메일 주소 */}
+                <div className="tourGuard_form_tt mag5 tourG_mab03">
+                  <label>이메일 주소</label>
                   <input
                     type="text"
+                    id="email1"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="이메일"
-                    className="form-input-mobile email-id-mobile"
+                    placeholder="아이디"
+                    className="tourGuard_input_w01"
+                    maxLength={20}
                   />
-                  <span className="email-at-mobile">@</span>
+                  <div className="tourGuard_txt03" style={{ position: 'relative', left: 0 }}>@</div>
                   <input
                     type="text"
+                    id="email2"
                     value={emailDomain}
                     onChange={(e) => setEmailDomain(e.target.value)}
                     placeholder="도메인"
-                    className="form-input-mobile email-domain-mobile"
+                    className="tourGuard_input_w01"
+                    maxLength={20}
                     readOnly={emailDomainSelect !== '직접입력'}
                   />
+                  <div className="tourGuard_input_cell08 tourGuard_input_cell09 tourGuard" style={{ width: '30%' }}>
+                    <span className="tourGuard_ps_box">
+                      <select
+                        className="tourGuard_sel"
+                        value={emailDomainSelect}
+                        onChange={handleEmailDomainSelect}
+                      >
+                        {emailDomains.map((domain) => (
+                          <option key={domain} value={domain}>
+                            {domain === '직접입력' ? '선택' : domain}
+                          </option>
+                        ))}
+                      </select>
+                    </span>
+                  </div>
                 </div>
-                <select
-                  value={emailDomainSelect}
-                  onChange={handleEmailDomainSelect}
-                  className="form-select-mobile"
-                >
-                  {emailDomains.map((domain) => (
-                    <option key={domain} value={domain}>
-                      {domain === '직접입력' ? '선택' : domain}
-                    </option>
-                  ))}
-                </select>
-              </div>
 
-              {/* 휴대폰 번호 */}
-              <div className="form-field-mobile">
-                <label className="form-label-mobile">휴대폰 번호</label>
-                <input
-                  type="tel"
-                  value={mobilePhone}
-                  onChange={handlePhoneChange}
-                  placeholder="휴대폰 번호를 입력해주세요"
-                  className="form-input-mobile"
-                />
-              </div>
+                {/* 휴대폰 번호 */}
+                <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_mat10">
+                  <label>휴대폰 번호</label>
+                  <input
+                    type="tel"
+                    value={mobilePhone}
+                    onChange={handlePhoneChange}
+                    placeholder="숫자만 입력해주세요."
+                    className="tourGuard_input_w02"
+                    maxLength={11}
+                  />
+                </div>
 
-              {/* 수신 여부 */}
-              <div className="receive-options-mobile">
-                <div className="receive-row-mobile">
-                  <span className="receive-label-mobile">이메일</span>
-                  <div className="receive-buttons-mobile">
-                    <label className="receive-option-mobile">
+                {/* 수신 여부 */}
+                <div className="tour2023_flex01 tourG_mat10">
+                  <p className="tour2023_title16">이메일</p>
+                  <ul className="tour2023_agree">
+                    <li className="tour2023_cir tour2023_chk">
                       <input
                         type="radio"
-                        name="emailReceive"
+                        name="receive_mail_yn"
+                        id="receive_mail_y_per"
                         checked={emailReceive}
                         onChange={() => setEmailReceive(true)}
                       />
-                      <span className={`receive-btn-mobile ${emailReceive ? 'active' : ''}`}>수신</span>
-                    </label>
-                    <label className="receive-option-mobile">
+                      <label htmlFor="receive_mail_y_per">
+                        <span className="tourGuard_txt24"> 수신</span>
+                      </label>
+                    </li>
+                    <li className="tour2023_cir tour2023_chk tourG_mleft05">
                       <input
                         type="radio"
-                        name="emailReceive"
+                        name="receive_mail_yn"
+                        id="receive_mail_n_per"
                         checked={!emailReceive}
                         onChange={() => setEmailReceive(false)}
                       />
-                      <span className={`receive-btn-mobile ${!emailReceive ? 'active' : ''}`}>미수신</span>
-                    </label>
-                  </div>
+                      <label htmlFor="receive_mail_n_per">
+                        <span className="tourGuard_txt24"> 미수신</span>
+                      </label>
+                    </li>
+                  </ul>
                 </div>
-                <div className="receive-row-mobile">
-                  <span className="receive-label-mobile">SMS</span>
-                  <div className="receive-buttons-mobile">
-                    <label className="receive-option-mobile">
+                <div className="tour2023_flex01 tourG_mat07">
+                  <p className="tour2023_title16">SMS</p>
+                  <ul className="tour2023_agree">
+                    <li className="tour2023_cir tour2023_chk">
                       <input
                         type="radio"
-                        name="smsReceive"
+                        name="receive_sms_yn"
+                        id="receive_sms_y_per"
                         checked={smsReceive}
                         onChange={() => setSmsReceive(true)}
                       />
-                      <span className={`receive-btn-mobile ${smsReceive ? 'active' : ''}`}>수신</span>
-                    </label>
-                    <label className="receive-option-mobile">
+                      <label htmlFor="receive_sms_y_per">
+                        <span className="tourGuard_txt24"> 수신</span>
+                      </label>
+                    </li>
+                    <li className="tour2023_cir tour2023_chk tourG_mleft05">
                       <input
                         type="radio"
-                        name="smsReceive"
+                        name="receive_sms_yn"
+                        id="receive_sms_n_per"
                         checked={!smsReceive}
                         onChange={() => setSmsReceive(false)}
                       />
-                      <span className={`receive-btn-mobile ${!smsReceive ? 'active' : ''}`}>미수신</span>
-                    </label>
-                  </div>
+                      <label htmlFor="receive_sms_n_per">
+                        <span className="tourGuard_txt24"> 미수신</span>
+                      </label>
+                    </li>
+                  </ul>
                 </div>
-              </div>
 
-              {/* 버튼 */}
-              <div className="form-buttons-mobile">
-                <button 
-                  type="button" 
-                  className="btn-secondary-mobile"
-                  onClick={handleGoHome}
-                >
-                  처음으로
-                </button>
-                <button 
-                  type="submit" 
-                  className="btn-primary-mobile"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? '처리 중...' : '회원정보변경'}
-                </button>
-              </div>
+                {/* 버튼 */}
+                <section className="tour2023_btn_ww tourG_mat05">
+                  <div className="tour2023_btn_ww01">
+                    <a href="#" onClick={(e) => { e.preventDefault(); handleGoHome(); }} className="tourGuard_btn_b tour2023_btn06_gray01">처음으로</a>
+                  </div>
+                  <div className="tour2023_btn_ww02">
+                    <button 
+                      type="submit" 
+                      className="tourGuard_btn_b tour2023_btn01"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? '처리 중...' : '회원정보변경'}
+                    </button>
+                  </div>
+                </section>
+              </section>
             </form>
           )}
+          <div className="tourG_mat14 tourG_Wrap"></div>
+          </div>
         </div>
       </main>
 

@@ -337,80 +337,105 @@
   color: #666;
 }
 
-/* Floating Buttons */
-.floating-buttons {
-  position: fixed;
-  left: calc(50% + 280px);
-  top: 160px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+/* 오른쪽 고정 버튼 */
+.mypage-pc .container_box_w {
+  position: relative;
+  width: 605px;
+  margin: 0 auto;
+  min-height: 0;
+  height: 0;
+}
+
+.mypage-pc .container_box_w .fixedRight_b01 {
+  position: absolute;
+  top: 0px;
+  left: 562px;
+  width: 107px;
+  height: 90px;
+  background: #fade21;
+  border-radius: 10px;
+  box-shadow: 7px 7px 10px rgb(0 0 0 / 5%);
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
   z-index: 100;
 }
 
-@media (max-width: 1100px) {
-  .floating-buttons {
-    right: 20px;
-    left: auto;
-  }
-}
-
-.floating-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 12px 16px;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  min-width: 100px;
-}
-
-.floating-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.cash-btn {
-  background: #ffd600;
-}
-
-.cash-btn .floating-text {
-  white-space: nowrap;
-}
-
-.service-btn {
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  flex-direction: row !important;
-  gap: 8px;
-}
-
-.service-btn .floating-icon-img {
-  margin-bottom: 0;
-}
-
-.service-btn .floating-text {
+.mypage-pc .container_box_w .fixedRight_b02 {
+  position: absolute;
+  display: inline-block;
   text-align: left;
-  word-break: keep-all;
-  white-space: pre-wrap;
+  top: 100px;
+  left: 562px;
+  width: 107px;
+  height: 58px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 7px 7px 10px rgb(0 0 0 / 5%);
+  cursor: pointer;
+  text-decoration: none;
+  z-index: 100;
 }
 
-.floating-icon-img {
-  width: 36px;
-  height: 36px;
-  object-fit: contain;
-  margin-bottom: 4px;
-}
-
-.floating-text {
-  font-size: 12px;
-  font-weight: 600;
-  color: #1a1a1a;
+.mypage-pc .fixedRight_txt01 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 14px;
+  letter-spacing: -1.2px;
+  color: #333;
+  line-height: 100%;
+  box-sizing: border-box;
+  text-decoration: none;
   text-align: center;
-  line-height: 1.3;
+  display: block;
+  margin-top: 8px;
+}
+
+.mypage-pc .fixedRight_txt02 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 13px;
+  letter-spacing: -0.4px;
+  color: #333;
+  line-height: 120%;
+  box-sizing: border-box;
+  text-decoration: none;
+  text-align: left;
+  display: inline-block;
+  margin-left: 4px;
+  margin-top: 14px;
+}
+
+.mypage-pc .icon_cash {
+  display: block;
+  width: 44px;
+  height: 43px;
+  background: url(/icons/icon_cash.png) no-repeat 0 0/contain;
+  margin: 13px 0 0 33px;
+}
+
+.mypage-pc .icon_cash .icon_cash01 {
+  display: block;
+  box-sizing: border-box;
+  text-align: center;
+  margin: 0 auto;
+  padding: 10px 0 0 0;
+}
+
+.mypage-pc .icon_menu {
+  display: inline-block;
+  width: 19px;
+  height: 19px;
+  background: url(/icons/icon_menu.png) no-repeat 0 0/contain;
+  vertical-align: top;
+  margin: 20px 0 0 17px;
+  text-align: left;
+}
+
+.mypage-pc .icon_menu .icon_menu01 {
+  display: inline-block;
+  box-sizing: border-box;
+  text-align: center;
+  margin: 0 auto;
+  padding: 0;
 }
 
 /* 법인회원 전용 스타일 */
@@ -734,9 +759,6 @@
     flex: 0 0 90px;
   }
 
-  .floating-buttons {
-    display: none;
-  }
   
   .business-divider {
     margin: 0 8px;

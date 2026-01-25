@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { getImagePath } from '@/utils/path';
 import { useAuth } from '@/contexts/AuthContext';
+import { getCorporateMemberInfo } from '@/services/authService';
 import ServiceModal from './ServiceModal';
 import './Header.css';
 
@@ -35,6 +36,24 @@ export default function Header({ isMobile = false, onOpenAccidentFreeCashModal }
   
   // 인증 상태 가져오기
   const { isLoggedIn, member, logout, isLoading } = useAuth();
+  const [corporateName, setCorporateName] = useState<string | null>(null);
+
+  // 법인 회원일 경우 법인명 가져오기
+  useEffect(() => {
+    if (isLoggedIn && member && member.member_type === '법인') {
+      getCorporateMemberInfo(member.id)
+        .then((result) => {
+          if (result.success && result.corporate) {
+            setCorporateName(result.corporate.company_name);
+          }
+        })
+        .catch((error) => {
+          console.error('법인명 조회 오류:', error);
+        });
+    } else {
+      setCorporateName(null);
+    }
+  }, [isLoggedIn, member]);
 
   // 로그아웃 처리
   const handleLogout = () => {
@@ -106,7 +125,16 @@ export default function Header({ isMobile = false, onOpenAccidentFreeCashModal }
               {!isLoading && (
                 isLoggedIn && member ? (
                   <div className="mobile-menu-header-user">
-                    <span className="mobile-menu-header-text">{member.name}님</span>
+                    <span className="mobile-menu-header-text">
+                      {member.member_type === '법인' && corporateName ? corporateName : member.name}님
+                    </span>
+                    <Link 
+                      href="/mypage"
+                      className="mobile-menu-info-btn"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      정보 변경
+                    </Link>
                     <button 
                       type="button"
                       className="mobile-menu-logout-btn"
@@ -179,7 +207,7 @@ export default function Header({ isMobile = false, onOpenAccidentFreeCashModal }
                 </span>
                 <span className="mobile-menu-arrow">›</span>
               </Link>
-              <Link href="/event-insurance/m" className="mobile-menu-item" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link href="/event-insurance" className="mobile-menu-item" onClick={() => setIsMobileMenuOpen(false)}>
                 <span className="mobile-menu-text">행사주최자 배상책임보험</span>
                 <span className="mobile-menu-arrow">›</span>
               </Link>
@@ -245,7 +273,7 @@ export default function Header({ isMobile = false, onOpenAccidentFreeCashModal }
                 {isLoggedIn && member ? (
                   <>
                     <Link href="/mypage" className="util-link user-name">
-                      {member.name}님
+                      {member.member_type === '법인' && corporateName ? corporateName : member.name}님
                     </Link>
                     <button 
                       type="button"

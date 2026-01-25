@@ -1,0 +1,172 @@
+/* PC Agreement Page Styles - Popup */
+
+.agreement-wrapper {
+  min-height: 100vh;
+  background: #fff;
+}
+
+#isbwrapper {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Header */
+.layer_header {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid #eaebef;
+  background: #fff;
+}
+
+.layer_header .layer_title {
+  font-family: 'NanumSquareNeoTTF-dEb';
+  font-size: 20px;
+  color: #202020;
+  letter-spacing: -0.8px;
+  text-align: left;
+  display: inline-block;
+}
+
+.layer_header .close {
+  font-size: 15px;
+  color: #545454;
+  text-decoration: none;
+  cursor: pointer;
+  background: url(/icons/ico_btn_close_bl.png) no-repeat 50% 50%;
+  background-size: contain;
+  border: none;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  text-indent: -9999px;
+  overflow: hidden;
+}
+
+.layer_header .close:hover {
+  opacity: 0.8;
+}
+
+.prow_01 {
+  padding-left: 4.68%;
+  padding-right: 4.68%;
+}
+
+/* Content */
+#contentWrap {
+  position: relative;
+  width: 100%;
+  padding-bottom: 100px;
+}
+
+.tourGuard_bg {
+  background-color: #fff;
+}
+
+.ag_center {
+  text-align: center;
+}
+
+.tourGuard_Topbg01 {
+  display: inline-block;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.tourG_Wrap {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.tourG_mat11 {
+  margin-top: 45px;
+}
+
+.tourG_mab03 {
+  margin-bottom: 10px !important;
+}
+
+.ag_left {
+  text-align: left;
+}
+
+.tour2023_txt31 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 18px;
+  color: #3e3e3e;
+  letter-spacing: -0.6px;
+  line-height: 125%;
+  text-align: left;
+  padding: 0 0 4px 0;
+  box-sizing: border-box;
+}
+
+.tour2023_txt32 {
+  font-size: 14px;
+  color: #7e7e7e;
+  text-align: left;
+  line-height: 130%;
+  letter-spacing: -0.8px;
+  vertical-align: top;
+  white-space: pre-line;
+}
+
+.tourG_mat23 {
+  margin-top: 160px;
+}
+
+/* Fixed Banner */
+#tour2023_fixedBanner {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 1000;
+  background: #fff;
+  border-top: 1px solid #eaebef;
+  padding: 15px 0;
+}
+
+.tour2023_bottom_btn {
+  left: 0;
+  bottom: 0;
+  color: #fff;
+  width: 100%;
+  display: inline-flex;
+  justify-content: center;
+  padding: 0 4.68%;
+}
+
+.tour2023_btn_b {
+  position: relative;
+  display: block;
+  width: 100%;
+  text-decoration: none;
+}
+
+.tour2023_btn07 {
+  width: 100%;
+  font-size: 22px;
+  color: #fff !important;
+  padding-top: 15px;
+  height: 60px;
+  box-sizing: border-box;
+  text-align: center;
+  letter-spacing: -1.5px;
+  background-color: #fe5700;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+}
+
+.tour2023_btn07:hover {
+  background-color: #e04d00;
+}
