@@ -19,6 +19,7 @@ import CompletionStep from '@/components/travel/CompletionStep';
 import DangerousActivityModal from '@/components/travel/DangerousActivityModal';
 import ConsentModal from '@/components/travel/ConsentModal';
 import ExcelUploadModal from '@/components/travel/ExcelUploadModal';
+import CoverageDetailModal from '@/components/travel/CoverageDetailModal';
 import { PlanType, PlanInfo, Participant, CalculatedPremiums, PaymentMethod, PaymentSubMethod, Gender } from '@/components/travel/types';
 import './page.css';
 
@@ -71,6 +72,8 @@ export default function PCDomesticPage() {
   const [hasDangerousActivity, setHasDangerousActivity] = useState<boolean | null>(null);
   const [travelPurpose, setTravelPurpose] = useState<string>('');
   const [showDangerousActivityModal, setShowDangerousActivityModal] = useState(false);
+  const [showCoverageDetailModal, setShowCoverageDetailModal] = useState(false);
+  const [selectedCoveragePlanType, setSelectedCoveragePlanType] = useState<PlanType | null>(null);
   
   // 동의서 모달 관련 상태
   const [showConsentModal, setShowConsentModal] = useState(false);
@@ -363,6 +366,12 @@ export default function PCDomesticPage() {
     if (showPlanSelection && planInfo) {
       await recalculatePremium(value);
     }
+  };
+
+  // 보장 상세보기 클릭 핸들러 (PC는 모달)
+  const handleContractDetailClick = (clickedPlanType: PlanType) => {
+    setSelectedCoveragePlanType(clickedPlanType);
+    setShowCoverageDetailModal(true);
   };
 
   // 가입자 보험료 계산 함수
@@ -1128,6 +1137,7 @@ export default function PCDomesticPage() {
             }}
             insuranceType="국내여행자보험"
             timeOptions={timeOptions}
+            onContractDetailClick={handleContractDetailClick}
           />
         )}
 
@@ -1192,6 +1202,20 @@ export default function PCDomesticPage() {
           isOpen={showDangerousActivityModal}
           onClose={() => setShowDangerousActivityModal(false)}
         />
+
+        {/* 보장 상세보기 모달 */}
+        {selectedCoveragePlanType && (
+          <CoverageDetailModal
+            isOpen={showCoverageDetailModal}
+            onClose={() => {
+              setShowCoverageDetailModal(false);
+              setSelectedCoveragePlanType(null);
+            }}
+            planType={selectedCoveragePlanType}
+            insuranceType="국내여행보험"
+            isMedicalExpense={hasMedicalExpense}
+          />
+        )}
 
         {/* 동의서 모달 */}
         <ConsentModal

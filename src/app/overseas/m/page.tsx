@@ -263,12 +263,10 @@ function MobileOverseasStep1Content() {
       const genderValue = getGenderFromBirthDate(birthDate, gender);
       const insuranceType = type === 'short' ? '해외여행보험' : type === 'long' ? '해외장기체류보험' : '단체여행자보험';
 
-      // 각 플랜별 보험료 계산
+      // 각 플랜별 보험료 계산 (모든 availablePlans를 계산)
       const plans: Record<string, PlanInfo> = {};
 
-      for (const planType of availablePlans.filter(p => planInfo && planInfo[p])) {
-        if (!planInfo[planType]) continue;
-        
+      for (const planType of availablePlans) {
         try {
           const response = await fetch('/api/travel/calculate-premium', {
             method: 'POST',
@@ -290,10 +288,46 @@ function MobileOverseasStep1Content() {
 
           const data = await response.json();
           if (data.success) {
+            // 플랜별 보장 내용 설정
+            let coverages: { label: string; amount: string }[];
+            
+            if (planType === '표준플랜') {
+              coverages = [
+                { label: '상해사망후유장해', amount: '2억원' },
+                { label: '해외의료비(상해)', amount: '5,000만원' },
+                { label: '해외의료비(질병)', amount: '5,000만원' },
+                { label: '휴대품손해(휴대폰은 보상제외)', amount: '100만원' },
+              ];
+            } else if (planType === '실속플랜') {
+              coverages = [
+                { label: '상해사망후유장해', amount: '1억원' },
+                { label: '해외의료비(상해)', amount: '2,000만원' },
+                { label: '해외의료비(질병)', amount: '2,000만원' },
+                { label: '휴대품손해(휴대폰은 보상제외)', amount: '50만원' },
+              ];
+            } else if (planType === '고급플랜') {
+              coverages = [
+                { label: '상해사망후유장해', amount: '3억원' },
+                { label: '해외의료비(상해)', amount: '1억원' },
+                { label: '해외의료비(질병)', amount: '1억원' },
+                { label: '휴대품손해(휴대폰은 보상제외)', amount: '150만원' },
+              ];
+            } else {
+              // 어린이플랜, 어르신플랜 등 기존 구조 유지
+              coverages = [
+                { label: '상해사망후유장해', amount: '1억원' },
+                { label: '상해입원의료비', amount: '1,000만원' },
+                { label: '상해통원의료비', amount: '10만원' },
+                { label: '질병입원의료비', amount: '1,000만원' },
+                { label: '질병통원의료비', amount: '10만원' },
+                { label: '휴대품손해(휴대폰은 보상제외)', amount: '50만원' },
+              ];
+            }
+            
             plans[planType] = {
               type: planType,
               premium: data.premium,
-              coverages: planInfo[planType].coverages, // 기존 coverages 유지
+              coverages: coverages,
             };
           }
         } catch (error) {
@@ -316,6 +350,44 @@ function MobileOverseasStep1Content() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasMedicalExpense]);
+
+  // 페이지 마운트 시 저장된 상태 복원 (coverage-detail에서 돌아올 때)
+  useEffect(() => {
+    const restoreState = () => {
+      try {
+        const savedState = localStorage.getItem('overseas_m_state');
+        if (savedState) {
+          const state = JSON.parse(savedState);
+          // showPlanSelection이 true이고 planInfo가 있으면 상태 복원
+          // 단, 이미 상태가 복원되어 있으면 복원하지 않음 (중복 복원 방지)
+          if (state.showPlanSelection && state.planInfo && (!showPlanSelection || !planInfo)) {
+            setShowPlanSelection(state.showPlanSelection);
+            setPlanInfo(state.planInfo);
+            setSelectedPlan(state.selectedPlan);
+            setHasMedicalExpense(state.hasMedicalExpense || true);
+            // 다른 상태들도 복원 (필요한 경우)
+            if (state.departureDate) setDepartureDate(state.departureDate);
+            if (state.departureTime) setDepartureTime(state.departureTime);
+            if (state.arrivalDate) setArrivalDate(state.arrivalDate);
+            if (state.arrivalTime) setArrivalTime(state.arrivalTime);
+            if (state.birthDate) setBirthDate(state.birthDate);
+            if (state.gender) setGender(state.gender);
+            if (state.travelCountry) setTravelCountry(state.travelCountry);
+          }
+          // 상태 복원 여부와 관계없이 localStorage는 유지 (다음 coverage-detail 방문 시에도 사용)
+        }
+      } catch (error) {
+        console.error('상태 복원 오류:', error);
+        localStorage.removeItem('overseas_m_state');
+      }
+    };
+
+    // URL에 returnUrl 파라미터가 있으면 (coverage-detail에서 돌아온 경우) 상태 복원
+    const returnUrl = searchParams.get('returnUrl');
+    if (returnUrl === '/overseas/m' || window.location.pathname === '/overseas/m') {
+      restoreState();
+    }
+  }, [searchParams, showPlanSelection, planInfo]);
 
   const handleCalculate = async () => {
     // 입력 검증
@@ -423,20 +495,39 @@ function MobileOverseasStep1Content() {
 
           const data = await response.json();
           if (data.success) {
-            // 플랜 정보 초기화 (보장내용은 기본값으로 설정, 추후 백엔드에서 받아올 수 있음)
-            plans[planType] = {
-              type: planType,
-              premium: data.premium,
-              coverages: [
+            // 플랜별 보장 내용 설정
+            let coverages: { label: string; amount: string }[];
+            
+            if (planType === '표준플랜') {
+              coverages = [
+                { label: '상해사망후유장해', amount: '2억원' },
+                { label: '해외의료비(상해)', amount: '5,000만원' },
+                { label: '해외의료비(질병)', amount: '5,000만원' },
+                { label: '휴대품손해(휴대폰은 보상제외)', amount: '100만원' },
+              ];
+            } else if (planType === '실속플랜') {
+              coverages = [
+                { label: '상해사망후유장해', amount: '1억원' },
+                { label: '해외의료비(상해)', amount: '2,000만원' },
+                { label: '해외의료비(질병)', amount: '2,000만원' },
+                { label: '휴대품손해(휴대폰은 보상제외)', amount: '50만원' },
+              ];
+            } else {
+              // 고급플랜 등 기존 구조 유지
+              coverages = [
                 { label: '상해사망후유장해', amount: '1억원' },
                 { label: '상해입원의료비', amount: '1,000만원' },
                 { label: '상해통원의료비', amount: '10만원' },
-                ...(planType !== '실속플랜' ? [
-                  { label: '질병입원의료비', amount: '1,000만원' },
-                  { label: '질병통원의료비', amount: '10만원' },
-                ] : []),
+                { label: '질병입원의료비', amount: '1,000만원' },
+                { label: '질병통원의료비', amount: '10만원' },
                 { label: '휴대품손해(휴대폰은 보상제외)', amount: '50만원' },
-              ],
+              ];
+            }
+            
+            plans[planType] = {
+              type: planType,
+              premium: data.premium,
+              coverages: coverages,
             };
           } else {
             console.error(`보험료 계산 실패 (${planType}):`, data.message);
@@ -1105,6 +1196,36 @@ function MobileOverseasStep1Content() {
                 insuranceType={getTitle()}
                 travelCountry={travelCountry}
                 travelPurpose={type === 'long' ? travelPurposeLong : undefined}
+                onContractDetailClick={(planType) => {
+                  // coverage-detail로 이동하기 전에 현재 상태를 저장
+                  if (showPlanSelection && planInfo) {
+                    try {
+                      localStorage.setItem('overseas_m_state', JSON.stringify({
+                        showPlanSelection: true,
+                        planInfo: planInfo,
+                        selectedPlan: selectedPlan,
+                        hasMedicalExpense,
+                        departureDate,
+                        departureTime,
+                        arrivalDate,
+                        arrivalTime,
+                        birthDate,
+                        gender,
+                        travelCountry,
+                        type,
+                      }));
+                    } catch (error) {
+                      console.error('상태 저장 오류:', error);
+                    }
+                  }
+                  
+                  const returnUrl = encodeURIComponent('/overseas/m');
+                  // insuranceType 매핑: '해외여행보험' -> '해외여행보험' (동일)
+                  const insuranceType = getTitle() === '해외여행보험' ? '해외여행보험' : getTitle();
+                  // 해외여행보험은 실손/비실손 구분이 있음
+                  const isMedicalExpenseParam = hasMedicalExpense ? 'true' : 'false';
+                  router.push(`/coverage-detail/m?planType=${planType}&insuranceType=${encodeURIComponent(insuranceType)}&isMedicalExpense=${isMedicalExpenseParam}&returnUrl=${returnUrl}`);
+                }}
               />
             )}
           </div>

@@ -74,6 +74,9 @@ interface TravelInfoStepProps {
   // 해외장기체류보험용 통화 플랜 필드
   currencyPlan?: '원화' | '외화';
   onCurrencyPlanChange?: (plan: '원화' | '외화') => void;
+  
+  // 보장 상세보기 클릭 핸들러
+  onContractDetailClick?: (planType: PlanType) => void;
 }
 
 export default function TravelInfoStep({
@@ -112,6 +115,7 @@ export default function TravelInfoStep({
   longTermPurposeOptions,
   currencyPlan,
   onCurrencyPlanChange,
+  onContractDetailClick,
 }: TravelInfoStepProps) {
   const planSelectionRef = useRef<HTMLDivElement>(null);
   const [isCountryModalOpen, setIsCountryModalOpen] = useState(false);
@@ -564,6 +568,7 @@ export default function TravelInfoStep({
                 onParticipantCountChange={onParticipantCountChange}
                 onAddParticipant={onAddParticipant}
                 insuranceType={insuranceType}
+                onContractDetailClick={onContractDetailClick}
                 currencyPlan={currencyPlan}
                 onCurrencyPlanChange={onCurrencyPlanChange}
                 travelCountry={travelCountry}

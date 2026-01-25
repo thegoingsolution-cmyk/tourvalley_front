@@ -203,6 +203,14 @@ function MobileDomesticStep1Content() {
     // 사용 가능한 플랜 (국내여행보험은 실속플랜, 표준플랜만)
     const availablePlans: PlanType[] = ['실속플랜', '표준플랜'];
 
+    // 기본 보장 항목 정의
+    const baseCoverages = [
+      { label: '상해사망/후유장해', amount: '3,000만원' },
+      { label: '상해의료비', amount: '100만원' },
+      { label: '질병사망', amount: '100만원' },
+      { label: '배상책임', amount: '1,000만원' },
+    ];
+
     setIsCalculating(true);
 
     try {
@@ -229,12 +237,10 @@ function MobileDomesticStep1Content() {
       const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
       const genderValue = getGenderFromBirthDate(birthDate, gender);
 
-      // 각 플랜별 보험료 계산
+      // 각 플랜별 보험료 계산 (모든 availablePlans를 계산)
       const plans: Record<string, PlanInfo> = {};
 
-      for (const planType of availablePlans.filter(p => planInfo && planInfo[p])) {
-        if (!planInfo[planType]) continue;
-        
+      for (const planType of availablePlans) {
         try {
           const response = await fetch('/api/travel/calculate-premium', {
             method: 'POST',
@@ -259,7 +265,7 @@ function MobileDomesticStep1Content() {
             plans[planType] = {
               type: planType,
               premium: data.premium,
-              coverages: planInfo[planType].coverages, // 기존 coverages 유지
+              coverages: baseCoverages, // baseCoverages 사용
             };
           }
         } catch (error) {
@@ -282,6 +288,43 @@ function MobileDomesticStep1Content() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasMedicalExpense]);
+
+  // 페이지 마운트 시 저장된 상태 복원 (coverage-detail에서 돌아올 때)
+  useEffect(() => {
+    const restoreState = () => {
+      try {
+        const savedState = localStorage.getItem('domestic_m_state');
+        if (savedState) {
+          const state = JSON.parse(savedState);
+          // showPlanSelection이 true이고 planInfo가 있으면 상태 복원
+          // 단, 이미 상태가 복원되어 있으면 복원하지 않음 (중복 복원 방지)
+          if (state.showPlanSelection && state.planInfo && (!showPlanSelection || !planInfo)) {
+            setShowPlanSelection(state.showPlanSelection);
+            setPlanInfo(state.planInfo);
+            setSelectedPlan(state.selectedPlan);
+            setHasMedicalExpense(state.hasMedicalExpense || true);
+            // 다른 상태들도 복원 (필요한 경우)
+            if (state.departureDate) setDepartureDate(state.departureDate);
+            if (state.departureTime) setDepartureTime(state.departureTime);
+            if (state.arrivalDate) setArrivalDate(state.arrivalDate);
+            if (state.arrivalTime) setArrivalTime(state.arrivalTime);
+            if (state.birthDate) setBirthDate(state.birthDate);
+            if (state.gender) setGender(state.gender);
+          }
+          // 상태 복원 여부와 관계없이 localStorage는 유지 (다음 coverage-detail 방문 시에도 사용)
+        }
+      } catch (error) {
+        console.error('상태 복원 오류:', error);
+        localStorage.removeItem('domestic_m_state');
+      }
+    };
+
+    // URL에 returnUrl 파라미터가 있으면 (coverage-detail에서 돌아온 경우) 상태 복원
+    const returnUrl = searchParams.get('returnUrl');
+    if (returnUrl === '/domestic/m' || window.location.pathname === '/domestic/m') {
+      restoreState();
+    }
+  }, [searchParams, showPlanSelection, planInfo]);
 
   const handleCalculate = async () => {
     // 입력 검증
@@ -389,6 +432,24 @@ function MobileDomesticStep1Content() {
       setPlanInfo(plans);
       setSelectedPlan(availablePlans[0]);
       setShowPlanSelection(true);
+      
+      // 상태를 localStorage에 저장 (coverage-detail 페이지에서 돌아올 때 복원용)
+      try {
+        localStorage.setItem('domestic_m_state', JSON.stringify({
+          showPlanSelection: true,
+          planInfo: plans,
+          selectedPlan: availablePlans[0],
+          hasMedicalExpense,
+          departureDate,
+          departureTime,
+          arrivalDate,
+          arrivalTime,
+          birthDate,
+          gender,
+        }));
+      } catch (error) {
+        console.error('상태 저장 오류:', error);
+      }
 
       // 스크롤 이동
       setTimeout(() => {
@@ -1088,6 +1149,34 @@ function MobileDomesticStep1Content() {
                 hasMedicalExpense={hasMedicalExpense}
                 onMedicalExpenseChange={setHasMedicalExpense}
                 insuranceType={getTitle()}
+                onContractDetailClick={(planType) => {
+                  // coverage-detail로 이동하기 전에 현재 상태를 다시 저장 (최신 상태 유지)
+                  if (showPlanSelection && planInfo) {
+                    try {
+                      localStorage.setItem('domestic_m_state', JSON.stringify({
+                        showPlanSelection: true,
+                        planInfo: planInfo,
+                        selectedPlan: selectedPlan,
+                        hasMedicalExpense,
+                        departureDate,
+                        departureTime,
+                        arrivalDate,
+                        arrivalTime,
+                        birthDate,
+                        gender,
+                      }));
+                    } catch (error) {
+                      console.error('상태 저장 오류:', error);
+                    }
+                  }
+                  
+                  const returnUrl = encodeURIComponent('/domestic/m');
+                  // insuranceType 매핑: '국내여행자보험' -> '국내여행보험'
+                  const insuranceType = getTitle() === '국내여행자보험' ? '국내여행보험' : getTitle();
+                  // 국내여행보험은 실손/비실손 구분이 있음
+                  const isMedicalExpenseParam = hasMedicalExpense ? 'true' : 'false';
+                  router.push(`/coverage-detail/m?planType=${planType}&insuranceType=${encodeURIComponent(insuranceType)}&isMedicalExpense=${isMedicalExpenseParam}&returnUrl=${returnUrl}`);
+                }}
               />
             )}
           </div>

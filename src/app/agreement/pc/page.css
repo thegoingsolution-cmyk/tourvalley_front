@@ -122,7 +122,8 @@
 }
 
 /* Fixed Banner */
-#tour2023_fixedBanner {
+/* agreement-wrapper 페이지에서만 적용되는 스타일 */
+.agreement-wrapper #tour2023_fixedBanner {
   position: fixed;
   left: 0;
   bottom: 0;
@@ -133,7 +134,8 @@
   padding: 15px 0;
 }
 
-.tour2023_bottom_btn {
+/* agreement-wrapper 페이지에서만 적용되는 스타일 */
+.agreement-wrapper .tour2023_bottom_btn {
   left: 0;
   bottom: 0;
   color: #fff;

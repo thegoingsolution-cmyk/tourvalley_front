@@ -1,10 +1,17 @@
 'use client';
 
-import React, { Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import './page.css';
+import React from 'react';
+import { PlanType } from './types';
+import './CoverageDetailModal.css';
+
+interface CoverageDetailModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  planType: PlanType;
+  insuranceType?: string; // 기본값: '국내여행보험'
+  isMedicalExpense?: boolean; // 실손의료비 포함 여부 (기본값: true, 국내/해외여행보험용)
+  currencyPlan?: '원화플랜' | '외화플랜'; // 원화플랜/외화플랜 구분 (유학/어학연수, 해외출장/주재원/교환교수용)
+}
 
 // 보장 상세 데이터 타입 정의
 interface CoverageItem {
@@ -25,7 +32,7 @@ interface PlanCoverage {
 }
 
 type InsuranceType = '국내여행보험' | '해외여행보험' | '유학/어학연수' | '워킹홀리데이' | '해외출장/주재원/교환교수';
-type PlanType = '실속플랜' | '표준플랜' | '고급플랜';
+type PlanTypeKey = '실속플랜' | '표준플랜' | '고급플랜';
 type MedicalExpenseType = '실손' | '비실손';
 type CurrencyPlanType = '원화플랜' | '외화플랜';
 
@@ -38,7 +45,7 @@ type CoverageDataValue =
   | Record<MedicalExpenseType, PlanCoverage>
   | Record<CurrencyPlanType, PlanCoverage>;
 
-const coverageDataMap: Record<InsuranceType, Record<PlanType, CoverageDataValue>> = {
+const coverageDataMap: Record<InsuranceType, Record<PlanTypeKey, CoverageDataValue>> = {
   '국내여행보험': {
     '실속플랜': {
       '실손': {
@@ -46,7 +53,7 @@ const coverageDataMap: Record<InsuranceType, Record<PlanType, CoverageDataValue>
         sections: [
           {
             title: '상해보장',
-            helpUrl: '/tour/tourvalley/rainbow/common/guarantee_detail_pop.jsp?group_product=DS&page_num=G1',
+            helpUrl: '/tour/tourvalley/rainbow/common/guarantee_detail_pop.jsp?group_product=DS&page_num=G5',
             items: [
               { label: '상해사망', amount: '1억원' },
               { label: '상해후유장해', amount: '-' },
@@ -75,14 +82,15 @@ const coverageDataMap: Record<InsuranceType, Record<PlanType, CoverageDataValue>
           },
           {
             title: '기타보장',
-            helpUrl: '/tour/tourvalley/rainbow/common/guarantee_detail_pop.jsp?group_product=DS&page_num=G4',
+            helpUrl: '/tour/tourvalley/rainbow/common/guarantee_detail_pop.jsp?group_product=DS&page_num=G6',
             items: [
               { label: '휴대품손해(본인부담금 1만원)', amount: '50만원', note: '(1개 20만원한도, 이동통신단말기 보상제외)' },
               { label: '골절(치아파절제외)진단비', amount: '10만원' },
               { label: '화상진단비', amount: '10만원' },
-              { label: '배상책임(본인부담금 1만원)', amount: '500만원' },
-              { label: '상해입원일당', amount: '-', note: '(4일이상 30일한도)' },
-              { label: '상해응급실내원(응급)의료비', amount: '-' },
+              { label: '배상책임(본인부담금 1만원)', amount: '1,000만원' },
+              { label: '상해입원일당', amount: '2만원', note: '(4일이상 30일한도)' },
+              { label: '상해응급실내원(응급)의료비', amount: '3만원' },
+              { label: '상해응급실내원(비응급)의료비', amount: '-' },
               { label: '골절수술비', amount: '20만원', note: '(동일사고 1회한)' },
               { label: '상해수술비', amount: '20만원', note: '(동일사고 1회한)' },
               { label: '깁스치료비', amount: '20만원', note: '(동일사고 또는 질병 1회한)' },
@@ -95,12 +103,10 @@ const coverageDataMap: Record<InsuranceType, Record<PlanType, CoverageDataValue>
         sections: [
           {
             title: '상해보장',
-            helpUrl: '/tour/tourvalley/rainbow/common/guarantee_detail_pop.jsp?group_product=DS&page_num=G1',
+            helpUrl: '/tour/tourvalley/rainbow/common/guarantee_detail_pop.jsp?group_product=DS&page_num=G5',
             items: [
               { label: '상해사망', amount: '1억원' },
               { label: '상해후유장해', amount: '-' },
-              { label: '상해입원의료비', amount: '1,000만원' },
-              { label: '상해통원의료비', amount: '10만원' },
             ],
           },
           {
@@ -117,21 +123,22 @@ const coverageDataMap: Record<InsuranceType, Record<PlanType, CoverageDataValue>
             title: '상해질병 3대 비급여 국내의료비',
             helpUrl: '/tour/tourvalley/rainbow/common/guarantee_detail_pop.jsp?group_product=DS&page_num=G3',
             items: [
-              { label: '도수, 체외충격파, 증식치료', amount: '350만원' },
-              { label: '주사치료', amount: '250만원' },
-              { label: '자기공명진단(MRA/MRI)', amount: '300만원' },
+              { label: '도수, 체외충격파, 증식치료', amount: '-' },
+              { label: '주사치료', amount: '-' },
+              { label: '자기공명진단(MRA/MRI)', amount: '-' },
             ],
           },
           {
             title: '기타보장',
-            helpUrl: '/tour/tourvalley/rainbow/common/guarantee_detail_pop.jsp?group_product=DS&page_num=G4',
+            helpUrl: '/tour/tourvalley/rainbow/common/guarantee_detail_pop.jsp?group_product=DS&page_num=G6',
             items: [
               { label: '휴대품손해(본인부담금 1만원)', amount: '50만원', note: '(1개 20만원한도, 이동통신단말기 보상제외)' },
               { label: '골절(치아파절제외)진단비', amount: '10만원' },
               { label: '화상진단비', amount: '10만원' },
-              { label: '배상책임(본인부담금 1만원)', amount: '500만원' },
-              { label: '상해입원일당', amount: '-', note: '(4일이상 30일한도)' },
-              { label: '상해응급실내원(응급)의료비', amount: '-' },
+              { label: '배상책임(본인부담금 1만원)', amount: '1,000만원' },
+              { label: '상해입원일당', amount: '2만원', note: '(4일이상 30일한도)' },
+              { label: '상해응급실내원(응급)의료비', amount: '3만원' },
+              { label: '상해응급실내원(비응급)의료비', amount: '-' },
               { label: '골절수술비', amount: '20만원', note: '(동일사고 1회한)' },
               { label: '상해수술비', amount: '20만원', note: '(동일사고 1회한)' },
               { label: '깁스치료비', amount: '20만원', note: '(동일사고 또는 질병 1회한)' },
@@ -229,7 +236,7 @@ const coverageDataMap: Record<InsuranceType, Record<PlanType, CoverageDataValue>
               { label: '휴대품손해(본인부담금 1만원)', amount: '50만원', note: '(1개 20만원한도, 이동통신단말기 보상제외)' },
               { label: '골절(치아파절제외)진단비', amount: '10만원' },
               { label: '화상진단비', amount: '10만원' },
-              { label: '배상책임(본인부담금 1만원)', amount: '1,000만원' },
+              { label: '배상책임(본인부담금 1만원)', amount: '500만원' },
               { label: '상해입원일당', amount: '-', note: '(4일이상 30일한도)' },
               { label: '상해응급실내원(응급)의료비', amount: '-' },
               { label: '골절수술비', amount: '20만원', note: '(동일사고 1회한)' },
@@ -244,99 +251,13 @@ const coverageDataMap: Record<InsuranceType, Record<PlanType, CoverageDataValue>
       '실손': {
         planName: '고급플랜',
         sections: [
-          {
-            title: '상해보장',
-            helpUrl: '/tour/tourvalley/rainbow/common/guarantee_detail_pop.jsp?group_product=DS&page_num=G1',
-            items: [
-              { label: '상해사망', amount: '1억원' },
-              { label: '상해후유장해', amount: '-' },
-              { label: '상해입원의료비', amount: '1,000만원' },
-              { label: '상해통원의료비', amount: '10만원' },
-            ],
-          },
-          {
-            title: '질병보장',
-            helpUrl: '/tour/tourvalley/rainbow/common/guarantee_detail_pop.jsp?group_product=DS&page_num=G2',
-            items: [
-              { label: '해외의료비', amount: '-' },
-              { label: '입원(급여/비급여)', amount: '1,000만원' },
-              { label: '통원(급여/비급여)', amount: '10만원' },
-              { label: '사망 및 80%이상 고도후유장해', amount: '1,000만원' },
-            ],
-          },
-          {
-            title: '상해질병 3대 비급여 국내의료비',
-            helpUrl: '/tour/tourvalley/rainbow/common/guarantee_detail_pop.jsp?group_product=DS&page_num=G3',
-            items: [
-              { label: '도수, 체외충격파, 증식치료', amount: '350만원' },
-              { label: '주사치료', amount: '250만원' },
-              { label: '자기공명진단(MRA/MRI)', amount: '300만원' },
-            ],
-          },
-          {
-            title: '기타보장',
-            helpUrl: '/tour/tourvalley/rainbow/common/guarantee_detail_pop.jsp?group_product=DS&page_num=G4',
-            items: [
-              { label: '휴대품손해(본인부담금 1만원)', amount: '50만원', note: '(1개 20만원한도, 이동통신단말기 보상제외)' },
-              { label: '골절(치아파절제외)진단비', amount: '10만원' },
-              { label: '화상진단비', amount: '10만원' },
-              { label: '배상책임(본인부담금 1만원)', amount: '1,000만원' },
-              { label: '상해입원일당', amount: '-', note: '(4일이상 30일한도)' },
-              { label: '상해응급실내원(응급)의료비', amount: '-' },
-              { label: '골절수술비', amount: '20만원', note: '(동일사고 1회한)' },
-              { label: '상해수술비', amount: '20만원', note: '(동일사고 1회한)' },
-              { label: '깁스치료비', amount: '20만원', note: '(동일사고 또는 질병 1회한)' },
-            ],
-          },
+          // TODO: 국내여행보험 고급플랜 실손 보장 내용을 여기에 입력하세요
         ],
       },
       '비실손': {
         planName: '고급플랜',
         sections: [
-          {
-            title: '상해보장',
-            helpUrl: '/tour/tourvalley/rainbow/common/guarantee_detail_pop.jsp?group_product=DS&page_num=G1',
-            items: [
-              { label: '상해사망', amount: '1억원' },
-              { label: '상해후유장해', amount: '-' },
-              { label: '상해입원의료비', amount: '1,000만원' },
-              { label: '상해통원의료비', amount: '10만원' },
-            ],
-          },
-          {
-            title: '질병보장',
-            helpUrl: '/tour/tourvalley/rainbow/common/guarantee_detail_pop.jsp?group_product=DS&page_num=G2',
-            items: [
-              { label: '해외의료비', amount: '-' },
-              { label: '입원(급여/비급여)', amount: '-' },
-              { label: '통원(급여/비급여)', amount: '-' },
-              { label: '사망 및 80%이상 고도후유장해', amount: '1,000만원' },
-            ],
-          },
-          {
-            title: '상해질병 3대 비급여 국내의료비',
-            helpUrl: '/tour/tourvalley/rainbow/common/guarantee_detail_pop.jsp?group_product=DS&page_num=G3',
-            items: [
-              { label: '도수, 체외충격파, 증식치료', amount: '350만원' },
-              { label: '주사치료', amount: '250만원' },
-              { label: '자기공명진단(MRA/MRI)', amount: '300만원' },
-            ],
-          },
-          {
-            title: '기타보장',
-            helpUrl: '/tour/tourvalley/rainbow/common/guarantee_detail_pop.jsp?group_product=DS&page_num=G4',
-            items: [
-              { label: '휴대품손해(본인부담금 1만원)', amount: '50만원', note: '(1개 20만원한도, 이동통신단말기 보상제외)' },
-              { label: '골절(치아파절제외)진단비', amount: '10만원' },
-              { label: '화상진단비', amount: '10만원' },
-              { label: '배상책임(본인부담금 1만원)', amount: '1,000만원' },
-              { label: '상해입원일당', amount: '-', note: '(4일이상 30일한도)' },
-              { label: '상해응급실내원(응급)의료비', amount: '-' },
-              { label: '골절수술비', amount: '20만원', note: '(동일사고 1회한)' },
-              { label: '상해수술비', amount: '20만원', note: '(동일사고 1회한)' },
-              { label: '깁스치료비', amount: '20만원', note: '(동일사고 또는 질병 1회한)' },
-            ],
-          },
+          // TODO: 국내여행보험 고급플랜 비실손 보장 내용을 여기에 입력하세요
         ],
       },
     },
@@ -899,7 +820,7 @@ const coverageDataMap: Record<InsuranceType, Record<PlanType, CoverageDataValue>
               { label: '상해후유장해', amount: '-' },
               { label: '해외의료비', amount: '100,000USD' },
               { label: '국내입원의료비(급여/비급여)', amount: '5,000만원' },
-              { label: '국내통원의료비(급여/비급여)', amount: '15만원' },
+              { label: '국내통원의료비(급여/비급여)', amount: '20만원' },
             ],
           },
           {
@@ -908,7 +829,7 @@ const coverageDataMap: Record<InsuranceType, Record<PlanType, CoverageDataValue>
             items: [
               { label: '해외의료비', amount: '100,000USD' },
               { label: '국내입원의료비(급여/비급여)', amount: '5,000만원' },
-              { label: '국내통원의료비(급여/비급여)', amount: '15만원' },
+              { label: '국내통원의료비(급여/비급여)', amount: '20만원' },
               { label: '사망 및 80%이상 고도후유장해', amount: '2,000만원' },
             ],
           },
@@ -1253,7 +1174,7 @@ const coverageDataMap: Record<InsuranceType, Record<PlanType, CoverageDataValue>
               { label: '상해후유장해', amount: '-' },
               { label: '해외의료비', amount: '1억원' },
               { label: '국내입원의료비(급여/비급여)', amount: '5,000만원' },
-              { label: '국내통원의료비(급여/비급여)', amount: '20만원' },
+              { label: '국내통원의료비(급여/비급여)', amount: '15만원' },
             ],
           },
           {
@@ -1262,7 +1183,7 @@ const coverageDataMap: Record<InsuranceType, Record<PlanType, CoverageDataValue>
             items: [
               { label: '해외의료비', amount: '1억원' },
               { label: '국내입원의료비(급여/비급여)', amount: '5,000만원' },
-              { label: '국내통원의료비(급여/비급여)', amount: '20만원' },
+              { label: '국내통원의료비(급여/비급여)', amount: '15만원' },
               { label: '사망 및 80%이상 고도후유장해', amount: '2,000만원' },
             ],
           },
@@ -1332,39 +1253,38 @@ const coverageDataMap: Record<InsuranceType, Record<PlanType, CoverageDataValue>
   },
 };
 
-function MobileCoverageDetailContent() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const planTypeParam = searchParams.get('planType') || '표준플랜';
-  const insuranceTypeParam = searchParams.get('insuranceType') || '국내여행보험';
-  const returnUrlParam = searchParams.get('returnUrl');
-  const returnUrl = returnUrlParam ? decodeURIComponent(returnUrlParam) : '/domestic/m';
-  const isMedicalExpenseParam = searchParams.get('isMedicalExpense');
-  const currencyPlanParam = searchParams.get('currencyPlan') as '원화플랜' | '외화플랜' | null;
+export default function CoverageDetailModal({
+  isOpen,
+  onClose,
+  planType,
+  insuranceType = '국내여행보험',
+  isMedicalExpense = true, // 기본값: 실손
+  currencyPlan, // 원화플랜/외화플랜 구분
+}: CoverageDetailModalProps) {
+  if (!isOpen) return null;
 
   // insurance_type과 plan_type에 따라 보장 데이터 가져오기
-  const insuranceType = insuranceTypeParam as InsuranceType;
-  const planType = planTypeParam as PlanType;
+  const insuranceTypeKey = insuranceType as InsuranceType;
+  const planTypeKey = planType as PlanTypeKey;
   
   // 국내여행보험과 해외여행보험은 실손/비실손 구분이 있음
-  const needsMedicalExpenseDistinction = insuranceType === '국내여행보험' || insuranceType === '해외여행보험';
+  const needsMedicalExpenseDistinction = insuranceTypeKey === '국내여행보험' || insuranceTypeKey === '해외여행보험';
   // 유학/어학연수와 해외출장/주재원/교환교수는 원화플랜/외화플랜 구분이 있음
-  const needsCurrencyPlanDistinction = insuranceType === '유학/어학연수' || insuranceType === '해외출장/주재원/교환교수';
+  const needsCurrencyPlanDistinction = insuranceTypeKey === '유학/어학연수' || insuranceTypeKey === '해외출장/주재원/교환교수';
   
   // 데이터 가져오기
-  const planData = coverageDataMap[insuranceType]?.[planType];
+  const planData = coverageDataMap[insuranceTypeKey]?.[planTypeKey];
   let coverageData: PlanCoverage;
   
   if (needsMedicalExpenseDistinction && planData && '실손' in planData) {
     // 실손/비실손 구분이 있는 경우
-    const isMedicalExpense = isMedicalExpenseParam !== 'false'; // 기본값: 실손
-    const medicalExpenseType = isMedicalExpense ? '실손' : '비실손';
+    const medicalExpenseType = isMedicalExpense !== false ? '실손' : '비실손'; // 기본값: 실손
     coverageData = (planData as Record<MedicalExpenseType, PlanCoverage>)[medicalExpenseType] || 
                    (planData as Record<MedicalExpenseType, PlanCoverage>)['실손'];
   } else if (needsCurrencyPlanDistinction && planData && '원화플랜' in planData) {
     // 원화플랜/외화플랜 구분이 있는 경우
-    const currencyPlan = currencyPlanParam || '원화플랜'; // 기본값: 원화플랜
-    coverageData = (planData as Record<CurrencyPlanType, PlanCoverage>)[currencyPlan] || 
+    const currencyPlanType = currencyPlan || '원화플랜'; // 기본값: 원화플랜
+    coverageData = (planData as Record<CurrencyPlanType, PlanCoverage>)[currencyPlanType] || 
                    (planData as Record<CurrencyPlanType, PlanCoverage>)['원화플랜'];
   } else if (planData && 'planName' in planData) {
     // 구분이 없는 경우 (직접 PlanCoverage)
@@ -1379,36 +1299,23 @@ function MobileCoverageDetailContent() {
     }
   }
 
-  const handleConfirm = (e?: React.MouseEvent<HTMLAnchorElement>) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    
-    // returnUrl이 있으면 해당 URL로 이동, 없으면 이전 페이지로
-    if (returnUrl && returnUrl !== '/coverage-detail/m') {
-      router.push(returnUrl);
-    } else {
-      router.back();
-    }
-  };
-
   return (
-    <div className="coverage-detail-mobile-page">
-      <Header isMobile={true} />
-      <div className="prow_01">
-        <div className="tourG_mat13">
-          <header id="header">
-            <div className="tour2023_header_inner tour2023_header_line">
-              <span className="tourTop_title">보장 상세보기</span>
-              <a className="close" href="javascript:void(0);" onClick={(e) => handleConfirm(e)}>닫기</a>
-            </div>
-          </header>
-
+    <div className="coverage-detail-modal-overlay" onClick={onClose}>
+      <div className="coverage-detail-modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="coverage-detail-modal-header">
+          <h2 className="coverage-detail-modal-title">보장 상세보기</h2>
+          <button
+            className="coverage-detail-modal-close-btn"
+            onClick={onClose}
+          >
+            ×
+          </button>
+        </div>
+        <div className="coverage-detail-modal-body">
           <p className="tour2023_title04">{coverageData.planName}</p>
           <p className="tour2023_Line01"></p>
           
-          {coverageData.sections.map((section: CoverageSection, sectionIndex: number) => (
+          {coverageData.sections.map((section, sectionIndex) => (
             <section key={sectionIndex}>
               <p className="tour2023_txt18">
                 <span className="tour2023_blue">{section.title}</span>
@@ -1416,6 +1323,7 @@ function MobileCoverageDetailContent() {
                   href={section.helpUrl} 
                   target="_blank" 
                   rel="noopener noreferrer"
+                  className="coverage-help-link"
                 >
                   <img 
                     src="/images/icon_tip.png" 
@@ -1425,7 +1333,7 @@ function MobileCoverageDetailContent() {
                 </a>
               </p>
               
-              {section.items.map((item: CoverageItem, itemIndex: number) => (
+              {section.items.map((item, itemIndex) => (
                 <ul key={itemIndex} className="tour2023_planLayer">
                   <li className="tour2023_txt16">
                     <span>{item.label}</span>
@@ -1441,32 +1349,15 @@ function MobileCoverageDetailContent() {
 
           <div className="tourG_mat17 tourG_Wrap"></div>
         </div>
-      </div>
-      
-      <section id="tour2023_fixedBanner">
-        <div className="tour2023_bottom_btn">
-          <a href="javascript:void(0);" className="tour2023_btn_b tour2023_btn07" onClick={(e) => handleConfirm(e)}>확인</a>
+        <div className="coverage-detail-modal-footer">
+          <button 
+            className="tour2023_btn_b tour2023_btn07"
+            onClick={onClose}
+          >
+            확인
+          </button>
         </div>
-      </section>
-      
-      <Footer isMobile={true} />
+      </div>
     </div>
   );
 }
-
-export default function MobileCoverageDetailPage() {
-  return (
-    <Suspense fallback={
-      <div className="coverage-detail-mobile-page">
-        <Header />
-        <div className="coverage-detail-loading" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
-          <div>로딩 중...</div>
-        </div>
-        <Footer />
-      </div>
-    }>
-      <MobileCoverageDetailContent />
-    </Suspense>
-  );
-}
-

@@ -20,6 +20,7 @@ import ConsentModal from '@/components/travel/ConsentModal';
 import ExcelUploadModal from '@/components/travel/ExcelUploadModal';
 import AccidentFreeCashModal from '@/components/travel/AccidentFreeCashModal';
 import ServiceModal from '@/components/ServiceModal';
+import CoverageDetailModal from '@/components/travel/CoverageDetailModal';
 import { PlanType, PlanInfo, Participant, CalculatedPremiums, PaymentMethod, PaymentSubMethod, Gender } from '@/components/travel/types';
 import './page.css';
 
@@ -75,6 +76,8 @@ export default function PCOverseasPage() {
   const [isCurrentlyAbroad, setIsCurrentlyAbroad] = useState<boolean | null>(null); // 현재 출국/해외 체류 중
   const [hasRestrictedCountry, setHasRestrictedCountry] = useState<boolean | null>(null); // 제한국가 포함 여부
   const [showRestrictedCountryModal, setShowRestrictedCountryModal] = useState(false);
+  const [showCoverageDetailModal, setShowCoverageDetailModal] = useState(false);
+  const [selectedCoveragePlanType, setSelectedCoveragePlanType] = useState<PlanType | null>(null);
   
   // 동의서 모달 관련 상태
   const [showConsentModal, setShowConsentModal] = useState(false);
@@ -321,6 +324,23 @@ export default function PCOverseasPage() {
     }
   };
 
+  // 보장 상세보기 클릭 핸들러 (PC는 모달)
+  const handleContractDetailClick = useCallback((clickedPlanType: PlanType) => {
+    setSelectedCoveragePlanType(clickedPlanType);
+    setShowCoverageDetailModal(true);
+  }, []);
+
+  // 보장 상세보기 모달 닫기 핸들러 (리렌더링 방지)
+  const handleCoverageDetailModalClose = useCallback(() => {
+    // 모달을 먼저 닫고, 다음 프레임에서 selectedCoveragePlanType을 null로 설정하여 불필요한 리렌더링 방지
+    setShowCoverageDetailModal(false);
+    // 모달이 완전히 닫힌 후에 selectedCoveragePlanType을 null로 설정
+    // 이렇게 하면 모달이 닫히는 동안 불필요한 리렌더링이 발생하지 않음
+    setTimeout(() => {
+      setSelectedCoveragePlanType(null);
+    }, 300); // 모달 애니메이션 시간보다 약간 긴 시간
+  }, []);
+
   // 가입자 보험료 계산 함수
   const handleCalculateParticipants = async () => {
     // 가입자 정보 검증
@@ -540,20 +560,46 @@ export default function PCOverseasPage() {
 
           const data = await response.json();
           if (data.success) {
-            // 플랜 정보 초기화 (보장내용은 기본값으로 설정, 추후 백엔드에서 받아올 수 있음)
-            plans[planType] = {
-              type: planType,
-              premium: data.premium,
-              coverages: [
+            // 플랜별 보장 내용 설정
+            let coverages: { label: string; amount: string }[];
+            
+            if (planType === '표준플랜') {
+              coverages = [
+                { label: '상해사망후유장해', amount: '2억원' },
+                { label: '해외의료비(상해)', amount: '5,000만원' },
+                { label: '해외의료비(질병)', amount: '5,000만원' },
+                { label: '휴대품손해(휴대폰은 보상제외)', amount: '100만원' },
+              ];
+            } else if (planType === '실속플랜') {
+              coverages = [
+                { label: '상해사망후유장해', amount: '1억원' },
+                { label: '해외의료비(상해)', amount: '2,000만원' },
+                { label: '해외의료비(질병)', amount: '2,000만원' },
+                { label: '휴대품손해(휴대폰은 보상제외)', amount: '50만원' },
+              ];
+            } else if (planType === '고급플랜') {
+              coverages = [
+                { label: '상해사망후유장해', amount: '3억원' },
+                { label: '해외의료비(상해)', amount: '1억원' },
+                { label: '해외의료비(질병)', amount: '1억원' },
+                { label: '휴대품손해(휴대폰은 보상제외)', amount: '150만원' },
+              ];
+            } else {
+              // 어린이플랜, 어르신플랜 등 기존 구조 유지
+              coverages = [
                 { label: '상해사망후유장해', amount: '1억원' },
                 { label: '상해입원의료비', amount: '1,000만원' },
                 { label: '상해통원의료비', amount: '10만원' },
-                ...(planType !== '실속플랜' ? [
-                  { label: '질병입원의료비', amount: '1,000만원' },
-                  { label: '질병통원의료비', amount: '10만원' },
-                ] : []),
+                { label: '질병입원의료비', amount: '1,000만원' },
+                { label: '질병통원의료비', amount: '10만원' },
                 { label: '휴대품손해(휴대폰은 보상제외)', amount: '50만원' },
-              ],
+              ];
+            }
+            
+            plans[planType] = {
+              type: planType,
+              premium: data.premium,
+              coverages: coverages,
             };
           } else {
             console.error(`보험료 계산 실패 (${planType}):`, data.message);
@@ -1048,6 +1094,7 @@ export default function PCOverseasPage() {
             onGenderChange={setGender}
             onMedicalExpenseChange={handleMedicalExpenseChange}
             onPlanSelect={setSelectedPlan}
+            onContractDetailClick={handleContractDetailClick}
             onParticipantCountChange={(count) => {
               setParticipantCount(count);
               if (count === 2) {
@@ -1188,6 +1235,17 @@ export default function PCOverseasPage() {
           isOpen={showRestrictedCountryModal}
           onClose={() => setShowRestrictedCountryModal(false)}
         />
+
+        {/* 보장 상세보기 모달 */}
+        {selectedCoveragePlanType && showCoverageDetailModal && (
+          <CoverageDetailModal
+            isOpen={showCoverageDetailModal}
+            onClose={handleCoverageDetailModalClose}
+            planType={selectedCoveragePlanType}
+            insuranceType="해외여행보험"
+            isMedicalExpense={hasMedicalExpense}
+          />
+        )}
 
         {/* 동의서 모달 */}
         <ConsentModal

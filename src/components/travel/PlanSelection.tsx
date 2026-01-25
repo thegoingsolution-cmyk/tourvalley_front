@@ -13,6 +13,7 @@ interface PlanSelectionProps {
   onParticipantCountChange: (count: 1 | 2) => void;
   onAddParticipant?: () => void;
   insuranceType?: string;
+  onContractDetailClick?: (planType: PlanType) => void;
   // 해외장기체류보험용 props
   currencyPlan?: '원화' | '외화';
   onCurrencyPlanChange?: (plan: '원화' | '외화') => void;
@@ -30,6 +31,7 @@ export default function PlanSelection({
   onParticipantCountChange,
   onAddParticipant,
   insuranceType,
+  onContractDetailClick,
   currencyPlan,
   onCurrencyPlanChange,
   travelCountry,
@@ -255,7 +257,19 @@ export default function PlanSelection({
                   </div>
                 ))}
               </div>
-              <a href="#" className="coverage-detail-link">보장 상세보기 &gt;</a>
+              <a 
+                href="#" 
+                className="coverage-detail-link"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  if (onContractDetailClick) {
+                    onContractDetailClick(planType as PlanType);
+                  }
+                }}
+              >
+                보장 상세보기 &gt;
+              </a>
             </div>
           );
         })}

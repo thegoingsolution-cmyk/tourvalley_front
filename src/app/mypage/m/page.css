@@ -606,7 +606,8 @@
   color: #666;
 }
 
-.tourGuard_form_tt .tourGuard_input_w01 {
+/* mypage-mobile 페이지에서만 적용되는 스타일 */
+.mypage-mobile .tourGuard_form_tt .tourGuard_input_w01 {
   width: 38% !important;
   flex: 0 0 38%;
 }

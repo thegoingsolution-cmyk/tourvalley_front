@@ -171,6 +171,46 @@ function MobileLongTermStayContent() {
     }
   }, [travelPurposeLong, currencyPlan]);
 
+  // 페이지 마운트 시 저장된 상태 복원 (coverage-detail에서 돌아올 때)
+  useEffect(() => {
+    const restoreState = () => {
+      try {
+        const savedState = localStorage.getItem('long_term_stay_m_state');
+        if (savedState) {
+          const state = JSON.parse(savedState);
+          // showPlanSelection이 true이고 planInfo가 있으면 상태 복원
+          // 단, 이미 상태가 복원되어 있으면 복원하지 않음 (중복 복원 방지)
+          if (state.showPlanSelection && state.planInfo && (!showPlanSelection || !planInfo)) {
+            setShowPlanSelection(state.showPlanSelection);
+            setPlanInfo(state.planInfo);
+            setSelectedPlan(state.selectedPlan);
+            setHasMedicalExpense(state.hasMedicalExpense || true);
+            // 다른 상태들도 복원 (필요한 경우)
+            if (state.departureDate) setDepartureDate(state.departureDate);
+            if (state.departureTime) setDepartureTime(state.departureTime);
+            if (state.arrivalDate) setArrivalDate(state.arrivalDate);
+            if (state.arrivalTime) setArrivalTime(state.arrivalTime);
+            if (state.birthDate) setBirthDate(state.birthDate);
+            if (state.gender) setGender(state.gender);
+            if (state.travelCountry) setTravelCountry(state.travelCountry);
+            if (state.travelPurposeLong) setTravelPurposeLong(state.travelPurposeLong);
+            if (state.currencyPlan) setCurrencyPlan(state.currencyPlan);
+          }
+          // 상태 복원 여부와 관계없이 localStorage는 유지 (다음 coverage-detail 방문 시에도 사용)
+        }
+      } catch (error) {
+        console.error('상태 복원 오류:', error);
+        localStorage.removeItem('long_term_stay_m_state');
+      }
+    };
+
+    // URL에 returnUrl 파라미터가 있으면 (coverage-detail에서 돌아온 경우) 상태 복원
+    const returnUrl = searchParams.get('returnUrl');
+    if (returnUrl === '/long-term-stay/m' || window.location.pathname === '/long-term-stay/m') {
+      restoreState();
+    }
+  }, [searchParams, showPlanSelection, planInfo]);
+
   // 보험나이 계산 함수 (만나이에서 6개월 경과 시 +1)
   const calculateAgeFromBirthDate = (birthDateStr: string): number | null => {
     if (!birthDateStr || birthDateStr.length !== 8) return null;
@@ -235,6 +275,143 @@ function MobileLongTermStayContent() {
     }
     
     return { valid: true };
+  };
+
+  // 보장 내용 설정 헬퍼 함수
+  const getCoveragesForPlan = (planType: string, insuranceType: string, currentCurrencyPlan: string): { label: string; amount: string }[] => {
+    // 유학/어학연수 또는 해외출장/주재원/교환교수인 경우 플랜별 보장 내용
+    if (insuranceType === '유학/어학연수' || insuranceType === '해외출장/주재원/교환교수') {
+      if (currentCurrencyPlan === '원화') {
+        // 원화 플랜
+        if (planType === '실속플랜') {
+          return [
+            { label: '상해사망후유장해', amount: '1억원' },
+            { label: '해외의료비(상해)', amount: '2,000만원' },
+            { label: '해외의료비(질병)', amount: '2,000만원' },
+            { label: '중대사고구조송환비용', amount: '2,000만원' },
+          ];
+        } else if (planType === '표준플랜') {
+          return [
+            { label: '상해사망후유장해', amount: '1억원' },
+            { label: '해외의료비(상해)', amount: '5,000만원' },
+            { label: '해외의료비(질병)', amount: '5,000만원' },
+            { label: '중대사고구조송환비용', amount: '2,000만원' },
+          ];
+        } else if (planType === '고급플랜') {
+          return [
+            { label: '상해사망후유장해', amount: '2억원' },
+            { label: '해외의료비(상해)', amount: '1억원' },
+            { label: '해외의료비(질병)', amount: '1억원' },
+            { label: '중대사고구조송환비용', amount: '5,000만원' },
+          ];
+        } else {
+          // 기타 플랜 기존 구조 유지
+          return [
+            { label: '상해사망후유장해', amount: '1억원' },
+            { label: '상해입원의료비', amount: '1,000만원' },
+            { label: '상해통원의료비', amount: '10만원' },
+            { label: '질병입원의료비', amount: '1,000만원' },
+            { label: '질병통원의료비', amount: '10만원' },
+            { label: '휴대품손해(휴대폰은 보상제외)', amount: '50만원' },
+          ];
+        }
+      } else if (currentCurrencyPlan === '외화') {
+        // 외화 플랜
+        if (planType === '실속플랜') {
+          return [
+            { label: '상해사망후유장해', amount: '1억원' },
+            { label: '해외의료비(상해)', amount: '20,000USD' },
+            { label: '해외의료비(질병)', amount: '20,000USD' },
+            { label: '중대사고구조송환비용', amount: '20,000USD' },
+          ];
+        } else if (planType === '표준플랜') {
+          return [
+            { label: '상해사망후유장해', amount: '1억원' },
+            { label: '해외의료비(상해)', amount: '50,000USD' },
+            { label: '해외의료비(질병)', amount: '50,000USD' },
+            { label: '중대사고구조송환비용', amount: '75,000USD' },
+          ];
+        } else if (planType === '고급플랜') {
+          return [
+            { label: '상해사망후유장해', amount: '2억원' },
+            { label: '해외의료비(상해)', amount: '100,000USD' },
+            { label: '해외의료비(질병)', amount: '100,000USD' },
+            { label: '중대사고구조송환비용', amount: '75,000USD' },
+          ];
+        } else {
+          // 기타 플랜 기존 구조 유지
+          return [
+            { label: '상해사망후유장해', amount: '1억원' },
+            { label: '상해입원의료비', amount: '1,000만원' },
+            { label: '상해통원의료비', amount: '10만원' },
+            { label: '질병입원의료비', amount: '1,000만원' },
+            { label: '질병통원의료비', amount: '10만원' },
+            { label: '휴대품손해(휴대폰은 보상제외)', amount: '50만원' },
+          ];
+        }
+      } else {
+        // 기존 구조 유지
+        return [
+          { label: '상해사망후유장해', amount: '1억원' },
+          { label: '상해입원의료비', amount: '1,000만원' },
+          { label: '상해통원의료비', amount: '10만원' },
+          ...(planType !== '실속플랜' ? [
+            { label: '질병입원의료비', amount: '1,000만원' },
+            { label: '질병통원의료비', amount: '10만원' },
+          ] : []),
+          { label: '휴대품손해(휴대폰은 보상제외)', amount: '50만원' },
+        ];
+      }
+    } else if (insuranceType === '워킹홀리데이') {
+      // 워킹홀리데이인 경우
+      if (planType === '실속플랜') {
+        // 실속 플랜: 원화 플랜
+        return [
+          { label: '상해사망후유장해', amount: '2,000만원' },
+          { label: '해외의료비(상해)', amount: '2,000만원' },
+          { label: '해외의료비(질병)', amount: '2,000만원' },
+          { label: '중대사고구조송환비용', amount: '1,000만원' },
+        ];
+      } else if (planType === '표준플랜') {
+        // 표준 플랜: 원화 플랜
+        return [
+          { label: '상해사망후유장해', amount: '5,000만원' },
+          { label: '해외의료비(상해)', amount: '5,000만원' },
+          { label: '해외의료비(질병)', amount: '5,000만원' },
+          { label: '중대사고구조송환비용', amount: '5,000만원' },
+        ];
+      } else if (planType === '고급플랜') {
+        // 고급 플랜: 외화 플랜 (EUR)
+        return [
+          { label: '상해사망후유장해', amount: '30,000EUR' },
+          { label: '해외의료비(상해)', amount: '30,000EUR' },
+          { label: '해외의료비(질병)', amount: '30,000EUR' },
+          { label: '중대사고구조송환비용', amount: '30,000EUR' },
+        ];
+      } else {
+        // 기타 플랜 기존 구조 유지
+        return [
+          { label: '상해사망후유장해', amount: '1억원' },
+          { label: '상해입원의료비', amount: '1,000만원' },
+          { label: '상해통원의료비', amount: '10만원' },
+          { label: '질병입원의료비', amount: '1,000만원' },
+          { label: '질병통원의료비', amount: '10만원' },
+          { label: '휴대품손해(휴대폰은 보상제외)', amount: '50만원' },
+        ];
+      }
+    } else {
+      // 기존 구조 유지
+      return [
+        { label: '상해사망후유장해', amount: '1억원' },
+        { label: '상해입원의료비', amount: '1,000만원' },
+        { label: '상해통원의료비', amount: '10만원' },
+        ...(planType !== '실속플랜' ? [
+          { label: '질병입원의료비', amount: '1,000만원' },
+          { label: '질병통원의료비', amount: '10만원' },
+        ] : []),
+        { label: '휴대품손해(휴대폰은 보상제외)', amount: '50만원' },
+      ];
+    }
   };
 
   const handleCalculate = async (overrideCurrencyPlan?: '원화' | '외화') => {
@@ -325,14 +502,11 @@ function MobileLongTermStayContent() {
 
             const data = await response.json();
             if (data.success) {
+              const coverages = getCoveragesForPlan(planType, insuranceType, '원화');
               plans[planType] = {
                 type: planType,
                 premium: data.premium,
-                coverages: [
-                  { label: '상해사망후유장해', amount: '1억원' },
-                  { label: '상해입원의료비', amount: '1,000만원' },
-                  { label: '상해통원의료비', amount: '10만원' },
-                ],
+                coverages: coverages,
               };
             }
           } catch (error) {
@@ -362,14 +536,11 @@ function MobileLongTermStayContent() {
 
           const data = await response.json();
           if (data.success) {
+            const coverages = getCoveragesForPlan('고급플랜', insuranceType, '외화');
             plans['고급플랜'] = {
               type: '고급플랜',
               premium: data.premium,
-              coverages: [
-                { label: '상해사망후유장해', amount: '1억원' },
-                { label: '상해입원의료비', amount: '1,000만원' },
-                { label: '상해통원의료비', amount: '10만원' },
-              ],
+              coverages: coverages,
             };
           }
         } catch (error) {
@@ -418,19 +589,14 @@ function MobileLongTermStayContent() {
 
             const data = await response.json();
             if (data.success) {
+              // 플랜별 보장 내용 설정
+              const currentCurrencyPlan = overrideCurrencyPlan || currencyPlan;
+              const coverages = getCoveragesForPlan(planType, insuranceType, currentCurrencyPlan);
+              
               plans[planType] = {
                 type: planType,
                 premium: data.premium,
-                coverages: [
-                  { label: '상해사망후유장해', amount: '1억원' },
-                  { label: '상해입원의료비', amount: '1,000만원' },
-                  { label: '상해통원의료비', amount: '10만원' },
-                  ...(planType !== '실속플랜' ? [
-                    { label: '질병입원의료비', amount: '1,000만원' },
-                    { label: '질병통원의료비', amount: '10만원' },
-                  ] : []),
-                  { label: '휴대품손해(휴대폰은 보상제외)', amount: '50만원' },
-                ],
+                coverages: coverages,
               };
             }
           } catch (error) {
@@ -1099,6 +1265,42 @@ function MobileLongTermStayContent() {
                   if (showPlanSelection && planInfo && birthDate && birthDate.length === 8) {
                     await handleCalculate(newCurrencyPlan);
                   }
+                }}
+                onContractDetailClick={(planType) => {
+                  // coverage-detail로 이동하기 전에 현재 상태를 저장
+                  if (showPlanSelection && planInfo) {
+                    try {
+                      localStorage.setItem('long_term_stay_m_state', JSON.stringify({
+                        showPlanSelection: true,
+                        planInfo: planInfo,
+                        selectedPlan: selectedPlan,
+                        hasMedicalExpense,
+                        departureDate,
+                        departureTime,
+                        arrivalDate,
+                        arrivalTime,
+                        birthDate,
+                        gender,
+                        travelCountry,
+                        travelPurposeLong,
+                        currencyPlan,
+                      }));
+                    } catch (error) {
+                      console.error('상태 저장 오류:', error);
+                    }
+                  }
+                  
+                  const returnUrl = encodeURIComponent('/long-term-stay/m');
+                  // insuranceType은 travelPurposeLong에 따라 결정
+                  const insuranceType = getTravelPurposeText(travelPurposeLong);
+                  // 워킹홀리데이는 currencyPlan이 없음
+                  const currencyPlanParam = travelPurposeLong === 'N010003' ? null : (currencyPlan === '원화' ? '원화플랜' : '외화플랜');
+                  
+                  let url = `/coverage-detail/m?planType=${planType}&insuranceType=${encodeURIComponent(insuranceType)}&returnUrl=${returnUrl}`;
+                  if (currencyPlanParam) {
+                    url += `&currencyPlan=${encodeURIComponent(currencyPlanParam)}`;
+                  }
+                  router.push(url);
                 }}
               />
             )}
