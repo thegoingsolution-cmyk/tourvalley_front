@@ -211,7 +211,8 @@
     width: 38%;
 }
 
-.tourGuard_bg_join {
+/* 네임스페이스를 사용하여 다른 페이지와의 CSS 충돌 방지 */
+.overseas-step1-mobile .tourGuard_bg_join {
     position: relative;
     display: flex;
     justify-content: space-between;
@@ -225,7 +226,7 @@
     margin-right: 0;
 }
 
-.tourGuard_input_cell {
+.overseas-step1-mobile .tourGuard_input_cell {
     position: relative;
     display: flex;
     justify-content: space-between;
@@ -238,11 +239,11 @@
     margin: 23px 0 0 10px;
 }
 
-.tourGuard_input_cell02 {
+.overseas-step1-mobile .tourGuard_input_cell02 {
     width: 38%;
 }
 
-.tourGuard_input_cell01 {
+.overseas-step1-mobile .tourGuard_input_cell01 {
     width: 98%;
 }
 
