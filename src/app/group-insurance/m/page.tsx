@@ -1960,6 +1960,9 @@ function MobileGroupInsuranceContent() {
             depositor_name: paymentSubMethod === '무통장입금' ? depositorName : null,
             bank_name: paymentSubMethod === '무통장입금' ? depositBank : null,
             account_number: paymentSubMethod === '무통장입금' ? (depositBank === '우리은행' ? '1005-604-481542' : '301-0337-8596-01') : null,
+            expected_deposit_date: paymentSubMethod === '무통장입금' && expectedDepositYear && expectedDepositMonth && expectedDepositDay 
+              ? `${expectedDepositYear}-${String(expectedDepositMonth).padStart(2, '0')}-${String(expectedDepositDay).padStart(2, '0')}` 
+              : null,
             card_type: paymentSubMethod === '수기카드' ? cardType : null,
             card_category: paymentSubMethod === '수기카드' ? cardCategory : null,
             card_number: paymentSubMethod === '수기카드' ? `${cardNumber1}-${cardNumber2}-${cardNumber3}-${cardNumber4}` : null,
