@@ -201,11 +201,35 @@
   text-decoration: none;
 }
 
+/* 확인 버튼 - 더 명시적인 선택자로 충돌 방지 */
+.coverage-detail-mobile-page #tour2023_fixedBanner .tour2023_bottom_btn .tour2023_btn_b.tour2023_btn07,
+.coverage-detail-mobile-page #tour2023_fixedBanner .tour2023_bottom_btn a.tour2023_btn07,
+.coverage-detail-mobile-page #tour2023_fixedBanner .tour2023_bottom_btn button.tour2023_btn07 {
+  width: 100% !important;
+  font-size: 18px !important;
+  color: #fff !important;
+  height: 55px !important;
+  box-sizing: border-box !important;
+  text-align: center !important;
+  letter-spacing: -1px !important;
+  background-color: #fe5700 !important;
+  border: none !important;
+  border-radius: 10px !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-family: 'NanumSquareNeoTTF-cBd' !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+}
+
 .coverage-detail-mobile-page .tour2023_btn07 {
   width: 100%;
   font-size: 18px;
   color: #fff !important;
-  padding-top: 15px;
   height: 55px;
   box-sizing: border-box;
   text-align: center;
@@ -215,8 +239,13 @@
   border-radius: 10px;
   cursor: pointer;
   text-decoration: none;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: 'NanumSquareNeoTTF-cBd';
+  padding: 0;
+  margin: 0;
+  line-height: 1;
 }
 
 .coverage-detail-mobile-page .tour2023_btn07:hover {

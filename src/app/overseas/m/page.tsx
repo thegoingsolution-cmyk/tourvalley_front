@@ -20,6 +20,7 @@ import DangerousActivityModal from '@/components/travel/DangerousActivityModal';
 import RestrictedCountryModal from '@/components/travel/RestrictedCountryModal';
 import ConsentModal from '@/components/travel/ConsentModal';
 import { PlanType, PlanInfo, Participant, CalculatedPremiums, PaymentMethod, PaymentSubMethod } from '@/components/travel/types';
+import { allCountries } from '@/components/travel/utils/countries';
 import './page.css';
 
 function MobileOverseasStep1Content() {
@@ -133,19 +134,7 @@ function MobileOverseasStep1Content() {
 
   // 여행국가 목록 불러오기
   useEffect(() => {
-    // TODO: API에서 여행국가 목록 불러오기
-    // 임시로 하드코딩
-    setTravelCountries([
-      { code: 'JP', name: '일본' },
-      { code: 'VN', name: '베트남' },
-      { code: 'TH', name: '태국' },
-      { code: 'TW', name: '대만' },
-      { code: 'PH', name: '필리핀' },
-      { code: 'GU', name: '괌' },
-      { code: 'SG', name: '싱가포르' },
-      { code: 'US', name: '미국' },
-      { code: 'MY', name: '말레이시아' },
-    ]);
+    setTravelCountries(allCountries);
   }, []);
 
   // STEP 2 (가입정보 입력) 진입 시 스크롤 최상단으로 이동
@@ -517,8 +506,15 @@ function MobileOverseasStep1Content() {
                 { label: '해외의료비(질병)', amount: '2,000만원' },
                 { label: '휴대품손해(휴대폰은 보상제외)', amount: '50만원' },
               ];
+            } else if (planType === '고급플랜') {
+              coverages = [
+                { label: '상해사망후유장해', amount: '3억원' },
+                { label: '해외의료비(상해)', amount: '1억원' },
+                { label: '해외의료비(질병)', amount: '1억원' },
+                { label: '휴대품손해(휴대폰은 보상제외)', amount: '150만원' },
+              ];
             } else {
-              // 고급플랜 등 기존 구조 유지
+              // 어린이플랜, 어르신플랜 등 기존 구조 유지
               coverages = [
                 { label: '상해사망후유장해', amount: '1억원' },
                 { label: '상해입원의료비', amount: '1,000만원' },
@@ -1202,7 +1198,7 @@ function MobileOverseasStep1Content() {
                 travelCountry={travelCountry}
                 travelPurpose={type === 'long' ? travelPurposeLong : undefined}
                 onContractDetailClick={(planType) => {
-                  // coverage-detail로 이동하기 전에 현재 상태를 저장
+                  // coverage-detail로 이동하기 전에 현재 상태를 다시 저장 (최신 상태 유지)
                   if (showPlanSelection && planInfo) {
                     try {
                       localStorage.setItem('overseas_m_state', JSON.stringify({

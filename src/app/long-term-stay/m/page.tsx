@@ -20,6 +20,7 @@ import DangerousActivityModal from '@/components/travel/DangerousActivityModal';
 import RestrictedCountryModal from '@/components/travel/RestrictedCountryModal';
 import ConsentModal from '@/components/travel/ConsentModal';
 import { PlanType, PlanInfo, Participant, CalculatedPremiums, PaymentMethod, PaymentSubMethod } from '@/components/travel/types';
+import { allCountries } from '@/components/travel/utils/countries';
 import './page.css';
 
 function MobileLongTermStayContent() {
@@ -149,17 +150,7 @@ function MobileLongTermStayContent() {
 
   // 여행국가 목록 불러오기
   useEffect(() => {
-    setTravelCountries([
-      { code: 'JP', name: '일본' },
-      { code: 'VN', name: '베트남' },
-      { code: 'TH', name: '태국' },
-      { code: 'TW', name: '대만' },
-      { code: 'PH', name: '필리핀' },
-      { code: 'GU', name: '괌' },
-      { code: 'SG', name: '싱가포르' },
-      { code: 'US', name: '미국' },
-      { code: 'MY', name: '말레이시아' },
-    ]);
+    setTravelCountries(allCountries);
   }, []);
 
   // STEP 2 진입 시 스크롤 최상단으로 이동
@@ -1272,7 +1263,7 @@ function MobileLongTermStayContent() {
                   }
                 }}
                 onContractDetailClick={(planType) => {
-                  // coverage-detail로 이동하기 전에 현재 상태를 저장
+                  // coverage-detail로 이동하기 전에 현재 상태를 다시 저장 (최신 상태 유지)
                   if (showPlanSelection && planInfo) {
                     try {
                       localStorage.setItem('long_term_stay_m_state', JSON.stringify({
