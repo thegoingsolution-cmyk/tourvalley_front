@@ -75,8 +75,8 @@ const applyVbankParams = (requestParams: any, params: any) => {
   requestParams.vbankValidHours = 168;
   requestParams.vbankExpDate = buildVbankExpireDate();
 
-  // 가맹점 설정에서 에스크로 사용인 경우 기본값을 true로 설정
-  requestParams.useEscrow = params.useEscrow ?? true;
+  // 테스트용으로 가상계좌 에스크로 기본값을 false로 설정
+  requestParams.useEscrow = params.useEscrow ?? false;
 
   console.log('가상계좌 파라미터 확인:', {
     method: requestParams.method,

@@ -18,6 +18,7 @@ export default function OverseasInsuranceStep5Page() {
   const [accountBank, setAccountBank] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [expectedDate, setExpectedDate] = useState('');
+  const [virtualBankCode, setVirtualBankCode] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   
   // 수기카드 관련 state
@@ -40,6 +41,8 @@ export default function OverseasInsuranceStep5Page() {
   
   // 년도 옵션 생성 (현재 년도 + 5년)
   const yearOptions = Array.from({ length: 6 }, (_, i) => currentYear + i);
+  const totalPremium = step3Data?.total_premium || 0;
+  const isVirtualAccountAvailable = totalPremium >= 10000;
   const [insuredList, setInsuredList] = useState<any[]>([]);
 
   useEffect(() => {
@@ -120,6 +123,12 @@ export default function OverseasInsuranceStep5Page() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!isVirtualAccountAvailable && payMethod === 'V') {
+      setPayMethod('C');
+    }
+  }, [isVirtualAccountAvailable, payMethod]);
+
   const handleBack = () => {
     window.location.href = '/group-insurance/overseas/step4';
   };
@@ -166,6 +175,21 @@ export default function OverseasInsuranceStep5Page() {
         }
         if (!cardholderResidentNumber || cardholderResidentNumber.length < 6) {
           alert('카드소유자 생년월일 또는 사업자번호를 입력해주세요.');
+          setIsProcessing(false);
+          return;
+        }
+      } else if (payMethod === 'V' && !isVirtualAccountAvailable) {
+        alert('가상계좌는 보험료가 1만원 이상일 때만 이용할 수 있습니다.');
+        setIsProcessing(false);
+        return;
+      } else if (payMethod === 'V') {
+        if (!virtualBankCode) {
+          alert('가상계좌 은행을 선택해주세요.');
+          setIsProcessing(false);
+          return;
+        }
+        if (!/^\d{3}$/.test(virtualBankCode)) {
+          alert('가상계좌 은행코드를 다시 선택해주세요.');
           setIsProcessing(false);
           return;
         }
@@ -522,9 +546,9 @@ export default function OverseasInsuranceStep5Page() {
         companions: [],
         payment: {
           payment_method: paymentMethodName,
-          payment_sub_method: payMethod === 'W' ? '수기카드' : (payMethod === 'B' ? '무통장입금' : null),
+          payment_sub_method: payMethod === 'W' ? '수기카드' : (payMethod === 'B' ? '무통장입금' : (payMethod === 'V' ? '가상계좌' : null)),
           amount: step3Data?.total_premium || 0,
-          status: (payMethod === 'C' || payMethod === 'N' || payMethod === 'K' || payMethod === 'W' || payMethod === 'B') ? '대기' : '완료',
+          status: (payMethod === 'C' || payMethod === 'N' || payMethod === 'K' || payMethod === 'W' || payMethod === 'B' || payMethod === 'V') ? '대기' : '완료',
           depositor_name: payMethod === 'B' ? (document.querySelector('input[name="payment_name"]') as HTMLInputElement)?.value : null,
           bank_name: payMethod === 'B' ? ((document.querySelector('input[name="accountB"]:checked') as HTMLInputElement)?.value === 'B1' ? '우리은행' : '농협') : null,
           account_number: payMethod === 'B' ? ((document.querySelector('input[name="accountB"]:checked') as HTMLInputElement)?.value === 'B1' ? '1005-604-481542' : '301-0337-8596-01') : null,
@@ -541,7 +565,7 @@ export default function OverseasInsuranceStep5Page() {
       };
 
       // 나이스페이먼츠, 네이버페이, 카카오페이는 계약 등록 후 결제 처리
-      if (payMethod === 'C' || payMethod === 'N' || payMethod === 'K') {
+      if (payMethod === 'C' || payMethod === 'N' || payMethod === 'K' || payMethod === 'V') {
         // 1. 계약 등록
         const contractResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/travel/register-contract`, {
           method: 'POST',
@@ -641,9 +665,46 @@ export default function OverseasInsuranceStep5Page() {
             alert(error instanceof Error ? error.message : '카카오페이 결제 중 오류가 발생했습니다.');
             setIsProcessing(false);
           }
+        } else if (payMethod === 'V') {
+          // 가상계좌 (나이스페이 결제창)
+          const paymentRequest = await requestNicepayPayment({
+            contract_id,
+            amount: step3Data?.total_premium || 0,
+            orderId: contractResult.contract_number,
+            goodsName: '해외여행보험',
+            buyerName: step2Data.contractor_name || '',
+            buyerEmail: step2Data.contractor_email || '',
+            buyerTel: step2Data.contractor_phone || '',
+            returnUrl: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/payments/nicepay/callback`,
+            closeUrl: `${window.location.origin}/payment/close`,
+          });
+
+          if (paymentRequest.success) {
+            localStorage.setItem('pendingPayment', JSON.stringify({
+              contract_id,
+              payment_method: paymentMethodName,
+              amount: step3Data?.total_premium || 0,
+              insuranceType: 'overseas',
+            }));
+            try {
+              await openNicepayWindow({
+                ...paymentRequest,
+                method: 'vbank',
+                bankCode: virtualBankCode,
+                vbankHolder: step2Data.contractor_name || '',
+              });
+            } catch (error) {
+              console.error('가상계좌 결제창 열기 오류:', error);
+              alert(error instanceof Error ? error.message : '가상계좌 결제창을 여는 중 오류가 발생했습니다.');
+              setIsProcessing(false);
+            }
+          } else {
+            alert(paymentRequest.message || '가상계좌 결제 요청에 실패했습니다.');
+            setIsProcessing(false);
+          }
         }
       } else {
-        // 무통장입금, 수기카드, 가상계좌는 바로 계약 등록
+        // 무통장입금, 수기카드는 바로 계약 등록
         const accountB = payMethod === 'B' ? (document.querySelector('input[name="accountB"]:checked') as HTMLInputElement)?.value : null;
         const paymentName = payMethod === 'B' ? (document.querySelector('input[name="payment_name"]') as HTMLInputElement)?.value : null;
         const expectedYear = payMethod === 'B' ? (document.querySelector('select[name="expected_year"]') as HTMLSelectElement)?.value : null;
@@ -669,8 +730,6 @@ export default function OverseasInsuranceStep5Page() {
             setPaymentMethod('무통장입금');
           } else if (payMethod === 'W') {
             setPaymentMethod('수기카드');
-          } else if (payMethod === 'V') {
-            setPaymentMethod('가상계좌');
           }
           setPaymentCompleted(true);
           
@@ -989,17 +1048,21 @@ export default function OverseasInsuranceStep5Page() {
                   </div>
                 </label>
 
-                <input
-                  type="radio"
-                  id="paymethod_V"
-                  name="paymethod"
-                  value="V"
-                  checked={payMethod === 'V'}
-                  onChange={(e) => handlePayMethodChange(e.target.value)}
-                />
-                <label htmlFor="paymethod_V" className="nomal_btn" style={{ display: 'none' }}>
-                  <div className="subtxt_03">가상계좌 발급</div>
-                </label>
+                {isVirtualAccountAvailable && (
+                  <>
+                    <input
+                      type="radio"
+                      id="paymethod_V"
+                      name="paymethod"
+                      value="V"
+                      checked={payMethod === 'V'}
+                      onChange={(e) => handlePayMethodChange(e.target.value)}
+                    />
+                    <label htmlFor="paymethod_V" className="nomal_btn">
+                      <div className="subtxt_03">가상계좌 발급</div>
+                    </label>
+                  </>
+                )}
 
                 <input
                   type="radio"
@@ -1261,6 +1324,50 @@ export default function OverseasInsuranceStep5Page() {
                     </tr>
                   </tbody>
                 </table>
+              </div>
+            )}
+
+            {payMethod === 'V' && (
+              <div className="in_wrap pb20" id="paymentArea_V">
+                <div className="bg_join input_cell">
+                  <label className="sName01" htmlFor="vbank_code">입금은행</label>
+                  <div className="in_wrap02">
+                    <div className="bg_join input_cell_01 wd_50">
+                      <span className="ps_box02 wd_100">
+                        <select
+                          className="sel01"
+                          id="vbank_code"
+                          name="vbank_code"
+                          value={virtualBankCode}
+                          onChange={(e) => setVirtualBankCode(e.target.value)}
+                        >
+                          <option value="">은행 선택</option>
+                          <option value="003">기업은행</option>
+                          <option value="004">국민은행</option>
+                          <option value="011">농협중앙회</option>
+                          <option value="020">우리은행</option>
+                          <option value="023">SC은행</option>
+                          <option value="031">대구은행</option>
+                          <option value="032">부산은행</option>
+                          <option value="034">광주은행</option>
+                          <option value="037">전북은행</option>
+                          <option value="039">경남은행</option>
+                          <option value="071">우체국</option>
+                          <option value="081">하나은행</option>
+                          <option value="088">신한은행</option>
+                          <option value="089">케이뱅크</option>
+                        </select>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="login_Btxt pb20">
+                  <dl style={{ border: '1px solid #d2d2d2', paddingLeft: '4px', background: 'aliceblue' }}>
+                    <dd>
+                      가상계좌는 결제하기 버튼을 클릭하시면 발급되며, 발급된 계좌번호는 문자로 발송됩니다.
+                    </dd>
+                  </dl>
+                </div>
               </div>
             )}
 

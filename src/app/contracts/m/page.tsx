@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -183,6 +183,14 @@ export default function MobileContractPage() {
   const [reSendYn, setReSendYn] = useState('N');
   const [beforeCtel, setBeforeCtel] = useState('');
   const [showCashModal, setShowCashModal] = useState(false);
+  const [isVerified, setIsVerified] = useState(false); // 인증 완료 여부
+  const [nonMemberContracts, setNonMemberContracts] = useState<Contract[]>([]); // 비회원 계약 목록
+  const [nonMemberContractPagination, setNonMemberContractPagination] = useState<{
+    currentPage: number;
+    totalPages: number;
+    totalCount: number;
+    pageSize: number;
+  }>({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
 
   // 타이머 효과
   useEffect(() => {
@@ -215,15 +223,38 @@ export default function MobileContractPage() {
     }
   }, [companyRemainingTime]);
 
-  // 유효성 검사
+  // 유효성 검사 (6자리: YYMMDD)
   const isValidBirthDate = (date: string): boolean => {
-    if (date.length !== 8) return false;
-    const year = parseInt(date.substring(0, 4));
-    const month = parseInt(date.substring(4, 6));
-    const day = parseInt(date.substring(6, 8));
-    if (year < 1900 || year > new Date().getFullYear()) return false;
+    if (!date || date.length !== 6) return false;
+    // 숫자만 있는지 확인
+    if (!/^\d{6}$/.test(date)) return false;
+    
+    const year = parseInt(date.substring(0, 2), 10);
+    const month = parseInt(date.substring(2, 4), 10);
+    const day = parseInt(date.substring(4, 6), 10);
+    
+    // NaN 체크
+    if (isNaN(year) || isNaN(month) || isNaN(day)) return false;
+    
+    // 월 검증
     if (month < 1 || month > 12) return false;
+    
+    // 일 검증 (기본 범위)
     if (day < 1 || day > 31) return false;
+    
+    // 실제 날짜 유효성 검사
+    const currentYear = new Date().getFullYear();
+    const currentYearLastTwo = currentYear % 100;
+    // YY가 현재 연도의 마지막 두 자리보다 크면 1900년대, 작거나 같으면 2000년대로 가정
+    const fullYear = year > currentYearLastTwo ? 1900 + year : 2000 + year;
+    
+    const dateObj = new Date(fullYear, month - 1, day);
+    if (dateObj.getFullYear() !== fullYear || 
+        dateObj.getMonth() !== month - 1 || 
+        dateObj.getDate() !== day) {
+      return false;
+    }
+    
     return true;
   };
 
@@ -240,7 +271,7 @@ export default function MobileContractPage() {
         return;
       }
       if (!birthDate || !isValidBirthDate(birthDate)) {
-        alert('생년월일을 8자리로 입력해 주세요.');
+        alert('생년월일을 6자리로 입력해 주세요. (예: 931208)');
         return;
       }
       if (!phoneNumber || !isValidPhoneNumber(phoneNumber)) {
@@ -315,6 +346,76 @@ export default function MobileContractPage() {
     }
   };
 
+  // 계약 리스트 영역 스크롤용 ref
+  const contractListRef = useRef<HTMLDivElement>(null);
+
+  // 로그인하지 않은 유저용: 계약 목록 조회
+  const getNonMemberContractList = async (page: number = 1) => {
+    try {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      let url = '';
+      
+      if (loginType === 'I') {
+        // 개인: 이름, 생년월일(6자리), 성별, 휴대폰 번호로 조회
+        const cleanedPhone = phoneNumber.replace(/-/g, '');
+        // 생년월일을 8자리로 변환 (YYMMDD -> YYYYMMDD)
+        let fullBirthDate = '';
+        if (birthDate.length === 6) {
+          const year = parseInt(birthDate.substring(0, 2), 10);
+          const currentYear = new Date().getFullYear();
+          const currentYearLastTwo = currentYear % 100;
+          const fullYear = year > currentYearLastTwo ? 1900 + year : 2000 + year;
+          fullBirthDate = `${fullYear}${birthDate.substring(2, 6)}`;
+        }
+        
+        url = `${API_BASE_URL}/api/contracts/non-member/list?name=${encodeURIComponent(insuredName)}&birth_date=${fullBirthDate}&gender=${gender}&phone=${cleanedPhone}&inyear=${inYear}&block_type=C&str_cur_page=${page}`;
+      } else {
+        // 단체: 사업자번호, 회사명, 담당자 휴대폰 번호로 조회
+        const businessNumber = `${businessNumber1}-${businessNumber2}-${businessNumber3}`;
+        const cleanedPhone = companyPhoneNumber.replace(/-/g, '');
+        url = `${API_BASE_URL}/api/contracts/non-member/list?company_name=${encodeURIComponent(companyName)}&business_number=${encodeURIComponent(businessNumber)}&phone=${cleanedPhone}&inyear=${inYear}&block_type=C&str_cur_page=${page}`;
+      }
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('API 호출 실패');
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        const contractsData = data.contracts || [];
+        setNonMemberContracts(contractsData);
+        setNonMemberContractPagination({
+          currentPage: data.pagination?.currentPage || page,
+          totalPages: data.pagination?.totalPages || 0,
+          totalCount: data.pagination?.totalCount || 0,
+          pageSize: data.pagination?.pageSize || 10
+        });
+        
+        // 계약 리스트가 있으면 해당 영역으로 스크롤 이동
+        if (contractsData.length > 0 && contractListRef.current) {
+          setTimeout(() => {
+            contractListRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 100);
+        }
+      } else {
+        setNonMemberContracts([]);
+        setNonMemberContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
+      }
+    } catch (error) {
+      console.error('계약 목록 조회 오류:', error);
+      setNonMemberContracts([]);
+      setNonMemberContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
+    }
+  };
+
   // 인증번호 확인
   const handleVerifyCode = async () => {
     if (!verificationCode || verificationCode.length !== 6) {
@@ -332,7 +433,9 @@ export default function MobileContractPage() {
       const result = await verifyCode(cleanedPhone, verificationCode);
       if (result.success) {
         alert('인증이 완료되었습니다.');
-        router.push('/contracts/list');
+        setIsVerified(true);
+        // 계약 목록 조회
+        await getNonMemberContractList();
       } else {
         alert(result.message || '인증번호가 일치하지 않습니다.');
       }
@@ -358,7 +461,9 @@ export default function MobileContractPage() {
       const result = await verifyCode(cleanedPhone, companyVerificationCode);
       if (result.success) {
         alert('인증이 완료되었습니다.');
-        router.push('/contracts/list');
+        setIsVerified(true);
+        // 계약 목록 조회
+        await getNonMemberContractList();
       } else {
         alert(result.message || '인증번호가 일치하지 않습니다.');
       }
@@ -369,6 +474,13 @@ export default function MobileContractPage() {
   };
 
   const handleSearch = async () => {
+    // 이미 인증이 완료된 경우 계약 리스트만 다시 조회
+    if (isVerified) {
+      await getNonMemberContractList();
+      return;
+    }
+
+    // 인증이 완료되지 않은 경우 인증 진행
     if (loginType === 'I') {
       if (!showVerificationInput || !isVerificationSent) {
         alert('인증번호받기를 먼저 해주세요.');
@@ -392,7 +504,7 @@ export default function MobileContractPage() {
 
   const handleBirthDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9]/g, '');
-    if (value.length <= 8) {
+    if (value.length <= 6) {
       setBirthDate(value);
     }
   };
@@ -819,6 +931,9 @@ export default function MobileContractPage() {
                       setIsVerificationSent(false);
                       setRemainingTime(0);
                       setCompanyRemainingTime(0);
+                      setIsVerified(false);
+                      setNonMemberContracts([]);
+                      setNonMemberContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
                     }}
                   />
                   <label htmlFor="one_pgood01">개인</label>
@@ -837,6 +952,9 @@ export default function MobileContractPage() {
                       setIsVerificationSent(false);
                       setRemainingTime(0);
                       setCompanyRemainingTime(0);
+                      setIsVerified(false);
+                      setNonMemberContracts([]);
+                      setNonMemberContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
                     }}
                   />
                   <label htmlFor="one_pgood02">단체(사업자/법인)</label>
@@ -869,8 +987,8 @@ export default function MobileContractPage() {
                     type="tel" 
                     name="birth_date" 
                     id="birth_date" 
-                    maxLength={8} 
-                    placeholder="예)19990515" 
+                    maxLength={6} 
+                    placeholder="예)931208" 
                     className="tourGuard_input_w01"
                     value={birthDate}
                     onChange={handleBirthDateChange}
@@ -968,7 +1086,7 @@ export default function MobileContractPage() {
                   />
                 </div>
 
-                <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line03">
+                <div className="tourGuard_form_tt mag5 tourG_mab03">
                   <label htmlFor="resno1">사업자번호</label>
                   <input 
                     type="tel" 
@@ -979,6 +1097,7 @@ export default function MobileContractPage() {
                     value={businessNumber1}
                     onChange={handleBusinessNumber1Change}
                   />
+                  <span className="business-number-separator">-</span>
                   <input 
                     type="tel" 
                     name="resno2" 
@@ -988,6 +1107,7 @@ export default function MobileContractPage() {
                     value={businessNumber2}
                     onChange={handleBusinessNumber2Change}
                   />
+                  <span className="business-number-separator">-</span>
                   <input 
                     type="tel" 
                     name="resno3" 
@@ -1058,6 +1178,288 @@ export default function MobileContractPage() {
               조회하기
             </a>
           </div>
+
+          {/* 인증 완료 후 계약 리스트 표시 */}
+          {isVerified && (
+            <div className="prow_01">
+              <div className="tourGuard_form_tt mag5 tourG_mab04 tourG_mat10">
+                <label htmlFor="">보험가입내역 조회</label>
+                <div className="tourGuard_bg_join tourGuard_input_cell tourGuard_input_cell01 tourGuard" style={{ marginRight: 0 }}>
+                  <span className="tourGuard_ps_box">
+                    <select 
+                      className="tourGuard_sel" 
+                      id="non_member_inyear" 
+                      value={inYear}
+                      onChange={(e) => {
+                        setInYear(Number(e.target.value));
+                        getNonMemberContractList(1);
+                      }}
+                    >
+                      <option value={1}>최근 1년이내</option>
+                      <option value={2}>최근 2년이내</option>
+                    </select>
+                  </span>
+                </div>
+              </div>
+
+              {/* 계약 리스트 */}
+              <div id="nonMemberContractList" ref={contractListRef} className="tourG_mat10" style={{ marginTop: 0, paddingTop: 40 }}>
+                {nonMemberContracts.length === 0 ? (
+                  <>
+                    <p className="tour2023_title02">가입/신청내역</p>
+                    <div className="tourG_line05 tourG_mat07 tourG_mab01"></div>
+                    <p className="tour2023_mypageBox">
+                      <span className="tour2023_title14">계약 내역이 없습니다.</span>
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    {(() => {
+                      // 헬퍼 함수들
+                      const formatDate = (dateStr: string) => {
+                        if (!dateStr) return '-';
+                        const date = new Date(dateStr);
+                        const year = date.getFullYear();
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const hour = date.getHours();
+                        return `${year}.${month}.${day} ${hour}시`;
+                      };
+
+                      const calculateDuration = (start: string, end: string) => {
+                        if (!start || !end) return '';
+                        const startDate = new Date(start);
+                        const endDate = new Date(end);
+                        const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+                        
+                        if (diffDays >= 1) {
+                          return `(${diffDays}일)`;
+                        } else {
+                          return `(${diffHours}시간)`;
+                        }
+                      };
+
+                      const getInsuranceTypeDisplay = (insuranceType: string) => {
+                        const longTermTypes = ['유학/어학연수', '해외출장/주재원/교환교수', '워킹홀리데이'];
+                        if (longTermTypes.includes(insuranceType)) {
+                          return '해외장기체류보험';
+                        }
+                        return insuranceType;
+                      };
+
+                      const getInsuranceCompany = (insuranceType: string) => {
+                        const longTermTypes = ['유학/어학연수', '해외출장/주재원/교환교수', '워킹홀리데이'];
+                        if (insuranceType === '국내여행보험') {
+                          return '라이나손해 국내여행보험';
+                        } else if (insuranceType === '해외여행보험') {
+                          return '라이나손해 해외여행보험';
+                        } else if (longTermTypes.includes(insuranceType)) {
+                          return '메리츠화재 해외장기체류보험';
+                        }
+                        return '라이나손해 해외여행보험';
+                      };
+
+                      return nonMemberContracts.map((contract, index) => (
+                        <div key={contract.id}>
+                          {index === 0 && (
+                            <p className="tour2023_title02">가입/신청내역</p>
+                          )}
+                          
+                          <div className="tourG_line05 tourG_mat07 tourG_mab01"></div>
+                          <ul className="tour2023_conList_Wrap">
+                            <li className="tour2023_conList">
+                              <span className="tour2023_txt09">관리번호</span>
+                              <span className="tour2023_txt10">
+                                {contract.contractNumber}
+                              </span>
+                            </li>
+                            <li className="tour2023_conList">
+                              <span className="tour2023_txt09">가입자</span>
+                              <span className="tour2023_txt10">
+                                {loginType === 'I' ? insuredName : companyName}
+                              </span>
+                            </li>
+                            <li className="tour2023_conList">
+                              <span className="tour2023_txt09">보험종목/상품명</span>
+                              <span className="tour2023_txt10">
+                                {getInsuranceTypeDisplay(contract.insuranceType)}<br />
+                                {getInsuranceCompany(contract.insuranceType)}
+                              </span>
+                            </li>
+                            <li className="tour2023_conList">
+                              <span className="tour2023_txt09">보험기간</span>
+                              <span className="tour2023_txt10">
+                                {formatDate(contract.departureDate)} ~ {formatDate(contract.arrivalDate)}<br />
+                                {calculateDuration(contract.departureDate, contract.arrivalDate)}
+                              </span>
+                            </li>
+                            <li className="tour2023_conList">
+                              <span className="tour2023_txt09">여행지/여행목적</span>
+                              <span className="tour2023_txt10">
+                                {(() => {
+                                  const destination = contract.travelCountry || contract.travelRegion || null;
+                                  const purpose = contract.travelPurpose || null;
+                                  
+                                  if (destination && purpose) {
+                                    return `${destination}/${purpose}`;
+                                  } else if (purpose) {
+                                    return purpose;
+                                  } else if (destination) {
+                                    return destination;
+                                  }
+                                  return '-';
+                                })()}
+                              </span>
+                            </li>
+                            <li className="tour2023_conList">
+                              <span className="tour2023_txt09">진행단계</span>
+                              <span className="tour2023_txt10">{contract.status}</span>
+                            </li>
+                          </ul>
+                          <div className="tourG_line05 tourG_mat09 tourG_mab04"></div>
+                          <a 
+                            href="#" 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              const popupWidth = 500;
+                              const popupHeight = 700;
+                              const left = (window.screen.width - popupWidth) / 2;
+                              const top = (window.screen.height - popupHeight) / 2;
+                              
+                              window.open(
+                                `/contracts/detail/${contract.id}`,
+                                'contract_detail',
+                                `width=${popupWidth},height=${popupHeight},left=${left},top=${top},scrollbars=yes,resizable=yes`
+                              );
+                            }}
+                          >
+                            <span className="tour2023_txt19">자세히보기&nbsp;&gt;</span>
+                          </a>
+                          <div className="tourG_mat14 tourG_Wrap"></div>
+                        </div>
+                      ));
+                    })()}
+
+                    {/* 페이지네이션 */}
+                    {nonMemberContractPagination.totalPages > 0 && (
+                      <div className="board_foot" style={{ paddingBottom: '12px' }}>
+                        <ul className="paging">
+                          {/* 첫 페이지로 이동 */}
+                          {nonMemberContractPagination.currentPage > 1 && (
+                            <li>
+                              <a 
+                                href="#" 
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  getNonMemberContractList(1);
+                                }}
+                                className="paging-nav-first"
+                                title="첫 페이지"
+                              >
+                                <span className="paging-double-arrow-left">
+                                  <img src={getImagePath('/images/g_more.png')} alt="첫 페이지" />
+                                  <img src={getImagePath('/images/g_more.png')} alt="" />
+                                </span>
+                              </a>
+                            </li>
+                          )}
+                          
+                          {/* 이전 페이지로 이동 */}
+                          {nonMemberContractPagination.currentPage > 1 && (
+                            <li>
+                              <a 
+                                href="#" 
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  getNonMemberContractList(nonMemberContractPagination.currentPage - 1);
+                                }}
+                                className="paging-nav-prev"
+                                title="이전 페이지"
+                              >
+                                <img src={getImagePath('/images/g_more.png')} alt="이전" className="paging-arrow-left" />
+                              </a>
+                            </li>
+                          )}
+
+                          {/* 페이지 번호들 (최대 3개) */}
+                          {(() => {
+                            const { currentPage, totalPages } = nonMemberContractPagination;
+                            let startPage = Math.max(1, currentPage - 1);
+                            let endPage = Math.min(totalPages, startPage + 2);
+                            
+                            // 끝에서 3개가 안 될 경우 시작점 조정
+                            if (endPage - startPage < 2) {
+                              startPage = Math.max(1, endPage - 2);
+                            }
+
+                            const pages = [];
+                            for (let i = startPage; i <= endPage; i++) {
+                              pages.push(i);
+                            }
+
+                            return pages.map((page) => (
+                              <li key={page} className={page === currentPage ? 'on' : ''}>
+                                <a 
+                                  href="#" 
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    if (page !== currentPage) {
+                                      getNonMemberContractList(page);
+                                    }
+                                  }}
+                                >
+                                  {page}
+                                </a>
+                              </li>
+                            ));
+                          })()}
+
+                          {/* 다음 페이지로 이동 */}
+                          {nonMemberContractPagination.currentPage < nonMemberContractPagination.totalPages && (
+                            <li>
+                              <a 
+                                href="#" 
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  getNonMemberContractList(nonMemberContractPagination.currentPage + 1);
+                                }}
+                                className="paging-nav-next"
+                                title="다음 페이지"
+                              >
+                                <img src={getImagePath('/images/g_more.png')} alt="다음" className="paging-arrow-right" />
+                              </a>
+                            </li>
+                          )}
+
+                          {/* 마지막 페이지로 이동 */}
+                          {nonMemberContractPagination.currentPage < nonMemberContractPagination.totalPages && (
+                            <li>
+                              <a 
+                                href="#" 
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  getNonMemberContractList(nonMemberContractPagination.totalPages);
+                                }}
+                                className="paging-nav-last"
+                                title="마지막 페이지"
+                              >
+                                <span className="paging-double-arrow-right">
+                                  <img src={getImagePath('/images/g_more.png')} alt="마지막" />
+                                  <img src={getImagePath('/images/g_more.png')} alt="" />
+                                </span>
+                              </a>
+                            </li>
+                          )}
+                        </ul>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </form>
 

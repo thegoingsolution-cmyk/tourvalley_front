@@ -23,7 +23,7 @@
 
 .signup-container {
   width: 100%;
-  max-width: 560px;
+  max-width: 480px;
   margin: 0 auto;
   position: relative;
   z-index: 1;
@@ -234,6 +234,14 @@
   color: #999;
 }
 
+.terms-arrow-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  margin-left: 8px;
+  cursor: pointer;
+}
+
 .terms-list {
   margin-bottom: 16px;
 }
@@ -286,15 +294,194 @@
 }
 
 .form-row {
-  margin-bottom: 16px;
+  margin-bottom: 10px;
+}
+
+/* Birth Date & Gender - align with TravelInfoStep */
+.signup-page-pc .field-row {
+  position: relative;
+  height: 65px;
+  border: 1px solid #c3c6ce;
+  border-radius: 15px;
+  background: #fff;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.signup-page-pc .field-group {
+  flex: 1;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.signup-page-pc .birth-field {
+  width: 38%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.signup-page-pc .gender-field {
+  width: 42%;
+  margin-right: 0;
+  margin-left: 40px;
+  text-align: left;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  min-width: 0;
+  height: 65px;
+}
+
+.signup-page-pc .field-label {
+  position: absolute;
+  top: 6px;
+  left: 20px;
+  color: #9797a3;
+  font-size: 12px;
+  letter-spacing: -0.8px;
+  margin-bottom: 0;
+}
+
+.signup-page-pc .gender-field > .field-label {
+  left: 30px;
+}
+
+.signup-page-pc .field-separator {
+  display: none;
+}
+
+.signup-page-pc .field-row.tourG_line:after {
+  content: '';
+  position: absolute;
+  display: inline-block;
+  width: 47px;
+  height: 50px;
+  top: -4px;
+  left: 40%;
+  margin: 0;
+  border-bottom: 1px solid #d5d7dd;
+  vertical-align: middle;
+  transform: rotate(297deg);
+  z-index: 0;
+}
+
+.signup-page-pc .field-input {
+  border: 0;
+  outline: none;
+  padding: 0;
+  background: transparent;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+  display: inline-block;
+  vertical-align: text-top;
+}
+
+.signup-page-pc .birth-input {
+  height: 32px;
+  padding-left: 10px;
+  border: 0;
+  color: #000;
+  font-size: 18px;
+  letter-spacing: 0px;
+  caret-color: #222;
+  display: inline-block;
+  vertical-align: text-top;
+  margin-top: 23px;
+  margin-left: 10px;
+  background: transparent;
+  width: calc(100% - 20px);
+  box-sizing: border-box;
+  line-height: 32px;
+}
+
+.signup-page-pc .birth-input::placeholder {
+  color: #dddddd;
+}
+
+.signup-page-pc .gender-options {
+  font-size: 0;
+  width: 100%;
+  margin-right: 0;
+  vertical-align: middle;
+  text-align: left;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-top: 23px;
+  padding: 0;
+  padding-left: 30px;
+  z-index: 2;
+  height: 32px;
+}
+
+.signup-page-pc .gender-option {
+  position: relative;
+  width: 40%;
+  display: flex;
+  align-items: center;
+  overflow-wrap: normal;
+  word-break: normal;
+  text-align: center;
+  background: transparent;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.signup-page-pc .gender-radio {
+  position: absolute;
+  display: block;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.signup-page-pc .gender-text {
+  width: 100%;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  text-align: left;
+  font-size: 17px;
+  letter-spacing: -0.8px;
+  color: #dddddd;
+  box-sizing: border-box;
+  margin: 0;
+  transition: color 0.2s;
+  position: relative;
+  z-index: 2;
+  line-height: 32px;
+}
+
+.signup-page-pc .gender-option.selected .gender-text {
+  color: #0000ff;
+  font-weight: 500;
+  z-index: 2;
 }
 
 .form-row.split {
   display: flex;
   align-items: stretch;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  border: 1px solid #c3c6ce;
+  border-radius: 15px;
   overflow: hidden;
+  height: 65px;
+  background: #fff;
 }
 
 .form-row.split .form-field {
@@ -306,28 +493,34 @@
   display: flex;
   align-items: center;
   padding: 0 12px;
-  color: #d0d0d0;
+  color: #d5d7dd;
   font-size: 18px;
   background: #fff;
 }
 
 .form-field {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 12px 16px;
+  position: relative;
+  border: 1px solid #c3c6ce;
+  border-radius: 15px;
+  padding: 0;
   background: #fff;
   box-sizing: border-box;
+  min-height: 65px;
 }
 
 .form-field.with-button {
-  padding: 12px 16px;
+  padding: 0;
 }
 
 .form-label {
+  position: absolute;
+  top: 6px;
+  left: 20px;
   display: block;
   font-size: 12px;
-  color: #999;
-  margin-bottom: 4px;
+  color: #9797a3;
+  margin-bottom: 0;
+  letter-spacing: -0.8px;
 }
 
 .label-highlight {
@@ -336,18 +529,21 @@
 
 .form-input {
   width: 100%;
-  height: 40px;
+  height: 32px;
   border: none;
   outline: none;
-  font-size: 15px;
-  color: #333;
-  padding: 0;
+  font-size: 18px;
+  color: #000;
+  padding: 0 0 0 4px;
   background: transparent;
   box-sizing: border-box;
+  margin-top: 23px;
+  margin-left: 10px;
+  width: calc(100% - 20px);
 }
 
 .form-input::placeholder {
-  color: #ccc;
+  color: #dddddd;
 }
 
 .form-input:focus {
@@ -358,23 +554,29 @@
 .input-with-btn {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  margin-top: 23px;
+  padding: 0 10px 0 0;
+  height: 32px;
 }
 
 .input-with-btn .form-input {
   flex: 1;
-  background: #f0f5ff;
-  padding: 8px 12px;
-  border-radius: 4px;
+  background: transparent;
+  padding: 0 0 0 4px;
+  border-radius: 0;
+  margin: 0 0 0 10px;
+  width: auto;
 }
 
 .inline-btn {
-  padding: 8px 16px;
-  border: 1px solid #d0d0d0;
-  border-radius: 6px;
+  height: 32px;
+  padding: 0 16px;
+  border: 1px solid #c3c6ce;
+  border-radius: 8px;
   background: #fff;
   color: #333;
-  font-size: 13px;
+  font-size: 14px;
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.2s;
@@ -425,14 +627,14 @@
 
 .gender-options {
   display: flex;
-  gap: 20px;
+  gap: 0;
 }
 
 .gender-option {
   display: flex;
   align-items: center;
-  gap: 4px;
   cursor: pointer;
+  width: 40%;
 }
 
 .gender-option input {
@@ -440,25 +642,23 @@
 }
 
 .gender-option span {
-  font-size: 15px;
-  color: #999;
+  font-size: 17px;
+  color: #dddddd;
 }
 
 .gender-option.selected span {
-  color: #3b5998;
-  font-weight: 600;
+  color: #0000ff;
+  font-weight: 500;
 }
 
 /* Email Field */
-.email-field .form-field {
-  border: none;
-  padding: 0;
-}
-
 .email-input-group {
   display: flex;
   align-items: center;
   gap: 8px;
+  height: 32px;
+  margin-top: 23px;
+  padding: 0 10px;
 }
 
 .email-id {
@@ -466,8 +666,8 @@
 }
 
 .email-at {
-  color: #999;
-  font-size: 15px;
+  color: #9797a3;
+  font-size: 18px;
 }
 
 .email-domain {
@@ -479,11 +679,19 @@
   width: 100%;
   border: none;
   outline: none;
-  font-size: 15px;
-  color: #333;
+  font-size: 18px;
+  color: #000;
   padding: 0;
   background: transparent;
   cursor: pointer;
+  height: 32px;
+  line-height: 32px;
+}
+
+.email-input-group .form-input,
+.email-input-group .form-select {
+  margin: 0;
+  width: auto;
 }
 
 /* Business Number */
@@ -491,6 +699,15 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-top: 23px;
+  padding: 0 10px;
+  height: 32px;
+}
+
+.business-number-group .form-input {
+  margin: 0;
+  width: auto;
+  height: 32px;
 }
 
 .business-input {
@@ -629,6 +846,10 @@
 /* File Input */
 .file-input {
   padding: 8px 0;
+  margin-top: 23px;
+  margin-left: 10px;
+  width: calc(100% - 20px);
+  height: auto;
 }
 
 .file-name {
@@ -687,59 +908,105 @@
   cursor: not-allowed;
 }
 
-/* Floating Buttons */
-.floating-buttons {
-  position: fixed;
-  left: calc(50% + 300px);
-  top: 160px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+/* 오른쪽 고정 버튼 */
+.signup-page-pc .container_box_w {
+  position: relative;
+  width: 605px;
+  margin: 0 auto;
+  min-height: 0;
+  height: 0;
+}
+
+.signup-page-pc .container_box_w .fixedRight_b01 {
+  position: absolute;
+  top: 0px;
+  left: 562px;
+  width: 107px;
+  height: 90px;
+  background: #fade21;
+  border-radius: 10px;
+  box-shadow: 7px 7px 10px rgb(0 0 0 / 5%);
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
   z-index: 100;
 }
 
-.floating-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 12px 16px;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  min-width: 80px;
-}
-
-.floating-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.cash-btn {
-  background: #ffd600;
-}
-
-.floating-icon-img {
-  width: 36px;
-  height: 36px;
-  object-fit: contain;
-  margin-bottom: 4px;
-}
-
-.floating-text {
-  font-size: 12px;
-  font-weight: 600;
-  color: #1a1a1a;
-  text-align: center;
-  line-height: 1.3;
-}
-
-.service-btn {
+.signup-page-pc .container_box_w .fixedRight_b02 {
+  position: absolute;
+  display: inline-block;
+  text-align: left;
+  top: 100px;
+  left: 562px;
+  width: 107px;
+  height: 58px;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  flex-direction: row;
-  gap: 8px;
+  border-radius: 10px;
+  box-shadow: 7px 7px 10px rgb(0 0 0 / 5%);
+  cursor: pointer;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.signup-page-pc .fixedRight_txt01 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 14px;
+  letter-spacing: -1.2px;
+  color: #333;
+  line-height: 100%;
+  box-sizing: border-box;
+  text-decoration: none;
+  text-align: center;
+  display: block;
+  margin-top: 8px;
+}
+
+.signup-page-pc .fixedRight_txt02 {
+  font-family: 'NanumSquareNeoTTF-cBd';
+  font-size: 13px;
+  letter-spacing: -0.4px;
+  color: #333;
+  line-height: 120%;
+  box-sizing: border-box;
+  text-decoration: none;
+  text-align: left;
+  display: inline-block;
+  margin-left: 4px;
+  margin-top: 14px;
+}
+
+.signup-page-pc .icon_cash {
+  display: block;
+  width: 44px;
+  height: 43px;
+  background: url(/icons/icon_cash.png) no-repeat 0 0/contain;
+  margin: 13px 0 0 33px;
+}
+
+.signup-page-pc .icon_cash .icon_cash01 {
+  display: block;
+  box-sizing: border-box;
+  text-align: center;
+  margin: 0 auto;
+  padding: 10px 0 0 0;
+}
+
+.signup-page-pc .icon_menu {
+  display: inline-block;
+  width: 19px;
+  height: 19px;
+  background: url(/icons/icon_menu.png) no-repeat 0 0/contain;
+  vertical-align: top;
+  margin: 20px 0 0 17px;
+  text-align: left;
+}
+
+.signup-page-pc .icon_menu .icon_menu01 {
+  display: inline-block;
+  box-sizing: border-box;
+  text-align: center;
+  margin: 0 auto;
+  padding: 10px 0 0 0;
 }
 
 /* Complete Page */

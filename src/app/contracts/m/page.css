@@ -169,7 +169,7 @@
   left: 20px;
   color: #9797a3;
   font-size: 12px;
-  font-family: 'Malgun Gothic', '맑은고딕', dotum, '돋움', AppleGothic, sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   letter-spacing: -0.8px;
 }
 
@@ -502,34 +502,15 @@
   z-index: 1;
 }
 
-.tourG_line03:before {
-  content: '';
-  position: absolute;
+/* 사업자번호 가로 구분자 */
+.business-number-separator {
   display: inline-block;
-  width: 18px;
-  height: 1px;
-  top: 38px;
-  left: 21%;
-  margin: 0px 0 0px 0px;
-  border-bottom: 1px solid #bcbcbc;
-  vertical-align: middle;
-  transform: rotate(359deg);
-  z-index: 1;
-}
-
-.tourG_line03:after {
-  content: '';
-  position: absolute;
-  display: inline-block;
-  width: 18px;
-  height: 1px;
-  top: 38px;
-  left: 48%;
-  margin: 0px 0 0px 0px;
-  border-bottom: 1px solid #bcbcbc;
-  vertical-align: middle;
-  transform: rotate(359deg);
-  z-index: 1;
+  margin: 0 4px;
+  font-size: 18px;
+  color: #d5d7dd;
+  line-height: 32px;
+  margin-top: 23px;
+  vertical-align: text-top;
 }
 
 /* 인증 버튼 영역 */
@@ -681,6 +662,18 @@
 
 .tour2023_grey {
   color: #a5a5a5;
+}
+
+/* 심의번호 섹션 스타일 - domestic/m와 통일 */
+.essential_Wrap .tour2023_txt02 {
+  font-size: 11px;
+  line-height: 150%;
+  letter-spacing: -1px;
+  display: inline-block;
+  text-align: center;
+  font-weight: 300;
+  color: #666;
+  padding: 0;
 }
 
 .tour2023_blue {

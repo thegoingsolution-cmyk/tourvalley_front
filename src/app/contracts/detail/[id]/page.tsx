@@ -10,6 +10,7 @@ export default function ContractDetailPage() {
   const contractId = params.id as string;
   const [contractDetail, setContractDetail] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [receiptLoading, setReceiptLoading] = useState(false);
 
   useEffect(() => {
     if (contractId) {
@@ -47,6 +48,58 @@ export default function ContractDetailPage() {
 
   const handleClose = () => {
     window.close();
+  };
+
+  const handleReceiptClick = async (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+
+    if (!contractDetail?.paymentMethod) {
+      alert('결제 정보를 찾을 수 없습니다.');
+      return;
+    }
+
+    const supportedMethods = ['나이스페이먼츠', '네이버페이', '카카오페이'];
+    if (!supportedMethods.includes(contractDetail.paymentMethod)) {
+      alert('해당 결제 수단의 영수증은 준비 중입니다.');
+      return;
+    }
+
+    if (receiptLoading) {
+      return;
+    }
+
+    setReceiptLoading(true);
+    try {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(
+        `${API_BASE_URL}/api/payments/receipt?contract_id=${contractId}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        }
+      );
+
+      const data = await response.json();
+      if (!response.ok || !data?.success) {
+        alert(data?.message || '영수증을 불러오지 못했습니다.');
+        return;
+      }
+
+      if (data.receiptUrl) {
+        window.open(data.receiptUrl, '_blank', 'noopener,noreferrer');
+        return;
+      }
+
+      alert('영수증 URL을 찾을 수 없습니다.');
+    } catch (error) {
+      console.error('영수증 조회 오류:', error);
+      alert('영수증 조회 중 오류가 발생했습니다.');
+    } finally {
+      setReceiptLoading(false);
+    }
   };
 
   if (loading) {
@@ -252,7 +305,7 @@ export default function ContractDetailPage() {
           <div className="tourG_mat04">
             <a 
               href="#" 
-              onClick={(e) => { e.preventDefault(); alert('보험료입금증'); }}
+              onClick={handleReceiptClick}
               className="tourGuard_btn_b tour2023_btn06_gray"
             >
               보험료입금증<span className="tour2023_arr01"></span>

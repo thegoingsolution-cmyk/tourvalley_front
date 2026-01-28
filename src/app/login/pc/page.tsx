@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import ServiceModal from '@/components/ServiceModal';
+import AccidentFreeCashModal from '@/components/travel/AccidentFreeCashModal';
 import { getImagePath } from '@/utils/path';
 import { login } from '@/services/authService';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,6 +14,8 @@ export default function PCLoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showServiceModal, setShowServiceModal] = useState(false);
+  const [showCashModal, setShowCashModal] = useState(false);
   
   // 인증 컨텍스트에서 login 함수 가져오기
   const { login: authLogin } = useAuth();
@@ -64,6 +68,23 @@ export default function PCLoginPage() {
         className="login-content-pc"
         style={{ backgroundImage: `url(${getImagePath('/202309_main_bg02.png')})` }}
       >
+        {/* 오른쪽 고정 버튼 */}
+        <div className="container_box_w">
+          <a href="#" onClick={(e) => { e.preventDefault(); setShowCashModal(true); }}>
+            <div className="fixedRight_b01">
+              <p className="icon_cash"><span className="icon_cash01"></span></p>
+              <p className="fixedRight_txt01">무사고캐시란?</p>
+            </div>
+          </a>
+
+          <a href="#" onClick={(e) => { e.preventDefault(); setShowServiceModal(true); }}>
+            <div className="fixedRight_b02">
+              <p className="icon_menu"><span className="icon_menu01"></span></p>
+              <p className="fixedRight_txt02">서비스<br/>전체보기</p>
+            </div>
+          </a>
+        </div>
+
         <div className="login-container">
           <div className="login-card">
             <h1 className="login-title">회원 LOGIN</h1>
@@ -144,20 +165,21 @@ export default function PCLoginPage() {
           </div>
         </div>
 
-        {/* Floating Buttons */}
-        <div className="floating-buttons">
-          <button className="floating-btn cash-btn">
-            <img src={getImagePath('/icons/icon_cash.png')} alt="무사고캐시" className="floating-icon-img" />
-            <span className="floating-text">무사고캐시란?</span>
-          </button>
-          <button className="floating-btn service-btn">
-            <img src={getImagePath('/icons/icon_menu.png')} alt="서비스 전체보기" className="floating-icon-img" />
-            <span className="floating-text">서비스<br/>전체보기</span>
-          </button>
-        </div>
       </main>
 
       <Footer isMobile={false} />
+
+      {/* 서비스 전체보기 모달 */}
+      <ServiceModal 
+        isOpen={showServiceModal} 
+        onClose={() => setShowServiceModal(false)} 
+      />
+
+      {/* 무사고캐시 모달 */}
+      <AccidentFreeCashModal
+        isOpen={showCashModal}
+        onClose={() => setShowCashModal(false)}
+      />
     </div>
   );
 }

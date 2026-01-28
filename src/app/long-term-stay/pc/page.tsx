@@ -203,6 +203,18 @@ export default function PCLongTermStayPage() {
     return genderInput === 'male' ? '남자' : '여자';
   };
 
+  const getResidentGenderCode = (birthDateStr: string, genderValue: Gender): string => {
+    if (!birthDateStr || birthDateStr.length < 4) {
+      return genderValue === '남자' ? '1' : '2';
+    }
+    const year = parseInt(birthDateStr.substring(0, 4), 10);
+    const is2000OrLater = !isNaN(year) && year >= 2000;
+    if (is2000OrLater) {
+      return genderValue === '남자' ? '3' : '4';
+    }
+    return genderValue === '남자' ? '1' : '2';
+  };
+
   // STEP2로 이동 시 화면 상단으로 스크롤
   useEffect(() => {
     if (showParticipantForm) {
@@ -992,7 +1004,7 @@ export default function PCLongTermStayPage() {
           contractor: {
             contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: participants[0]?.name || '',
-            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${participants[0].gender === '남자' ? '1' : '2'}******` : '',
+            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${getResidentGenderCode(participants[0].birthDate, participants[0].gender)}******` : '',
             mobile_phone: participants[0]?.phone || '',
             email: participants[0]?.email1 && participants[0]?.email2 ? `${participants[0].email1}@${participants[0].email2}` : '',
           },
@@ -1005,7 +1017,7 @@ export default function PCLongTermStayPage() {
               sequence_number: idx + 1,
               name: p.name,
               english_name: p.englishName || null,
-              resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
+              resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}******`,
               gender: p.gender,
               age: age || 0,
               plan_type: calculatedParticipant?.planType || selectedPlan || '실속플랜',
@@ -1126,7 +1138,7 @@ export default function PCLongTermStayPage() {
           contractor: {
             contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: participants[0]?.name || '',
-            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${participants[0].gender === '남자' ? '1' : '2'}******` : '',
+            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${getResidentGenderCode(participants[0].birthDate, participants[0].gender)}******` : '',
             mobile_phone: participants[0]?.phone || '',
             email: participants[0]?.email1 && participants[0]?.email2 ? `${participants[0].email1}@${participants[0].email2}` : '',
           },
@@ -1139,7 +1151,7 @@ export default function PCLongTermStayPage() {
               sequence_number: idx + 1,
               name: p.name,
               english_name: p.englishName || null,
-              resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
+              resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}******`,
               gender: p.gender,
               age: age || 0,
               plan_type: calculatedParticipant?.planType || selectedPlan || '실속플랜',
@@ -1216,7 +1228,7 @@ export default function PCLongTermStayPage() {
           contractor: {
             contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: participants[0]?.name || '',
-            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${participants[0].gender === '남자' ? '1' : '2'}******` : '',
+            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${getResidentGenderCode(participants[0].birthDate, participants[0].gender)}******` : '',
             mobile_phone: participants[0]?.phone || '',
             email: participants[0]?.email1 && participants[0]?.email2 
               ? `${participants[0].email1}@${participants[0].email2 === '직접입력' ? participants[0].customEmail : participants[0].email2}`
@@ -1229,7 +1241,7 @@ export default function PCLongTermStayPage() {
               sequence_number: idx + 1,
               name: p.name,
               english_name: p.englishName || null,
-              resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
+              resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}******`,
               gender: p.gender,
               age: age || 0,
               plan_type: selectedPlan || '실속플랜',

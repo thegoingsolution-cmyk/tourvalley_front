@@ -347,7 +347,7 @@
   left: 30px;
   color: #9797a3;
   font-size: 12px;
-  font-family: 'Malgun Gothic','맑은 고딕',dotum,'돋움',AppleGothic,sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   letter-spacing: -0.8px;
   margin-bottom: 0;
   z-index: 1;
@@ -379,7 +379,7 @@
   left: 20px;
   color: #9797a3;
   font-size: 12px;
-  font-family: 'Malgun Gothic','맑은 고딕',dotum,'돋움',AppleGothic,sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   letter-spacing: -0.8px;
   margin-bottom: 0;
 }
@@ -614,7 +614,7 @@
   left: 20px;
   color: #9797a3;
   font-size: 12px;
-  font-family: 'Malgun Gothic','맑은 고딕',dotum,'돋움',AppleGothic,sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   letter-spacing: -0.8px;
 }
 
@@ -685,7 +685,7 @@
   left: 30px !important;
   color: #9797a3 !important;
   font-size: 12px !important;
-  font-family: 'Malgun Gothic','맑은 고딕',dotum,'돋움',AppleGothic,sans-serif !important;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif !important;
   letter-spacing: -0.8px !important;
   z-index: 2;
 }
@@ -701,7 +701,7 @@
   text-align: center;
   background: transparent;
   font-size: 17px;
-  font-family: 'Malgun Gothic','맑은 고딕',dotum,'돋움',AppleGothic,sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
 }
 
 .domestic-page-pc .tourG_inp_rdo input {
@@ -731,7 +731,7 @@
   display: inline-block;
   text-align: left;
   font-size: 17px;
-  font-family: 'Malgun Gothic','맑은 고딕',dotum,'돋움',AppleGothic,sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   vertical-align: middle;
   letter-spacing: -0.8px;
   color: #dddddd;
@@ -1155,7 +1155,7 @@
   left: 20px;
   color: #9797a3;
   font-size: 12px;
-  font-family: 'Malgun Gothic','맑은 고딕',dotum,'돋움',AppleGothic,sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   letter-spacing: -0.8px;
   margin-bottom: 0;
 }

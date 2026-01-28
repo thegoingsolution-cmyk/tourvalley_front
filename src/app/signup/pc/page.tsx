@@ -68,6 +68,24 @@ export default function PCSignupPage() {
 
   const emailDomains = ['선택', 'naver.com', 'gmail.com', 'daum.net', 'hanmail.net', 'nate.com', '직접입력'];
 
+  const openTermsPopup = () => {
+    const width = 900;
+    const height = 700;
+    const left = Math.max(0, Math.round((window.screen.width - width) / 2));
+    const top = Math.max(0, Math.round((window.screen.height - height) / 2));
+    const features = `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`;
+    window.open('/terms/pc', 'tourvalley-terms', features);
+  };
+
+  const openPrivacyPopup = () => {
+    const width = 900;
+    const height = 700;
+    const left = Math.max(0, Math.round((window.screen.width - width) / 2));
+    const top = Math.max(0, Math.round((window.screen.height - height) / 2));
+    const features = `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`;
+    window.open('/privacy/pc', 'tourvalley-privacy', features);
+  };
+
   // Timer countdown effect
   useEffect(() => {
     if (remainingTime > 0 && !phoneVerified) {
@@ -352,6 +370,23 @@ export default function PCSignupPage() {
         className="signup-content-pc"
         style={{ backgroundImage: `url(${getImagePath('/202309_main_bg02.png')})` }}
       >
+        {/* 오른쪽 고정 버튼 */}
+        <div className="container_box_w">
+          <a href="#" onClick={(e) => { e.preventDefault(); setShowCashModal(true); }}>
+            <div className="fixedRight_b01">
+              <p className="icon_cash"><span className="icon_cash01"></span></p>
+              <p className="fixedRight_txt01">무사고캐시란?</p>
+            </div>
+          </a>
+
+          <a href="#" onClick={(e) => { e.preventDefault(); setShowServiceModal(true); }}>
+            <div className="fixedRight_b02">
+              <p className="icon_menu"><span className="icon_menu01"></span></p>
+              <p className="fixedRight_txt02">서비스<br/>전체보기</p>
+            </div>
+          </a>
+        </div>
+
         <div className="signup-container">
           <div className="signup-card">
             <h1 className="signup-title">{step === 'complete' ? '투어밸리' : '투어밸리 회원가입'}</h1>
@@ -440,7 +475,16 @@ export default function PCSignupPage() {
                         className={`checkbox-icon ${termsAgreed ? 'checked' : ''}`}
                       />
                       <span className="terms-text">(필수) 투어밸리 사이트 이용약관 동의</span>
-                      <span className="terms-arrow">›</span>
+                      <img
+                        src={getImagePath('/images/g_more.png')}
+                        alt="더보기"
+                        className="terms-arrow-icon"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          openTermsPopup();
+                        }}
+                      />
                     </label>
 
                     <label className="terms-item" onClick={() => handleIndividualTerm('privacy', !privacyAgreed)}>
@@ -450,7 +494,16 @@ export default function PCSignupPage() {
                         className={`checkbox-icon ${privacyAgreed ? 'checked' : ''}`}
                       />
                       <span className="terms-text">(필수) 개인정보 수집, 이용, 조회 제공 동의</span>
-                      <span className="terms-arrow">›</span>
+                      <img
+                        src={getImagePath('/images/g_more.png')}
+                        alt="더보기"
+                        className="terms-arrow-icon"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          openPrivacyPopup();
+                        }}
+                      />
                     </label>
 
                     <label className="terms-item" onClick={() => handleIndividualTerm('marketing', !marketingAgreed)}>
@@ -460,7 +513,6 @@ export default function PCSignupPage() {
                         className={`checkbox-icon ${marketingAgreed ? 'checked' : ''}`}
                       />
                       <span className="terms-text">(선택) 혜택알림 이메일, 문자 동의</span>
-                      <span className="terms-arrow">›</span>
                     </label>
                   </div>
 
@@ -561,21 +613,21 @@ export default function PCSignupPage() {
                   </div>
 
                   {/* Birth Date & Gender */}
-                  <div className="form-row split">
-                    <div className="form-field">
-                      <label className="form-label">생년월일</label>
+                  <div className="field-row tourG_line">
+                    <div className="field-group birth-field">
+                      <label className="field-label">생년월일 8자리</label>
                       <input
                         type="text"
                         value={birthDate}
                         onChange={(e) => setBirthDate(e.target.value)}
                         placeholder="예)19990515"
                         maxLength={8}
-                        className="form-input"
+                        className="field-input birth-input"
                       />
                     </div>
-                    <span className="field-divider">/</span>
-                    <div className="form-field gender-field">
-                      <label className="form-label">성별</label>
+                    <span className="field-separator">/</span>
+                    <div className="field-group gender-field">
+                      <label className="field-label">성별</label>
                       <div className="gender-options">
                         <label className={`gender-option ${gender === 'male' ? 'selected' : ''}`}>
                           <input
@@ -584,8 +636,9 @@ export default function PCSignupPage() {
                             value="male"
                             checked={gender === 'male'}
                             onChange={(e) => setGender(e.target.value)}
+                            className="gender-radio"
                           />
-                          <span>남자</span>
+                          <span className="gender-text">남자</span>
                         </label>
                         <label className={`gender-option ${gender === 'female' ? 'selected' : ''}`}>
                           <input
@@ -594,8 +647,9 @@ export default function PCSignupPage() {
                             value="female"
                             checked={gender === 'female'}
                             onChange={(e) => setGender(e.target.value)}
+                            className="gender-radio"
                           />
-                          <span>여자</span>
+                          <span className="gender-text">여자</span>
                         </label>
                       </div>
                     </div>
@@ -1017,17 +1071,6 @@ export default function PCSignupPage() {
           </div>
         </div>
 
-        {/* Floating Buttons */}
-        <div className="floating-buttons">
-          <button className="floating-btn cash-btn" onClick={() => setShowCashModal(true)}>
-            <img src={getImagePath('/icons/icon_cash.png')} alt="무사고캐시" className="floating-icon-img" />
-            <span className="floating-text">무사고캐시란?</span>
-          </button>
-          <button className="floating-btn service-btn" onClick={() => setShowServiceModal(true)}>
-            <img src={getImagePath('/icons/icon_menu.png')} alt="서비스 전체보기" className="floating-icon-img" />
-            <span className="floating-text">서비스<br/>전체보기</span>
-          </button>
-        </div>
       </main>
 
       <Footer isMobile={false} />

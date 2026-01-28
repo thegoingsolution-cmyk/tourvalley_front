@@ -20,7 +20,7 @@ import DangerousActivityModal from '@/components/travel/DangerousActivityModal';
 import RestrictedCountryModal from '@/components/travel/RestrictedCountryModal';
 import ConsentModal from '@/components/travel/ConsentModal';
 import { PlanType, PlanInfo, Participant, CalculatedPremiums, PaymentMethod, PaymentSubMethod } from '@/components/travel/types';
-import { allCountries } from '@/components/travel/utils/countries';
+import { allCountries, frequentCountries } from '@/components/travel/utils/countries';
 import './page.css';
 
 function MobileOverseasStep1Content() {
@@ -181,6 +181,18 @@ function MobileOverseasStep1Content() {
   // 성별 변환 함수 (M/W -> 남자/여자)
   const getGenderFromBirthDate = (birthDateStr: string, gender: 'M' | 'W'): string => {
     return gender === 'M' ? '남자' : '여자';
+  };
+
+  const getResidentGenderCode = (birthDateStr: string, genderValue: '남자' | '여자'): string => {
+    if (!birthDateStr || birthDateStr.length < 4) {
+      return genderValue === '남자' ? '1' : '2';
+    }
+    const year = parseInt(birthDateStr.substring(0, 4), 10);
+    const is2000OrLater = !isNaN(year) && year >= 2000;
+    if (is2000OrLater) {
+      return genderValue === '남자' ? '3' : '4';
+    }
+    return genderValue === '남자' ? '1' : '2';
   };
 
   // 이메일 생성 함수
@@ -376,10 +388,13 @@ function MobileOverseasStep1Content() {
       }
     };
 
-    // URL에 returnUrl 파라미터가 있으면 (coverage-detail에서 돌아온 경우) 상태 복원
+    // URL에 returnUrl 파라미터가 있을 때만 복원 (coverage-detail에서 돌아온 경우)
+    // 그 외 진입에서는 오래된 저장값을 제거해 초기 상태로 유지
     const returnUrl = searchParams.get('returnUrl');
-    if (returnUrl === '/overseas/m' || window.location.pathname === '/overseas/m') {
+    if (returnUrl === '/overseas/m') {
       restoreState();
+    } else {
+      localStorage.removeItem('overseas_m_state');
     }
   }, [searchParams, showPlanSelection, planInfo]);
 
@@ -770,7 +785,7 @@ function MobileOverseasStep1Content() {
           contractor: {
             contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: participants[0]?.name || '',
-            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${participants[0].gender === '남자' ? '1' : '2'}******` : '',
+            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${getResidentGenderCode(participants[0].birthDate, participants[0].gender)}******` : '',
             mobile_phone: participants[0]?.phone || '',
             email: getFullEmail(participants[0]),
           },
@@ -780,7 +795,7 @@ function MobileOverseasStep1Content() {
             return {
               sequence_number: idx + 1,
               name: p.name,
-              resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
+              resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}******`,
               gender: p.gender,
               age: age || 0,
               plan_type: calculatedParticipant?.planType || selectedPlan || '실속플랜',
@@ -898,7 +913,7 @@ function MobileOverseasStep1Content() {
           contractor: {
             contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: participants[0]?.name || '',
-            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${participants[0].gender === '남자' ? '1' : '2'}******` : '',
+            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${getResidentGenderCode(participants[0].birthDate, participants[0].gender)}******` : '',
             mobile_phone: participants[0]?.phone || '',
             email: getFullEmail(participants[0]),
           },
@@ -908,7 +923,7 @@ function MobileOverseasStep1Content() {
             return {
               sequence_number: idx + 1,
               name: p.name,
-              resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
+              resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}******`,
               gender: p.gender,
               age: age || 0,
               plan_type: calculatedParticipant?.planType || selectedPlan || '실속플랜',
@@ -992,7 +1007,7 @@ function MobileOverseasStep1Content() {
               sequence_number: idx + 1,
               name: p.name,
               english_name: (p as any).englishName || null,
-              resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
+              resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}******`,
               gender: p.gender,
               age: age || 0,
               plan_type: selectedPlan || '실속플랜',
@@ -1170,6 +1185,7 @@ function MobileOverseasStep1Content() {
             onTravelCountryChange={setTravelCountry}
             onTravelPurposeChange={setTravelPurposeLong}
             travelCountries={travelCountries}
+            frequentCountries={frequentCountries}
             type={type}
           />
 

@@ -5,6 +5,8 @@ import DatePicker, { registerLocale } from 'react-datepicker';
 import { ko } from 'date-fns/locale';
 import { format, parse } from 'date-fns';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useAuth } from '@/contexts/AuthContext';
+import { getCorporateMemberInfo } from '@/services/authService';
 import '../../popup/page.css';
 
 // 한국어 locale 등록
@@ -25,6 +27,7 @@ const parseDate = (dateString: string): Date | null => {
 };
 
 export default function OverseasInsuranceStep2Page() {
+  const { isLoggedIn, member } = useAuth();
   const [startDate, setStartDate] = useState('');
   const [startHour, setStartHour] = useState('01');
   const [endDate, setEndDate] = useState('');
@@ -158,6 +161,82 @@ export default function OverseasInsuranceStep2Page() {
     }
     setCountryTypes(initialCountryTypes);
   }, []);
+
+  useEffect(() => {
+    const applyIfEmpty = (selector: string, value?: string | null) => {
+      const element = document.querySelector(selector) as HTMLInputElement | null;
+      if (element && value && !element.value) {
+        element.value = value;
+      }
+    };
+
+    const applySelectValue = (selector: string, value?: string | null) => {
+      const element = document.querySelector(selector) as HTMLSelectElement | null;
+      if (element && value) {
+        element.value = value;
+      }
+    };
+
+    const splitEmail = (email?: string | null) => {
+      if (!email) return { id: '', domain: '' };
+      const [id, domain] = email.split('@');
+      return { id: id || '', domain: domain || '' };
+    };
+
+    const splitPhone = (phone?: string | null) => {
+      if (!phone) return { part1: '', part2: '', part3: '' };
+      const digits = phone.replace(/\D/g, '');
+      if (digits.length < 9) return { part1: '', part2: '', part3: '' };
+      if (digits.length === 10) {
+        return { part1: digits.slice(0, 3), part2: digits.slice(3, 6), part3: digits.slice(6, 10) };
+      }
+      return { part1: digits.slice(0, 3), part2: digits.slice(3, 7), part3: digits.slice(7, 11) };
+    };
+
+    const splitBusinessNumber = (businessNumber?: string | null) => {
+      if (!businessNumber) return { part1: '', part2: '', part3: '' };
+      const digits = businessNumber.replace(/\D/g, '');
+      return {
+        part1: digits.slice(0, 3),
+        part2: digits.slice(3, 5),
+        part3: digits.slice(5, 10),
+      };
+    };
+
+    const loadCorporateInfo = async () => {
+      if (!isLoggedIn || !member || member.member_type === '개인') return;
+
+      try {
+        const result = await getCorporateMemberInfo(member.id);
+        if (!result.success || !result.corporate) return;
+
+        const primaryContact = result.contacts?.find(contact => contact.is_primary) || result.contacts?.[0];
+        const businessParts = splitBusinessNumber(result.corporate.business_number);
+        const contactEmail = splitEmail(primaryContact?.email || member.email);
+        const contactMobile = splitPhone(primaryContact?.mobile_phone || member.mobile_phone);
+
+        applyIfEmpty('input[name="contract_company"]', result.corporate.company_name);
+        applyIfEmpty('input[name="resno1"]', businessParts.part1);
+        applyIfEmpty('input[name="resno2"]', businessParts.part2);
+        applyIfEmpty('input[name="resno3"]', businessParts.part3);
+        applyIfEmpty('input[name="charge"]', primaryContact?.contact_name);
+        applyIfEmpty('input[name="position"]', primaryContact?.position);
+        applySelectValue('select[name="contract_ctel_no1"]', contactMobile.part1);
+        applyIfEmpty('input[name="contract_ctel_no2"]', contactMobile.part2);
+        applyIfEmpty('input[name="contract_ctel_no3"]', contactMobile.part3);
+
+        if (contactEmail.id || contactEmail.domain) {
+          setEmail1(contactEmail.id);
+          setEmail2(contactEmail.domain);
+          applySelectValue('select[name="email2_sel"]', contactEmail.domain);
+        }
+      } catch (error) {
+        console.error('법인 정보 조회 오류:', error);
+      }
+    };
+
+    loadCorporateInfo();
+  }, [isLoggedIn, member]);
 
   const handleSubmit = () => {
     // 계약자(법인/단체) 정보 수집

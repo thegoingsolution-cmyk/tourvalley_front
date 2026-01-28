@@ -883,7 +883,7 @@
   left: 20px;
   color: #9797a3;
   font-size: 12px;
-  font-family: 'Malgun Gothic','맑은 고딕',dotum,'돋움',AppleGothic,sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   letter-spacing: -0.8px;
   margin-bottom: 0;
 }
@@ -989,7 +989,7 @@
 }
 
 .event-insurance-page-pc .tour2024_ListB td.sName {
-  font-family: "Noto Sans KR", sans-serif,'Malgun Gothic','맑은 고딕';
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   border-top: solid 1px #000;
   background: #cfe3f6;
   font-size: 13px;

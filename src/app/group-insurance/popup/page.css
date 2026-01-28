@@ -22,7 +22,7 @@ body {
   margin: 0 auto;
   background: url(/tourvalley/image/speed/speed_background.jpg) no-repeat top center;
   background-color: #70ccd7;
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   letter-spacing: -0.7px;
   padding-bottom: 62px;
   margin-bottom: 150px;
@@ -68,7 +68,7 @@ body {
 }
 
 .tour2023_pc_SpeedTop_title {
-  font-family: 'NanumSquareNeoTTF-eHv', 'Noto Sans KR', sans-serif;
+  font-family: 'NanumSquareNeoTTF-eHv', sans-serif;
   display: inline-block;
   position: relative;
   line-height: 100%;
@@ -80,7 +80,7 @@ body {
 }
 
 .tour2023_pc_SpeedTop_title01 {
-  font-family: 'NanumSquareNeoTTF-bRg', 'Noto Sans KR', sans-serif;
+  font-family: 'NanumSquareNeoTTF-bRg', sans-serif;
   display: inline-block;
   position: relative;
   line-height: 120%;
@@ -92,7 +92,7 @@ body {
 }
 
 .tour2023_pc_SpeedTop_title02 {
-  font-family: 'NanumSquareNeoTTF-bRg', 'Noto Sans KR', sans-serif;
+  font-family: 'NanumSquareNeoTTF-bRg', sans-serif;
   display: block;
   position: relative;
   line-height: 110%;
@@ -105,7 +105,7 @@ body {
 }
 
 .tour2023_pc_SpeedTop_title03 {
-  font-family: 'NanumSquareNeoTTF-bRg', 'Noto Sans KR', sans-serif;
+  font-family: 'NanumSquareNeoTTF-bRg', sans-serif;
   line-height: 140%;
   letter-spacing: -1px;
   font-size: 15px;
@@ -113,7 +113,7 @@ body {
 }
 
 .tour2023_pc_SpeedTop_title04 {
-  font-family: 'NanumSquareNeoTTF-dEb', 'Noto Sans KR', sans-serif;
+  font-family: 'NanumSquareNeoTTF-dEb', sans-serif;
   line-height: 140%;
   letter-spacing: -1px;
   font-size: 15px;
@@ -122,7 +122,7 @@ body {
 }
 
 .tour2023_pc_SpeedTop_title05 {
-  font-family: 'NanumSquareNeoTTF-dEb', 'Noto Sans KR', sans-serif;
+  font-family: 'NanumSquareNeoTTF-dEb', sans-serif;
   line-height: 140%;
   letter-spacing: -1.3px;
   font-size: 24px;
@@ -229,7 +229,7 @@ body {
   color: #a5b1cc;
   background: #eff3fe;
   margin-bottom: 1px;
-  font-family: 'NanumSquareNeoTTF-bRg', 'Noto Sans KR', sans-serif;
+  font-family: 'NanumSquareNeoTTF-bRg', sans-serif;
   text-align: center;
   border-radius: 8px;
   padding-top: 12px;
@@ -243,7 +243,7 @@ body {
   height: 51px;
   background: #5294f2;
   color: #fff;
-  font-family: 'NanumSquareNeoTTF-cBd', 'Noto Sans KR', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-weight: 700;
   position: relative;
 }
@@ -327,7 +327,7 @@ body {
 }
 
 .specialB th {
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   border: 0;
   color: #787878;
   border-top: 1px solid #eaebef;
@@ -338,7 +338,7 @@ body {
 }
 
 .specialB td {
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   padding: 13px 10px 12px;
   border: 0;
   border-right: solid 1px #b6b6b6;
@@ -353,7 +353,7 @@ body {
 }
 
 .specialB td.sName {
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   border-top: solid 2px #000;
   background: #f7f7f9;
   padding: 13px 10px 12px;
@@ -364,7 +364,7 @@ body {
 }
 
 .specialB td.sName01 {
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   border-top: solid 1px #b6b6b6;
   background: #f7f7f9;
   padding: 16px 10px 14px;
@@ -375,7 +375,7 @@ body {
 }
 
 .specialB td.ddT {
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   border-top: solid 2px #000;
   padding: 16px 10px 14px;
   border-bottom: solid 1px #b6b6b6;
@@ -386,7 +386,7 @@ body {
 }
 
 .specialB td.dd {
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   padding: 16px 10px 14px;
   border: 0;
   border-bottom: solid 1px #b6b6b6;
@@ -396,7 +396,7 @@ body {
 }
 
 .specialB td.dd.tb {
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   padding: 16px 10px 14px;
   border: 0;
   border-top: solid 1px #b6b6b6;
@@ -411,7 +411,7 @@ body {
 }
 
 .sName_m {
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   padding: 13px 10px 12px;
   font-size: 14px;
   font-weight: 500;
@@ -463,7 +463,7 @@ body {
 }
 
 .dd {
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   padding: 16px 10px 14px;
   border: 0;
   border-bottom: solid 1px #b6b6b6;
@@ -617,7 +617,7 @@ body {
   line-height: 220%;
   border: none;
   box-sizing: border-box;
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   color: #000;
 }
 
@@ -649,7 +649,7 @@ body {
   background: #fff url(/img/smart/car/icon_sel.png) right 5px no-repeat;
   background-size: 10px;
   color: #000;
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
 }
 
 select::-ms-expand {
@@ -689,7 +689,7 @@ select::-ms-expand {
   font-size: 19px;
   letter-spacing: -0.5px;
   margin-bottom: 10px;
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
 }
 
 .con03 ul {
@@ -704,7 +704,7 @@ select::-ms-expand {
   font-size: 12.5px;
   color: #333;
   line-height: 1.4;
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-weight: 300;
   letter-spacing: -1.7px;
 }
@@ -722,7 +722,7 @@ select::-ms-expand {
   line-height: 47px;
   clear: both;
   margin-bottom: 40px;
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
 }
 
 .con_btnWrap a {
@@ -750,7 +750,7 @@ select::-ms-expand {
   line-height: 47px;
   clear: both;
   margin-bottom: 40px;
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
 }
 
 .con_btnWrap_b a {
@@ -987,7 +987,7 @@ select::-ms-expand {
 }
 
 .tour2023_pc_txt01 {
-  font-family: 'NanumSquareNeoTTF-cBd', 'Noto Sans KR', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-size: 16px;
   color: #0042ff;
   text-align: left;
@@ -1013,7 +1013,7 @@ select::-ms-expand {
   border: 1px solid #5294f2;
   text-decoration: none;
   display: inline-block;
-  font-family: 'NanumSquareNeoTTF-cBd', 'Noto Sans KR', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-weight: 700;
   cursor: pointer;
 }
@@ -1041,7 +1041,7 @@ select::-ms-expand {
 }
 
 .tour2023_pc_joinTxt {
-  font-family: 'NanumSquareNeoTTF-bRg', 'Noto Sans KR', sans-serif;
+  font-family: 'NanumSquareNeoTTF-bRg', sans-serif;
   line-height: 138%;
   letter-spacing: -0.5px;
   font-size: 15px;
@@ -1051,7 +1051,7 @@ select::-ms-expand {
 }
 
 .tour2023_pc_joinTxt01 {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-size: 15px;
   color: #0042ff;
   text-align: left;
@@ -1077,7 +1077,7 @@ select::-ms-expand {
   font-weight: 600;
   color: #333;
   margin-bottom: 7px;
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
 }
 
 .Box_line01 .txt dd {
@@ -1124,7 +1124,7 @@ select::-ms-expand {
   padding-left: 8px;
   background: url(/img/smart/mtourvalley/bl_dot.png) no-repeat 0 6px;
   background-size: 3px;
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
 }
 
 .font_gray {
@@ -1221,7 +1221,7 @@ select::-ms-expand {
   text-align: left;
   vertical-align: middle;
   letter-spacing: -1.3px;
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
 }
 
 .Pslist td:last-child {
@@ -1252,7 +1252,7 @@ select::-ms-expand {
   color: #95979d;
   line-height: 140%;
   text-align: center;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
 }
 
 /* 플랜 가이드 */
@@ -1632,7 +1632,7 @@ select::-ms-expand {
 }
 
 .tour2023_pcBox_tit01 {
-  font-family: 'NanumSquareNeoTTF-cBd', 'Noto Sans KR', sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-size: 22px;
   color: #3e3e3e;
   letter-spacing: -1.5px;

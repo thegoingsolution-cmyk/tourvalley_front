@@ -12,6 +12,7 @@ interface MobilePlanSelectionProps {
   insuranceType?: string;
   contractBreakdownText?: string;
   onContractDetailClick?: (planType: PlanType) => void;
+  onContractBreakdownClick?: (planType: PlanType) => void;
   // 해외장기체류보험용 props
   currencyPlan?: '원화' | '외화';
   onCurrencyPlanChange?: (plan: '원화' | '외화') => void;
@@ -29,6 +30,7 @@ export default function MobilePlanSelection({
   insuranceType,
   contractBreakdownText,
   onContractDetailClick,
+  onContractBreakdownClick,
   currencyPlan,
   onCurrencyPlanChange,
   travelCountry,
@@ -247,14 +249,6 @@ export default function MobilePlanSelection({
                 </div>
                 <div className="plan-price">{plan.premium.toLocaleString()}원</div>
               </div>
-              <div className="plan-coverages">
-                {plan.coverages.map((coverage, idx) => (
-                  <div key={idx} className="coverage-item">
-                    <span className="coverage-label">{coverage.label}</span>
-                    <span className="coverage-amount">{coverage.amount}</span>
-                  </div>
-                ))}
-              </div>
               {contractBreakdownText && (
                 <div
                   className="contract-breakdown"
@@ -274,12 +268,12 @@ export default function MobilePlanSelection({
                   }}
                 >
                   <span style={{ flex: 1, textAlign: 'center' }}>{contractBreakdownText}</span>
-                  {onContractDetailClick && (
+                  {onContractBreakdownClick && (
                     <button
                       type="button"
                       onClick={(event) => {
                         event.stopPropagation();
-                        onContractDetailClick(planType as PlanType);
+                        onContractBreakdownClick(planType as PlanType);
                       }}
                       style={{
                         fontSize: '12px',
@@ -296,7 +290,15 @@ export default function MobilePlanSelection({
                     </button>
                   )}
                 </div>
-              )}
+              )}   
+              <div className="plan-coverages">
+                {plan.coverages.map((coverage, idx) => (
+                  <div key={idx} className="coverage-item">
+                    <span className="coverage-label">{coverage.label}</span>
+                    <span className="coverage-amount">{coverage.amount}</span>
+                  </div>
+                ))}
+              </div>                         
               {onContractDetailClick && (
                 <a 
                   href="#" 

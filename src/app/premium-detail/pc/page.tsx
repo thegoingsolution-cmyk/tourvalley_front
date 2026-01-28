@@ -7,6 +7,7 @@ import './page.css';
 function PCPremiumDetailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const returnUrl = searchParams.get('returnUrl');
   const [participants, setParticipants] = useState<Array<{
     id: number;
     name: string;
@@ -111,7 +112,20 @@ function PCPremiumDetailContent() {
                 <h2 className="modal-title">가입자 자세히보기</h2>
                 <button
                   className="modal-close-btn"
-                  onClick={() => window.close()}
+                  onClick={() => {
+                    if (returnUrl) {
+                      if (returnUrl.startsWith('/group-insurance/m')) {
+                        try {
+                          sessionStorage.setItem('groupInsuranceReturn', '1');
+                        } catch (error) {
+                          console.error('복귀 플래그 저장 오류:', error);
+                        }
+                      }
+                      router.push(returnUrl);
+                      return;
+                    }
+                    window.close();
+                  }}
                 >
                   ×
                 </button>

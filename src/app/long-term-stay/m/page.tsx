@@ -20,7 +20,7 @@ import DangerousActivityModal from '@/components/travel/DangerousActivityModal';
 import RestrictedCountryModal from '@/components/travel/RestrictedCountryModal';
 import ConsentModal from '@/components/travel/ConsentModal';
 import { PlanType, PlanInfo, Participant, CalculatedPremiums, PaymentMethod, PaymentSubMethod } from '@/components/travel/types';
-import { allCountries } from '@/components/travel/utils/countries';
+import { allCountries, frequentCountries } from '@/components/travel/utils/countries';
 import './page.css';
 
 function MobileLongTermStayContent() {
@@ -200,10 +200,13 @@ function MobileLongTermStayContent() {
       }
     };
 
-    // URL에 returnUrl 파라미터가 있으면 (coverage-detail에서 돌아온 경우) 상태 복원
+    // URL에 returnUrl 파라미터가 있을 때만 복원 (coverage-detail에서 돌아온 경우)
+    // 그 외 진입에서는 오래된 저장값을 제거해 초기 상태로 유지
     const returnUrl = searchParams.get('returnUrl');
-    if (returnUrl === '/long-term-stay/m' || window.location.pathname === '/long-term-stay/m') {
+    if (returnUrl === '/long-term-stay/m') {
       restoreState();
+    } else {
+      localStorage.removeItem('long_term_stay_m_state');
     }
   }, [searchParams, showPlanSelection, planInfo]);
 
@@ -244,6 +247,18 @@ function MobileLongTermStayContent() {
   // 성별 변환 함수
   const getGenderFromBirthDate = (birthDateStr: string, gender: 'M' | 'W'): string => {
     return gender === 'M' ? '남자' : '여자';
+  };
+
+  const getResidentGenderCode = (birthDateStr: string, genderValue: '남자' | '여자'): string => {
+    if (!birthDateStr || birthDateStr.length < 4) {
+      return genderValue === '남자' ? '1' : '2';
+    }
+    const year = parseInt(birthDateStr.substring(0, 4), 10);
+    const is2000OrLater = !isNaN(year) && year >= 2000;
+    if (is2000OrLater) {
+      return genderValue === '남자' ? '3' : '4';
+    }
+    return genderValue === '남자' ? '1' : '2';
   };
 
   // 이메일 생성 함수
@@ -836,7 +851,7 @@ function MobileLongTermStayContent() {
           contractor: {
             contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: participants[0]?.name || '',
-            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${participants[0].gender === '남자' ? '1' : '2'}******` : '',
+            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${getResidentGenderCode(participants[0].birthDate, participants[0].gender)}******` : '',
             mobile_phone: participants[0]?.phone || '',
             email: getFullEmail(participants[0]),
           },
@@ -846,7 +861,7 @@ function MobileLongTermStayContent() {
             return {
               sequence_number: idx + 1,
               name: p.name,
-              resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
+              resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}******`,
               gender: p.gender,
               age: age || 0,
               plan_type: calculatedParticipant?.planType || selectedPlan || '실속플랜',
@@ -964,7 +979,7 @@ function MobileLongTermStayContent() {
           contractor: {
             contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: participants[0]?.name || '',
-            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${participants[0].gender === '남자' ? '1' : '2'}******` : '',
+            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${getResidentGenderCode(participants[0].birthDate, participants[0].gender)}******` : '',
             mobile_phone: participants[0]?.phone || '',
             email: getFullEmail(participants[0]),
           },
@@ -974,7 +989,7 @@ function MobileLongTermStayContent() {
             return {
               sequence_number: idx + 1,
               name: p.name,
-              resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
+              resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}******`,
               gender: p.gender,
               age: age || 0,
               plan_type: calculatedParticipant?.planType || selectedPlan || '실속플랜',
@@ -1060,7 +1075,7 @@ function MobileLongTermStayContent() {
               sequence_number: idx + 1,
               name: p.name,
               english_name: p.englishName || null,
-              resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
+              resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}******`,
               gender: p.gender,
               age: age || 0,
               plan_type: selectedPlan || '실속플랜',
@@ -1225,6 +1240,12 @@ function MobileLongTermStayContent() {
             onTravelCountryChange={setTravelCountry}
             onTravelPurposeChange={setTravelPurposeLong}
             travelCountries={travelCountries}
+            frequentCountries={frequentCountries}
+            travelPurposeOptions={[
+              { value: 'N010001', label: '유학/어학연수' },
+              { value: 'N010002', label: '해외출장/주재원/교환교수' },
+              { value: 'N010003', label: '워킹홀리데이' },
+            ]}
             type={type}
           />
 

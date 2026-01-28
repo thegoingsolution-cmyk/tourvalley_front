@@ -1,0 +1,91 @@
+.terms-layer {
+  background-color: #fff;
+  color: #333;
+  font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  line-height: 1.6;
+}
+
+#insLayer {
+  min-height: 100vh;
+}
+
+.layer_header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 56px;
+  padding: 14px 4.68% 0;
+  border-bottom: 1px solid #000;
+  background: #fff;
+  box-sizing: border-box;
+  z-index: 10;
+}
+
+.layer_title {
+  display: block;
+  font-size: 20px;
+  text-align: center;
+}
+
+.close {
+  position: absolute;
+  top: 18px;
+  right: 4.68%;
+  font-size: 14px;
+  color: #333;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.bgcolor_white {
+  background-color: #fff;
+}
+
+.pt30 {
+  padding-top: 30px;
+}
+
+.pb30 {
+  padding-bottom: 30px;
+}
+
+.ptb20 {
+  padding-top: 40px;
+}
+
+.prow_01 {
+  padding-left: 4.68%;
+  padding-right: 4.68%;
+}
+
+.yakgwan {
+  padding-top: 40px;
+}
+
+.pol_head2 {
+  display: block;
+  text-align: left;
+  font-size: 14px;
+  color: #333;
+}
+
+.ttl_blue2 {
+  font-size: 12px;
+  font-family: 'Dotum', '돋움', sans-serif;
+  color: #3377c5;
+  font-weight: normal;
+  text-decoration: underline;
+}
+
+p {
+  margin: 12px 0;
+}

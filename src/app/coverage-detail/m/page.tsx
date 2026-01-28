@@ -1387,6 +1387,13 @@ function MobileCoverageDetailContent() {
     
     // returnUrl이 있으면 해당 URL로 이동, 없으면 이전 페이지로
     if (returnUrl && returnUrl !== '/coverage-detail/m') {
+      if (returnUrl.startsWith('/group-insurance/m')) {
+        try {
+          sessionStorage.setItem('groupInsuranceReturn', '1');
+        } catch (error) {
+          console.error('복귀 플래그 저장 오류:', error);
+        }
+      }
       router.push(returnUrl);
     } else {
       router.back();

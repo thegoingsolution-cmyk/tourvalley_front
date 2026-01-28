@@ -540,7 +540,7 @@ export default function ParticipantInputPage() {
         </section>
       </div>
 
-      <Footer isMobile={true} />
+      {/* <Footer isMobile={true} /> */}
     </div>
   );
 }

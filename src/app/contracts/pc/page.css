@@ -232,13 +232,8 @@
   background: #fff;
   box-sizing: border-box;
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   margin-bottom: 10px;
-  width: 100%;
-  min-width: 0; /* flex item이 부모보다 작아질 수 있도록 */
-  max-width: 100%; /* 부모 너비를 넘지 않도록 */
-  padding-right: 10px;
 }
 
 /* 보험가입내역 조회 섹션 전용 스타일 */
@@ -408,7 +403,7 @@
   left: 20px;
   color: #9797a3;
   font-size: 12px;
-  font-family: 'Malgun Gothic', '맑은고딕', dotum, '돋움', AppleGothic, sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   letter-spacing: -0.8px;
 }
 
@@ -416,20 +411,17 @@
 .contract-page-pc .tourGuard_form_tt input[type="tel"] {
   height: 32px;
   padding-left: 10px;
-  padding-right: 5px;
   border: 0;
   color: #000;
   font-size: 18px;
   letter-spacing: 0px;
   caret-color: #222;
   display: inline-block;
-  vertical-align: middle;
+  vertical-align: text-top;
   padding-top: 0px;
-  margin-top: 0;
+  margin-top: 23px;
   margin-left: 10px;
   background: transparent;
-  flex: 1;
-  min-width: 0;
 }
 
 .contract-page-pc .tourGuard_form_tt input::placeholder {
@@ -474,7 +466,7 @@
   left: 0;
   color: #9797a3;
   font-size: 12px;
-  font-family: 'Malgun Gothic', '맑은고딕', dotum, '돋움', AppleGothic, sans-serif;
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   letter-spacing: -0.8px;
   margin-right: 0;
   white-space: nowrap;
@@ -605,28 +597,15 @@
   z-index: 1;
 }
 
-.contract-page-pc .tourG_line03::before {
-  content: '';
-  position: absolute;
+/* 사업자번호 가로 구분자 */
+.contract-page-pc .business-number-separator {
   display: inline-block;
-  width: 1px;
-  height: 50px;
-  top: 7px;
-  left: 33%;
-  margin: 0px 0 0px 0px;
-  background: #d5d7dd;
-}
-
-.contract-page-pc .tourG_line03::after {
-  content: '';
-  position: absolute;
-  display: inline-block;
-  width: 1px;
-  height: 50px;
-  top: 7px;
-  left: 66%;
-  margin: 0px 0 0px 0px;
-  background: #d5d7dd;
+  margin: 0 4px;
+  font-size: 18px;
+  color: #d5d7dd;
+  line-height: 32px;
+  margin-top: 23px;
+  vertical-align: text-top;
 }
 
 /* 회원 로그인 섹션 */
@@ -1647,7 +1626,7 @@
   padding: 5px 0px 5px 0px;
   border: 0;
   letter-spacing: -1.2px;
-  font-family: "Noto Sans KR", sans-serif,'Malgun Gothic','맑은 고딕';
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-size: 15px;
   color: #333;
   background: #fff;
@@ -1660,7 +1639,7 @@
   padding: 5px 0px 5px 0px;
   border: 0;
   letter-spacing: -1.2px;
-  font-family: "Noto Sans KR", sans-serif,'Malgun Gothic','맑은 고딕';
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-size: 15px;
   letter-spacing: -1px;
   color: #333;
@@ -1670,7 +1649,7 @@
 }
 
 .contract-page-pc .tour2023_ListB td.sName {
-  font-family: "Noto Sans KR", sans-serif,'Malgun Gothic','맑은 고딕';
+  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   border-top: solid 1px #000;
   background: #cfe3f6;
   font-size: 13px;

@@ -370,7 +370,7 @@ export default function GroupParticipantInfoStep({
             <select
               id="group_contact_person"
               name="group_contact_person"
-              className="tourGuard_input_w01"
+              className="tourGuard_input_w01 contact-person-select"
               value={groupInfo.contactPerson}
               onChange={(e) => {
                 const selectedContact = contacts.find(c => c.contact_name === e.target.value);

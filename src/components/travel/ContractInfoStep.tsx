@@ -75,8 +75,11 @@ export default function ContractInfoStep({
     if (!birthDate || birthDate.length !== 8) return '';
     // YYYYMMDD 형식에서 뒤 6자리 추출 (YYMMDD)
     const yearMonthDay = birthDate.substring(2, 8);
-    // 성별 코드: 남자 = 1, 여자 = 2
-    const genderCode = gender === '남자' ? '1' : '2';
+    const year = parseInt(birthDate.substring(0, 4), 10);
+    const is2000OrLater = !isNaN(year) && year >= 2000;
+    const genderCode = is2000OrLater
+      ? (gender === '남자' ? '3' : '4')
+      : (gender === '남자' ? '1' : '2');
     return `${yearMonthDay}-${genderCode}******`;
   };
 

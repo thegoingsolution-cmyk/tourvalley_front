@@ -47,6 +47,8 @@ interface TravelInfoStepProps {
   
   // Options
   travelCountries?: Array<{ code: string; name: string }>;
+  frequentCountries?: Array<{ code: string; name: string }>;
+  travelPurposeOptions?: Array<{ value: string; label: string }>;
   timeOptions?: number[];
 }
 
@@ -69,6 +71,8 @@ export default function MobileTravelInfoStep({
   onTravelCountryChange,
   onTravelPurposeChange,
   travelCountries = [],
+  frequentCountries = [],
+  travelPurposeOptions,
   timeOptions = Array.from({ length: 24 }, (_, i) => i + 1),
 }: TravelInfoStepProps) {
   const [hasSelectedDepartureDate, setHasSelectedDepartureDate] = useState(false);
@@ -278,11 +282,30 @@ export default function MobileTravelInfoStep({
                   onChange={(e) => onTravelCountryChange(e.target.value)}
                 >
                   <option value="">선택하세요</option>
-                  {travelCountries.map((country) => (
-                    <option key={country.code} value={country.name}>
-                      {country.name}
-                    </option>
-                  ))}
+                  {frequentCountries.length > 0 ? (
+                    <>
+                      <optgroup label="자주가는 국가">
+                        {frequentCountries.map((country) => (
+                          <option key={`frequent-${country.code}`} value={country.name}>
+                            {country.name}
+                          </option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="전체 국가">
+                        {travelCountries.map((country) => (
+                          <option key={country.code} value={country.name}>
+                            {country.name}
+                          </option>
+                        ))}
+                      </optgroup>
+                    </>
+                  ) : (
+                    travelCountries.map((country) => (
+                      <option key={country.code} value={country.name}>
+                        {country.name}
+                      </option>
+                    ))
+                  )}
                 </select>
               </span>
             </div>
@@ -302,10 +325,16 @@ export default function MobileTravelInfoStep({
                   value={travelPurpose}
                   onChange={(e) => onTravelPurposeChange && onTravelPurposeChange(e.target.value)}
                 >
-                  <option value="N010001">유학/어학연수</option>
-                  <option value="N010003_1">해외출장/주재원</option>
-                  <option value="N010003_2">교환교수</option>
-                  <option value="N010002">워킹홀리데이</option>
+                  {(travelPurposeOptions ?? [
+                    { value: 'N010001', label: '유학/어학연수' },
+                    { value: 'N010003_1', label: '해외출장/주재원' },
+                    { value: 'N010003_2', label: '교환교수' },
+                    { value: 'N010002', label: '워킹홀리데이' },
+                  ]).map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
                 </select>
               </span>
             </div>

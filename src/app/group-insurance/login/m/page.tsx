@@ -26,6 +26,7 @@ export default function MobileGroupInsuranceLoginPage() {
       return;
     }
 
+    sessionStorage.setItem('groupInsuranceReturn', '1');
     sessionStorage.setItem('groupInsuranceJoinContinue', '1');
     window.location.href = '/group-insurance';
   };

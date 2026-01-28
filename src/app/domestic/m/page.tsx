@@ -131,6 +131,18 @@ function MobileDomesticStep1Content() {
     }
   };
 
+  const getResidentGenderCode = (birthDateStr: string, genderValue: '남자' | '여자'): string => {
+    if (!birthDateStr || birthDateStr.length < 4) {
+      return genderValue === '남자' ? '1' : '2';
+    }
+    const year = parseInt(birthDateStr.substring(0, 4), 10);
+    const is2000OrLater = !isNaN(year) && year >= 2000;
+    if (is2000OrLater) {
+      return genderValue === '남자' ? '3' : '4';
+    }
+    return genderValue === '남자' ? '1' : '2';
+  };
+
   // 생년월일로부터 보험나이 계산 (만나이에서 6개월 경과 시 +1)
   const calculateAgeFromBirthDate = (birthDateStr: string): number | null => {
     if (birthDateStr.length !== 8) return null;
@@ -324,10 +336,13 @@ function MobileDomesticStep1Content() {
       }
     };
 
-    // URL에 returnUrl 파라미터가 있으면 (coverage-detail에서 돌아온 경우) 상태 복원
+    // URL에 returnUrl 파라미터가 있을 때만 복원 (coverage-detail에서 돌아온 경우)
+    // 그 외 진입에서는 오래된 저장값을 제거해 초기 상태로 유지
     const returnUrl = searchParams.get('returnUrl');
-    if (returnUrl === '/domestic/m' || window.location.pathname === '/domestic/m') {
+    if (returnUrl === '/domestic/m') {
       restoreState();
+    } else {
+      localStorage.removeItem('domestic_m_state');
     }
   }, [searchParams, showPlanSelection, planInfo]);
 
@@ -746,7 +761,7 @@ function MobileDomesticStep1Content() {
           contractor: {
             contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: participants[0]?.name || '',
-            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${participants[0].gender === '남자' ? '1' : '2'}******` : '',
+            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${getResidentGenderCode(participants[0].birthDate, participants[0].gender)}******` : '',
             mobile_phone: participants[0]?.phone || '',
             email: getFullEmail(participants[0]),
           },
@@ -756,7 +771,7 @@ function MobileDomesticStep1Content() {
             return {
               sequence_number: idx + 1,
               name: p.name,
-              resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
+              resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}******`,
               gender: p.gender,
               age: age || 0,
               plan_type: calculatedParticipant?.planType || selectedPlan || '실속플랜',
@@ -872,7 +887,7 @@ function MobileDomesticStep1Content() {
           contractor: {
             contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: participants[0]?.name || '',
-            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${participants[0].gender === '남자' ? '1' : '2'}******` : '',
+            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${getResidentGenderCode(participants[0].birthDate, participants[0].gender)}******` : '',
             mobile_phone: participants[0]?.phone || '',
             email: getFullEmail(participants[0]),
           },
@@ -882,7 +897,7 @@ function MobileDomesticStep1Content() {
             return {
               sequence_number: idx + 1,
               name: p.name,
-              resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
+              resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}******`,
               gender: p.gender,
               age: age || 0,
               plan_type: calculatedParticipant?.planType || selectedPlan || '실속플랜',
@@ -963,7 +978,7 @@ function MobileDomesticStep1Content() {
             return {
               sequence_number: idx + 1,
               name: p.name,
-              resident_number: `${p.birthDate}-${p.gender === '남자' ? '1' : '2'}******`,
+              resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}******`,
               gender: p.gender,
               age: age || 0,
               plan_type: calculatedParticipant?.planType || selectedPlan || '실속플랜',
