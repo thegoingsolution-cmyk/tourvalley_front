@@ -60,6 +60,15 @@ export default function PCLoginPage() {
     window.location.href = path;
   };
 
+  const openRecoveryPopup = (path: string, name: string) => {
+    const width = 520;
+    const height = 760;
+    const left = Math.max(0, Math.round((window.screen.width - width) / 2));
+    const top = Math.max(0, Math.round((window.screen.height - height) / 2));
+    const features = `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`;
+    window.open(path, name, features);
+  };
+
   return (
     <div className="login-page-pc">
       <Header isMobile={false} />
@@ -141,7 +150,7 @@ export default function PCLoginPage() {
               <button 
                 type="button" 
                 className="link-btn"
-                onClick={() => handleNavigate('/find-id')}
+                onClick={() => openRecoveryPopup('/find-id/pc', 'tourvalley-find-id')}
               >
                 아이디찾기
               </button>
@@ -149,7 +158,7 @@ export default function PCLoginPage() {
               <button 
                 type="button" 
                 className="link-btn"
-                onClick={() => handleNavigate('/reset-password')}
+                onClick={() => openRecoveryPopup('/reset-password/pc', 'tourvalley-reset-password')}
               >
                 비밀번호재설정
               </button>

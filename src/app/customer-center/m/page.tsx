@@ -49,7 +49,7 @@ function MobileCustomerCenterContent() {
     secret_password: '',
   });
   const [searchKeyword, setSearchKeyword] = useState('');
-  const [activeTab, setActiveTab] = useState('일반');
+  const [activeTab, setActiveTab] = useState('의료비');
 
   // 공지사항 목록 로드
   useEffect(() => {
@@ -75,6 +75,12 @@ function MobileCustomerCenterContent() {
   useEffect(() => {
     if (view === 'qna') {
       fetchQnaList(1);
+    }
+  }, [view]);
+
+  useEffect(() => {
+    if (view === 'chubb' || view === 'hyundai') {
+      setActiveTab('의료비');
     }
   }, [view]);
 
@@ -291,56 +297,220 @@ function MobileCustomerCenterContent() {
     <div className="customer-detail-container-mobile">
       <div className="customer-detail-header-mobile">
         <h1 className="customer-detail-title-mobile">CHUBB 에이스손해보험</h1>
-        <button onClick={() => window.location.href = '/customer-center/m'} className="customer-detail-back-mobile">
-          ← 뒤로
-        </button>
       </div>
-      
-      <div className="customer-detail-notice-mobile">
-        <p>해외에서 보험사고가 발생하여 영문 증빙서류를 관련회사로 제출한 경우 보험사에 사고 내역만 별도로 우선 전달합니다.</p>
-        <p>보험금 청구기간은 사고발생대지 3년입니다.</p>
+      <h2 className="sub_title_03 pb20 ag_left">라이나손해보험</h2>
+      <h2 className="sub_title ag_left">보험금 청구 안내</h2>
+
+      <div className="customer-detail-notice join01_box">
+        <div className="txt">
+          해외에서 보험사고가 발생한 경우 보험금 지급과 관련된 서류를 꼼꼼히 챙기셔야 보험금을 손쉽게 받으실 수 있습니다.<br />
+          특히 휴대품 도난시 현지 경찰서에서 도난확인서(Police Report)를 발급받아 오시기 바랍니다.<br />
+          보험금 청구기간은 사고일로부터 3년입니다.
+        </div>
       </div>
 
-      <div className="customer-detail-contacts-mobile">
-        <p>• 에이스 손해보험: 1666-5075</p>
+      <div className="customer-detail-contacts con01">
+        <ul>
+          <li><strong><span className="font_blue">에이스 손해보험 고객센터:</span> 1666-5075</strong></li>
+          <li><strong><span className="font_blue">해외 24시간 SOS 상담전화:</span> +82-1588-1983</strong></li>
+        </ul>
       </div>
 
-      <div className="customer-detail-tabs-mobile">
-        <button 
-          className={`customer-tab-mobile ${activeTab === '일반' ? 'active' : ''}`}
-          onClick={() => setActiveTab('일반')}
-        >
-          일반
-        </button>
-        <button 
-          className={`customer-tab-mobile ${activeTab === '주대응' ? 'active' : ''}`}
-          onClick={() => setActiveTab('주대응')}
-        >
-          주대응
-        </button>
-        <button 
-          className={`customer-tab-mobile ${activeTab === '배상책임' ? 'active' : ''}`}
-          onClick={() => setActiveTab('배상책임')}
-        >
-          배상책임
-        </button>
-        <button 
-          className={`customer-tab-mobile ${activeTab === '한정된 자산에 대한 추가보장' ? 'active' : ''}`}
-          onClick={() => setActiveTab('한정된 자산에 대한 추가보장')}
-        >
-          한정된 자산에<br/>대한 추가보장
-        </button>
+      <h2 className="sub_title ag_left">보험금청구 구비서류 안내</h2>
+
+      <div className="customer-detail-tabs">
+        <div className="subNaviWrap02">
+          <table className="naviLev2">
+            <tbody>
+              <tr>
+                <td className={activeTab === '의료비' ? 'on' : ''}>
+                  <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('의료비'); }}>의료비</a>
+                </td>
+                <td className={activeTab === '휴대품' ? 'on' : ''}>
+                  <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('휴대품'); }}>휴대품</a>
+                </td>
+                <td className={activeTab === '배상책임' ? 'on' : ''}>
+                  <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('배상책임'); }}>배상책임</a>
+                </td>
+                <td className={activeTab === '항공편 지연에 따른 추가비용' ? 'on' : ''}>
+                  <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('항공편 지연에 따른 추가비용'); }}>항공편 지연에 따른<br />추가비용</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <div className="customer-detail-content-mobile">
-        {activeTab === '일반' && (
-          <div className="customer-procedure-mobile">
-            <ol>
-              <li>1. 보험금청구서 개인(심돌부상)차변제외서 / 제반비용 포함</li>
-              <li>2. 여권사본</li>
-              <li>3. 청구인 신분증사본</li>
-              <li>4. 가족관계 확인 가족관계제공력서, 주민등록등본 등</li>
-            </ol>
+      <div className="customer-detail-content">
+        {activeTab === '의료비' && (
+          <div className="join02_box">
+            <div className="txt customer-procedure">
+              <ol>
+                <li>1. 보험금청구서 및 개인(신용)정보처리동의서 (계좌번호 포함)</li>
+                <li>2. 여권사본</li>
+                <li>3. 청구인 신분증사본</li>
+                <li>4. [가족관계 확인필요시](피보험자 미성년자인 경우 등) 가족관계증명서, 주민등록등본 등</li>
+              </ol>
+
+              ------------------------------------------------------------------------------------
+
+              <div className="customer-procedure-section">
+                <strong className="customer-procedure-title">= 해외의료비 =</strong>
+                <ol>
+                  <li>1. 진단서(MEDICAL RECORD)</li>
+                  <li>2. 치료비영수증(원본)</li>
+                </ol>
+              </div>
+
+              <div className="customer-procedure-section">
+                <strong className="customer-procedure-title">= 국내의료비(입원) =</strong>
+                <ol>
+                  <li>1. 가이드(인솔자) 또는 목격자(제3자) 확인서</li>
+                  <li>2. 진단서</li>
+                  <li>3. (50만원 이하시 진단명이 포함된 입퇴원확인서 또는 진료확인서로 대체 가능)</li>
+                  <li>4. 진료비계산서(영수증)</li>
+                  <li>5. 진료비 세부(상세)내역서</li>
+                </ol>
+              </div>
+
+              <div className="customer-procedure-section">
+                <strong className="customer-procedure-title">= 국내의료비(통원) =</strong>
+                <ol>
+                  <li>1. 가이드(인솔자) 또는 목격자(제3자) 확인서</li>
+                  <li>2. 진단명이 포함된 서류(진단서, 통원확인서, 처방전, 소견서, 진료차트 등)</li>
+                  <li>3. 진료비계산서(영수증)</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        )}
+        {activeTab === '휴대품' && (
+          <div className="join02_box">
+            <div className="txt customer-procedure">
+              <ol>
+                <li>1. 보험금청구서 및 개인(신용)정보처리동의서 (계좌번호 포함)</li>
+                <li>2. 여권사본</li>
+                <li>3. 청구인 신분증사본</li>
+                <li>4. [가족관계 확인필요시](피보험자 미성년자인 경우 등) 가족관계증명서, 주민등록등본 등</li>
+              </ol>
+
+              ------------------------------------------------------------------------------------
+
+              <div className="customer-procedure-section">
+                <strong className="customer-procedure-title">= 도난 =</strong>
+                <ol>
+                  <li>
+                    1. 도난신고 사실확인서(Police Report)<br />
+                    - 현지 경찰서에 신고 : 도난신고 확인서 발급<br />
+                    - 공항수하물 사고시 : 공항안내서 신고확인서<br />
+                    (항공사 보상관련 확인서류 첨부)<br />
+                    - 호텔도난시 ) 프론트에 신고후 확인증 첨부<br />
+                    - 경찰서 등 신고할 수 없는 부득이한 상황인 경우<br />
+                    : 가이드 또는 목격자(제3자)확인서, 대사관 신고
+                  </li>
+                  <li>
+                    2. 피해품 영수증(피해입증자료) : 구매영수증(발급시)<br />
+                    - 구입시점부터 사고시점까지 법정 감가율 적용<br />
+                    - 미제출시 25%감가(산정내역에 따라 변동)
+                  </li>
+                </ol>
+              </div>
+
+              <div className="customer-procedure-section">
+                <strong className="customer-procedure-title">= 파손 =</strong>
+                <ol>
+                  <li>1. 가이드 또는 목격자(제3자) 확인서</li>
+                  <li>2. 파손 물품 사진</li>
+                  <li>3. 수리가능시 : 수리견적서, 영수증</li>
+                  <li>4. 수리불가능시 : 수리불가확인서</li>
+                  <li>5. 스마트폰인 경우 : 휴대폰 이용계약 등록사항 증명서(통신사 발급)</li>
+                </ol>
+              </div>
+
+              <div className="customer-procedure-section">
+                <strong className="customer-procedure-title">항공사에서 보상을 받은 경우</strong>
+                <ol>
+                  <li>1. 항공사 사고접수지</li>
+                  <li>2. 입금액이 확인가능한 통장사본</li>
+                  <li>3. 항공사 보상불가 확인서(보상받지 못한 경우)</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        )}
+        {activeTab === '배상책임' && (
+          <div className="join02_box">
+            <div className="txt customer-procedure">
+              <ol>
+                <li>1. 보험금청구서 및 개인(신용)정보처리동의서 (계좌번호 포함)</li>
+                <li>2. 피보험자 주민등록등본(가족관계 확인서)</li>
+                <li>3. 피해자 신분증 사본, 개인정보처리동의서</li>
+                <li>4. 피보험자, 피해자 사고확인서(보험회사 양식)</li>
+              </ol>
+
+              -------------------------------------------------------------------------------
+
+              <div className="customer-procedure-section">
+                <strong className="customer-procedure-title">= 대인사고 =</strong>
+                <ol>
+                  <li>1. 피해자 진단서, 초진(응급)진료차트, 치료비영수증</li>
+                  <li>2. 사고관련 입증서류 및 합의서</li>
+                </ol>
+              </div>
+
+              <div className="customer-procedure-section">
+                <strong className="customer-procedure-title">= 대물사고 =</strong>
+                <ol>
+                  <li>1. 피해물 사진</li>
+                  <li>2. 피해물 구입영수증 및 수리견적서, 수리영수증</li>
+                  <li>3. 사고관련 입증서류 및 합의서</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        )}
+        {activeTab === '항공편 지연에 따른 추가비용' && (
+          <div className="join02_box">
+            <div className="txt customer-procedure">
+              <ol>
+                <li><strong>사고발생 수 30일 이내 손해입증자료 제출</strong></li>
+                <li>1. 항공사 확인서</li>
+                <li>2. e-ticket, 피보험자 여권 사본 및 출입국 사실 증명서</li>
+                <li>3. 손해입증자료(구입일시, 내역, 장소가 확인 가능한 영수증에 한함)</li>
+              </ol>
+
+              ------------------------------------------------------------------------------
+
+              <div className="customer-procedure-section">
+                <strong className="customer-procedure-title">= 결항/지연/취소/과적에 의한 탑승거부로 <br />4시간 내에 대체(항공)수단이 제공되지 못한 경우 =</strong>
+                <ol>
+                  <li>1. 식사, 간식, 전화통화 영수증</li>
+                  <li>2. 숙박비, 숙박시설에 대한 교통비, 수화물이 다른 항공편으로 출발한 경우 비상의복 및 필수품 구입비용 영수증(단, 숙박이 필요한 경우에 한함)</li>
+                </ol>
+              </div>
+
+              <div className="customer-procedure-section">
+                <strong className="customer-procedure-title">= 수화물이 6시간 내에 도착하지 못한 경우 =</strong>
+                <ol>
+                  <li>1. 비상의복과 필수품 구입비용 영수증</li>
+                </ol>
+              </div>
+
+              <div className="customer-procedure-section">
+                <strong className="customer-procedure-title">= 수화물이 24시간 내에 도착하지 못한 경우 =</strong>
+                <ol>
+                  <li>1. 예정된 도착지에 도착 후 120시간 내에 발생한 의복과 필수품 등의 구입비용 영수증</li>
+                </ol>
+              </div>
+
+              <div className="customer-procedure-section">
+                <strong className="customer-procedure-title">알아두세요!</strong>
+                <ol>
+                  <li>※ 발생 영수증의 경우 반드시 구입일시가 기재된 영수증이어야 합니다.</li>
+                  <li>※ 항공사 확인서의 경우 결항, 지연, 과적에 의한 탑승거부 등 항공편 또는 수화물의 지연사유와 지연된 시간이 반드시 기재되어 있어야 합니다. (항공사 담당자 및 연락처가 기재되어 있지 않은 경우에는 서류 여백에 해당 사항을 별도로 기재바랍니다.)</li>
+                </ol>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -351,56 +521,219 @@ function MobileCustomerCenterContent() {
     <div className="customer-detail-container-mobile">
       <div className="customer-detail-header-mobile">
         <h1 className="customer-detail-title-mobile">현대해상</h1>
-        <button onClick={() => window.location.href = '/customer-center/m'} className="customer-detail-back-mobile">
-          ← 뒤로
-        </button>
       </div>
-      
-      <div className="customer-detail-notice-mobile">
-        <p>해외에서 보험사고가 발생하여 영문 증빙서류를 관련회사로 제출한 경우 보험사에 사고 내역만 별도로 우선 전달합니다.</p>
-        <p>보험금 청구기간은 사고발생대지 3년입니다.</p>
+      <h2 className="sub_title_03 pb20 ag_left">현대해상</h2>
+      <h2 className="sub_title ag_left">보험금 청구 안내</h2>
+
+      <div className="customer-detail-notice join01_box">
+        <div className="txt">
+          해외에서 보험사고가 발생한 경우 보험금 지급과 관련된 서류를 꼼꼼히 챙기셔야 보험금을 손쉽게 받으실 수 있습니다.<br />
+          특히 휴대품 도난시 현지 경찰서에서 도난확인서(Police Report)를 발급받아 오시기 바랍니다. <br />
+          보험금 청구기간은 사고일로부터 3년입니다.
+        </div>
       </div>
 
-      <div className="customer-detail-contacts-mobile">
-        <p>• 현대해상: 1899-6782</p>
+      <div className="customer-detail-contacts con01">
+        <ul>
+          <li><strong><span className="font_blue">현대해상 고객센터:</span> 1899-6782</strong></li>
+        </ul>
       </div>
 
-      <div className="customer-detail-tabs-mobile">
-        <button 
-          className={`customer-tab-mobile ${activeTab === '일반' ? 'active' : ''}`}
-          onClick={() => setActiveTab('일반')}
-        >
-          일반
-        </button>
-        <button 
-          className={`customer-tab-mobile ${activeTab === '주대응' ? 'active' : ''}`}
-          onClick={() => setActiveTab('주대응')}
-        >
-          주대응
-        </button>
-        <button 
-          className={`customer-tab-mobile ${activeTab === '배상책임' ? 'active' : ''}`}
-          onClick={() => setActiveTab('배상책임')}
-        >
-          배상책임
-        </button>
-        <button 
-          className={`customer-tab-mobile ${activeTab === '한정된 자산에 대한 추가보장' ? 'active' : ''}`}
-          onClick={() => setActiveTab('한정된 자산에 대한 추가보장')}
-        >
-          한정된 자산에<br/>대한 추가보장
-        </button>
+      <h2 className="sub_title ag_left">보험금청구 구비서류 안내</h2>
+
+      <div className="customer-detail-tabs">
+        <div className="subNaviWrap02">
+          <table className="naviLev2">
+            <tbody>
+              <tr>
+                <td className={activeTab === '의료비' ? 'on' : ''}>
+                  <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('의료비'); }}>의료비</a>
+                </td>
+                <td className={activeTab === '휴대품' ? 'on' : ''}>
+                  <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('휴대품'); }}>휴대품</a>
+                </td>
+                <td className={activeTab === '배상책임' ? 'on' : ''}>
+                  <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('배상책임'); }}>배상책임</a>
+                </td>
+                <td className={activeTab === '항공편 지연에 따른 추가비용' ? 'on' : ''}>
+                  <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('항공편 지연에 따른 추가비용'); }}>항공편 지연에 따른<br />추가비용</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <div className="customer-detail-content-mobile">
-        {activeTab === '일반' && (
-          <div className="customer-procedure-mobile">
-            <ol>
-              <li>1. 보험금청구서 개인(심돌부상)차변제외서 / 제반비용 포함</li>
-              <li>2. 여권사본</li>
-              <li>3. 청구인 신분증사본</li>
-              <li>4. 가족관계 확인 가족관계제공력서, 주민등록등본 등</li>
-            </ol>
+      <div className="customer-detail-content">
+        {activeTab === '의료비' && (
+          <div className="join02_box">
+            <div className="txt customer-procedure">
+              <ol>
+                <li>1. 보험금청구서 및 개인(신용)정보처리동의서 (계좌번호 포함)</li>
+                <li>2. 여권사본</li>
+                <li>3. 청구인 신분증사본</li>
+                <li>4. [가족관계 확인필요시](피보험자 미성년자인 경우 등) 가족관계증명서, 주민등록등본 등</li>
+              </ol>
+
+              --------------------------------------------------------------------------------------------------
+
+              <div className="customer-procedure-section">
+                <strong className="customer-procedure-title">= 해외의료비 =</strong>
+                <ol>
+                  <li>1. 진단서(MEDICAL RECORD)</li>
+                  <li>2. 치료비영수증(원본)</li>
+                </ol>
+              </div>
+
+              <div className="customer-procedure-section">
+                <strong className="customer-procedure-title">= 국내의료비(입원) =</strong>
+                <ol>
+                  <li>1. 가이드(인솔자) 또는 목격자(제3자) 확인서</li>
+                  <li>2. 진단서</li>
+                  <li>3. (50만원 이하시 진단명이 포함된 입퇴원확인서 또는 진료확인서로 대체 가능)</li>
+                  <li>4. 진료비계산서(영수증)</li>
+                  <li>5. 진료비 세부(상세)내역서</li>
+                </ol>
+              </div>
+
+              <div className="customer-procedure-section">
+                <strong className="customer-procedure-title">= 국내의료비(통원) =</strong>
+                <ol>
+                  <li>1. 가이드(인솔자) 또는 목격자(제3자) 확인서</li>
+                  <li>2. 진단명이 포함된 서류(진단서, 통원확인서, 처방전, 소견서, 진료차트 등)</li>
+                  <li>3. 진료비계산서(영수증)</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        )}
+        {activeTab === '휴대품' && (
+          <div className="join02_box">
+            <div className="txt customer-procedure">
+              <ol>
+                <li>1. 보험금청구서 및 개인(신용)정보처리동의서 (계좌번호 포함)</li>
+                <li>2. 여권사본</li>
+                <li>3. 청구인 신분증사본</li>
+                <li>4. [가족관계 확인필요시](피보험자 미성년자인 경우 등) 가족관계증명서, 주민등록등본 등</li>
+              </ol>
+
+              --------------------------------------------------------------------------------------------------
+
+              <div className="customer-procedure-section">
+                <strong className="customer-procedure-title">= 도난 =</strong>
+                <ol>
+                  <li>
+                    1. 도난신고 사실확인서(Police Report)<br />
+                    - 현지 경찰서에 신고 : 도난신고 확인서 발급<br />
+                    - 공항수하물 사고시 : 공항안내서 신고확인서<br />
+                    (항공사 보상관련 확인서류 첨부)<br />
+                    - 호텔도난시 ) 프론트에 신고후 확인증 첨부<br />
+                    - 경찰서 등 신고할 수 없는 부득이한 상황인 경우<br />
+                    : 가이드 또는 목격자(제3자)확인서, 대사관 신고
+                  </li>
+                  <li>
+                    2. 피해품 영수증(피해입증자료) : 구매영수증(발급시)<br />
+                    - 구입시점부터 사고시점까지 법정 감가율 적용<br />
+                    - 미제출시 25%감가(산정내역에 따라 변동)
+                  </li>
+                </ol>
+              </div>
+
+              <div className="customer-procedure-section">
+                <strong className="customer-procedure-title">= 파손 =</strong>
+                <ol>
+                  <li>1. 가이드 또는 목격자(제3자) 확인서</li>
+                  <li>2. 파손 물품 사진</li>
+                  <li>3. 수리가능시 : 수리견적서, 영수증</li>
+                  <li>4. 수리불가능시 : 수리불가확인서</li>
+                  <li>5. 스마트폰인 경우 : 휴대폰 이용계약 등록사항 증명서(통신사 발급)</li>
+                </ol>
+              </div>
+
+              <div className="customer-procedure-section">
+                <strong className="customer-procedure-title">항공사에서 보상을 받은 경우</strong>
+                <ol>
+                  <li>1. 항공사 사고접수지</li>
+                  <li>2. 입금액이 확인가능한 통장사본</li>
+                  <li>3. 항공사 보상불가 확인서(보상받지 못한 경우)</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        )}
+        {activeTab === '배상책임' && (
+          <div className="join02_box">
+            <div className="txt customer-procedure">
+              <ol>
+                <li>1. 보험금청구서 및 개인(신용)정보처리동의서 (계좌번호 포함)</li>
+                <li>2. 피보험자 주민등록등본(가족관계 확인서)</li>
+                <li>3. 피해자 신분증 사본, 개인정보처리동의서</li>
+                <li>4. 피보험자, 피해자 사고확인서(보험회사 양식)</li>
+              </ol>
+
+              --------------------------------------------------------------------------------------------------
+
+              <div className="customer-procedure-section">
+                <strong className="customer-procedure-title">= 대인사고 =</strong>
+                <ol>
+                  <li>1. 피해자 진단서, 초진(응급)진료차트, 치료비영수증</li>
+                  <li>2. 사고관련 입증서류 및 합의서</li>
+                </ol>
+              </div>
+
+              <div className="customer-procedure-section">
+                <strong className="customer-procedure-title">= 대물사고 =</strong>
+                <ol>
+                  <li>1. 피해물 사진</li>
+                  <li>2. 피해물 구입영수증 및 수리견적서, 수리영수증</li>
+                  <li>3. 사고관련 입증서류 및 합의서</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        )}
+        {activeTab === '항공편 지연에 따른 추가비용' && (
+          <div className="join02_box">
+            <div className="txt customer-procedure">
+              <ol>
+                <li><strong>사고발생 수 30일 이내 손해입증자료 제출</strong></li>
+                <li>1. 항공사 확인서</li>
+                <li>2. e-ticket, 피보험자 여권 사본 및 출입국 사실 증명서</li>
+                <li>3. 손해입증자료(구입일시, 내역, 장소가 확인 가능한 영수증에 한함)</li>
+              </ol>
+
+              --------------------------------------------------------------------------------------------------
+
+              <div className="customer-procedure-section">
+                <strong className="customer-procedure-title">= 결항/지연/취소/과적에 의한 탑승거부로 <br />4시간 내에 대체(항공)수단이 제공되지 못한 경우 =</strong>
+                <ol>
+                  <li>1. 식사, 간식, 전화통화 영수증</li>
+                  <li>2. 숙박비, 숙박시설에 대한 교통비, 수화물이 다른 항공편으로 출발한 경우 비상의복 및 필수품 구입비용 영수증(단, 숙박이 필요한 경우에 한함)</li>
+                </ol>
+              </div>
+
+              <div className="customer-procedure-section">
+                <strong className="customer-procedure-title">= 수화물이 6시간 내에 도착하지 못한 경우 =</strong>
+                <ol>
+                  <li>1. 비상의복과 필수품 구입비용 영수증</li>
+                </ol>
+              </div>
+
+              <div className="customer-procedure-section">
+                <strong className="customer-procedure-title">= 수화물이 24시간 내에 도착하지 못한 경우 =</strong>
+                <ol>
+                  <li>1. 예정된 도착지에 도착 후 120시간 내에 발생한 의복과 필수품 등의 구입비용 영수증</li>
+                </ol>
+              </div>
+
+              <div className="customer-procedure-section">
+                <strong className="customer-procedure-title">알아두세요!</strong>
+                <ol>
+                  <li>※ 발생 영수증의 경우 반드시 구입일시가 기재된 영수증이어야 합니다.</li>
+                  <li>※ 항공사 확인서의 경우 결항, 지연, 과적에 의한 탑승거부 등 항공편 또는 수화물의 지연사유와 지연된 시간이 반드시 기재되어 있어야 합니다. (항공사 담당자 및 연락처가 기재되어 있지 않은 경우에는 서류 여백에 해당 사항을 별도로 기재바랍니다.)</li>
+                </ol>
+              </div>
+            </div>
           </div>
         )}
       </div>

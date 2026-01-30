@@ -39,6 +39,17 @@ interface LoginResponse {
   member?: MemberInfo;
 }
 
+interface FindIdResponse {
+  success: boolean;
+  message: string;
+  username?: string;
+}
+
+interface ResetPasswordResponse {
+  success: boolean;
+  message: string;
+}
+
 interface PersonalMemberData {
   username: string;
   password: string;
@@ -202,6 +213,99 @@ export const login = async (username: string, password: string): Promise<LoginRe
       success: false,
       message: '로그인에 실패했습니다. 잠시 후 다시 시도해주세요.',
     };
+  }
+};
+
+/**
+ * 아이디 찾기
+ */
+export const findMemberId = async (data: {
+  memberType: 'I' | 'C';
+  name?: string;
+  companyName?: string;
+  businessNumber?: string;
+  birthDate?: string;
+  gender?: string;
+  phoneNumber: string;
+}): Promise<FindIdResponse> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/find-id`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...data,
+        phoneNumber: data.phoneNumber.replace(/-/g, ''),
+      }),
+    });
+    return await response.json();
+  } catch (error) {
+    console.error('아이디 찾기 오류:', error);
+    return { success: false, message: '아이디 찾기에 실패했습니다. 잠시 후 다시 시도해주세요.' };
+  }
+};
+
+/**
+ * 비밀번호 재설정 본인 확인
+ */
+export const verifyResetPassword = async (data: {
+  memberType: 'I' | 'C';
+  username: string;
+  name?: string;
+  companyName?: string;
+  businessNumber?: string;
+  birthDate?: string;
+  gender?: string;
+  phoneNumber: string;
+}): Promise<ResetPasswordResponse> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/reset-password/verify`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...data,
+        phoneNumber: data.phoneNumber.replace(/-/g, ''),
+      }),
+    });
+    return await response.json();
+  } catch (error) {
+    console.error('비밀번호 재설정 확인 오류:', error);
+    return { success: false, message: '비밀번호 재설정 확인에 실패했습니다. 잠시 후 다시 시도해주세요.' };
+  }
+};
+
+/**
+ * 비밀번호 재설정
+ */
+export const confirmResetPassword = async (data: {
+  memberType: 'I' | 'C';
+  username: string;
+  name?: string;
+  companyName?: string;
+  businessNumber?: string;
+  birthDate?: string;
+  gender?: string;
+  phoneNumber: string;
+  newPassword: string;
+}): Promise<ResetPasswordResponse> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/reset-password/confirm`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...data,
+        phoneNumber: data.phoneNumber.replace(/-/g, ''),
+      }),
+    });
+    return await response.json();
+  } catch (error) {
+    console.error('비밀번호 재설정 오류:', error);
+    return { success: false, message: '비밀번호 재설정에 실패했습니다. 잠시 후 다시 시도해주세요.' };
   }
 };
 

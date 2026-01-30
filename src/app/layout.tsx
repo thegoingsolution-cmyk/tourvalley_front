@@ -9,8 +9,8 @@ const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 const faviconPath = basePath ? `${basePath}/favicon.ico` : '/favicon.ico';
 
 export const metadata: Metadata = {
-  title: 'BZValley - B2C',
-  description: 'BZValley B2C 사용자 서비스',
+  title: '투어밸리 여행자보험',
+  description: '투어밸리 여행자보험',
   icons: {
     icon: faviconPath,
     shortcut: faviconPath,

@@ -1,3 +1,18 @@
+.customer-detail-content .join01_box,
+.customer-detail-notice.join01_box {
+  position: relative;
+  background-color: #fff;
+  border: 1px solid #dddddd;
+}
+
+.customer-detail-content .join01_box .txt,
+.customer-detail-notice.join01_box .txt {
+  font-size: 0.688rem;
+  color: #666;
+  padding: 12px 12px;
+  line-height: 1.6em;
+}
+
 /* ========================================
    PC Customer Center Page Styles
    ======================================== */
@@ -54,6 +69,33 @@
   flex-direction: column;
   position: relative;
   z-index: 101;
+}
+
+.customer-form-card .sub_title {
+  font-size: 18px;
+  font-weight: 600;
+  padding-bottom: 10px;
+  letter-spacing: -1.5px;
+}
+
+.customer-form-card .sub_title_03 {
+  color: #2380f0;
+  font-size: 20px;
+  line-height: 1.25em;
+  letter-spacing: -1px;
+  font-weight: bold;
+}
+
+.customer-form-card .font_blue {
+  color: #15aefd;
+}
+
+.customer-form-card .ag_left {
+  text-align: left !important;
+}
+
+.customer-form-card .pb20 {
+  padding-bottom: 20px;
 }
 
 /* Main View Styles */
@@ -608,13 +650,20 @@
 }
 
 .customer-detail-notice {
-  background: #f8f9fa;
-  padding: 25px;
-  border-radius: 10px;
-  margin-bottom: 30px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 15px;
   line-height: 1.8;
-  color: #666;
-  font-size: 15px;
+  color: #333;
+  font-size: 12px;
+  border: 1px solid #dfdfdf;
+}
+
+.customer-detail-notice.join01_box {
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
 }
 
 .customer-detail-notice p {
@@ -623,83 +672,162 @@
 
 .customer-detail-contacts {
   margin-bottom: 30px;
-  padding: 20px;
-  background: linear-gradient(135deg, #fff9e6 0%, #fffef0 100%);
-  border-radius: 10px;
-  border-left: 4px solid #ffd700;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  border: none;
 }
 
 .customer-detail-contacts p {
   margin: 8px 0;
   color: #333;
-  font-weight: 500;
-  font-size: 15px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.customer-detail-contacts.con01 ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.customer-detail-contacts.con01 li {
+  padding: 0 0 5px 8px;
+  background: url(/icons/con_icon.gif) no-repeat 1px 5px;
+  font-size: 13px;
+  color: #000;
 }
 
 .customer-detail-tabs {
-  display: flex;
-  gap: 5px;
-  margin-bottom: 30px;
-  border-bottom: 2px solid #f0f0f0;
-  flex-wrap: wrap;
+  margin-bottom: 0;
+}
+
+.customer-detail-tabs .subNaviWrap02 {
+  clear: both;
+  height: 100%;
+}
+
+.customer-detail-tabs .subNaviWrap02 table {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.customer-detail-tabs .subNaviWrap02 table tr td {
+  position: relative;
+  overflow: hidden;
+  line-height: 16px;
+  padding: 8px;
+  vertical-align: middle;
+  border: 1px solid #dddddd;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: normal;
+  color: #000;
+  background: #f7f7f7;
+}
+
+.customer-detail-tabs .subNaviWrap02 table tr td a {
+  display: block;
+  width: 100%;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.customer-detail-tabs .subNaviWrap02 table tr td.on {
+  background: #7fc5ff;
+  border: 1px solid #7fc5ff;
+  color: #fff;
+}
+
+.customer-detail-tabs .subNaviWrap02 table tr td.bg {
+  background: #efefef;
+  border: 1px solid #dddddd;
+  color: #000;
 }
 
 .customer-tab {
-  padding: 14px 24px;
-  background: none;
+  flex: 1 1 0;
+  padding: 15px 10px;
+  background: #f5f5f5;
   border: none;
-  border-bottom: 3px solid transparent;
-  color: #999;
-  font-size: 15px;
+  border-right: 1px solid #dfdfdf;
+  border-bottom: 1px solid #dfdfdf;
+  color: #666;
+  font-size: 14px;
   cursor: pointer;
   transition: all 0.3s;
   white-space: normal;
   text-align: center;
-  min-width: 100px;
+  min-width: 0;
+  line-height: 1.3;
 }
 
 .customer-tab:hover {
-  color: #667eea;
-  background: #f8f9fa;
+  color: #15aefd;
+  background: #fff;
 }
 
 .customer-tab.active {
-  color: #667eea;
-  border-bottom-color: #667eea;
-  font-weight: bold;
-  background: #f8f9fa;
+  color: #15aefd;
+  font-weight: 600;
+  background: #fff;
+  border-bottom: 3px solid #15aefd;
+  position: relative;
+  z-index: 1;
 }
 
-.customer-detail-content {
-  padding: 20px 0;
+.customer-tab:last-child {
+  border-right: none;
 }
 
 .customer-procedure {
-  line-height: 2;
+  line-height: 1.8;
   color: #333;
 }
 
 .customer-procedure ol {
-  padding-left: 20px;
+  padding-left: 0;
+  margin: 0;
+  list-style: none;
 }
 
 .customer-procedure li {
-  margin-bottom: 12px;
-  font-size: 15px;
+  font-size: inherit;
 }
 
 .customer-procedure-section {
-  margin-top: 30px;
-  padding: 25px;
-  background: #f8f9fa;
-  border-radius: 10px;
-  border-left: 4px solid #667eea;
+  margin-top: 20px;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  border-left: none;
 }
 
-.customer-procedure-section h3 {
-  color: #667eea;
-  margin-bottom: 15px;
-  font-size: 18px;
+.customer-procedure-title {
+  display: block;
+  color: #666;
+  font-size: 0.688rem;
+}
+
+.customer-detail-content .join02_box {
+  position: relative;
+  background-color: #fff;
+  border-left: 1px solid #dddddd;
+  border-right: 1px solid #dddddd;
+  border-bottom: 1px solid #dddddd;
+}
+
+.customer-detail-content .join02_box .txt {
+  font-size: 0.688rem;
+  color: #666;
+  padding: 20px 20px;
+  line-height: 1.6em;
+}
+
+.customer-detail-content .join02_box .txt b,
+.customer-detail-content .join02_box .txt strong {
   font-weight: bold;
 }
 
