@@ -2,46 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import '../../popup/page.css';
-
-// 주민번호에서 나이와 성별 계산
-const calculateAgeAndGender = (residentNumber: string) => {
-  if (!residentNumber || residentNumber.length < 7) {
-    return { age: 0, gender: '남자' };
-  }
-
-  const birthYear = parseInt(residentNumber.substring(0, 2));
-  const birthMonth = parseInt(residentNumber.substring(2, 4));
-  const birthDay = parseInt(residentNumber.substring(4, 6));
-  const genderCode = parseInt(residentNumber.substring(6, 7));
-
-  // 성별 결정
-  let gender = '남자';
-  let centuryPrefix = 1900;
-  
-  if (genderCode === 1 || genderCode === 2) {
-    centuryPrefix = 1900;
-    gender = genderCode === 1 ? '남자' : '여자';
-  } else if (genderCode === 3 || genderCode === 4) {
-    centuryPrefix = 2000;
-    gender = genderCode === 3 ? '남자' : '여자';
-  }
-
-  // 만 나이 계산
-  const fullBirthYear = centuryPrefix + birthYear;
-  const today = new Date();
-  const currentYear = today.getFullYear();
-  const currentMonth = today.getMonth() + 1;
-  const currentDay = today.getDate();
-
-  let age = currentYear - fullBirthYear;
-  
-  // 생일이 지나지 않았으면 나이에서 1을 뺌
-  if (currentMonth < birthMonth || (currentMonth === birthMonth && currentDay < birthDay)) {
-    age--;
-  }
-
-  return { age, gender };
-};
+import { calculateAgeAndGenderFromResidentNumber } from '@/utils/age';
 
 // 플랜 코드를 백엔드 API용 플랜 타입으로 변환
 const getPlanType = (planCd: string): string => {
@@ -89,7 +50,7 @@ export default function DomesticInsuranceStep3Page() {
           console.log(`피보험자 ${i}:`, { name, residentNumber });
           console.log('step2 전체 데이터:', data2);
           
-          const { age, gender } = calculateAgeAndGender(residentNumber);
+          const { age, gender } = calculateAgeAndGenderFromResidentNumber(residentNumber);
           
           console.log('계산된 나이/성별:', { age, gender });
           
