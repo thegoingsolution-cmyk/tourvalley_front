@@ -44,11 +44,16 @@ export default function DomesticInsuranceStep3Page() {
         const insuredPersons = [];
         for (let i = 1; i <= data1.tourNum; i++) {
           const name = data2[`insured_name_${i}`] || `피보험자${i}`;
-          const residentNumber = data2[`insured_ssn_${i}`] || '';
+          const countryType = data2[`insured_country_type_${i}`] || 'D';
           
-          console.log('=== 피보험자 정보 디버깅 ===');
-          console.log(`피보험자 ${i}:`, { name, residentNumber });
-          console.log('step2 전체 데이터:', data2);
+          let residentNumber = '';
+          if (countryType === 'D') {
+            residentNumber = data2[`insured_ssn_${i}`] || '';
+          } else {
+            const ssn1 = data2[`insured_ssn1_${i}`] || '';
+            const ssn2 = data2[`insured_ssn2_${i}`] || '';
+            residentNumber = ssn1 + ssn2;
+          }
           
           const { age, gender } = calculateAgeAndGenderFromResidentNumber(residentNumber);
           

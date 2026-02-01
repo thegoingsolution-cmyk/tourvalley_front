@@ -545,6 +545,11 @@ body {
   padding-left: 13px;
 }
 
+/* group-insurance popup: DatePicker 입력 필드 글자 크기 14px (글로벌 18px 오버라이드) */
+.speed_Wrap .input_cell_01 .date-picker-wrapper .react-datepicker__input-container input {
+  font-size: 14px !important;
+}
+
 /* 너비 */
 .wd_27 {
   width: 27%;

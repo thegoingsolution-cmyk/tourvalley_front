@@ -413,6 +413,7 @@ export default function OverseasInsuranceStep2Page() {
           </div>
           <form name="inputForm" method="POST">
             <div className="bgcolor_white">
+              {/* 2단계에서는 여행보험 기본정보 변경 불가 (1단계에서 세팅한 데이터 사용)
               <h2 className="sub_title pt30 ag_left">여행보험 기본정보</h2>
               <div className="detailView01 bgcolor_white">
                 <table className="specialB" border={1} cellSpacing="0" style={{ borderCollapse: 'collapse' }}>
@@ -625,6 +626,7 @@ export default function OverseasInsuranceStep2Page() {
                   </tbody>
                 </table>
               </div>
+              */}
 
               <div id="contractor_info">
                 <div id="top_title">
