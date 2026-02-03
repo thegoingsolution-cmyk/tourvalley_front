@@ -262,6 +262,7 @@ export default function DomesticInsuranceStep5Page() {
           gender: gender,
           age: age,
           plan_type: planCode === 'BAW' ? '실속플랜' : '고보장플랜',
+          plan_variant: 'B',
           premium: premium,
           has_medical_expense: 1,
         });

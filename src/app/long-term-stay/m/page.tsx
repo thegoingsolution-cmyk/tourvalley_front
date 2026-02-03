@@ -23,6 +23,12 @@ import { PlanType, PlanInfo, Participant, CalculatedPremiums, PaymentMethod, Pay
 import { allCountries, frequentCountries } from '@/components/travel/utils/countries';
 import './page.css';
 
+const WORKING_HOLIDAY_PLAN_MAPPING: Record<string, string> = {
+  '실속플랜': '워킹홀리데이실속플랜',
+  '표준플랜': '워킹홀리데이표준플랜',
+  '고급플랜': '워킹홀리데이(유로화플랜)',
+};
+
 function MobileLongTermStayContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -489,10 +495,12 @@ function MobileLongTermStayContent() {
 
       // 워킹홀리데이인 경우: 원화(실속, 표준) + 외화(고급) 플랜 계산
       if (isWorkingHoliday) {
+        // 워킹홀리데이 플랜명 매핑: 프론트엔드 표시명 -> DB 저장명
         // 원화 플랜: 실속, 표준
         const wonPlans: PlanType[] = ['실속플랜', '표준플랜'];
-        for (const planType of wonPlans) {
+        for (const displayPlanType of wonPlans) {
           try {
+            const dbPlanType = WORKING_HOLIDAY_PLAN_MAPPING[displayPlanType] || displayPlanType;
             const response = await fetch('/api/travel/calculate-premium', {
               method: 'POST',
               headers: {
@@ -502,7 +510,8 @@ function MobileLongTermStayContent() {
                 insurance_type: insuranceType,
                 age: age,
                 gender: genderValue,
-                plan_type: planType,
+                plan_type: dbPlanType,
+                plan_variant: 'B',
                 has_medical_expense: hasMedicalExpense ? 1 : 0,
                 departure_date: departureDateTime,
                 arrival_date: arrivalDateTime,
@@ -513,20 +522,21 @@ function MobileLongTermStayContent() {
 
             const data = await response.json();
             if (data.success) {
-              const coverages = getCoveragesForPlan(planType, insuranceType, '원화');
-              plans[planType] = {
-                type: planType,
+              const coverages = getCoveragesForPlan(displayPlanType, insuranceType, '원화');
+              plans[displayPlanType] = {
+                type: displayPlanType,
                 premium: data.premium,
                 coverages: coverages,
               };
             }
           } catch (error) {
-            console.error(`보험료 계산 오류 (${planType}):`, error);
+            console.error(`보험료 계산 오류 (${displayPlanType}):`, error);
           }
         }
 
         // 외화 플랜: 고급
         try {
+          const dbPlanType = WORKING_HOLIDAY_PLAN_MAPPING['고급플랜'] || '고급플랜';
           const response = await fetch('/api/travel/calculate-premium', {
             method: 'POST',
             headers: {
@@ -536,7 +546,8 @@ function MobileLongTermStayContent() {
               insurance_type: insuranceType,
               age: age,
               gender: genderValue,
-              plan_type: '고급플랜',
+              plan_type: dbPlanType,
+              plan_variant: 'B',
               has_medical_expense: hasMedicalExpense ? 1 : 0,
               departure_date: departureDateTime,
               arrival_date: arrivalDateTime,
@@ -590,6 +601,7 @@ function MobileLongTermStayContent() {
                 age: age,
                 gender: genderValue,
                 plan_type: planType,
+                plan_variant: 'B',
                 has_medical_expense: hasMedicalExpense ? 1 : 0,
                 departure_date: departureDateTime,
                 arrival_date: arrivalDateTime,
@@ -677,7 +689,14 @@ function MobileLongTermStayContent() {
           return;
         }
 
-        const planType = selectedPlan || '실속플랜';
+        const displayPlanType = selectedPlan || '실속플랜';
+        let dbPlanType: string = displayPlanType;
+        let currencyPlanValue = currencyPlan;
+
+        if (isWorkingHoliday) {
+          dbPlanType = WORKING_HOLIDAY_PLAN_MAPPING[displayPlanType] || displayPlanType;
+          currencyPlanValue = displayPlanType === '고급플랜' ? '외화' : '원화';
+        }
         
         // 24시는 다음날 00시로 변환
         let departureDateFormatted = departureDate;
@@ -701,9 +720,6 @@ function MobileLongTermStayContent() {
         const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
         const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
 
-        // 워킹홀리데이인 경우 외화, 그 외는 선택된 통화 플랜 사용
-        const useCurrencyPlan = isWorkingHoliday ? '외화' : currencyPlan;
-
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/travel/calculate-premium`, {
           method: 'POST',
           headers: {
@@ -713,11 +729,12 @@ function MobileLongTermStayContent() {
             insurance_type: getTravelPurposeText(travelPurposeLong),
             age: age,
             gender: participant.gender,
-            plan_type: planType,
+            plan_type: dbPlanType,
+            plan_variant: 'B',
             has_medical_expense: hasMedicalExpense ? 1 : 0,
             departure_date: departureDateTime,
             arrival_date: arrivalDateTime,
-            currency_plan: useCurrencyPlan,
+            currency_plan: currencyPlanValue,
             travel_country: travelCountry,
           }),
         });
@@ -730,7 +747,7 @@ function MobileLongTermStayContent() {
             name: participant.name,
             gender: participant.gender,
             birthDate: participant.birthDate,
-            planType: planType,
+            planType: displayPlanType,
             premium: data.premium,
           });
           totalPremium += data.premium;

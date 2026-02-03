@@ -517,7 +517,7 @@
     display: none;
 }
 
-/* Fixed Bottom Button Styles */
+/* Fixed Bottom Button Styles - 상단 회색선 한 줄만 표시 (border 대신 box-shadow로 이중선 방지) */
 #tour2023_fixedBanner {
     position: fixed;
     display: block;
@@ -525,7 +525,12 @@
     z-index: 100;
     bottom: 0;
     background-color: #fff;
-    border-top: 1px solid #e0e0e0;
+    border-top: none;
+    box-shadow: 0 -1px 0 0 #e0e0e0;
+}
+
+#tour2023_fixedBanner .tour2023_bottom_btn {
+    border-top: none !important;
 }
 
 .tour2023_bottom_btn {

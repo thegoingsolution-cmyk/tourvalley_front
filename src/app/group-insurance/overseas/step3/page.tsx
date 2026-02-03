@@ -105,6 +105,7 @@ export default function OverseasInsuranceStep3Page() {
           age: person.age,
           gender: person.gender,
           plan_type: getPlanType(selectedPlans[person.index] || 'STW'),
+          plan_variant: 'B',
           has_medical_expense: hasMedicalExpense,
         };
       });

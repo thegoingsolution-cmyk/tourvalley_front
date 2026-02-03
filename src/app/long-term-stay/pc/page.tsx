@@ -459,6 +459,7 @@ export default function PCLongTermStayPage() {
               age: age,
               gender: genderValue,
               plan_type: planType,
+              plan_variant: 'B',
               has_medical_expense: medicalExpense ? 1 : 0,
               departure_date: departureDateTime,
               arrival_date: arrivalDateTime,
@@ -614,6 +615,7 @@ export default function PCLongTermStayPage() {
             age: age,
             gender: participant.gender,
             plan_type: dbPlanType, // DB에 저장된 플랜명 사용
+            plan_variant: 'B',
             has_medical_expense: hasMedicalExpense ? 1 : 0,
             departure_date: departureDateTime,
             arrival_date: arrivalDateTime,
@@ -749,6 +751,7 @@ export default function PCLongTermStayPage() {
               age: Number(age),
               gender: String(genderValue || ''),
               plan_type: String(dbPlanType), // DB에 저장된 플랜명 사용
+              plan_variant: 'B',
               has_medical_expense: hasMedicalExpense ? 1 : 0,
               departure_date: String(departureDateTime),
               arrival_date: String(arrivalDateTime),
@@ -790,6 +793,7 @@ export default function PCLongTermStayPage() {
             age: Number(age),
             gender: String(genderValue || ''),
             plan_type: String(dbPlanType), // '워킹홀리데이(유로화플랜)' 사용
+            plan_variant: 'B',
             has_medical_expense: hasMedicalExpense ? 1 : 0,
             departure_date: String(departureDateTime),
             arrival_date: String(arrivalDateTime),
@@ -853,6 +857,7 @@ export default function PCLongTermStayPage() {
               age: Number(age),
               gender: String(genderValue || ''),
               plan_type: String(planType),
+              plan_variant: 'B',
               has_medical_expense: hasMedicalExpense ? 1 : 0,
               departure_date: String(departureDateTime),
               arrival_date: String(arrivalDateTime),

@@ -139,6 +139,7 @@ export default function LongStayInsuranceStep3Page() {
           age: person.age,
           gender: person.gender,
           plan_type: getPlanType(planCode, travelPurpose),
+          plan_variant: 'B',
           has_medical_expense: true,
           currency_plan: getCurrencyPlan(planCode, travelPurpose),
         };

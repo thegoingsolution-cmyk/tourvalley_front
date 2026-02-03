@@ -1,5 +1,5 @@
 @font-face {
-  font-family: 'NanumSquareNeoTTF-cBd';
+  font-family: 'NanumSquareNeo';
   font-weight: 700;
   src: url('/fonts/NanumSquareNeoTTF-cBd.woff2') format('woff2'),
        url('/fonts/NanumSquareNeoTTF-cBd.woff') format('woff'),
@@ -25,20 +25,14 @@
   box-sizing: border-box;
   padding: 0;
   margin: 0;
-  font-family: inherit;
-  letter-spacing: inherit;
-  line-height: inherit;
-  font-weight: inherit;
 }
 
 html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-  font-family: 'NanumSquareNeoTTF-cBd', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-  font-weight: 400;
-  letter-spacing: -1px;
-  line-height: 125%;
+  font-family: 'NanumSquare', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  font-weight: 800;
 }
 
 .main-container {
@@ -146,11 +140,11 @@ body {
   margin-bottom: 3px !important;
   width: 100% !important;
   line-height: 220% !important;
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif !important;
+  font-family: 'Nanum Gothic', sans-serif !important;
   border: none !important;
   box-sizing: border-box !important;
   color: #dddddd !important;
-  font-size: 18px !important;
+  font-size: 13px !important;
   background: url(/images/speed_d.jpg) no-repeat left center !important;
   background-size: 21px !important;
 }
@@ -182,7 +176,7 @@ body {
 
 /* DatePicker 캘린더 스타일 - 크기 축소 */
 .custom-calendar {
-  font-family: 'NanumSquareNeoTTF-cBd', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif !important;
+  font-family: 'NanumSquare', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif !important;
   border: 1px solid #e0e0e0;
   border-radius: 6px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
@@ -205,7 +199,7 @@ body {
 
 .custom-calendar .react-datepicker__header {
   background-color: #f8f9fa !important;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: none !important; /* 라이브러리 기본 border 제거 */
   border-radius: 6px 6px 0 0;
   padding-top: 8px;
   padding-bottom: 8px;
@@ -297,14 +291,40 @@ body {
 }
 
 .custom-calendar .react-datepicker__navigation {
-  top: 10px;
-  width: 26px;
-  height: 26px;
+  top: 10px; /* PC */
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-calendar .react-datepicker__navigation-icon {
+  position: relative;
+  top: 0;
 }
 
 .custom-calendar .react-datepicker__navigation-icon::before {
   border-color: #666;
-  border-width: 2px 2px 0 0;
+  border-style: solid;
+  border-width: 3px 3px 0 0;
+  content: '';
+  display: block;
+  height: 9px;
+  width: 9px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -5px;
+  margin-left: -5px;
+}
+
+.custom-calendar .react-datepicker__navigation-icon--previous::before {
+  transform: rotate(-135deg);
+}
+
+.custom-calendar .react-datepicker__navigation-icon--next::before {
+  transform: rotate(45deg);
 }
 
 .custom-calendar .react-datepicker__navigation:hover *::before {
@@ -330,6 +350,20 @@ body {
 .react-datepicker-popper[data-placement] {
   z-index: 999999 !important;
   position: absolute !important;
+}
+
+/* 실제 폰: 2번째 클릭 시 포커스 이동으로 z-index 밀림 방지 */
+@media (hover: none) and (pointer: coarse) {
+  .custom-popper,
+  .custom-popper .react-datepicker-popper,
+  .react-datepicker-popper,
+  .react-datepicker-popper[data-placement] {
+    z-index: 2147483647 !important;
+    isolation: isolate;
+  }
+  .custom-calendar .react-datepicker__navigation {
+    top: 2px; /* mobile */
+  }
 }
 
 /* 포지셔닝 개선 - 입력 필드 바로 아래에 표시 */

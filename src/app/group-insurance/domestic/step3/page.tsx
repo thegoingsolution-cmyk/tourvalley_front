@@ -93,6 +93,7 @@ export default function DomesticInsuranceStep3Page() {
         age: person.age,
         gender: person.gender,
         plan_type: getPlanType(selectedPlans[person.index] || 'BAW'),
+        plan_variant: 'B',
         has_medical_expense: true, // 국내실손 포함 여부 (플랜에 따라 다를 수 있음)
       }));
 

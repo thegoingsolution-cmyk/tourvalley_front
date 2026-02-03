@@ -2,12 +2,49 @@
 
 import React, { useState, useEffect } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
+import type { ReactDatePickerCustomHeaderProps } from 'react-datepicker';
 import { ko } from 'date-fns/locale';
 import { format, parse } from 'date-fns';
 import 'react-datepicker/dist/react-datepicker.css';
 
-// 한국어 locale 등록
 registerLocale('ko', ko);
+
+/** 이전/다음 달 버튼이 포커스를 받지 않도록 → 실제 폰에서 2번째 클릭 시 z-index 밀림 방지 */
+function CalendarHeaderNoFocus(props: ReactDatePickerCustomHeaderProps) {
+  const { monthDate, decreaseMonth, increaseMonth, prevMonthButtonDisabled, nextMonthButtonDisabled } = props;
+  const monthLabel = format(monthDate, 'yyyy년 MM월', { locale: ko });
+  const stopFocus = (e: React.MouseEvent) => e.preventDefault();
+  return (
+    <div className="react-datepicker__header-wrapper">
+      {!prevMonthButtonDisabled && (
+        <button
+          type="button"
+          tabIndex={-1}
+          className="react-datepicker__navigation react-datepicker__navigation--previous"
+          onClick={decreaseMonth}
+          onMouseDown={stopFocus}
+          aria-label="이전 달"
+        >
+          <span className="react-datepicker__navigation-icon react-datepicker__navigation-icon--previous" />
+        </button>
+      )}
+      <button
+        type="button"
+        tabIndex={-1}
+        className={`react-datepicker__navigation react-datepicker__navigation--next ${nextMonthButtonDisabled ? 'react-datepicker__navigation--next--disabled' : ''}`}
+        onClick={increaseMonth}
+        onMouseDown={stopFocus}
+        disabled={nextMonthButtonDisabled}
+        aria-label="다음 달"
+      >
+        <span className="react-datepicker__navigation-icon react-datepicker__navigation-icon--next" />
+      </button>
+      <div className="react-datepicker__header">
+        <h2 className="react-datepicker__current-month">{monthLabel}</h2>
+      </div>
+    </div>
+  );
+}
 
 // 날짜 포맷 함수
 const formatDate = (date: Date): string => {
@@ -145,6 +182,7 @@ export default function MobileGroupTravelInfoStep({
               showPopperArrow={false}
               popperPlacement="bottom-start"
               shouldCloseOnSelect={true}
+              renderCustomHeader={(p) => <CalendarHeaderNoFocus {...p} />}
               strictParsing
             />
           </div>
@@ -204,6 +242,7 @@ export default function MobileGroupTravelInfoStep({
               showPopperArrow={false}
               popperPlacement="bottom-start"
               shouldCloseOnSelect={true}
+              renderCustomHeader={(p) => <CalendarHeaderNoFocus {...p} />}
               strictParsing
             />
           </div>

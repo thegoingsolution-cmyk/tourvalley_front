@@ -405,6 +405,7 @@ export default function OverseasInsuranceStep5Page() {
           gender: gender,
           age: age,
           plan_type: planTypeName,
+          plan_variant: 'B',
           premium: premium,
           has_medical_expense: planType === 'V' ? 1 : 0, // V면 국내실손 담보(1), N이면 부담보(0)
           nationality_type: nationalityType,
