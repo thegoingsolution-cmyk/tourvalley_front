@@ -1245,16 +1245,9 @@
     padding: 20px !important;
 }
 
-/* PaymentStep 상단 "보험료 결제" 제목 - 다른 페이지와 동일하게 18px */
+/* PaymentStep 상단 "보험료 결제" 제목 - 장기체류 모바일에서는 숨김 */
 .long-term-stay-mobile .payment-form-card .form-header {
-    margin-bottom: 16px;
-}
-.long-term-stay-mobile .payment-form-card .form-header .form-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin: 0;
-    line-height: 1.35;
+    display: none;
 }
 
 .contract-form-card {

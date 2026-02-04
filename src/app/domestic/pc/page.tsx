@@ -93,7 +93,14 @@ export default function PCDomesticPage() {
   const [paymentSubMethod, setPaymentSubMethod] = useState<PaymentSubMethod | null>(null);
   const [accidentFreeCash, setAccidentFreeCash] = useState(0);
   const [useAccidentFreeCash, setUseAccidentFreeCash] = useState(0);
-  
+
+  // 로그인 회원의 무사고캐시 보유액 반영 (계약정보 단계에서 표시)
+  useEffect(() => {
+    if (member && typeof member.accident_free_cash === 'number') {
+      setAccidentFreeCash(member.accident_free_cash);
+    }
+  }, [member]);
+
   // 무통장입금 관련 상태
   const [depositBank, setDepositBank] = useState<string>('');
   const [depositorName, setDepositorName] = useState<string>('');
