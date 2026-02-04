@@ -245,12 +245,12 @@ export default function ContractDetailPage() {
               <span className="tour2023_txt10">{Math.floor(contractDetail.totalPremium || 0).toLocaleString()} 원</span>
             </li>
             <li className="tour2023_conList">
-              <span className="tour2023_txt09">무사고캐시</span>
-              <span className="tour2023_txt10">0 원</span>
+              <span className="tour2023_txt09">무사고캐시 사용</span>
+              <span className="tour2023_txt10">{Math.floor(contractDetail.useAccidentFreeCash ?? 0).toLocaleString()} 원</span>
             </li>
             <li className="tour2023_conList">
               <span className="tour2023_txt09">결제보험료</span>
-              <span className="tour2023_txt10">{Math.floor(contractDetail.totalPremium || 0).toLocaleString()} 원</span>
+              <span className="tour2023_txt10">{Math.floor(contractDetail.paidAmount ?? contractDetail.totalPremium ?? 0).toLocaleString()} 원</span>
             </li>
           </ul>
           

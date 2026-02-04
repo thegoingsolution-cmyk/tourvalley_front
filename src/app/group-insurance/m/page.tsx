@@ -1900,6 +1900,9 @@ function MobileGroupInsuranceContent() {
             payment_sub_method: null,
             amount: receiptPremium,
             status: '대기',
+            use_accident_free_cash: useAccidentFreeCash,
+            normal_premium: normalPremium,
+            receipt_premium: receiptPremium,
           },
         };
 
@@ -2072,6 +2075,9 @@ function MobileGroupInsuranceContent() {
             payment_sub_method: '가상계좌',
             amount: receiptPremium,
             status: '대기',
+            use_accident_free_cash: useAccidentFreeCash,
+            normal_premium: normalPremium,
+            receipt_premium: receiptPremium,
           },
         };
 
@@ -2194,6 +2200,7 @@ function MobileGroupInsuranceContent() {
             payment_sub_method: paymentSubMethod || null,
             amount: receiptPremium,
             status: (paymentSubMethod === '무통장입금' || paymentSubMethod === '수기카드' || paymentSubMethod === '가상계좌') ? '대기' : '완료',
+            use_accident_free_cash: useAccidentFreeCash,
             depositor_name: paymentSubMethod === '무통장입금' ? depositorName : null,
             bank_name: paymentSubMethod === '무통장입금' ? depositBank : null,
             account_number: paymentSubMethod === '무통장입금' ? (depositBank === '우리은행' ? '1005-604-481542' : '301-0337-8596-01') : null,

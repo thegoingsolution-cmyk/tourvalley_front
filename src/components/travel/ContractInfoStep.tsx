@@ -301,9 +301,15 @@ export default function ContractInfoStep({
                     <input
                       type="number"
                       value={useAccidentFreeCash}
-                      onChange={(e) => handleUseCashChange(parseInt(e.target.value) || 0)}
+                      onChange={(e) => {
+                      const raw = e.target.value.replace(/\D/g, '');
+                      const withoutLeadingZeros = raw === '' ? '' : String(parseInt(raw, 10));
+                      const num = withoutLeadingZeros === '' ? 0 : parseInt(withoutLeadingZeros, 10);
+                      handleUseCashChange(num);
+                    }}
                       min="0"
                       max={accidentFreeCash}
+                      style={{ fontSize: '16px' }}
                     />
                     <span className="unit-text">원</span>
                   </div>
