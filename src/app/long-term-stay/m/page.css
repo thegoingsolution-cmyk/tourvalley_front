@@ -1206,6 +1206,102 @@
 }
 
 /* ========================================
+   ParticipantInfoStep - 보험료 계산하기 / 결과 / 신청하기 (CSS 충돌 방지 스코핑)
+   ======================================== */
+.long-term-stay-mobile .calculate-final-btn {
+  width: 100%;
+  padding: 16px;
+  background: #2843e5;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background 0.2s;
+}
+.long-term-stay-mobile .calculate-final-btn:hover:not(:disabled) {
+  background: #1e33c4;
+}
+.long-term-stay-mobile .calculate-final-btn:disabled,
+.long-term-stay-mobile .calculate-final-btn.calculated {
+  background: #ccc;
+  cursor: not-allowed;
+  color: #999;
+}
+
+.long-term-stay-mobile .premium-summary {
+  margin-top: 20px;
+  padding: 16px;
+  background: #eef2fc;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.long-term-stay-mobile .premium-detail-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.long-term-stay-mobile .premium-participant-count {
+  font-size: 14px;
+  color: #333;
+}
+.long-term-stay-mobile .premium-detail-link {
+  display: inline-block;
+  text-align: center;
+  padding: 8px 14px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #2843e5;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.long-term-stay-mobile .premium-detail-link:hover {
+  background: #f0f4ff;
+  border-color: #2843e5;
+}
+.long-term-stay-mobile .premium-total {
+  text-align: right;
+  font-size: 16px;
+  color: #333;
+  flex: 1;
+  min-width: 100%;
+  margin-top: 8px;
+}
+.long-term-stay-mobile .premium-amount {
+  font-size: 22px;
+  font-weight: 700;
+  color: #2843e5;
+}
+
+.long-term-stay-mobile .apply-btn {
+  width: 100%;
+  padding: 16px;
+  background: #f15a24;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background 0.2s;
+}
+.long-term-stay-mobile .apply-btn:hover {
+  background: #d94e1f;
+}
+
+/* ========================================
    Consent Modal Styles - Mobile
    ======================================== */
 
