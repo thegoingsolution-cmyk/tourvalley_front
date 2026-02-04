@@ -1304,7 +1304,15 @@ function MobileOverseasStep1Content() {
 
       {/* STEP 2-1: 위험활동 확인 및 여행목적 선택 화면 */}
       {showStep2_1 && !showStep3 && !showCompletionScreen && (
-        <RiskActivityStep
+        <div className="prow_01">
+          {/* 상단 타이틀 가입단계 */}
+          <div className="tour2023_BWrap tourG_mat13 tourG_mab05">
+            <p className="tour2023_title01">{getTitle()}</p>
+            {/* 가입 단계 */}
+            <MobileStepIndicator currentStep={getCurrentStep()} />
+          </div>
+
+          <RiskActivityStep
           insuranceType={getTitle()}
           hasDangerousActivity={hasDangerousActivity}
           travelPurpose={travelPurpose}
@@ -1331,7 +1339,8 @@ function MobileOverseasStep1Content() {
             // 동의서 모달 표시
             setShowConsentModal(true);
           }}
-        />
+          />
+        </div>
       )}
 
       {/* 위험활동 확인 모달 */}

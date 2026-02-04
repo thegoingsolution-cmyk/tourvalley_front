@@ -1279,36 +1279,6 @@ function MobileDomesticStep1Content() {
             onShowDangerousActivityModal={() => setShowDangerousActivityModal(true)}
             onNext={handleProceedToStep3}
           />
-
-          {/* 버튼 영역 */}
-          <div className="tourG_mat04 tourG_mab02">
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <a
-                href="javascript:void(0);"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setShowStep2_1(false);
-                  setShowParticipantForm(true);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                className="tourGuard_btn_b tour2023_btn03"
-                style={{ width: '50%' }}
-              >
-                이전
-              </a>
-              <a
-                href="javascript:void(0);"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleProceedToStep3();
-                }}
-                className="tourGuard_btn_b tour2023_btn01"
-                style={{ width: '50%', opacity: hasDangerousActivity === null ? 0.6 : 1, pointerEvents: hasDangerousActivity === null ? 'none' : 'auto' }}
-              >
-                다음
-              </a>
-            </div>
-          </div>
         </div>
       )}
 

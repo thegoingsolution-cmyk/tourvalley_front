@@ -1391,40 +1391,49 @@ function MobileLongTermStayContent() {
 
       {/* STEP 2-1: 위험활동 확인 */}
       {showStep2_1 && !showStep3 && !showCompletionScreen && (
-        <RiskActivityStep
-          insuranceType={getTitle()}
-          hasDangerousActivity={hasDangerousActivity}
-          travelPurpose={getTravelPurposeText(travelPurposeLong)}
-          onDangerousActivityChange={setHasDangerousActivity}
-          onTravelPurposeChange={(value) => {
-            // 텍스트를 코드로 변환
-            const codeMap: Record<string, string> = {
-              '유학/어학연수': 'N010001',
-              '해외출장/주재원/교환교수': 'N010002',
-              '워킹홀리데이': 'N010003',
-            };
-            setTravelPurposeLong(codeMap[value] || 'N010001');
-          }}
-          onShowDangerousActivityModal={() => setShowDangerousActivityModal(true)}
-          isOverseas={true}
-          isCurrentlyAbroad={isCurrentlyAbroad}
-          hasRestrictedCountry={hasRestrictedCountry}
-          onCurrentlyAbroadChange={setIsCurrentlyAbroad}
-          onRestrictedCountryChange={setHasRestrictedCountry}
-          onShowRestrictedCountryModal={() => setShowRestrictedCountryModal(true)}
-          isLongTermStay={true}
-          onNext={() => {
-            if (hasDangerousActivity === null) {
-              alert('위험한 활동 참여 여부를 선택해주세요.');
-              return;
-            }
-            if (!travelPurposeLong) {
-              alert('여행목적을 선택해주세요.');
-              return;
-            }
-            setShowConsentModal(true);
-          }}
-        />
+        <div className="prow_01">
+          {/* 상단 타이틀 가입단계 */}
+          <div className="tour2023_BWrap tourG_mat13 tourG_mab05">
+            <p className="tour2023_title01">{getTitle()}</p>
+            {/* 가입 단계 */}
+            <MobileStepIndicator currentStep={getCurrentStep()} />
+          </div>
+
+          <RiskActivityStep
+            insuranceType={getTitle()}
+            hasDangerousActivity={hasDangerousActivity}
+            travelPurpose={getTravelPurposeText(travelPurposeLong)}
+            onDangerousActivityChange={setHasDangerousActivity}
+            onTravelPurposeChange={(value) => {
+              // 텍스트를 코드로 변환
+              const codeMap: Record<string, string> = {
+                '유학/어학연수': 'N010001',
+                '해외출장/주재원/교환교수': 'N010002',
+                '워킹홀리데이': 'N010003',
+              };
+              setTravelPurposeLong(codeMap[value] || 'N010001');
+            }}
+            onShowDangerousActivityModal={() => setShowDangerousActivityModal(true)}
+            isOverseas={true}
+            isCurrentlyAbroad={isCurrentlyAbroad}
+            hasRestrictedCountry={hasRestrictedCountry}
+            onCurrentlyAbroadChange={setIsCurrentlyAbroad}
+            onRestrictedCountryChange={setHasRestrictedCountry}
+            onShowRestrictedCountryModal={() => setShowRestrictedCountryModal(true)}
+            isLongTermStay={true}
+            onNext={() => {
+              if (hasDangerousActivity === null) {
+                alert('위험한 활동 참여 여부를 선택해주세요.');
+                return;
+              }
+              if (!travelPurposeLong) {
+                alert('여행목적을 선택해주세요.');
+                return;
+              }
+              setShowConsentModal(true);
+            }}
+          />
+        </div>
       )}
 
       <DangerousActivityModal
