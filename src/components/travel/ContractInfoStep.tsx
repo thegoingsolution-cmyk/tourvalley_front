@@ -26,6 +26,8 @@ interface ContractInfoStepProps {
   onContractConfirmedChange: (confirmed: boolean) => void;
   onShowPayment: () => void;
   companyName?: string; // 법인단체명 (단체 보험인 경우)
+  /** 상단 form-header(타이틀+StepIndicator) 숨김 (페이지에서 이미 헤더를 렌더할 때 사용, 예: long-term-stay/m) */
+  hideFormHeader?: boolean;
 }
 
 export default function ContractInfoStep({
@@ -49,6 +51,7 @@ export default function ContractInfoStep({
   onContractConfirmedChange,
   onShowPayment,
   companyName,
+  hideFormHeader = false,
 }: ContractInfoStepProps) {
   const [isAccidentFreeCashModalOpen, setIsAccidentFreeCashModalOpen] = useState(false);
 
@@ -104,11 +107,13 @@ export default function ContractInfoStep({
     <section className={`form-section ${contractConfirmed ? 'has-payment-step' : ''}`}>
       <div className="form-container">
         <div className="form-card contract-form-card">
-          <div className="form-header">
-            {/* <h1 className="form-title">{insuranceType}</h1> */}
-            <h1 className="form-title"></h1>
-            <StepIndicator currentStep={3} />
-          </div>
+          {!hideFormHeader && (
+            <div className="form-header">
+              {/* <h1 className="form-title">{insuranceType}</h1> */}
+              <h1 className="form-title"></h1>
+              <StepIndicator currentStep={3} />
+            </div>
+          )}
 
           <div className="step3-section">
             <div className="step3-header">

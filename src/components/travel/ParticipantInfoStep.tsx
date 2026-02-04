@@ -27,6 +27,8 @@ interface ParticipantInfoStepProps {
   // STEP1에서 입력한 생년월일
   birthDate?: string;
   gender?: 'male' | 'female';
+  /** 모바일 등 상단에서 이미 단계 인디케이터를 보여줄 때 true → form-header(타이틀+단계) 생략 */
+  hideFormHeader?: boolean;
 }
 
 export default function ParticipantInfoStep({
@@ -49,6 +51,7 @@ export default function ParticipantInfoStep({
   calculateAgeFromBirthDate,
   birthDate,
   gender,
+  hideFormHeader = false,
 }: ParticipantInfoStepProps) {
   const [verificationSent, setVerificationSent] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
@@ -174,11 +177,12 @@ export default function ParticipantInfoStep({
     <section className="form-section">
       <div className="form-container">
         <div className="form-card">
-          <div className="form-header">
-            {/* <h1 className="form-title">{insuranceType}</h1> */}
-            <h1 className="form-title"></h1>
-            <StepIndicator currentStep={2} />
-          </div>
+          {!hideFormHeader && (
+            <div className="form-header">
+              <h1 className="form-title"></h1>
+              <StepIndicator currentStep={2} />
+            </div>
+          )}
 
           {/* 가입자 정보 입력 폼 */}
           {participants.map((participant, index) => (

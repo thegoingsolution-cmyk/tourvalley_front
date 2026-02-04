@@ -21,6 +21,8 @@ interface RiskActivityStepProps {
   // 해외장기체류보험용
   travelPurposeOptions?: string[]; // 여행목적 옵션 (해외장기체류보험용)
   isLongTermStay?: boolean; // 해외장기체류보험 여부
+  /** 상단 form-header(타이틀+StepIndicator) 숨김 (페이지에서 이미 헤더를 렌더할 때 사용, 예: long-term-stay/m) */
+  hideFormHeader?: boolean;
 }
 
 export default function RiskActivityStep({
@@ -39,6 +41,7 @@ export default function RiskActivityStep({
   onShowRestrictedCountryModal,
   travelPurposeOptions,
   isLongTermStay = false,
+  hideFormHeader = false,
 }: RiskActivityStepProps) {
   const handleTravelPurposeChange = (purpose: string) => {
     onTravelPurposeChange(purpose);
@@ -48,11 +51,13 @@ export default function RiskActivityStep({
     <section className="form-section">
       <div className="form-container">
         <div className="form-card">
-          <div className="form-header">
-            {/* <h1 className="form-title">{insuranceType}</h1> */}
-            <h1 className="form-title"></h1>
-            <StepIndicator currentStep={2} />
-          </div>
+          {!hideFormHeader && (
+            <div className="form-header">
+              {/* <h1 className="form-title">{insuranceType}</h1> */}
+              <h1 className="form-title"></h1>
+              <StepIndicator currentStep={2} />
+            </div>
+          )}
 
           {/* 해외여행보험일 경우: 현재 출국/해외 체류 중 질문 */}
           {isOverseas && onCurrentlyAbroadChange && (

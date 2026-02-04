@@ -1234,9 +1234,13 @@ function MobileLongTermStayContent() {
       {/* STEP 1: 여행정보 입력 화면 */}
       {!showParticipantForm && !showStep2_1 && !showStep3 && !showCompletionScreen && (
         <div className="prow_01">
-          <div className="tour2023_BWrap tourG_mat13 tourG_mab05">
-            <p className="tour2023_title01">{getTitle()}</p>
-            <MobileStepIndicator currentStep={getCurrentStep()} />
+          <div className="longstay-mobile-step-header">
+            <div className="longstay-mobile-step-header__row tourG_mat13 tourG_mab05">
+              <p className="longstay-mobile-step-header__title">{getTitle()}</p>
+              <div className="longstay-mobile-step-indicator-wrap">
+                <MobileStepIndicator currentStep={getCurrentStep()} />
+              </div>
+            </div>
           </div>
 
           <MobileTravelInfoStep
@@ -1348,11 +1352,15 @@ function MobileLongTermStayContent() {
       {/* STEP 2: 가입정보 입력 */}
       {showParticipantForm && !showStep2_1 && !showStep3 && !showCompletionScreen && (
         <div className="prow_01">
-          <div className="tour2023_BWrap tourG_mat13 tourG_mab05">
-            <p className="tour2023_title01">{getTitle()}</p>
-            <MobileStepIndicator currentStep={getCurrentStep()} />
+          <div className="longstay-mobile-step-header">
+            <div className="longstay-mobile-step-header__row tourG_mat13 tourG_mab05">
+              <p className="longstay-mobile-step-header__title">{getTitle()}</p>
+              <div className="longstay-mobile-step-indicator-wrap">
+                <MobileStepIndicator currentStep={getCurrentStep()} />
+              </div>
+            </div>
           </div>
-          
+
           <ParticipantInfoStep
             insuranceType={getTitle()}
             participants={participants}
@@ -1377,6 +1385,7 @@ function MobileLongTermStayContent() {
             calculateAgeFromBirthDate={calculateAgeFromBirthDate}
             birthDate={birthDate}
             gender={gender === 'M' ? 'male' : 'female'}
+            hideFormHeader
           />
         </div>
       )}
@@ -1392,11 +1401,13 @@ function MobileLongTermStayContent() {
       {/* STEP 2-1: 위험활동 확인 */}
       {showStep2_1 && !showStep3 && !showCompletionScreen && (
         <div className="prow_01">
-          {/* 상단 타이틀 가입단계 */}
-          <div className="tour2023_BWrap tourG_mat13 tourG_mab05">
-            <p className="tour2023_title01">{getTitle()}</p>
-            {/* 가입 단계 */}
-            <MobileStepIndicator currentStep={getCurrentStep()} />
+          <div className="longstay-mobile-step-header">
+            <div className="longstay-mobile-step-header__row tourG_mat13 tourG_mab05">
+              <p className="longstay-mobile-step-header__title">{getTitle()}</p>
+              <div className="longstay-mobile-step-indicator-wrap">
+                <MobileStepIndicator currentStep={getCurrentStep()} />
+              </div>
+            </div>
           </div>
 
           <RiskActivityStep
@@ -1404,6 +1415,7 @@ function MobileLongTermStayContent() {
             hasDangerousActivity={hasDangerousActivity}
             travelPurpose={getTravelPurposeText(travelPurposeLong)}
             onDangerousActivityChange={setHasDangerousActivity}
+            hideFormHeader
             onTravelPurposeChange={(value) => {
               // 텍스트를 코드로 변환
               const codeMap: Record<string, string> = {
@@ -1463,18 +1475,21 @@ function MobileLongTermStayContent() {
       {/* STEP 3: 계약정보 및 결제 화면 */}
       {showStep3 && !showCompletionScreen && (
         <>
-          {/* 상단 타이틀 가입단계 */}
           <div className="prow_01">
-            <div className="tour2023_BWrap tourG_mat13 tourG_mab05">
-              <p className="tour2023_title01">{getTitle()}</p>
-              {/* 가입 단계 */}
-              <MobileStepIndicator currentStep={getCurrentStep()} />
+            <div className="longstay-mobile-step-header">
+              <div className="longstay-mobile-step-header__row tourG_mat13 tourG_mab05">
+                <p className="longstay-mobile-step-header__title">{getTitle()}</p>
+                <div className="longstay-mobile-step-indicator-wrap">
+                  <MobileStepIndicator currentStep={getCurrentStep()} />
+                </div>
+              </div>
             </div>
           </div>
-          
+
           <ContractInfoStep
             insuranceType={getTitle()}
             insuranceCompany="메리츠화재"
+            hideFormHeader
             departureDate={departureDate}
             departureTime={departureTime}
             arrivalDate={arrivalDate}
