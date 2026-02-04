@@ -895,8 +895,8 @@ function MobileOverseasStep1Content() {
             alert(error instanceof Error ? error.message : '카카오페이 결제 중 오류가 발생했습니다.');
           }
         }
-      } else {
-        // 기타결제 (무통장입금, 수기카드)는 바로 계약 등록
+      } else if (paymentMethod === '기타결제' && paymentSubMethod !== '가상계좌') {
+        // 기타결제 중 무통장입금, 수기카드만 여기서 계약 등록 후 완료 화면 (가상계좌는 아래 별도 블록에서 처리)
         const contractData = {
           contract: {
             member_id: isLoggedIn && member ? member.id : null,
