@@ -255,7 +255,7 @@ export default function PCMainPage() {
                 alt="행사주최자 배상책임보험"
                 className="nav-icon-image"
               />
-              <span className="nav-icon-label">행사주최자<br />배상책임보험</span>
+              <span className="nav-icon-label">행사보험<br />견적신청</span>
             </div>
             <div className="nav-icon-item" onClick={() => router.push('/estimate/step1')}>
               <img
@@ -271,7 +271,7 @@ export default function PCMainPage() {
                 alt="여행사전용 여행보험센터"
                 className="nav-icon-image"
               />
-              <span className="nav-icon-label">여행사전용<br />여행보험센터</span>
+              <span className="nav-icon-label">투어밸리<br />B2B센터</span>
             </div>
             <div className="nav-icon-item" onClick={() => setShowCashModal(true)}>
               <img

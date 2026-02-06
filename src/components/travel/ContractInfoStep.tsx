@@ -134,7 +134,6 @@ export default function ContractInfoStep({
                         <title>계약정보</title>
                         <style>
                           body {
-                            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
                             padding: 20px;
                             margin: 0;
                           }

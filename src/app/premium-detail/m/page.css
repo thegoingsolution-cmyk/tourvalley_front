@@ -57,7 +57,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: inherit;
 }
 
 .modal-close-btn:hover {
@@ -171,4 +170,5 @@
 .confirm-btn:active {
   background: #e55a2b;
 }
+
 

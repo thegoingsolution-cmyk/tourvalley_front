@@ -1006,6 +1006,7 @@ function MobileGroupInsuranceContent() {
       
       const today = new Date();
       const birthDate = new Date(year, month - 1, day);
+      if (birthDate.getMonth() !== month - 1 || birthDate.getDate() !== day) return null;
       
       let age = today.getFullYear() - birthDate.getFullYear();
       const monthDiff = today.getMonth() - birthDate.getMonth();
@@ -1016,8 +1017,12 @@ function MobileGroupInsuranceContent() {
       }
       
       // 보험나이 계산: 만나이에서 6개월이 경과하면 +1
-      // 생일로부터 6개월 후 날짜 계산
-      const sixMonthsLater = new Date(birthDate);
+      // 마지막 생일 기준으로 6개월 경과 여부 계산
+      const lastBirthday = new Date(today.getFullYear(), month - 1, day);
+      if (today < lastBirthday) {
+        lastBirthday.setFullYear(lastBirthday.getFullYear() - 1);
+      }
+      const sixMonthsLater = new Date(lastBirthday);
       sixMonthsLater.setMonth(sixMonthsLater.getMonth() + 6);
       
       // 오늘이 생일로부터 6개월 후 날짜보다 이후이면 보험나이 +1
@@ -1148,6 +1153,7 @@ function MobileGroupInsuranceContent() {
             body: JSON.stringify({
               insurance_type: getInsuranceType(),
               age: age,
+              birth_date: birthDate,
               gender: genderValue,
               plan_type: dbPlanType,
               plan_variant: 'B',
@@ -1253,6 +1259,7 @@ function MobileGroupInsuranceContent() {
               body: JSON.stringify({
                 insurance_type: getInsuranceType(),
                 age: age,
+                birth_date: insured.birthDate,
                 gender: genderValue,
                 plan_type: dbPlanType,
                 plan_variant: 'B',
@@ -1428,6 +1435,7 @@ function MobileGroupInsuranceContent() {
                 body: JSON.stringify({
                   insurance_type: getInsuranceType(),
                   age: age,
+                  birth_date: insured.birthDate,
                   gender: genderValue,
                   plan_type: dbPlanType,
                   plan_variant: 'B',
@@ -1599,6 +1607,7 @@ function MobileGroupInsuranceContent() {
             body: JSON.stringify({
               insurance_type: getInsuranceType(),
               age: age,
+              birth_date: birthDate,
               gender: genderValue,
               plan_type: dbPlanType,
               plan_variant: 'B',
@@ -1712,6 +1721,7 @@ function MobileGroupInsuranceContent() {
           body: JSON.stringify({
             insurance_type: getInsuranceType(),
             age: age,
+            birth_date: participant.birthDate,
             gender: participant.gender,
             plan_type: dbPlanType,
             plan_variant: 'B',
@@ -2317,6 +2327,17 @@ function MobileGroupInsuranceContent() {
     }
   };
 
+  const getInsuranceCompanyName = () => {
+    switch (activeTab) {
+      case 'FL':
+        return '메리츠화재보험';
+      case 'DS':
+      case 'FS':
+      default:
+        return '라이나손해보험';
+    }
+  };
+
   const getInsuranceType = () => {
     switch (activeTab) {
       case 'DS':
@@ -2830,7 +2851,7 @@ function MobileGroupInsuranceContent() {
           
           <ContractInfoStep
             insuranceType={getTitle()}
-            insuranceCompany="메리츠화재"
+            insuranceCompany={getInsuranceCompanyName()}
             departureDate={departureDate}
             departureTime={departureTime}
             arrivalDate={arrivalDate}

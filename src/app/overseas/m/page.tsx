@@ -18,7 +18,7 @@ import CompletionStep from '@/components/travel/CompletionStep';
 import ExcelUploadModal from '@/components/travel/ExcelUploadModal';
 import DangerousActivityModal from '@/components/travel/DangerousActivityModal';
 import RestrictedCountryModal from '@/components/travel/RestrictedCountryModal';
-import ConsentModal from '@/components/travel/ConsentModal';
+import ConsentModalMobile from '@/components/mobiletravel/ConsentModalMobile';
 import { PlanType, PlanInfo, Participant, CalculatedPremiums, PaymentMethod, PaymentSubMethod } from '@/components/travel/types';
 import { allCountries, frequentCountries } from '@/components/travel/utils/countries';
 import './page.css';
@@ -163,6 +163,7 @@ function MobileOverseasStep1Content() {
     
     const today = new Date();
     const birthDate = new Date(birthYear, birthMonth, birthDay);
+    if (birthDate.getMonth() !== birthMonth || birthDate.getDate() !== birthDay) return null;
     
     let age = today.getFullYear() - birthYear;
     const monthDiff = today.getMonth() - birthMonth;
@@ -173,8 +174,12 @@ function MobileOverseasStep1Content() {
     }
     
     // 보험나이 계산: 만나이에서 6개월이 경과하면 +1
-    // 생일로부터 6개월 후 날짜 계산
-    const sixMonthsLater = new Date(birthDate);
+    // 마지막 생일 기준으로 6개월 경과 여부 계산
+    const lastBirthday = new Date(today.getFullYear(), birthMonth, birthDay);
+    if (today < lastBirthday) {
+      lastBirthday.setFullYear(lastBirthday.getFullYear() - 1);
+    }
+    const sixMonthsLater = new Date(lastBirthday);
     sixMonthsLater.setMonth(sixMonthsLater.getMonth() + 6);
     
     // 오늘이 생일로부터 6개월 후 날짜보다 이후이면 보험나이 +1
@@ -289,6 +294,7 @@ function MobileOverseasStep1Content() {
             body: JSON.stringify({
               insurance_type: insuranceType,
               age: age,
+              birth_date: birthDate,
               gender: genderValue,
               plan_type: planType,
               plan_variant: 'B',
@@ -500,6 +506,7 @@ function MobileOverseasStep1Content() {
             body: JSON.stringify({
               insurance_type: insuranceType,
               age: age,
+              birth_date: birthDate,
               gender: genderValue,
               plan_type: planType,
               plan_variant: 'B',
@@ -654,6 +661,7 @@ function MobileOverseasStep1Content() {
           body: JSON.stringify({
             insurance_type: type === 'short' ? '해외여행보험' : type === 'long' ? '유학/어학연수' : '해외여행보험',
             age: age,
+            birth_date: participant.birthDate,
             gender: participant.gender,
             plan_type: planType,
             plan_variant: 'B',
@@ -1370,7 +1378,7 @@ function MobileOverseasStep1Content() {
       />
 
       {/* 동의서 모달 */}
-      <ConsentModal
+      <ConsentModalMobile
         isOpen={showConsentModal}
         onClose={() => setShowConsentModal(false)}
         onConfirm={() => {

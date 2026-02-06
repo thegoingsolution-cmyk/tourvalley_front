@@ -367,7 +367,6 @@
   left: 20px;
   color: #9797a3;
   font-size: 12px;
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   letter-spacing: -0.8px;
   margin-bottom: 0;
 }
@@ -582,7 +581,6 @@
   left: 30px;
   color: #9797a3;
   font-size: 12px;
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   letter-spacing: -0.8px;
   margin-bottom: 0;
   z-index: 1;
@@ -1496,7 +1494,6 @@
 }
 
 .long-term-stay-page-pc .modal-title {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 22px;
   color: #3e3e3e;
   letter-spacing: -0.5px;
@@ -1816,7 +1813,6 @@
 }
 
 .long-term-stay-page-pc .fixedRight_txt01 {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 14px;
   letter-spacing: -1.2px;
   color: #333;
@@ -1829,7 +1825,6 @@
 }
 
 .long-term-stay-page-pc .fixedRight_txt02 {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 13px;
   letter-spacing: -0.4px;
   color: #333;
@@ -2025,7 +2020,6 @@
 }
 
 .long-term-stay-page-pc .btn_b.tour2023PC_btn04 {
-  font-family: 'NanumSquareNeoTTF-bRg';
   width: 100%;
   font-size: 21px;
   letter-spacing: -1px;
@@ -2058,7 +2052,6 @@
 
 /* ConsentModal의 modal-title은 제목이 더 길어서 다른 스타일 적용 */
 .long-term-stay-page-pc .modal-content:has(.tour2023_limit_state) .modal-title {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 22px;
   color: #3e3e3e;
   letter-spacing: -1.5px;
@@ -2249,7 +2242,6 @@
 
 /* tourGuard_btn01 확인 버튼 (파란색) */
 .long-term-stay-page-pc .tourGuard_btn01 {
-  font-family: 'NanumSquareNeoTTF-bRg';
   background-color: #2843e5;
   color: #fff !important;
   font-size: 21px;
@@ -3317,7 +3309,6 @@
 }
 
 .long-term-stay-page-pc .tour2023_pcBox_tit {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 20px;
   font-weight: 700;
   color: #333;
@@ -3330,7 +3321,6 @@
 }
 
 .long-term-stay-page-pc .tour2023_pcBox_txt01 {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 28px;
   font-weight: 700;
   color: #333;
@@ -3369,7 +3359,6 @@
   display: inline-block;
   background: #ffe500;
   color: #333 !important;
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 18px;
   font-weight: 700;
   padding: 15px 40px;
@@ -3547,3 +3536,4 @@
     padding: 15px;
   }
 }
+

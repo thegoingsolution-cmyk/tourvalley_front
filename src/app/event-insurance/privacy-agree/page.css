@@ -30,7 +30,6 @@
 }
 
 .privacy-agree-page .tourTop_title {
-  font-family: 'NanumSquareNeoTTF-dEb', sans-serif;
   font-size: 16px;
   color: #202020;
   letter-spacing: -1.2px;
@@ -73,7 +72,6 @@
 }
 
 .privacy-agree-page .tour2023_title19 {
-  font-family: 'NanumSquareNeoTTF-dEb', sans-serif;
   font-size: 20px;
   color: #202020;
   letter-spacing: -1.2px;
@@ -91,7 +89,6 @@
 }
 
 .privacy-agree-page .content_agree_Box01 {
-  font-family: 'NanumSquareNeoTTF-bRg', sans-serif;
   font-size: 14px;
   color: #3e3e3e;
   letter-spacing: -0.4px;
@@ -129,7 +126,6 @@
   box-sizing: border-box;
   color: #fff !important;
   text-align: center;
-  font-family: 'NanumSquareNeoTTF-dEb', sans-serif;
   font-size: 16px;
   letter-spacing: -1px;
   line-height: 50px;
@@ -140,4 +136,5 @@
 .privacy-agree-page .tour2023_btn07:hover {
   opacity: 0.9;
 }
+
 

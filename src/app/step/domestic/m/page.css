@@ -33,7 +33,6 @@
 }
 
 .domestic-step-page-mobile .tour2023_intro_txt05 {
-  font-family: 'NanumSquareNeoTTF-dEb';
   font-size: 26px;
   color: #202020;
   letter-spacing: -1.5px;
@@ -43,7 +42,6 @@
 }
 
 .domestic-step-page-mobile .tour2023_intro_txt06 {
-  font-family: 'NanumSquareNeoTTF-bRg';
   font-size: 16px;
   color: #000;
   letter-spacing: -1px;
@@ -68,7 +66,6 @@
 }
 
 .domestic-step-page-mobile .tour2023_intro_txt11 {
-  font-family: 'NanumSquareNeoTTF-dEb';
   font-size: 22px;
   color: #fff;
   letter-spacing: -1.4px;
@@ -173,7 +170,6 @@
 }
 
 .domestic-step-page-mobile .essential_Wrap .tour2023_txt02 {
-  font-family: 'NanumSquareNeoTTF-aLt';
   font-size: 12px;
   line-height: 18px;
   color: #a5a5a5;
@@ -194,3 +190,4 @@
 .domestic-step-page-mobile .tourG_mat10 {
   margin-top: 35px;
 }
+

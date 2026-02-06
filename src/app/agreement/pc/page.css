@@ -24,7 +24,6 @@
 }
 
 .layer_header .layer_title {
-  font-family: 'NanumSquareNeoTTF-dEb';
   font-size: 20px;
   color: #202020;
   letter-spacing: -0.8px;
@@ -97,7 +96,6 @@
 }
 
 .tour2023_txt31 {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 18px;
   color: #3e3e3e;
   letter-spacing: -0.6px;
@@ -172,3 +170,4 @@
 .tour2023_btn07:hover {
   background-color: #e04d00;
 }
+

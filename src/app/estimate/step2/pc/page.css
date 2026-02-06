@@ -240,7 +240,6 @@
 
 /* Agreement Section */
 .estimate-step2-page .tour2023_title10 {
-  font-family: 'NanumSquareNeoTTF-dEb';
   font-size: 21px;
   color: #202020;
   letter-spacing: -2.2px;
@@ -461,7 +460,6 @@
 }
 
 .estimate-step2-page .modal-title {
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-size: 22px;
   color: #3e3e3e;
   letter-spacing: -0.5px;
@@ -738,7 +736,6 @@
 }
 
 .estimate-step2-page .fixedRight_txt01 {
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-size: 14px;
   letter-spacing: -1.2px;
   color: #333;
@@ -751,7 +748,6 @@
 }
 
 .estimate-step2-page .fixedRight_txt02 {
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-size: 13px;
   letter-spacing: -0.4px;
   color: #333;
@@ -851,7 +847,6 @@
   left: 20px;
   color: #9797a3;
   font-size: 12px;
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   letter-spacing: -0.8px;
 }
 
@@ -989,4 +984,5 @@
     display: none;
   }
 }
+
 

@@ -169,6 +169,7 @@ export default function PCDomesticPage() {
       
       const today = new Date();
       const birthDate = new Date(year, month - 1, day);
+      if (birthDate.getMonth() !== month - 1 || birthDate.getDate() !== day) return null;
       let age = today.getFullYear() - year;
       
       // 생일이 지나지 않았으면 나이 -1 (만나이 계산)
@@ -177,8 +178,12 @@ export default function PCDomesticPage() {
       }
       
       // 보험나이 계산: 만나이에서 6개월이 경과하면 +1
-      // 생일로부터 6개월 후 날짜 계산
-      const sixMonthsLater = new Date(birthDate);
+      // 마지막 생일 기준으로 6개월 경과 여부 계산
+      const lastBirthday = new Date(today.getFullYear(), month - 1, day);
+      if (today < lastBirthday) {
+        lastBirthday.setFullYear(lastBirthday.getFullYear() - 1);
+      }
+      const sixMonthsLater = new Date(lastBirthday);
       sixMonthsLater.setMonth(sixMonthsLater.getMonth() + 6);
       
       // 오늘이 생일로부터 6개월 후 날짜보다 이후이면 보험나이 +1
@@ -320,6 +325,7 @@ export default function PCDomesticPage() {
             body: JSON.stringify({
               insurance_type: '국내여행보험',
               age: age,
+              birth_date: birthDate,
               gender: genderValue,
               plan_type: planType,
               plan_variant: 'B',
@@ -465,6 +471,7 @@ export default function PCDomesticPage() {
           body: JSON.stringify({
             insurance_type: '국내여행보험',
             age: age,
+            birth_date: participant.birthDate,
             gender: participant.gender,
             plan_type: planType,
             plan_variant: 'B',
@@ -589,6 +596,7 @@ export default function PCDomesticPage() {
             body: JSON.stringify({
               insurance_type: '국내여행보험',
               age: age,
+              birth_date: birthDate,
               gender: genderValue,
               plan_type: planType,
               plan_variant: 'B',

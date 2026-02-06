@@ -38,7 +38,6 @@
 }
 
 .estimate-completion-modal-content .tour2023_pcBox_tit {
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-size: 20px;
   font-weight: 700;
   color: #333;
@@ -177,4 +176,5 @@
     min-width: auto;
   }
 }
+
 

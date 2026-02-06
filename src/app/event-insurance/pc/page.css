@@ -722,7 +722,6 @@
 }
 
 .event-insurance-page-pc .react-datepicker {
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   border: 1px solid #d5d7dd;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -883,7 +882,6 @@
   left: 20px;
   color: #9797a3;
   font-size: 12px;
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   letter-spacing: -0.8px;
   margin-bottom: 0;
 }
@@ -989,7 +987,6 @@
 }
 
 .event-insurance-page-pc .tour2024_ListB td.sName {
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   border-top: solid 1px #000;
   background: #cfe3f6;
   font-size: 13px;
@@ -1230,7 +1227,6 @@
 }
 
 .event-insurance-page-pc .tour2023_title18 {
-  font-family: 'NanumSquareNeoTTF-dEb';
   font-size: 23px;
   color: #202020;
   letter-spacing: -1.2px;
@@ -1350,7 +1346,6 @@
 }
 
 .event-insurance-page-pc .tour2023_title05 {
-  font-family: 'NanumSquareNeoTTF-dEb';
   font-size: 23px;
   color: #202020;
   letter-spacing: -1.2px;
@@ -1531,7 +1526,6 @@
 }
 
 .event-insurance-page-pc .tour2023_help_txt01 {
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-size: 17px;
   color: #202020;
   letter-spacing: -1.2px;
@@ -1541,7 +1535,6 @@
 }
 
 .event-insurance-page-pc .tour2023_help_txt02 {
-  font-family: 'NanumSquareNeoTTF-bRg', sans-serif;
   font-size: 14px;
   color: #3e3e3e;
   letter-spacing: -0.4px;
@@ -1661,7 +1654,6 @@
 }
 
 .event-insurance-page-pc .fixedRight_txt01 {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 14px;
   letter-spacing: -1.2px;
   color: #333;
@@ -1674,7 +1666,6 @@
 }
 
 .event-insurance-page-pc .fixedRight_txt02 {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 13px;
   letter-spacing: -0.4px;
   color: #333;
@@ -1720,4 +1711,5 @@
   margin: 0 auto;
   padding: 10px 0 0 0;
 }
+
 

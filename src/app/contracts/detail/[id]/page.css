@@ -55,7 +55,6 @@
 
 /* 타이틀 */
 .tour2023_title02 {
-  font-family: 'NanumSquareNeoTTF-dEb';
   font-size: 24px;
   color: #202020;
   letter-spacing: -1.2px;
@@ -226,4 +225,5 @@
     display: none;
   }
 }
+
 

@@ -406,7 +406,6 @@
 }
 
 .qna-detail-mobile .fixedRight_txt01 {
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-size: 12px;
   letter-spacing: -0.8px;
   color: #333;
@@ -418,7 +417,6 @@
 }
 
 .qna-detail-mobile .fixedRight_txt02 {
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-size: 11px;
   letter-spacing: -0.3px;
   color: #333;
@@ -461,4 +459,5 @@
   margin: 0 auto;
   padding: 8px 0 0 0;
 }
+
 

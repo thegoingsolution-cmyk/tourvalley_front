@@ -151,7 +151,6 @@
 
 /* Agreement Section */
 .estimate-step2-mobile .tour2023_title10 {
-  font-family: 'NanumSquareNeoTTF-dEb';
   font-size: 21px;
   color: #202020;
   letter-spacing: -2.2px;
@@ -275,7 +274,6 @@
   left: 20px;
   color: #9797a3;
   font-size: 12px;
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   letter-spacing: -0.8px;
   z-index: 1;
 }
@@ -501,7 +499,6 @@
   justify-content: center;
   gap: 8px;
   transition: all 0.2s;
-  font-family: inherit;
 }
 
 .estimate-step2-mobile .excel-upload-btn:hover {
@@ -550,7 +547,6 @@
 }
 
 .modal-title {
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-size: 22px;
   color: #3e3e3e;
   letter-spacing: -0.5px;
@@ -875,3 +871,4 @@
     font-size: 20px;
   }
 }
+

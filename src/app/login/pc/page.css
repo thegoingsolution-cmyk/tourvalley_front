@@ -234,7 +234,6 @@
 }
 
 .login-page-pc .fixedRight_txt01 {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 14px;
   letter-spacing: -1.2px;
   color: #333;
@@ -247,7 +246,6 @@
 }
 
 .login-page-pc .fixedRight_txt02 {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 13px;
   letter-spacing: -0.4px;
   color: #333;
@@ -293,4 +291,5 @@
   margin: 0 auto;
   padding: 10px 0 0 0;
 }
+
 

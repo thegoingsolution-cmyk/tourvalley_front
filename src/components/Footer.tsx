@@ -98,11 +98,15 @@ export default function Footer({ isMobile = false }: FooterProps) {
             )}
           </div>
           <div className="footer-pc-info">
-            <p>㈜빨주노초파남보 | (04543) 서울 중구 을지로11길 15 동화빌딩 603호 사업자등록번호: 256-81-03026</p>
-            <p>대표: 한상윤</p>
-            <p>보험대리점등록번호: 제2022120036호 (대리점등록증) | 통신판매업신고: 제2023-서울중구-0084호</p>
-            <p>tourvalley@insvalley.com</p>
-            <p>Copyright ⓒSince 2008 tourvalley.net All Rights Reserved</p>
+            <p>
+              <span className="footer-pc-info-company">상호명 : ㈜빨주노초파남보</span> 대표 한상윤
+            </p>
+            <p>(04543) 서울시 중구 을지로11길 15 동화빌딩 603호 사업자등록번호 256-81-03026</p>
+            <p>
+              <span className="footer-pc-info-company">고객센터 1599-2541</span> 팩스번호 02)2261-0098 이메일 admin@Tourvalley.net
+            </p>
+            <p>보험대리점등록번호:제2002120036호(대리점등록증) 통신판매업신고:서울중구-0084호</p>
+            <p>Copyrightⓒsince 2008 Tourvalley.net. All Rights Reserved</p>
           </div>
         </div>
       </div>

@@ -44,6 +44,8 @@ export default function DomesticInsuranceStep5Page() {
   const yearOptions = Array.from({ length: 6 }, (_, i) => currentYear + i);
   const totalPremium = step3Data?.total_premium || 0;
   const isVirtualAccountAvailable = totalPremium >= 10000;
+  const getPlanDisplayName = (planCode: string) =>
+    planCode === 'BAW' ? '실속플랜(국내실손 포함)' : '표준플랜(국내실손 포함)';
 
   useEffect(() => {
     // 결제 완료 후 리다이렉트 확인
@@ -71,7 +73,7 @@ export default function DomesticInsuranceStep5Page() {
         for (let i = 1; i <= data1.tourNum; i++) {
           const name = data2[`insured_name_${i}`] || `피보험자${i}`;
           const planCode = data3.selected_plans?.[i] || 'BAW';
-          const planName = planCode === 'BAW' ? '실속플랜(국내실손 포함)' : '고보장플랜(국내실손 포함)';
+          const planName = getPlanDisplayName(planCode);
           const premium = data3.premiums?.[i] || 0;
 
           insuredPersons.push({
@@ -96,18 +98,6 @@ export default function DomesticInsuranceStep5Page() {
       // URL에서 파라미터 제거
       window.history.replaceState({}, '', window.location.pathname);
       
-      // 팝업창 크기 조정 (결제 완료 화면을 위해 더 크게)
-      try {
-        window.resizeTo(870, 930);
-        // 팝업창을 화면 중앙으로 이동
-        const left = (window.screen.width - 870) / 2;
-        const top = (window.screen.height - 930) / 2;
-        window.moveTo(left, top);
-      } catch (e) {
-        // 팝업창 크기 조정이 실패할 수 있음 (보안 제한)
-        console.log('팝업창 크기 조정 실패:', e);
-      }
-      
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, []);
@@ -124,6 +114,37 @@ export default function DomesticInsuranceStep5Page() {
 
   const handlePayMethodChange = (method: string) => {
     setPayMethod(method);
+  };
+
+  const buildPremiumDetailData = () => {
+    if (!step1Data || !step2Data || !step3Data) {
+      return null;
+    }
+
+    const count = step1Data.tourNum || insuredList.length || 0;
+    const participants = [];
+    for (let i = 1; i <= count; i++) {
+      const name = step2Data[`insured_name_${i}`] || `피보험자${i}`;
+      const birthDate = step2Data[`insured_birth_${i}`] || '';
+      const gender = step2Data[`insured_gender_${i}`] || '남자';
+      const planCode = step3Data.selected_plans?.[i] || 'BAW';
+      const premium = step3Data.premiums?.[i] || 0;
+
+      participants.push({
+        id: i,
+        name,
+        gender,
+        birthDate,
+        planType: getPlanDisplayName(planCode),
+        premium,
+      });
+    }
+
+    return {
+      participants,
+      totalPremium: step3Data?.total_premium || 0,
+      hasMedicalExpense: true,
+    };
   };
 
   const handlePayment = async () => {
@@ -261,7 +282,7 @@ export default function DomesticInsuranceStep5Page() {
           resident_number: birthDate ? `${birthDate}-${genderCode}******` : '',
           gender: gender,
           age: age,
-          plan_type: planCode === 'BAW' ? '실속플랜' : '고보장플랜',
+          plan_type: planCode === 'BAW' ? '실속플랜' : '표준플랜',
           plan_variant: 'B',
           premium: premium,
           has_medical_expense: 1,
@@ -496,19 +517,7 @@ export default function DomesticInsuranceStep5Page() {
             setPaymentMethod('수기카드');
           }
           setPaymentCompleted(true);
-          
-          // 팝업창 크기 조정 (결제 완료 화면을 위해 더 크게)
-          try {
-            window.resizeTo(1200, 1000);
-            // 팝업창을 화면 중앙으로 이동
-            const left = (window.screen.width - 1200) / 2;
-            const top = (window.screen.height - 1000) / 2;
-            window.moveTo(left, top);
-          } catch (e) {
-            // 팝업창 크기 조정이 실패할 수 있음 (보안 제한)
-            console.log('팝업창 크기 조정 실패:', e);
-          }
-          
+
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
           alert(data.message || '계약 등록에 실패했습니다.');
@@ -724,7 +733,19 @@ export default function DomesticInsuranceStep5Page() {
                       {step1Data.tourNum > 1 && ` 외 ${step1Data.tourNum - 1}명`}
                       <a
                         href="#"
-                        onClick={(e) => { e.preventDefault(); setShowDetailModal(true); }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          const detailData = buildPremiumDetailData();
+                          if (detailData) {
+                            localStorage.setItem('premiumDetailData', JSON.stringify(detailData));
+                          }
+                          const popup = window.open(
+                            '/premium-detail/pc',
+                            'premiumDetailPopup',
+                            'width=720,height=640,scrollbars=yes'
+                          );
+                          if (popup) popup.focus();
+                        }}
                         className="tour2023_btn_b02 tour2023_btn08"
                         style={{ font: 'unset', marginLeft: '6px' }}
                       >
@@ -1097,14 +1118,15 @@ export default function DomesticInsuranceStep5Page() {
             {payMethod === 'V' && (
               <div className="in_wrap pb20" id="paymentArea_V">
                 <div className="bg_join input_cell">
-                  <label className="sName01" htmlFor="vbank_code">입금은행</label>
-                  <div className="in_wrap02">
-                    <div className="bg_join input_cell_01 wd_50">
-                      <span className="ps_box02 wd_100">
+                  <div className="ccs_rdo_area" style={{ width: '100%' }}>
+                    <span className="ccs_inp_rdo" style={{ width: '100%' }}>
+                      <input type="radio" id="at1" value="V" name="accountV" checked readOnly />
+                      <label htmlFor="at1">가상계좌발급</label>
+                      <span className="ps_box" style={{ display: 'inline', marginLeft: '110px' }}>
                         <select
-                          className="sel01"
-                          id="vbank_code"
-                          name="vbank_code"
+                          className="sel"
+                          name="EP_vacct_bank"
+                          style={{ width: '60%' }}
                           value={virtualBankCode}
                           onChange={(e) => setVirtualBankCode(e.target.value)}
                         >
@@ -1113,27 +1135,28 @@ export default function DomesticInsuranceStep5Page() {
                           <option value="004">국민은행</option>
                           <option value="011">농협중앙회</option>
                           <option value="020">우리은행</option>
-                          <option value="023">SC은행</option>
-                          <option value="031">대구은행</option>
+                          <option value="023">SC제일은행</option>
+                          <option value="026">신한은행</option>
                           <option value="032">부산은행</option>
-                          <option value="034">광주은행</option>
-                          <option value="037">전북은행</option>
-                          <option value="039">경남은행</option>
                           <option value="071">우체국</option>
                           <option value="081">하나은행</option>
-                          <option value="088">신한은행</option>
-                          <option value="089">케이뱅크</option>
                         </select>
                       </span>
-                    </div>
+                    </span>
                   </div>
                 </div>
-                <div className="login_Btxt pb20">
-                  <dl style={{ border: '1px solid #d2d2d2', paddingLeft: '4px', background: 'aliceblue' }}>
-                    <dd>
-                      가상계좌는 결제하기 버튼을 클릭하시면 발급되며, 발급된 계좌번호는 문자로 발송됩니다.
-                    </dd>
-                  </dl>
+                <div>
+                  <div className="login_Btxt pb20">
+                    <dl style={{ border: '1px solid #d2d2d2', paddingLeft: '4px', background: 'aliceblue' }}>
+                      <dd>
+                        가상계좌 발급은 먼저 <span className="font_red">입금은행을 선택</span>하시고{' '}
+                        <span className="font_red">아래의 결제하기</span>를 클릭하시면 고객님 한분만을 위한 전용 가상계좌가 생성되고
+                        입금계좌를 문자로 보내드립니다.(단, 보험료가 1만원이 넘는 경우에 한합니다)
+                      </dd>
+                      <dd>고객님 전용 가상계좌로 여행보험료가 입금되면 보험료결제가 완료됩니다.</dd>
+                      <dd>가상계좌발급이 불가능한 경우에는 보험료입금 전용계좌 무통장입금을 선택하여 결제하시기 바랍니다.</dd>
+                    </dl>
+                  </div>
                 </div>
               </div>
             )}

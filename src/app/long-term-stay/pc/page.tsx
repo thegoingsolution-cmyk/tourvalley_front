@@ -182,6 +182,7 @@ export default function PCLongTermStayPage() {
       
       const today = new Date();
       const birthDate = new Date(year, month - 1, day);
+      if (birthDate.getMonth() !== month - 1 || birthDate.getDate() !== day) return null;
       let age = today.getFullYear() - year;
       
       // 생일이 지나지 않았으면 나이 -1 (만나이 계산)
@@ -190,8 +191,12 @@ export default function PCLongTermStayPage() {
       }
       
       // 보험나이 계산: 만나이에서 6개월이 경과하면 +1
-      // 생일로부터 6개월 후 날짜 계산
-      const sixMonthsLater = new Date(birthDate);
+      // 마지막 생일 기준으로 6개월 경과 여부 계산
+      const lastBirthday = new Date(today.getFullYear(), month - 1, day);
+      if (today < lastBirthday) {
+        lastBirthday.setFullYear(lastBirthday.getFullYear() - 1);
+      }
+      const sixMonthsLater = new Date(lastBirthday);
       sixMonthsLater.setMonth(sixMonthsLater.getMonth() + 6);
       
       // 오늘이 생일로부터 6개월 후 날짜보다 이후이면 보험나이 +1
@@ -464,6 +469,7 @@ export default function PCLongTermStayPage() {
             body: JSON.stringify({
               insurance_type: insuranceType,
               age: age,
+              birth_date: birthDate,
               gender: genderValue,
               plan_type: planType,
               plan_variant: 'B',
@@ -620,6 +626,7 @@ export default function PCLongTermStayPage() {
           body: JSON.stringify({
             insurance_type: travelPurpose || '유학/어학연수',
             age: age,
+            birth_date: participant.birthDate,
             gender: participant.gender,
             plan_type: dbPlanType, // DB에 저장된 플랜명 사용
             plan_variant: 'B',
@@ -756,6 +763,7 @@ export default function PCLongTermStayPage() {
             const requestBody = {
               insurance_type: String(travelPurpose || ''),
               age: Number(age),
+              birth_date: birthDate,
               gender: String(genderValue || ''),
               plan_type: String(dbPlanType), // DB에 저장된 플랜명 사용
               plan_variant: 'B',
@@ -798,6 +806,7 @@ export default function PCLongTermStayPage() {
           const requestBody = {
             insurance_type: String(travelPurpose || ''),
             age: Number(age),
+            birth_date: birthDate,
             gender: String(genderValue || ''),
             plan_type: String(dbPlanType), // '워킹홀리데이(유로화플랜)' 사용
             plan_variant: 'B',
@@ -862,6 +871,7 @@ export default function PCLongTermStayPage() {
             const requestBody = {
               insurance_type: String(travelPurpose || ''),
               age: Number(age),
+              birth_date: birthDate,
               gender: String(genderValue || ''),
               plan_type: String(planType),
               plan_variant: 'B',

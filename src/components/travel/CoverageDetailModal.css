@@ -37,7 +37,6 @@
 }
 
 .coverage-detail-modal-title {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 22px;
   color: #3e3e3e;
   letter-spacing: -0.5px;
@@ -74,7 +73,6 @@
 }
 
 .coverage-detail-modal-body .tour2023_title04 {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 20px;
   color: #3e3e3e;
   margin: 0 0 16px 0;
@@ -99,7 +97,6 @@
 
 .coverage-detail-modal-body .tour2023_blue {
   color: #1b37e1 !important;
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 16px;
 }
 
@@ -169,3 +166,4 @@
   align-items: center;
   justify-content: center;
 }
+

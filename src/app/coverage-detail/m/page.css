@@ -39,7 +39,6 @@
 
 .coverage-detail-mobile-page .tour2023_header_inner .tourTop_title {
   display: block;
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 18px;
   font-weight: 700;
   color: #000;
@@ -71,7 +70,6 @@
 
 /* 타이틀 스타일 */
 .coverage-detail-mobile-page .tour2023_title04 {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 17px;
   font-weight: 700;
   color: #333333;
@@ -97,7 +95,6 @@
 
 .coverage-detail-mobile-page .tour2023_blue {
   color: #1b37e1 !important;
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 16px;
 }
 
@@ -220,7 +217,6 @@
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  font-family: 'NanumSquareNeoTTF-cBd' !important;
   padding: 0 !important;
   margin: 0 !important;
   line-height: 1 !important;
@@ -242,7 +238,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'NanumSquareNeoTTF-cBd';
   padding: 0;
   margin: 0;
   line-height: 1;
@@ -255,3 +250,4 @@
 .coverage-detail-mobile-page .tour2023_btn07:active {
   background-color: #d04500;
 }
+

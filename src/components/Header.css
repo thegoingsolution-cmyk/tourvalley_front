@@ -71,7 +71,6 @@
   background: none;
   border: none;
   cursor: pointer;
-  font-family: inherit;
   padding: 0;
   padding-bottom: 0.5rem;
 }
@@ -256,7 +255,6 @@ body.mobile-menu-open {
   background: none;
   border: none;
   cursor: pointer;
-  font-family: inherit;
   font-size: inherit;
   width: 100%;
   text-align: left;
@@ -432,4 +430,5 @@ a.mobile-menu-header-text {
 a.mobile-menu-header-text:hover {
   text-decoration: underline;
 }
+
 

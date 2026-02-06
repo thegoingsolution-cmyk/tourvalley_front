@@ -7,7 +7,6 @@
 
 body {
   background-color: #fff;
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   line-height: 1.6;
   color: #333;
 }
@@ -134,7 +133,6 @@ body {
 
 /* 텍스트 스타일 - test.css 참조 */
 .tour2023_txt42 {
-  font-family: 'NanumSquareNeoTTF-dEb';
   font-size: 30px;
   letter-spacing: -1px;
   color: #2c2c2c;
@@ -142,7 +140,6 @@ body {
 }
 
 .tour2023_txt32 {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 17px;
   letter-spacing: -0.5px;
   color: #3e3e3e;
@@ -150,7 +147,6 @@ body {
 }
 
 .tourGuard_txt08 {
-  font-family: 'NanumSquareNeoTTF-dEb';
   font-size: 19px;
   letter-spacing: -1px;
   color: #2c2c2c;
@@ -226,7 +222,6 @@ body {
 }
 
 .tour2023_btn_b {
-  font-family: 'NanumSquareNeoTTF-bRg';
   width: 100%;
   font-size: 21px;
   letter-spacing: -1px;
@@ -331,4 +326,5 @@ a:hover {
     max-width: 100%;
   }
 }
+
 

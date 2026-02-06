@@ -32,7 +32,6 @@
     height: 35px;
     border-bottom: 5px solid #1b37e1;
     color: #1b37e1;
-    font-family: 'NanumSquareNeoTTF-dEb';
 }
 
 /* Step Indicator Styles */
@@ -295,7 +294,6 @@
     font-weight: bold;
     color: #333;
     line-height: 1.4;
-    font-family: 'NanumSquareNeoTTF-dEb';
     margin: 0;
     min-width: 0; /* flex item??축소?????�도�?*/
     overflow: visible; /* ??�??�시�??�해 visible�?변�?*/
@@ -307,7 +305,6 @@
     font-size: 16px;
     color: #666;
     font-weight: normal;
-    font-family: 'NanumSquareNeoTTF-bRg';
 }
 
 /* ?�의번호 ?�역 */
@@ -473,7 +470,6 @@
     left: 20px;
     color: #9797a3;
     font-size: 12px;
-    font-family: 'NanumSquareNeoTTF-cBd','맑�?고딕',dotum,'?��?',AppleGothic,sans-serif;
     letter-spacing: -0.8px;
 }
 
@@ -823,7 +819,6 @@
 }
 
 .layer_title {
-    font-family: 'NanumSquareNeoTTF-cBd', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size: 18px;
     font-weight: 700;
     color: #333;
@@ -908,7 +903,6 @@
 }
 
 .tour2023_title03 {
-    font-family: 'NanumSquareNeoTTF-cBd', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size: 20px;
     font-weight: 700;
     color: #333;
@@ -1068,7 +1062,6 @@
 
 .excel-upload-page .tourTop_title {
     display: block;
-    font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
     font-size: 18px;
     font-weight: 700;
     color: #000;
@@ -1255,7 +1248,6 @@
 }
 
 .modal-title {
-    font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
     font-size: 22px;
     color: #3e3e3e;
     letter-spacing: -0.5px;
@@ -1698,7 +1690,6 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-family: 'NanumSquareNeoTTF-cBd','맑�?고딕',dotum,'?��?',AppleGothic,sans-serif;
     letter-spacing: -0.8px;
 }
 
@@ -2010,7 +2001,6 @@
 
 /* ConsentModal??modal-title?�??�목????길어???�른 ?��????�용 */
 .group-insurance-mobile .modal-content:has(.tour2023_limit_state) .modal-title {
-    font-family: 'NanumSquareNeoTTF-cBd';
     font-size: 14px;
     color: #3e3e3e;
     letter-spacing: -0.5px;
@@ -2067,7 +2057,6 @@
 
 /* btn_b.tour2023PC_btn04 확인 버튼 (주황색) */
 .btn_b.tour2023PC_btn04 {
-    font-family: 'NanumSquareNeoTTF-bRg';
     width: 100%;
     font-size: 18px;
     letter-spacing: -0.5px;
@@ -2253,7 +2242,6 @@
 
 /* tourGuard_btn01 ?�인 버튼 (?��??? */
 .group-insurance-mobile .tourGuard_btn01 {
-    font-family: 'NanumSquareNeoTTF-bRg';
     background-color: #2843e5;
     color: #fff !important;
     font-size: 18px;
@@ -3760,7 +3748,6 @@
 }
 
 .consent-modal-mobile-content .tourGuard_btn01 {
-    font-family: 'NanumSquareNeoTTF-bRg';
     background-color: #2843e5;
     color: #fff !important;
     font-size: 18px;
@@ -3780,3 +3767,4 @@
 .consent-modal-mobile-content .tourGuard_btn01:hover {
     background-color: #1e33c4;
 }
+

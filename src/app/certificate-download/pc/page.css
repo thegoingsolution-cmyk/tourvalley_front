@@ -20,7 +20,6 @@
 }
 
 .cd-title {
-  font-family: 'NanumSquareNeoTTF-eHv', sans-serif;
   font-size: 28px;
   font-weight: 800;
   color: #2c2c2c;
@@ -87,7 +86,6 @@
 }
 
 .cd-radio-text {
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-size: 16px;
   font-weight: 700;
   color: #2c2c2c;
@@ -105,7 +103,6 @@
 }
 
 .cd-form-group label {
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-size: 15px;
   font-weight: 700;
   color: #2c2c2c;
@@ -194,7 +191,6 @@
   height: 50px;
   border: none;
   border-radius: 4px;
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
@@ -236,4 +232,5 @@
     font-size: 24px;
   }
 }
+
 

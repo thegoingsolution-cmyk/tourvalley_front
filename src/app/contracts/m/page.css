@@ -30,7 +30,6 @@
 
 .tour2023_header_inner .tourTop_title {
   display: block;
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 18px;
   font-weight: 700;
   color: #000;
@@ -40,7 +39,6 @@
 
 /* 타이틀 */
 .tour2023_title04 {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 17px;
   font-weight: 700;
   color: #333333;
@@ -169,7 +167,6 @@
   left: 20px;
   color: #9797a3;
   font-size: 12px;
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   letter-spacing: -0.8px;
 }
 
@@ -821,7 +818,6 @@ address {
   box-sizing: border-box;
   text-align: center;
   letter-spacing: -1px;
-  font-family: 'NanumSquareNeoTTF-cBd';
 }
 
 /* 활성화된 탭 스타일 */
@@ -833,7 +829,6 @@ address {
   box-sizing: border-box;
   text-align: center;
   letter-spacing: -1px;
-  font-family: 'NanumSquareNeoTTF-dEb';
 }
 
 /* 탭 버튼 너비는 flex: 1로 자동 조정됨 (부모에서 상속) */
@@ -871,7 +866,6 @@ address {
   line-height: 130%;
   letter-spacing: -1.5px;
   vertical-align: top;
-  font-family: 'NanumSquareNeoTTF-bRg';
 }
 
 .tour2023_mileList_txt02 {
@@ -881,7 +875,6 @@ address {
   line-height: 130%;
   letter-spacing: -0.8px;
   vertical-align: top;
-  font-family: 'NanumSquareNeoTTF-cBd';
 }
 
 .tour2023_mileList_txt03 {
@@ -892,7 +885,6 @@ address {
   margin-top: 3px;
   letter-spacing: -0.2px;
   line-height: 110%;
-  font-family: 'NanumSquareNeoTTF-bRg';
 }
 
 /* 마일리지 BOX */
@@ -910,7 +902,6 @@ address {
 }
 
 .tour2023_mileBOX_txt01 {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 15px;
   line-height: 142%;
   letter-spacing: -1px;
@@ -921,7 +912,6 @@ address {
 }
 
 .tour2023_mileBOX_txt02 {
-  font-family: 'NanumSquareNeoTTF-dEb';
   display: block;
   color: #2c3fb3;
   font-size: 22px;
@@ -961,7 +951,6 @@ address {
   line-height: 130%;
   letter-spacing: -1px;
   vertical-align: top;
-  font-family: 'NanumSquareNeoTTF-bRg';
 }
 
 .tour2023_mileageTop_menu .tour2023_txt04 {
@@ -984,7 +973,6 @@ address {
   color: #223ee9!important;
   text-align: center;
   cursor: pointer;
-  font-family: 'NanumSquareNeoTTF-cBd';
   transition: all 0.3s;
 }
 
@@ -1004,7 +992,6 @@ address {
 .tour2023_title14 {
   font-size: 16px;
   color: #666;
-  font-family: 'NanumSquareNeoTTF-bRg';
 }
 
 /* 페이지네이션 스타일 */
@@ -1035,7 +1022,6 @@ address {
   border: 1px solid #ddd;
   border-radius: 4px;
   transition: all 0.2s;
-  font-family: 'NanumSquareNeoTTF-bRg';
   min-width: 40px;
   height: 36px;
   box-sizing: border-box;
@@ -1163,7 +1149,6 @@ address {
 }
 
 .tour2023_conList_txt {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 16px;
   letter-spacing: -1.2px;
   color: #989898;
@@ -1174,7 +1159,6 @@ address {
 }
 
 .tour2023_conList_txt01 {
-  font-family: 'NanumSquareNeoTTF-dEb';
   font-size: 29px;
   letter-spacing: -1.8px;
   color: #989898;
@@ -1184,7 +1168,6 @@ address {
 }
 
 .tour2023_conList_txt02 {
-  font-family: 'NanumSquareNeoTTF-bRg';
   font-size: 23px;
   color: #989898;
   line-height: 130%;
@@ -1194,7 +1177,6 @@ address {
 }
 
 .tour2023_conList_txt03 {
-  font-family: 'NanumSquareNeoTTF-dEb';
   font-size: 24px;
   letter-spacing: -1.4px;
   color: #242424;
@@ -1210,7 +1192,6 @@ address {
 
 /* 텍스트 스타일 */
 .tour2023_title02 {
-  font-family: 'NanumSquareNeoTTF-dEb';
   font-size: 24px;
   color: #202020;
   letter-spacing: -1.2px;
@@ -1227,7 +1208,6 @@ address {
   line-height: 130%;
   letter-spacing: -1.5px;
   vertical-align: top;
-  font-family: 'NanumSquareNeoTTF-bRg';
 }
 
 .tour2023_txt10 {
@@ -1237,7 +1217,6 @@ address {
   line-height: 130%;
   letter-spacing: -0.8px;
   vertical-align: top;
-  font-family: 'NanumSquareNeoTTF-bRg';
 }
 
 .tour2023_txt19 {
@@ -1250,7 +1229,6 @@ address {
   text-decoration: underline;
   display: inline-block;
   width: 95%;
-  font-family: 'NanumSquareNeoTTF-bRg';
 }
 
 /* 구분선 */
@@ -1427,7 +1405,6 @@ address {
   font-weight: bold;
   color: #333;
   margin-bottom: 20px;
-  font-family: 'NanumSquareNeoTTF-cBd';
 }
 
 .tour2023_guide_txt02 {
@@ -1465,3 +1442,4 @@ body.modal-open {
   width: 100%;
   height: 100%;
 }
+

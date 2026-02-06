@@ -62,7 +62,8 @@
 
 /* contract-form-container 내부의 prow_01은 padding 제거 (form-card의 padding 사용) */
 .contract-form-container .prow_01 {
-  padding: 0;
+  padding-left: 4.68%;
+  padding-right: 4.68%;
 }
 
 /* 헤더 라인 */
@@ -103,13 +104,12 @@
 
 /* 타이틀 */
 .contract-page-pc .tour2023_title04 {
-  font-family: 'NanumSquareNeoTTF-dEb', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 23px;
   color: #202020;
   letter-spacing: -1.2px;
   text-align: left;
   display: inline-block;
-  margin: 40px 0 12px 2px;
+  margin: 0px 0 12px 2px;
   width: 100%;
 }
 
@@ -316,7 +316,6 @@
 
 /* 마일리지 관련 스타일 */
 .contract-page-pc .tour2023_txt34 {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 19px;
   color: #1b37e1;
   text-align: center;
@@ -326,7 +325,6 @@
 }
 
 .contract-page-pc .tour2023_txt38 {
-  font-family: 'NanumSquareNeoTTF-eHv';
 }
 
 .contract-page-pc .tour2023_mypage_cashBox {
@@ -403,7 +401,6 @@
   left: 20px;
   color: #9797a3;
   font-size: 12px;
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   letter-spacing: -0.8px;
 }
 
@@ -466,7 +463,6 @@
   left: 0;
   color: #9797a3;
   font-size: 12px;
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   letter-spacing: -0.8px;
   margin-right: 0;
   white-space: nowrap;
@@ -797,8 +793,8 @@
 
 /* test.html과 동일한 구조를 위한 추가 스타일 */
 .contract-page-pc .container_box .prow_01 {
-  padding: 0; /* container_box의 padding 사용 */
-  padding-bottom: 20px; /* 하단 패딩 추가 */
+  padding-left: 4.68%;
+  padding-right: 4.68%;
   position: relative;
   width: 100%;
   box-sizing: border-box;
@@ -908,7 +904,6 @@
 }
 
 .contract-page-pc .tour2023_pcBox_tit {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 20px;
   font-weight: 700;
   color: #333;
@@ -943,7 +938,6 @@
 }
 
 .contract-page-pc .tour2023_pcBox_txt01 {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 28px;
   font-weight: 700;
   color: #333;
@@ -986,7 +980,6 @@
   display: inline-block;
   background: #ffe500;
   color: #333 !important;
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 18px;
   font-weight: 700;
   padding: 15px 40px;
@@ -1075,7 +1068,7 @@
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   box-sizing: border-box;
-  padding: 32px; /* 로그인하지 않은 유저 화면과 동일한 패딩 */
+  padding: 0px; /* 로그인하지 않은 유저 화면과 동일한 패딩 */
   padding-bottom: 160px; /* 하단 패딩 추가로 푸터와의 간격 확보 (계약 리스트가 매우 길어도 충분한 여유 공간) */
   margin-bottom: 120px; /* 추가 마진으로 푸터와의 간격 확보 */
 }
@@ -1096,8 +1089,8 @@
 /* 상단 탭 메뉴 */
 .contract-page-pc #tour2023_mypageTop {
   position: relative;
-  width: calc(100% + 64px); /* 좌우 padding 상쇄 (32px * 2) */
-  margin: -32px -32px 20px -32px; /* 위, 좌, 우 padding 상쇄 */
+  width: 100%;
+  margin: 0 0 20px 0;
 }
 
 .contract-page-pc .tour2023_mypageTop_menu {
@@ -1127,7 +1120,6 @@
 }
 
 .contract-page-pc .tour2023_mypageTop_m01 {
-  font-family: 'NanumSquareNeoTTF-cBd';
 }
 
 .contract-page-pc .tour2023_mypageTop_m01.on {
@@ -1213,7 +1205,6 @@
 }
 
 .contract-page-pc .fixedRight_txt01 {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 14px;
   letter-spacing: -1.2px;
   color: #333;
@@ -1226,7 +1217,6 @@
 }
 
 .contract-page-pc .fixedRight_txt02 {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 13px;
   letter-spacing: -0.4px;
   color: #333;
@@ -1286,7 +1276,6 @@
   padding: 12px 10px 10px 10px;
   border-bottom: 1px solid #d8d8d8;
   border-right: solid 1px #d8d8d8;
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 16px;
   color: #333;
   background: #fff;
@@ -1396,7 +1385,6 @@
 
 /* 타이틀 스타일 */
 .contract-page-pc .tour2023_title10 {
-  font-family: 'NanumSquareNeoTTF-dEb';
   font-size: 18px;
   color: #202020;
   letter-spacing: -0.8px;
@@ -1433,7 +1421,6 @@
 
 /* 계약 리스트 카드 스타일 */
 .contract-page-pc .tour2023_title02 {
-  font-family: 'NanumSquareNeoTTF-dEb';
   font-size: 24px;
   color: #202020;
   letter-spacing: -1.2px;
@@ -1626,7 +1613,6 @@
   padding: 5px 0px 5px 0px;
   border: 0;
   letter-spacing: -1.2px;
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-size: 15px;
   color: #333;
   background: #fff;
@@ -1639,7 +1625,6 @@
   padding: 5px 0px 5px 0px;
   border: 0;
   letter-spacing: -1.2px;
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-size: 15px;
   letter-spacing: -1px;
   color: #333;
@@ -1649,7 +1634,6 @@
 }
 
 .contract-page-pc .tour2023_ListB td.sName {
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   border-top: solid 1px #000;
   background: #cfe3f6;
   font-size: 13px;
@@ -1835,12 +1819,12 @@
 
 .contract-page-pc .tour2023_btn01 {
   display: inline-block;
-  background: #1b37e1;
+  background: #2c3fb3;
   color: #fff !important;
-  font-size: 16px;
+  font-size: 21px;
   font-weight: bold;
   padding: 12px 40px;
-  border-radius: 6px;
+  border-radius: 10px;
   text-decoration: none;
   border: none;
   cursor: pointer;
@@ -1849,4 +1833,5 @@
 .contract-page-pc .tour2023_btn01:hover {
   background: #0f2bb8;
 }
+
 

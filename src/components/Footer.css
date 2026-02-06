@@ -53,6 +53,11 @@
   margin-left: 30px;
 }
 
+.footer-pc-info .footer-pc-info-company {
+  color: #000;
+  font-weight: 600;
+}
+
 .footer-pc-copyright {
   padding-top: 1rem;
   border-top: 1px solid #e0e0e0;
@@ -192,4 +197,5 @@
 .company-modal-close-btn:hover {
   background-color: #555;
 }
+
 

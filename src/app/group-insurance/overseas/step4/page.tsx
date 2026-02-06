@@ -8,6 +8,8 @@ export default function OverseasInsuranceStep4Page() {
   const [agree2, setAgree2] = useState('');
   const [agree3, setAgree3] = useState('');
   const [agree4, setAgree4] = useState('');
+  const [agree5, setAgree5] = useState('');
+  const [agree6, setAgree6] = useState('');
   const [showFinalModal, setShowFinalModal] = useState(false);
   const [allAgree, setAllAgree] = useState(false);
   const [finalAgree1, setFinalAgree1] = useState(false);
@@ -16,7 +18,7 @@ export default function OverseasInsuranceStep4Page() {
   const [finalAgree4, setFinalAgree4] = useState(false);
 
   const handleNextStep = () => {
-    // 1. 여행기간 중 아래의 위험한 활동이 포함되어 있습니까?
+    // 1. 현재 출국하였거나 해외체류중이십니까?
     if (!agree1) {
       alert('1번 항목을 선택해주세요.');
       return;
@@ -26,21 +28,41 @@ export default function OverseasInsuranceStep4Page() {
       return;
     }
 
-    // 2. 실손 의료보험 계약체결을 위한 사전 동의
-    if (agree2 !== 'Y') {
-      alert('2번 항목의 실손 의료보험 계약체결을 위한 사전 동의를 해주세요.');
+    // 2. 여행하려는 나라가 제한 국가에 포함되어 있습니까?
+    if (!agree2) {
+      alert('2번 항목을 선택해주세요.');
+      return;
+    }
+    if (agree2 === 'Y') {
+      alert('죄송합니다. 고객님\n여행보험에 가입할 수 없습니다.');
       return;
     }
 
-    // 3. 여행보험 약관보기
-    if (agree3 !== 'Y') {
-      alert('3번 항목의 여행보험 약관보기를 읽어보고 선택해주세요.');
+    // 3. 여행기간 중 아래의 위험한 활동이 포함되어 있습니까?
+    if (!agree3) {
+      alert('3번 항목을 선택해주세요.');
+      return;
+    }
+    if (agree3 === 'Y') {
+      alert('죄송합니다. 고객님\n여행보험에 가입할 수 없습니다.');
       return;
     }
 
-    // 4. 여행보험 가입시 알아두어야 할 사항
+    // 4. 실손 의료보험 계약체결을 위한 사전 동의
     if (agree4 !== 'Y') {
-      alert('4번 항목의 여행보험 가입시 알아두어야 할 사항을 읽어보고 선택해주세요.');
+      alert('4번 항목의 실손 의료보험 계약체결을 위한 사전 동의를 해주세요.');
+      return;
+    }
+
+    // 5. 여행보험 약관보기
+    if (agree5 !== 'Y') {
+      alert('5번 항목의 여행보험 약관보기를 읽어보고 선택해주세요.');
+      return;
+    }
+
+    // 6. 여행보험 가입시 알아두어야 할 사항
+    if (agree6 !== 'Y') {
+      alert('6번 항목의 여행보험 가입시 알아두어야 할 사항을 읽어보고 선택해주세요.');
       return;
     }
 
@@ -120,9 +142,127 @@ export default function OverseasInsuranceStep4Page() {
           <div className="bgcolor_white">
             <p className="sub_title_02 ag_left pt10">4단계 : 설문서 작성</p>
 
-            {/* 1. 여행기간 중 아래의 위험한 활동이 포함되어 있습니까? */}
+            {/* 1. 현재 출국하였거나 해외체류중이십니까? */}
             <p className="sub_title_s ag_left pt30">
-              <strong>1. 여행기간 중 아래의 위험한 활동이 포함되어 있습니까?</strong>
+              <strong>1. 현재 출국하였거나 해외체류중이십니까?</strong>
+            </p>
+            <div className="ccs_tbl v2 ty2" style={{ marginBottom: '16px' }}>
+              <div className="ccs_tbl_cont">
+                <div className="ccs_rdo_area">
+                  <span className="ccs_inp_rdo">
+                    <input
+                      type="radio"
+                      id="a01"
+                      value="Y"
+                      name="agree1"
+                      checked={agree1 === 'Y'}
+                      onChange={(e) => setAgree1(e.target.value)}
+                    />
+                    <label htmlFor="a01">예</label>
+                  </span>
+                  <span className="ccs_inp_rdo">
+                    <input
+                      type="radio"
+                      id="a02"
+                      value="N"
+                      name="agree1"
+                      checked={agree1 === 'N'}
+                      onChange={(e) => setAgree1(e.target.value)}
+                    />
+                    <label htmlFor="a02">아니요</label>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="plan_guide mb10 mt10">
+              <dl>
+                <dd>
+                  해외여행보험은 출국 전에 가입하셔야 합니다. 이미 출국하셨거나 해외에 체류 중인 경우에는 보험가입이
+                  불가능합니다.(다만, 해외장기체류보험을 갱신하는 경우에는 보험가입이 가능합니다. 투어밸리 고객센터로
+                  문의하시기 바랍니다.)
+                </dd>
+              </dl>
+            </div>
+
+            {/* 2. 여행하려는 나라(목적지 , 경유지 포함) 다음 나라가 포함되어 있습니까? */}
+            <p className="sub_title_s ag_left pt30">
+              <strong>2. 여행하려는 나라(목적지 , 경유지 포함) 다음 나라가 포함되어 있습니까?</strong>
+            </p>
+            <div className="ccs_tbl v2 ty2" style={{ marginBottom: '16px' }}>
+              <div className="ccs_tbl_cont">
+                <div className="ccs_rdo_area">
+                  <span className="ccs_inp_rdo">
+                    <input
+                      type="radio"
+                      id="b01"
+                      value="Y"
+                      name="agree2"
+                      checked={agree2 === 'Y'}
+                      onChange={(e) => setAgree2(e.target.value)}
+                    />
+                    <label htmlFor="b01">예</label>
+                  </span>
+                  <span className="ccs_inp_rdo">
+                    <input
+                      type="radio"
+                      id="b02"
+                      value="N"
+                      name="agree2"
+                      checked={agree2 === 'N'}
+                      onChange={(e) => setAgree2(e.target.value)}
+                    />
+                    <label htmlFor="b02">아니요</label>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="detailView bgcolor_white">
+              <table className="specialB" border={1} cellSpacing="0">
+                <caption></caption>
+                <colgroup>
+                  <col width="30%" />
+                  <col width="70%" />
+                </colgroup>
+                <tbody>
+                  <tr>
+                    <td className="sName01">유럽</td>
+                    <td className="dd tb ag_left">우크라이나, 벨라루스, 크림반도, (러시아의 체첸), 몰도바, 알바니아</td>
+                  </tr>
+                  <tr>
+                    <td className="sName01">아시아</td>
+                    <td className="dd ag_left">
+                      레바논, 북한, 시리아, 아르메니아, 아프가니스탄, 예멘, 오만, 이라크, 이란, 이스라엘,
+                      타지키스탄, 파키스탄, 팔레스타인 자치구, (인도의 잠무, 카슈미르), (필리핀의 민다나오),
+                      (태국의 파타니, 알라, 나라티왓, 송클라주), (중국의 후베이성(우한))
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="sName01">북아메리카</td>
+                    <td className="dd ag_left">니카라과, 쿠바</td>
+                  </tr>
+                  <tr>
+                    <td className="sName01">남아메리카</td>
+                    <td className="dd ag_left">베넬수엘라, 아이티</td>
+                  </tr>
+                  <tr>
+                    <td className="sName01">아프리카</td>
+                    <td className="dd ag_left">
+                      기니, 나이지리아, 니제르, 리비아, 말리, 모잠비크, 부룬디, 부르키나파소, 소말리아, 수단,
+                      시에라리온, 알제리, 이디오피아, 이집트, 자이레, 중앙아프리카, 챠드, 케냐, 코트디브와르,
+                      콩고, 콩고(자이레)
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="sName01">기타</td>
+                    <td className="dd ag_left">남극</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* 3. 여행기간 중 아래의 위험한 활동이 포함되어 있습니까? */}
+            <p className="sub_title_s ag_left pt30">
+              <strong>3. 여행기간 중 아래의 위험한 활동이 포함되어 있습니까?</strong>
             </p>
             <div className="ccs_tbl v2 ty2">
               <div className="ccs_tbl_cont">
@@ -132,9 +272,9 @@ export default function OverseasInsuranceStep4Page() {
                       type="radio"
                       id="c01"
                       value="Y"
-                      name="agree1"
-                      checked={agree1 === 'Y'}
-                      onChange={(e) => setAgree1(e.target.value)}
+                      name="agree3"
+                      checked={agree3 === 'Y'}
+                      onChange={(e) => setAgree3(e.target.value)}
                     />
                     <label htmlFor="c01">예</label>
                   </span>
@@ -143,16 +283,16 @@ export default function OverseasInsuranceStep4Page() {
                       type="radio"
                       id="c02"
                       value="N"
-                      name="agree1"
-                      checked={agree1 === 'N'}
-                      onChange={(e) => setAgree1(e.target.value)}
+                      name="agree3"
+                      checked={agree3 === 'N'}
+                      onChange={(e) => setAgree3(e.target.value)}
                     />
                     <label htmlFor="c02">아니요</label>
                   </span>
                 </div>
               </div>
             </div>
-            <div className="Box_line02 mtb15 mt15">
+            <div className="Box_line02  mtb15 mt15">
               <p className="txt">
                 <span className="font_blue01">
                   ① 스쿠버다이빙 ② 행글라이딩,패러글라이딩 ③ 스카이다이빙 ④ 수상스키 ⑤ 자동차,오토바이 경주{' '}
@@ -165,9 +305,9 @@ export default function OverseasInsuranceStep4Page() {
               </p>
             </div>
 
-            {/* 2. 실손 의료보험 계약체결을 위한 사전 동의 */}
+            {/* 4. 실손 의료보험 계약체결을 위한 사전 동의 */}
             <p className="sub_title_s ag_left pt30">
-              <strong>2. 실손 의료보험 계약체결을 위한 사전 동의</strong>
+              <strong>4. 실손 의료보험 계약체결을 위한 사전 동의</strong>
             </p>
             <div className="Box_line02">
               <p className="txt">
@@ -188,9 +328,9 @@ export default function OverseasInsuranceStep4Page() {
                       type="radio"
                       id="d01"
                       value="Y"
-                      name="agree2"
-                      checked={agree2 === 'Y'}
-                      onChange={(e) => setAgree2(e.target.value)}
+                      name="agree4"
+                      checked={agree4 === 'Y'}
+                      onChange={(e) => setAgree4(e.target.value)}
                     />
                     <label htmlFor="d01">예</label>
                   </span>
@@ -199,9 +339,9 @@ export default function OverseasInsuranceStep4Page() {
                       type="radio"
                       id="d02"
                       value="N"
-                      name="agree2"
-                      checked={agree2 === 'N'}
-                      onChange={(e) => setAgree2(e.target.value)}
+                      name="agree4"
+                      checked={agree4 === 'N'}
+                      onChange={(e) => setAgree4(e.target.value)}
                     />
                     <label htmlFor="d02">아니요</label>
                   </span>
@@ -209,9 +349,9 @@ export default function OverseasInsuranceStep4Page() {
               </div>
             </div>
 
-            {/* 3. 여행보험 약관보기 */}
+            {/* 5. 여행보험 약관보기 */}
             <p className="sub_title_s ag_left pt30">
-              <strong>3. 여행보험 약관보기</strong>
+              <strong>5. 여행보험 약관보기</strong>
             </p>
             <a
               href="/pdf/ACE손해_해외여행보험약관.pdf"
@@ -233,9 +373,9 @@ export default function OverseasInsuranceStep4Page() {
                       type="radio"
                       id="e01"
                       value="Y"
-                      name="agree3"
-                      checked={agree3 === 'Y'}
-                      onChange={(e) => setAgree3(e.target.value)}
+                      name="agree5"
+                      checked={agree5 === 'Y'}
+                      onChange={(e) => setAgree5(e.target.value)}
                     />
                     <label htmlFor="e01">예</label>
                   </span>
@@ -244,9 +384,9 @@ export default function OverseasInsuranceStep4Page() {
                       type="radio"
                       id="e02"
                       value="N"
-                      name="agree3"
-                      checked={agree3 === 'N'}
-                      onChange={(e) => setAgree3(e.target.value)}
+                      name="agree5"
+                      checked={agree5 === 'N'}
+                      onChange={(e) => setAgree5(e.target.value)}
                     />
                     <label htmlFor="e02">아니요</label>
                   </span>
@@ -254,9 +394,9 @@ export default function OverseasInsuranceStep4Page() {
               </div>
             </div>
 
-            {/* 4. 여행보험 가입시 알아두어야 할 사항 */}
+            {/* 6. 여행보험 가입시 알아두어야 할 사항 */}
             <p className="sub_title_s ag_left pt30">
-              <strong>4. 여행보험 가입시 알아두어야 할 사항</strong>
+              <strong>6. 여행보험 가입시 알아두어야 할 사항</strong>
             </p>
             <div style={{ textAlign: 'center' }}>
               <div className="polWrap" style={{ width: '96%', textAlign: 'left' }}>
@@ -386,9 +526,9 @@ export default function OverseasInsuranceStep4Page() {
                       type="radio"
                       id="f01"
                       value="Y"
-                      name="agree4"
-                      checked={agree4 === 'Y'}
-                      onChange={(e) => setAgree4(e.target.value)}
+                      name="agree6"
+                      checked={agree6 === 'Y'}
+                      onChange={(e) => setAgree6(e.target.value)}
                     />
                     <label htmlFor="f01">예</label>
                   </span>
@@ -397,9 +537,9 @@ export default function OverseasInsuranceStep4Page() {
                       type="radio"
                       id="f02"
                       value="N"
-                      name="agree4"
-                      checked={agree4 === 'N'}
-                      onChange={(e) => setAgree4(e.target.value)}
+                      name="agree6"
+                      checked={agree6 === 'N'}
+                      onChange={(e) => setAgree6(e.target.value)}
                     />
                     <label htmlFor="f02">아니요</label>
                   </span>

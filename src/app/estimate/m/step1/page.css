@@ -34,7 +34,6 @@
   font-weight: bold;
   color: #333;
   line-height: 1.4;
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   margin: 0;
 }
 
@@ -193,7 +192,6 @@
   height: 35px;
   border-bottom: 5px solid #1b37e1;
   color: #1b37e1;
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-weight: 500;
 }
 
@@ -220,7 +218,6 @@
   left: 20px;
   color: #9797a3;
   font-size: 12px;
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   letter-spacing: -0.8px;
   z-index: 1;
 }
@@ -548,3 +545,4 @@
     padding: 15px 15px;
   }
 }
+

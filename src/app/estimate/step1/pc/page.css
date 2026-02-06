@@ -275,7 +275,6 @@
   color: #d4d5d9;
   border-bottom: 5px solid #e0e3eb;
   margin-bottom: 1px;
-  font-family: 'NanumSquareNeoTTF-cBd';
   text-decoration: none;
 }
 
@@ -283,7 +282,6 @@
   height: 35px;
   border-bottom: 5px solid #1b37e1;
   color: #1b37e1;
-  font-family: 'NanumSquareNeoTTF-dEb';
 }
 
 /* Form */
@@ -368,7 +366,6 @@
   left: 20px;
   color: #9797a3;
   font-size: 12px;
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   letter-spacing: -0.8px;
   margin-bottom: 0;
 }
@@ -487,7 +484,6 @@
   left: 20px;
   color: #9797a3;
   font-size: 12px;
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   letter-spacing: -0.8px;
 }
 
@@ -744,7 +740,6 @@
 }
 
 .estimate-step1-page .fixedRight_txt01 {
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-size: 14px;
   letter-spacing: -1.2px;
   color: #333;
@@ -757,7 +752,6 @@
 }
 
 .estimate-step1-page .fixedRight_txt02 {
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-size: 13px;
   letter-spacing: -0.4px;
   color: #333;
@@ -805,7 +799,6 @@
 }
 
 .estimate-step1-page .fixedRight_txt01 {
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-size: 14px;
   letter-spacing: -1.2px;
   color: #333;
@@ -818,7 +811,6 @@
 }
 
 .estimate-step1-page .fixedRight_txt02 {
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-size: 13px;
   letter-spacing: -0.4px;
   color: #333;
@@ -990,7 +982,6 @@
 }
 
 .tour2023_pcBox_tit {
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif !important;
   font-size: 20px !important;
   font-weight: 700 !important;
   color: #333 !important;
@@ -1087,4 +1078,5 @@
     padding: 15px !important;
   }
 }
+
 

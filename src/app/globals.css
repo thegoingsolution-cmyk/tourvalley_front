@@ -140,7 +140,6 @@ body {
   margin-bottom: 3px !important;
   width: 100% !important;
   line-height: 220% !important;
-  font-family: 'Nanum Gothic', sans-serif !important;
   border: none !important;
   box-sizing: border-box !important;
   color: #dddddd !important;
@@ -176,7 +175,6 @@ body {
 
 /* DatePicker 캘린더 스타일 - 크기 축소 */
 .custom-calendar {
-  font-family: 'NanumSquare', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif !important;
   border: 1px solid #e0e0e0;
   border-radius: 6px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
@@ -634,3 +632,4 @@ tbody tr:first-of-type .input_cell_01 .date-picker-wrapper:focus-within {
 .tourGuard_form_tt.tourG_line:first-of-type:has(.date-picker-wrapper:focus-within) .date-picker-wrapper {
   z-index: 100 !important;
 }
+

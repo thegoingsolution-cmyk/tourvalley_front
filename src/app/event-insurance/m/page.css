@@ -2,7 +2,6 @@
 .event-insurance-mobile {
   min-height: 100vh;
   background-color: #fff;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   /* 다른 페이지의 전역 스타일과 격리 */
   isolation: isolate;
 }
@@ -458,7 +457,6 @@
 }
 
 .event-insurance-mobile .tour2024_ListB td.sName {
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   border-top: solid 1px #000;
   background: #cfe3f6;
   font-size: 13px;
@@ -1205,3 +1203,4 @@
     font-size: 11px;
   }
 }
+

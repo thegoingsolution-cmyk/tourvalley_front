@@ -26,7 +26,6 @@
 }
 
 .accident-free-cash-mobile .tour2023_pcBox_tit {
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-size: 18px;
   font-weight: 700;
   color: #333;
@@ -44,7 +43,6 @@
 }
 
 .accident-free-cash-mobile .tour2023_cashInfo_txt01 {
-  font-family: 'NanumSquareNeoTTF-cBd', sans-serif;
   font-size: 31px;
   color: #000;
   letter-spacing: -1.8px;
@@ -56,7 +54,6 @@
 }
 
 .accident-free-cash-mobile .tour2023_cashInfo_txt02 {
-  font-family: 'NanumSquareNeoTTF-aLt', sans-serif;
   font-size: 19px;
   color: #666;
   letter-spacing: -0.8px;
@@ -68,7 +65,6 @@
 }
 
 .accident-free-cash-mobile .tour2023_cashInfo_txt03 {
-  font-family: 'NanumSquareNeoTTF-aLt', sans-serif;
   font-size: 21px;
   color: #1a1a1a;
   letter-spacing: -1px;
@@ -80,7 +76,6 @@
 }
 
 .accident-free-cash-mobile .tour2023_cashInfo_txt04 {
-  font-family: 'NanumSquareNeoTTF-aLt', sans-serif;
   font-size: 17px;
   color: #999;
   letter-spacing: -0.8px;
@@ -111,7 +106,6 @@
 }
 
 .accident-free-cash-mobile .tour2023m_cash01 {
-  font-family: 'NanumSquareNeoTTF-aLt', sans-serif;
   width: 280px;
   font-size: 21px;
   font-weight: 400;
@@ -176,4 +170,5 @@
   line-height: 133%;
   word-break: keep-all;
 }
+
 

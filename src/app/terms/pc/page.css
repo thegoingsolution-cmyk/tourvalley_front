@@ -1,7 +1,6 @@
 .terms-layer {
   background-color: #fff;
   color: #333;
-  font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
   line-height: 1.6;
 }
 
@@ -80,7 +79,6 @@
 
 .ttl_blue2 {
   font-size: 12px;
-  font-family: 'Dotum', '돋움', sans-serif;
   color: #3377c5;
   font-weight: normal;
   text-decoration: underline;
@@ -89,3 +87,4 @@
 p {
   margin: 12px 0;
 }
+

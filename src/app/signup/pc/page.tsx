@@ -37,6 +37,7 @@ export default function PCSignupPage() {
   const [termsAgreed, setTermsAgreed] = useState(false);
   const [privacyAgreed, setPrivacyAgreed] = useState(false);
   const [marketingAgreed, setMarketingAgreed] = useState(false);
+  const [showTermsNotice, setShowTermsNotice] = useState(false);
 
   // Personal member form states
   const [username, setUsername] = useState('');
@@ -540,6 +541,41 @@ export default function PCSignupPage() {
                     가입하기
                   </button>
                 </div>
+
+                <div className="terms-notice-toggle">
+                  <button
+                    type="button"
+                    className="terms-notice-btn"
+                    onClick={() => setShowTermsNotice(prev => !prev)}
+                  >
+                    <span>약관 주요사항 고지</span>
+                    <span className={`terms-notice-arrow ${showTermsNotice ? 'open' : ''}`}></span>
+                  </button>
+                </div>
+
+                {showTermsNotice && (
+                  <section className="terms-notice-panel">
+                    <p className="terms-notice-title">
+                      약관 전문은 위의 이용약관 보기에 전문이 게시되어 있습니다.
+                    </p>
+                    <ul className="terms-notice-list">
+                      <li>(필수) 투어밸리 회원 이용약관</li>
+                      <li>
+                        단체(단체취급) 여행보험 가입 동의<br />
+                        ① 회사는 단체(단체취급)보험 특별약관에서 정한 단체(단체취급)계약의 포괄(대표)계약자가 되어 이용자를 가입자(피보험자)로 하는 단체(단체취급) 여행보험계약을 체결할 수 있습니다. 이때 적용되는 보험은 해외여행보험, 해외장기체류보험, 국내여행보험입니다.<br />
+                        ② 이용자가 가입하는 단체(단체취급)보험의 보험금의 종류가 사망보험금인 경우 사망보험금에 대한 보험수익자는 피보험자의 법정상속인으로 되고 나머지는 피보험자가 보험수익자가 됩니다.<br />
+                        ③ 이용자는 회사를 단체(단체취급)계약의 포괄(대표)계약자로 하는 단체(단체취급)여행보험에 가입하기 위해서는 회사가 요구하는 소정의 가입절차에 따라 사이트 이용약관, 여행보험 가입절차에 따른 동의 및 가입신청을 하여야 합니다.<br />
+                        ⑥ 단체(단체취급)여행보험에 가입하고자 하는 이용자는 보험약관, 알아두실 사항 등 보험계약과 관련된 사항을 충분히 이해한 후 가입하여야 하며 보험계약에 관한 세부사항은 보험회사가 제공하는 보험약관에 따릅니다.<br />
+                        ⑦ 단체(단체취급)여행보험의 보험료는 소득세 연말정산 대상이 아닙니다. 또한 현금으로 결제한 경우 보험료는 세법 관련규정(소득세법 시행령 제25조 2항)에 의해 현금영수증 발급대상이 아닙니다.
+                      </li>
+                      <li>
+                        (필수) 개인정보 수집 및 이용<br />
+                        - 개인회원 : 이름, 성별, 생년월일, 휴대폰번호, 이메일주소<br />
+                        - 법인단체회원 : 회사/단체명, 사업자번호, 담당자명, 휴대폰번호, 이메일주소
+                      </li>
+                    </ul>
+                  </section>
+                )}
               </div>
             )}
 

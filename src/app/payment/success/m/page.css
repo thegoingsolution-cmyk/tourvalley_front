@@ -534,7 +534,6 @@
 }
 
 .payment-success-mobile .tour2023_pcBox_tit {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 15px;
   font-weight: 700;
   color: #333;
@@ -548,7 +547,6 @@
 }
 
 .payment-success-mobile .tour2023_pcBox_txt01 {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 18px;
   font-weight: 700;
   color: #333;
@@ -587,7 +585,6 @@
   display: inline-block;
   background: #ffe500;
   color: #333 !important;
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 14px;
   font-weight: 700;
   padding: 10px 24px;
@@ -713,7 +710,6 @@
 }
 
 .tour2023_pcBox_tit {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 17px;
   font-weight: 700;
   color: #333;
@@ -726,7 +722,6 @@
 }
 
 .tour2023_pcBox_txt01 {
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 22px;
   font-weight: 700;
   color: #333;
@@ -765,7 +760,6 @@
   display: inline-block;
   background: #ffe500;
   color: #333 !important;
-  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 16px;
   font-weight: 700;
   padding: 12px 30px;
@@ -811,4 +805,5 @@
 .tour2023PC_cash_info li:last-child {
   flex: 1;
 }
+
 
