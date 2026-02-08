@@ -194,4 +194,21 @@ export default function RiskActivityStep({
           <button
             type="button"
             className="step2-1-next-btn"
-    
+            onClick={onNext}
+            disabled={
+              (isOverseas && onCurrentlyAbroadChange && isCurrentlyAbroad === null) ||
+              hasDangerousActivity === null || 
+              hasDangerousActivity === true || 
+              (isOverseas && onRestrictedCountryChange && hasRestrictedCountry === null) ||
+              (isOverseas && onRestrictedCountryChange && hasRestrictedCountry === true) ||
+              (!isLongTermStay && !travelPurpose)
+            }
+          >
+            다음
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+

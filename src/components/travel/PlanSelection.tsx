@@ -192,4 +192,119 @@ export default function PlanSelection({
             .filter(([planType]) => !planDisplayOrder.includes(planType as PlanType));
           
           return [...sortedPlans, ...otherPlans];
-        })().
+        })().map(([planType, plan]) => {
+          // 플랜 표시 이름 매핑 (백엔드에서 받아올 수 있도록 확장 가능)
+          const planDisplayNames: Record<string, string> = {
+            '실속플랜': '실속플랜',
+            '표준플랜': '표준플랜',
+            '고급플랜': '고급플랜',
+            '어린이플랜': '어린이플랜',
+            '어르신플랜1': '어르신플랜1',
+            '어르신플랜2': '어르신플랜2',
+          };
+
+          // 플랜별 배지 색상 매핑
+          const planBadgeColors: Record<string, string> = {
+            '실속플랜': '#f65b64',
+            '표준플랜': '#377af6',
+            '고급플랜': '#2cc5ca',
+            '어린이플랜': '#377af6', // 실속플랜과 동일
+            '어르신플랜1': '#377af6', // 실속플랜과 동일
+            '어르신플랜2': '#377af6', // 실속플랜과 동일
+          };
+
+          // 플랜 배지 스타일 결정
+          const getBadgeClass = (type: string) => {
+            if (type === '실속플랜' || type === '어린이플랜' || type === '어르신플랜1') {
+              return 'plan-badge-economy';
+            }
+            return 'plan-badge-high';
+          };
+
+          // 플랜 표시 이름 결정
+          const getDisplayName = (type: string) => {
+            return planDisplayNames[type] || type;
+          };
+
+          // 플랜 배지 색상 결정
+          const getBadgeColor = (type: string) => {
+            return planBadgeColors[type] || '#999';
+          };
+
+          return (
+            <div 
+              key={planType}
+              className={`plan-card ${selectedPlan === planType ? 'selected' : ''}`}
+              onClick={() => onPlanSelect(planType as PlanType)}
+            >
+              <div className="plan-header-row">
+                <div 
+                  className={`plan-badge ${getBadgeClass(planType)}`}
+                  style={{ 
+                    background: getBadgeColor(planType),
+                    color: '#fff'
+                  }}
+                >
+                  {getDisplayName(planType)}
+                </div>
+                <div className="plan-price">{plan.premium.toLocaleString()}원</div>
+              </div>
+              <div className="plan-coverages">
+                {plan.coverages.map((coverage, idx) => (
+                  <div key={idx} className="coverage-item">
+                    <span className="coverage-label">{coverage.label}</span>
+                    <span className="coverage-amount">{coverage.amount}</span>
+                  </div>
+                ))}
+              </div>
+              <a 
+                href="#" 
+                className="coverage-detail-link"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  if (onContractDetailClick) {
+                    onContractDetailClick(planType as PlanType);
+                  }
+                }}
+              >
+                보장 상세보기 &gt;
+              </a>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* 가입 인원 선택 */}
+      <div 
+        className="participant-selection"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          className={`participant-btn ${participantCount === 2 ? 'active' : ''}`}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onParticipantCountChange(2);
+            onAddParticipant?.();
+          }}
+        >
+          2인 이상 가입
+        </button>
+        <button
+          type="button"
+          className={`participant-btn primary ${participantCount === 1 ? 'active' : ''}`}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onParticipantCountChange(1);
+          }}
+        >
+          1인 가입
+        </button>
+      </div>
+    </div>
+  );
+}
+
