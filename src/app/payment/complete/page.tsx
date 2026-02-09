@@ -62,6 +62,9 @@ function PaymentCompleteContent() {
         console.log('저장된 pendingPayment:', pendingPaymentStr);
         
         const pendingPayment = pendingPaymentStr ? JSON.parse(pendingPaymentStr) : null;
+        const mallParams = mallReserved ? new URLSearchParams(mallReserved) : null;
+        const insuranceTypeFromMall = mallParams?.get('insuranceType');
+        const paymentMethodFromMall = mallParams?.get('paymentMethod');
         console.log('파싱된 pendingPayment:', pendingPayment);
 
         // contract_id 결정
@@ -98,17 +101,24 @@ function PaymentCompleteContent() {
             console.log('✅ 결제 승인 성공!');
             
             // group-insurance 결제인지 확인
-            if (pendingPayment?.insuranceType === 'domestic') {
+            const resolvedInsuranceType =
+              pendingPayment?.insuranceType || insuranceTypeFromMall || null;
+            const resolvedPaymentMethod =
+              pendingPayment?.payment_method || paymentMethodFromMall || '나이스페이먼츠';
+
+            const groupContractNumber = orderId || approveResult.data?.contractNumber || '';
+
+            if (resolvedInsuranceType === 'domestic') {
               localStorage.removeItem('pendingPayment');
-              router.push(`/group-insurance/domestic/step5?paymentSuccess=true&paymentMethod=${encodeURIComponent(pendingPayment.payment_method || '나이스페이먼츠')}`);
+              router.push(`/group-insurance/domestic/step5?paymentSuccess=true&paymentMethod=${encodeURIComponent(resolvedPaymentMethod)}&contractId=${encodeURIComponent(String(contract_id || ''))}&contractNumber=${encodeURIComponent(groupContractNumber)}`);
               return;
-            } else if (pendingPayment?.insuranceType === 'overseas') {
+            } else if (resolvedInsuranceType === 'overseas') {
               localStorage.removeItem('pendingPayment');
-              router.push(`/group-insurance/overseas/step5?paymentSuccess=true&paymentMethod=${encodeURIComponent(pendingPayment.payment_method || '나이스페이먼츠')}`);
+              router.push(`/group-insurance/overseas/step5?paymentSuccess=true&paymentMethod=${encodeURIComponent(resolvedPaymentMethod)}&contractId=${encodeURIComponent(String(contract_id || ''))}&contractNumber=${encodeURIComponent(groupContractNumber)}`);
               return;
-            } else if (pendingPayment?.insuranceType === 'longstay') {
+            } else if (resolvedInsuranceType === 'longstay') {
               localStorage.removeItem('pendingPayment');
-              router.push(`/group-insurance/longstay/step5?paymentSuccess=true&paymentMethod=${encodeURIComponent(pendingPayment.payment_method || '나이스페이먼츠')}`);
+              router.push(`/group-insurance/longstay/step5?paymentSuccess=true&paymentMethod=${encodeURIComponent(resolvedPaymentMethod)}&contractId=${encodeURIComponent(String(contract_id || ''))}&contractNumber=${encodeURIComponent(groupContractNumber)}`);
               return;
             }
             

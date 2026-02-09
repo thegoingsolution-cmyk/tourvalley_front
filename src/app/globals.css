@@ -1,3 +1,4 @@
+/* 폰트 경로: Next.js는 public 폴더를 루트로 서빙하므로 반드시 /fonts/ 사용 (절대 /public/fonts/ 사용 금지) */
 @font-face {
   font-family: 'NanumSquareNeo';
   font-weight: 700;
@@ -21,6 +22,62 @@
   font-display: swap;
 }
 
+/* Noto Sans KR - 로컬 (공공/가독성, 다양한 굵기). Nginx /fonts/ 로 서빙 */
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-weight: 100;
+  src: url('/fonts/NotoSansKR-Thin.ttf') format('truetype');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-weight: 200;
+  src: url('/fonts/NotoSansKR-ExtraLight.ttf') format('truetype');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-weight: 300;
+  src: url('/fonts/NotoSansKR-Light.ttf') format('truetype');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-weight: 400;
+  src: url('/fonts/NotoSansKR-Regular.ttf') format('truetype');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-weight: 500;
+  src: url('/fonts/NotoSansKR-Medium.ttf') format('truetype');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-weight: 600;
+  src: url('/fonts/NotoSansKR-SemiBold.ttf') format('truetype');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-weight: 700;
+  src: url('/fonts/NotoSansKR-Bold.ttf') format('truetype');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-weight: 800;
+  src: url('/fonts/NotoSansKR-ExtraBold.ttf') format('truetype');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-weight: 900;
+  src: url('/fonts/NotoSansKR-Black.ttf') format('truetype');
+  font-display: swap;
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -31,8 +88,8 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-  font-family: 'NanumSquare', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-  font-weight: 800;
+  font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  font-weight: 400; /* Regular - 공공/가독성 기준 */
 }
 
 .main-container {

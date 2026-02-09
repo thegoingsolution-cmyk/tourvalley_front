@@ -16,6 +16,8 @@ export default function DomesticInsuranceStep5Page() {
   const [insuredList, setInsuredList] = useState<any[]>([]);
   const [paymentCompleted, setPaymentCompleted] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('');
+  const [paymentContractId, setPaymentContractId] = useState('');
+  const [paymentContractNumber, setPaymentContractNumber] = useState('');
   const [accountBank, setAccountBank] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [expectedDate, setExpectedDate] = useState('');
@@ -52,6 +54,8 @@ export default function DomesticInsuranceStep5Page() {
     const urlParams = new URLSearchParams(window.location.search);
     const paymentSuccess = urlParams.get('paymentSuccess');
     const paymentMethodParam = urlParams.get('paymentMethod');
+    const contractIdParam = urlParams.get('contractId');
+    const contractNumberParam = urlParams.get('contractNumber');
 
     // Load data from localStorage
     const step1 = localStorage.getItem('domesticInsuranceStep1');
@@ -88,12 +92,85 @@ export default function DomesticInsuranceStep5Page() {
       }
     }
 
+    const loadFallbackContractData = async (contractId: string) => {
+      try {
+        const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        const [contractResponse, companionsResponse] = await Promise.all([
+          fetch(`${apiBase}/api/contracts/detail/${contractId}`),
+          fetch(`${apiBase}/api/travel/group/contract/${contractId}/companions`),
+        ]);
+
+        if (contractResponse.ok) {
+          const contractResult = await contractResponse.json();
+          if (contractResult?.success && contractResult.contract) {
+            const contract = contractResult.contract;
+            const parseDateTime = (value?: string | null) => {
+              if (!value) return { date: '', hour: '' };
+              const date = new Date(value);
+              if (isNaN(date.getTime())) return { date: '', hour: '' };
+              const year = date.getFullYear();
+              const month = String(date.getMonth() + 1).padStart(2, '0');
+              const day = String(date.getDate()).padStart(2, '0');
+              const hour = String(date.getHours()).padStart(2, '0');
+              return { date: `${year}-${month}-${day}`, hour };
+            };
+
+            const departure = parseDateTime(contract.departureDate);
+            const arrival = parseDateTime(contract.arrivalDate);
+
+            setStep1Data({
+              tourNum: contract.travelParticipants || 0,
+              startDate: departure.date,
+              startHour: departure.hour,
+              endDate: arrival.date,
+              endHour: arrival.hour,
+            });
+            setStep2Data({
+              contractor_name: contract.contractorCompanyName || contract.memberName || '',
+            });
+            setStep3Data({
+              total_premium: Number(contract.totalPremium || 0),
+            });
+            if (!paymentMethodParam && contract.paymentMethod) {
+              setPaymentMethod(contract.paymentMethod);
+            }
+          }
+        }
+
+        if (companionsResponse.ok) {
+          const companionsResult = await companionsResponse.json();
+          const companions = companionsResult?.companions || [];
+          if (companions.length) {
+            setInsuredList(
+              companions.map((companion: any, index: number) => ({
+                index: companion.sequence_number || index + 1,
+                name: companion.name || `피보험자${index + 1}`,
+                planName: companion.plan_type || '-',
+                premium: companion.premium || 0,
+              }))
+            );
+          }
+        }
+      } catch (error) {
+        console.error('계약 정보 조회 실패:', error);
+      }
+    };
+
     // 결제 완료 후 리다이렉트인 경우 상태 설정
     if (paymentSuccess === 'true') {
       // 결제 완료 상태로 설정
       setPaymentCompleted(true);
       if (paymentMethodParam) {
         setPaymentMethod(paymentMethodParam);
+      }
+      if (contractIdParam) {
+        setPaymentContractId(contractIdParam);
+      }
+      if (contractNumberParam) {
+        setPaymentContractNumber(contractNumberParam);
+      }
+      if ((!step1 || !step2 || !step3) && contractIdParam) {
+        loadFallbackContractData(contractIdParam);
       }
       // URL에서 파라미터 제거
       window.history.replaceState({}, '', window.location.pathname);
@@ -393,7 +470,15 @@ export default function DomesticInsuranceStep5Page() {
               insuranceType: 'domestic',
             }));
             try {
-              await openNicepayWindow(paymentRequest);
+              const mallReserved = new URLSearchParams({
+                contract_id: String(contract_id),
+                insuranceType: 'domestic',
+                paymentMethod: paymentMethodName,
+              }).toString();
+              await openNicepayWindow({
+                ...paymentRequest,
+                mallReserved,
+              });
             } catch (error) {
               console.error('결제창 열기 오류:', error);
               alert(error instanceof Error ? error.message : '결제창을 여는 중 오류가 발생했습니다.');
@@ -472,11 +557,17 @@ export default function DomesticInsuranceStep5Page() {
               insuranceType: 'domestic',
             }));
             try {
+              const mallReserved = new URLSearchParams({
+                contract_id: String(contract_id),
+                insuranceType: 'domestic',
+                paymentMethod: paymentMethodName,
+              }).toString();
               await openNicepayWindow({
                 ...paymentRequest,
                 method: 'vbank',
                 bankCode: virtualBankCode,
                 vbankHolder: step2Data.contractor_name || '',
+                mallReserved,
               });
             } catch (error) {
               console.error('가상계좌 결제창 열기 오류:', error);
@@ -530,6 +621,23 @@ export default function DomesticInsuranceStep5Page() {
       setIsProcessing(false);
     }
   };
+
+  if (paymentCompleted && (!step1Data || !step2Data)) {
+    return (
+      <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+        <div style={{ maxWidth: '480px', width: '100%', textAlign: 'center', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '24px' }}>
+          <h2 style={{ marginBottom: '12px' }}>결제가 완료되었습니다.</h2>
+          {paymentContractNumber && (
+            <p style={{ marginBottom: '8px' }}>계약번호: {paymentContractNumber}</p>
+          )}
+          {paymentContractId && (
+            <p style={{ marginBottom: '16px' }}>계약ID: {paymentContractId}</p>
+          )}
+          <p style={{ color: '#6b7280' }}>상세 정보는 해당 계약 조회 화면에서 확인할 수 있습니다.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!step1Data || !step2Data) {
     return <div>데이터를 불러오는 중...</div>;

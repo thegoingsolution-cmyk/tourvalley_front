@@ -15,7 +15,9 @@ body {
   overflow-y: auto;
 }
 
+/* 그룹보험(국내/해외/장기체류) 공통: 디폴트 폰트 명시 적용 */
 .speed_Wrap {
+  font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
   -webkit-font-smoothing: subpixel-antialiased;
   width: 848px;
   min-width: 848px;

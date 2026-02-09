@@ -99,6 +99,18 @@ export const openNicepayWindow = (params: any) => {
     // 나이스페이는 소문자 vbank를 요구함
     const paymentMethod = params.method || 'card';
     
+    const buildMallReserved = () => {
+      if (typeof params.mallReserved === 'string' && params.mallReserved.trim()) {
+        return params.mallReserved.trim();
+      }
+      const mallParams = new URLSearchParams();
+      if (params.contract_id) mallParams.set('contract_id', String(params.contract_id));
+      if (params.insuranceType) mallParams.set('insuranceType', String(params.insuranceType));
+      if (params.paymentMethod) mallParams.set('paymentMethod', String(params.paymentMethod));
+      if (params.returnPath) mallParams.set('returnPath', String(params.returnPath));
+      return mallParams.toString();
+    };
+
     // 스크립트가 이미 로드되어 있는지 확인
     const authnice = (window as any).AUTHNICE;
     if (authnice) {
@@ -111,7 +123,7 @@ export const openNicepayWindow = (params: any) => {
           amount: typeof params.amount === 'string' ? parseInt(params.amount, 10) : params.amount,
           goodsName: params.goodsName,
           returnUrl: params.returnUrl,
-          mallReserved: params.contract_id ? `contract_id=${params.contract_id}` : '',
+          mallReserved: buildMallReserved(),
           buyerName: params.buyerName,
           buyerEmail: params.buyerEmail,
           buyerTel: params.buyerTel,
@@ -159,7 +171,7 @@ export const openNicepayWindow = (params: any) => {
               amount: typeof params.amount === 'string' ? parseInt(params.amount, 10) : params.amount,
               goodsName: params.goodsName,
               returnUrl: params.returnUrl,
-              mallReserved: params.contract_id ? `contract_id=${params.contract_id}` : '',
+              mallReserved: buildMallReserved(),
               buyerName: params.buyerName,
               buyerEmail: params.buyerEmail,
               buyerTel: params.buyerTel,
