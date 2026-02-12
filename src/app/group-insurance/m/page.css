@@ -1,6 +1,17 @@
 /* Container Styles - domestic/m/page.css 기반 */
 /* .group-insurance-mobile - ?�단 padding ?�거??*/
 
+/* 기본 날짜(초기값)는 회색 유지, 사용자가 선택했을 때만 검정 */
+.group-insurance-mobile .date-picker-wrapper .react-datepicker__input-container input.date-input:not(.user-selected),
+.group-insurance-mobile .date-picker-wrapper .react-datepicker__input-container input.tourGuard_input_w01:not(.user-selected) {
+    color: #dddddd;
+}
+
+.group-insurance-mobile .date-picker-wrapper .react-datepicker__input-container input.date-input.user-selected,
+.group-insurance-mobile .date-picker-wrapper .react-datepicker__input-container input.tourGuard_input_w01.user-selected {
+    color: #000;
+}
+
 /* ??메뉴 ?��???- test.css 9872-9914 ?�인 */
 .menu_wrap_tab {
     position: relative;
@@ -498,6 +509,23 @@
     display: flex;
     align-items: center;
 }
+
+.group-insurance-mobile .group-participant-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.group-insurance-mobile .group-participant-row .group-participant-input {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.group-insurance-mobile .group-participant-row .tour2023_event_file {
+    margin-left: auto;
+    padding-left: 12px;
+}
+
 
 .tour2023_btn_b01 {
     position: relative;

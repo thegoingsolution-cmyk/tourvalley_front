@@ -24,11 +24,8 @@ import { PlanType, PlanInfo, Participant, CalculatedPremiums, PaymentMethod, Pay
 import { frequentCountries, allCountries } from '@/components/travel/utils/countries';
 import './page.css';
 
-const WORKING_HOLIDAY_PLAN_MAPPING: Record<string, string> = {
-  '실속플랜': '워킹홀리데이실속플랜',
-  '표준플랜': '워킹홀리데이표준플랜',
-  '고급플랜': '워킹홀리데이(유로화플랜)',
-};
+// 워킹홀리데이 DB plan_type (화면에 그대로 표시)
+const WORKING_HOLIDAY_DB_PLANS = ['워킹홀리데이실속플랜', '워킹홀리데이표준플랜', '워킹홀리데이(유로화플랜)'] as const;
 
 const getDomesticCoverages = (planType: PlanType): { label: string; amount: string }[] => [
   { label: '상해사망후유장해', amount: '1억원' },
@@ -137,7 +134,8 @@ const getLongTermStayCoverages = (
       }
     }
   } else if (insuranceType === '워킹홀리데이') {
-    if (planType === '실속플랜') {
+    const whCoverageType = planType === '워킹홀리데이실속플랜' ? '실속플랜' : planType === '워킹홀리데이표준플랜' ? '표준플랜' : planType === '워킹홀리데이(유로화플랜)' ? '고급플랜' : planType;
+    if (whCoverageType === '실속플랜') {
       return [
         { label: '상해사망후유장해', amount: '2,000만원' },
         { label: '해외의료비(상해)', amount: '2,000만원' },
@@ -145,7 +143,7 @@ const getLongTermStayCoverages = (
         { label: '중대사고구조송환비용', amount: '1,000만원' },
       ];
     }
-    if (planType === '표준플랜') {
+    if (whCoverageType === '표준플랜') {
       return [
         { label: '상해사망후유장해', amount: '5,000만원' },
         { label: '해외의료비(상해)', amount: '5,000만원' },
@@ -153,7 +151,7 @@ const getLongTermStayCoverages = (
         { label: '중대사고구조송환비용', amount: '5,000만원' },
       ];
     }
-    if (planType === '고급플랜') {
+    if (whCoverageType === '고급플랜') {
       return [
         { label: '상해사망후유장해', amount: '30,000EUR' },
         { label: '해외의료비(상해)', amount: '30,000EUR' },
@@ -462,6 +460,31 @@ function MobileGroupInsuranceContent() {
   const [isSamePremium, setIsSamePremium] = useState<boolean>(false);
   
   const planSelectionRef = useRef<HTMLDivElement>(null);
+  const fetchAvailablePlans = async (age: number, genderValue: string) => {
+    try {
+      const response = await fetch('/api/travel/available-plans', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          insurance_type: getInsuranceType(),
+          age,
+          gender: genderValue,
+          plan_variant: 'B',
+          has_medical_expense: hasMedicalExpense ? 1 : 0,
+          include_foreign_currency: activeTab === 'FL',
+        }),
+      });
+      const data = await response.json();
+      if (data?.success && Array.isArray(data.plan_types)) {
+        return data.plan_types as PlanType[];
+      }
+    } catch (error) {
+      console.error('플랜 목록 조회 실패:', error);
+    }
+    return [];
+  };
 
   const createEmptyParticipant = (id: number): Participant => ({
     id,
@@ -1110,25 +1133,25 @@ function MobileGroupInsuranceContent() {
 
     const isWorkingHoliday = activeTab === 'FL' && travelPurposeLong === 'N010003';
     const getPlanRequestInfo = (planType: string) => {
-      const dbPlanType = isWorkingHoliday
-        ? (WORKING_HOLIDAY_PLAN_MAPPING[planType] || planType)
-        : planType;
+      const dbPlanType = planType;
       const requestCurrencyPlan = activeTab !== 'FL'
         ? '원화'
-        : (isWorkingHoliday ? (planType === '고급플랜' ? '외화' : '원화') : currencyPlan);
+        : (isWorkingHoliday ? (planType === '워킹홀리데이(유로화플랜)' ? '외화' : '원화') : currencyPlan);
 
       return { dbPlanType, requestCurrencyPlan };
     };
 
-    let availablePlans: PlanType[] = [];
-    if (activeTab === 'DS') {
-      availablePlans = ['실속플랜', '표준플랜'];
-    } else if (age >= 0 && age < 15) {
-      availablePlans = ['어린이플랜'];
-    } else if (age >= 15 && age <= 70) {
-      availablePlans = ['실속플랜', '표준플랜', '고급플랜'];
-    } else if (age >= 71 && age <= 90) {
-      availablePlans = ['어르신플랜1', '어르신플랜2'];
+    const genderValue = getGenderFromBirthDate(birthDate, gender);
+    let availablePlans: PlanType[] = planInfo ? (Object.keys(planInfo) as PlanType[]) : [];
+    if (availablePlans.length === 0) {
+      if (isWorkingHoliday) {
+        availablePlans = [...WORKING_HOLIDAY_DB_PLANS];
+      } else {
+        availablePlans = await fetchAvailablePlans(age, genderValue);
+      }
+    }
+    if (availablePlans.length === 0) {
+      return;
     }
 
     setIsCalculating(true);
@@ -1136,12 +1159,12 @@ function MobileGroupInsuranceContent() {
     try {
       const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
       const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
-      const genderValue = getGenderFromBirthDate(birthDate, gender);
-
       const plans: Record<string, PlanInfo> = {};
+      const isDomestic = activeTab === 'DS';
+      const isLongTermStay = activeTab === 'FL';
+      const insuranceType = getInsuranceType();
 
-      for (const planType of availablePlans.filter(p => planInfo && planInfo[p])) {
-        if (!planInfo[planType]) continue;
+      for (const planType of availablePlans) {
         const { dbPlanType, requestCurrencyPlan } = getPlanRequestInfo(planType);
 
         try {
@@ -1167,10 +1190,13 @@ function MobileGroupInsuranceContent() {
 
           const data = await response.json();
           if (data.success) {
+            const fallbackCoverages = isLongTermStay
+              ? getLongTermStayCoverages(planType, insuranceType, requestCurrencyPlan)
+              : (isDomestic ? getDomesticCoverages(planType) : getOverseasCoverages(planType));
             plans[planType] = {
               type: planType,
               premium: data.premium,
-              coverages: planInfo[planType].coverages,
+              coverages: planInfo?.[planType]?.coverages || fallbackCoverages,
             };
           }
         } catch (error) {
@@ -1179,6 +1205,12 @@ function MobileGroupInsuranceContent() {
       }
 
       setPlanInfo(plans);
+      if (!plans[selectedPlan]) {
+        const nextPlan = Object.keys(plans)[0] as PlanType | undefined;
+        if (nextPlan) {
+          setSelectedPlan(nextPlan);
+        }
+      }
     } catch (error) {
       console.error('보험료 재계산 오류:', error);
     } finally {
@@ -1210,19 +1242,31 @@ function MobileGroupInsuranceContent() {
     try {
       const isWorkingHoliday = activeTab === 'FL' && travelPurposeLong === 'N010003';
       const getPlanRequestInfo = (planType: string) => {
-        const dbPlanType = isWorkingHoliday
-          ? (WORKING_HOLIDAY_PLAN_MAPPING[planType] || planType)
-          : planType;
+        const dbPlanType = planType;
         const requestCurrencyPlan = activeTab !== 'FL'
           ? '원화'
-          : (isWorkingHoliday ? (planType === '고급플랜' ? '외화' : '원화') : currencyPlan);
+          : (isWorkingHoliday ? (planType === '워킹홀리데이(유로화플랜)' ? '외화' : '원화') : currencyPlan);
 
         return { dbPlanType, requestCurrencyPlan };
       };
 
-      const availablePlans: PlanType[] = activeTab === 'DS' 
-        ? ['실속플랜', '표준플랜']
-        : ['실속플랜', '표준플랜', '고급플랜'];
+      let availablePlans: PlanType[] = [];
+      if (isWorkingHoliday) {
+        availablePlans = [...WORKING_HOLIDAY_DB_PLANS];
+      } else {
+        const target = groupInsuredData[0];
+        const age = calculateAgeFromBirthDate(target.birthDate);
+        if (age === null) {
+          setIsCalculating(false);
+          return;
+        }
+        const genderValue = target.gender === 'W' ? '여자' : '남자';
+        availablePlans = await fetchAvailablePlans(age, genderValue);
+      }
+      if (availablePlans.length === 0) {
+        setIsCalculating(false);
+        return;
+      }
 
       const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
       const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
@@ -1378,20 +1422,33 @@ function MobileGroupInsuranceContent() {
       try {
         const isWorkingHoliday = activeTab === 'FL' && travelPurposeLong === 'N010003';
         const getPlanRequestInfo = (planType: string) => {
-          const dbPlanType = isWorkingHoliday
-            ? (WORKING_HOLIDAY_PLAN_MAPPING[planType] || planType)
-            : planType;
+          const dbPlanType = planType;
           const requestCurrencyPlan = activeTab !== 'FL'
             ? '원화'
-            : (isWorkingHoliday ? (planType === '고급플랜' ? '외화' : '원화') : currencyPlan);
+            : (isWorkingHoliday ? (planType === '워킹홀리데이(유로화플랜)' ? '외화' : '원화') : currencyPlan);
 
           return { dbPlanType, requestCurrencyPlan };
         };
 
-        // 그룹 가입자는 모든 플랜 사용 가능 (나이 제한 없음)
-        const availablePlans: PlanType[] = activeTab === 'DS' 
-          ? ['실속플랜', '표준플랜']
-          : ['실속플랜', '표준플랜', '고급플랜'];
+        let availablePlans: PlanType[] = [];
+        if (isWorkingHoliday) {
+          availablePlans = [...WORKING_HOLIDAY_DB_PLANS];
+        } else {
+          const target = groupInsuredData[0];
+          const age = calculateAgeFromBirthDate(target.birthDate);
+          if (age === null) {
+            alert('생년월일을 올바르게 입력해주세요.');
+            setIsCalculating(false);
+            return;
+          }
+          const genderValue = target.gender === 'W' ? '여자' : '남자';
+          availablePlans = await fetchAvailablePlans(age, genderValue);
+        }
+        if (availablePlans.length === 0) {
+          alert('가입 가능한 플랜이 없습니다.');
+          setIsCalculating(false);
+          return;
+        }
 
         const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
         const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
@@ -1557,18 +1614,17 @@ function MobileGroupInsuranceContent() {
       return;
     }
 
-    // 플랜 결정
+    // 플랜 결정 (DB plan_type 기준으로 화면 표시)
+    const isWorkingHoliday = activeTab === 'FL' && travelPurposeLong === 'N010003';
     let availablePlans: PlanType[] = [];
-    if (activeTab === 'DS') {
-      availablePlans = ['실속플랜', '표준플랜'];
-    } else if (age >= 0 && age < 15) {
-      availablePlans = ['어린이플랜'];
-    } else if (age >= 15 && age <= 70) {
-      availablePlans = ['실속플랜', '표준플랜', '고급플랜'];
-    } else if (age >= 71 && age <= 90) {
-      availablePlans = ['어르신플랜1', '어르신플랜2'];
+    if (isWorkingHoliday) {
+      availablePlans = [...WORKING_HOLIDAY_DB_PLANS];
     } else {
-      alert('가입 가능한 나이 범위를 벗어났습니다.');
+      const genderValue = getGenderFromBirthDate(birthDate, gender);
+      availablePlans = await fetchAvailablePlans(age, genderValue);
+    }
+    if (availablePlans.length === 0) {
+      alert('가입 가능한 플랜이 없습니다.');
       return;
     }
 
@@ -1578,14 +1634,11 @@ function MobileGroupInsuranceContent() {
       const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
       const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
       const genderValue = getGenderFromBirthDate(birthDate, gender);
-      const isWorkingHoliday = activeTab === 'FL' && travelPurposeLong === 'N010003';
       const getPlanRequestInfo = (planType: string) => {
-        const dbPlanType = isWorkingHoliday
-          ? (WORKING_HOLIDAY_PLAN_MAPPING[planType] || planType)
-          : planType;
+        const dbPlanType = planType;
         const requestCurrencyPlan = activeTab !== 'FL'
           ? '원화'
-          : (isWorkingHoliday ? (planType === '고급플랜' ? '외화' : '원화') : currencyPlan);
+          : (isWorkingHoliday ? (planType === '워킹홀리데이(유로화플랜)' ? '외화' : '원화') : currencyPlan);
 
         return { dbPlanType, requestCurrencyPlan };
       };
@@ -1690,12 +1743,10 @@ function MobileGroupInsuranceContent() {
       let totalPremium = 0;
       const isWorkingHoliday = activeTab === 'FL' && travelPurposeLong === 'N010003';
       const getPlanRequestInfo = (planType: string) => {
-        const dbPlanType = isWorkingHoliday
-          ? (WORKING_HOLIDAY_PLAN_MAPPING[planType] || planType)
-          : planType;
+        const dbPlanType = planType;
         const requestCurrencyPlan = activeTab !== 'FL'
           ? '원화'
-          : (isWorkingHoliday ? (planType === '고급플랜' ? '외화' : '원화') : currencyPlan);
+          : (isWorkingHoliday ? (planType === '워킹홀리데이(유로화플랜)' ? '외화' : '원화') : currencyPlan);
 
         return { dbPlanType, requestCurrencyPlan };
       };
@@ -1708,7 +1759,20 @@ function MobileGroupInsuranceContent() {
           return;
         }
 
-        const planType = selectedPlan || '실속플랜';
+        let planType: string = selectedPlan || '실속플랜';
+        if (!isWorkingHoliday) {
+          if (age <= 14) {
+            planType = '어린이플랜';
+          } else if (age >= 71) {
+            planType = selectedPlan === '어르신플랜2' ? '어르신플랜2' : '어르신플랜1';
+          } else {
+            const basePlan =
+              selectedPlan && !['어린이플랜', '어르신플랜1', '어르신플랜2'].includes(selectedPlan)
+                ? selectedPlan
+                : '실속플랜';
+            planType = basePlan;
+          }
+        }
         const { dbPlanType, requestCurrencyPlan } = getPlanRequestInfo(planType);
         const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
         const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
@@ -1782,10 +1846,12 @@ function MobileGroupInsuranceContent() {
       return;
     }
 
-    // if (activeTab !== 'DS' && !travelPurpose) {
-    //   alert('여행목적을 선택해주세요.');
-    //   return;
-    // }
+    if (['래프팅', '스키/스노보드'].includes(travelPurpose)) {
+      alert(
+        '죄송합니다 고객님\n래프팅, 스키/스노보드를 목적으로 국내여행을 가는 경우에는 여행보험에 가입하실 수 없습니다.'
+      );
+      return;
+    }
 
     if (hasDangerousActivity) {
       setShowDangerousActivityModal(true);
@@ -1897,9 +1963,7 @@ function MobileGroupInsuranceContent() {
               resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}******`,
               gender: p.gender,
               age: age || 0,
-              plan_type: (activeTab === 'FL' && travelPurposeLong === 'N010003')
-                ? (WORKING_HOLIDAY_PLAN_MAPPING[selectedPlan || '실속플랜'] || (selectedPlan || '실속플랜'))
-                : (selectedPlan || '실속플랜'),
+              plan_type: selectedPlan || '실속플랜',
               premium: participantPremium?.premium || 0,
               has_medical_expense: hasMedicalExpense ? 1 : 0,
             };
@@ -2072,9 +2136,7 @@ function MobileGroupInsuranceContent() {
               resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}******`,
               gender: p.gender,
               age: age || 0,
-              plan_type: (activeTab === 'FL' && travelPurposeLong === 'N010003')
-                ? (WORKING_HOLIDAY_PLAN_MAPPING[selectedPlan || '실속플랜'] || (selectedPlan || '실속플랜'))
-                : (selectedPlan || '실속플랜'),
+              plan_type: selectedPlan || '실속플랜',
               premium: participantPremium?.premium || 0,
               has_medical_expense: hasMedicalExpense ? 1 : 0,
             };
@@ -2197,9 +2259,7 @@ function MobileGroupInsuranceContent() {
               resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}******`,
               gender: p.gender,
               age: age || 0,
-              plan_type: (activeTab === 'FL' && travelPurposeLong === 'N010003')
-                ? (WORKING_HOLIDAY_PLAN_MAPPING[selectedPlan || '실속플랜'] || (selectedPlan || '실속플랜'))
-                : (selectedPlan || '실속플랜'),
+              plan_type: selectedPlan || '실속플랜',
               premium: participantPremium?.premium || 0,
               has_medical_expense: hasMedicalExpense ? 1 : 0,
             };

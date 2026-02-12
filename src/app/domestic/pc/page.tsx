@@ -275,6 +275,32 @@ export default function PCDomesticPage() {
     return { valid: true };
   };
 
+  const fetchAvailablePlans = useCallback(async (age: number, genderValue: Gender, medicalExpenseValue: boolean = hasMedicalExpense) => {
+    try {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${apiBase}/api/travel/available-plans`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          insurance_type: '국내여행보험',
+          age,
+          gender: genderValue,
+          plan_variant: 'B',
+          has_medical_expense: medicalExpenseValue ? 1 : 0,
+        }),
+      });
+      const data = await response.json();
+      if (data?.success && Array.isArray(data.plan_types)) {
+        return data.plan_types as PlanType[];
+      }
+    } catch (error) {
+      console.error('플랜 목록 조회 실패:', error);
+    }
+    return [];
+  }, [hasMedicalExpense]);
+
   // 보험료 재계산 (실손의료비 옵션 변경 시)
   const recalculatePremium = useCallback(async (medicalExpenseValue?: boolean) => {
     if (!planInfo || !selectedPlan || !birthDate || birthDate.length !== 8) return;
@@ -311,11 +337,22 @@ export default function PCDomesticPage() {
 
       const medicalExpense = medicalExpenseValue !== undefined ? medicalExpenseValue : hasMedicalExpense;
 
-      // 빈 객체로 시작하여 성공한 플랜만 추가 (제외 시 표준플랜 등이 사라질 수 있음)
+      // 빈 객체로 시작하여 성공한 플랜만 추가 (현재 화면에 있는 플랜명 그대로 재계산)
       const updatedPlans: Record<string, PlanInfo> = {};
+      let planTypesToRecalc = Object.keys(planInfo) as PlanType[];
 
-      // 각 플랜별 보험료 재계산
-      for (const planType of ['실속플랜', '표준플랜'] as PlanType[]) {
+      if (planTypesToRecalc.length === 0) {
+        const availablePlans = await fetchAvailablePlans(age, genderValue, medicalExpense);
+        if (availablePlans.length === 0) {
+          setPlanInfo({});
+          return;
+        }
+        planTypesToRecalc = availablePlans;
+      }
+
+      const coveragesMap = await fetchPlanCoverages(planTypesToRecalc, medicalExpense);
+
+      for (const planType of planTypesToRecalc) {
         try {
           const response = await fetch('/api/travel/calculate-premium', {
             method: 'POST',
@@ -339,23 +376,22 @@ export default function PCDomesticPage() {
 
           const data = await response.json();
           if (data.success) {
-            // 기존 planInfo에 플랜이 있으면 coverages를 유지, 없으면 기본 coverages 생성
+            const hasDiseaseCoverage = planType !== '실속플랜';
             if (planInfo[planType]) {
-              // 기존 planInfo의 coverages를 유지하면서 premium만 업데이트
               updatedPlans[planType] = {
                 ...planInfo[planType],
                 premium: data.premium,
+                coverages: coveragesMap[planType] || planInfo[planType].coverages,
               };
             } else {
-              // planInfo에 없으면 새로운 플랜 정보 생성 (handleCalculate와 동일한 로직)
               updatedPlans[planType] = {
-                type: planType,
+                type: planType as PlanType,
                 premium: data.premium,
-                coverages: [
+                coverages: coveragesMap[planType] || [
                   { label: '상해사망후유장해', amount: '1억원' },
                   { label: '상해입원의료비', amount: '1,000만원' },
                   { label: '상해통원의료비', amount: '10만원' },
-                  ...(planType !== '실속플랜' ? [
+                  ...(hasDiseaseCoverage ? [
                     { label: '질병입원의료비', amount: '1,000만원' },
                     { label: '질병통원의료비', amount: '10만원' },
                   ] : []),
@@ -383,7 +419,7 @@ export default function PCDomesticPage() {
     } finally {
       setIsCalculating(false);
     }
-  }, [planInfo, selectedPlan, birthDate, gender, departureDate, departureTime, arrivalDate, arrivalTime, hasMedicalExpense]);
+  }, [planInfo, selectedPlan, birthDate, gender, departureDate, departureTime, arrivalDate, arrivalTime, hasMedicalExpense, fetchAvailablePlans]);
 
   // 실손의료비 옵션 변경 핸들러
   const handleMedicalExpenseChange = async (value: boolean) => {
@@ -392,6 +428,29 @@ export default function PCDomesticPage() {
     if (showPlanSelection && planInfo) {
       await recalculatePremium(value);
     }
+  };
+
+  const fetchPlanCoverages = async (planTypes: PlanType[], medicalExpenseValue: boolean = hasMedicalExpense) => {
+    try {
+      const response = await fetch('/api/travel/plan-coverages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          insurance_type: '국내여행보험',
+          plan_types: planTypes,
+          has_medical_expense: medicalExpenseValue ? 1 : 0,
+        }),
+      });
+      const data = await response.json();
+      if (data?.success && data.coverages) {
+        return data.coverages as Record<string, { label: string; amount: string }[]>;
+      }
+    } catch (error) {
+      console.error('보장내용 조회 실패:', error);
+    }
+    return {};
   };
 
   // 보장 상세보기 클릭 핸들러 (PC는 모달)
@@ -437,8 +496,19 @@ export default function PCDomesticPage() {
           return;
         }
 
-        // 플랜 타입 결정 (STEP1에서 선택한 플랜 사용)
-        const planType = selectedPlan === '실속플랜' ? '실속플랜' : '표준플랜';
+        // 플랜 타입 결정: 나이에 따라 백엔드에 보내는 플랜명 사용 (STEP1 선택 플랜 또는 나이별 자동)
+        let planType: string;
+        if (age <= 14) {
+          planType = '어린이플랜';
+        } else if (age >= 71) {
+          planType = selectedPlan === '어르신플랜2' ? '어르신플랜2' : '어르신플랜1';
+        } else {
+          const basePlan =
+            selectedPlan && !['어린이플랜', '어르신플랜1', '어르신플랜2'].includes(selectedPlan)
+              ? selectedPlan
+              : '실속플랜';
+          planType = basePlan;
+        }
 
         // 보험료 계산 API 호출
         // 24시는 다음날 00시로 변환
@@ -539,22 +609,13 @@ export default function PCDomesticPage() {
       return;
     }
 
-    // 플랜 타입 결정 (나이에 따라)
-    let availablePlans: PlanType[] = [];
-    if (age >= 0 && age <= 15) {
-      // 어린이플랜만 가능 (실속플랜, 표준플랜은 15세 이상)
-      alert('15세 미만은 어린이플랜만 가능합니다.');
-      return;
-    } else if (age >= 15 && age <= 70) {
-      availablePlans = ['실속플랜', '표준플랜'];
-    } else if (age >= 71 && age <= 90) {
-      // 어르신플랜만 가능
-      alert('71세 이상은 어르신플랜만 가능합니다.');
-      return;
-    } else {
-      alert('가입 가능한 나이 범위를 벗어났습니다.');
+    const genderValue = getGenderFromBirthDate(birthDate, gender);
+    const availablePlans = await fetchAvailablePlans(age, genderValue);
+    if (availablePlans.length === 0) {
+      alert('가입 가능한 플랜이 없습니다.');
       return;
     }
+    const coveragesMap = await fetchPlanCoverages(availablePlans);
 
     setIsCalculating(true);
 
@@ -580,8 +641,6 @@ export default function PCDomesticPage() {
       
       const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
       const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
-      const genderValue = getGenderFromBirthDate(birthDate, gender);
-
       // 각 플랜별 보험료 계산 (동적으로 생성)
       const plans: Record<string, PlanInfo> = {};
 
@@ -612,18 +671,9 @@ export default function PCDomesticPage() {
           if (data.success) {
             // 플랜 정보 초기화 (보장내용은 기본값으로 설정, 추후 백엔드에서 받아올 수 있음)
             plans[planType] = {
-              type: planType,
+              type: planType as PlanType,
               premium: data.premium,
-              coverages: [
-                { label: '상해사망후유장해', amount: '1억원' },
-                { label: '상해입원의료비', amount: '1,000만원' },
-                { label: '상해통원의료비', amount: '10만원' },
-                ...(planType !== '실속플랜' ? [
-                  { label: '질병입원의료비', amount: '1,000만원' },
-                  { label: '질병통원의료비', amount: '10만원' },
-                ] : []),
-                { label: '휴대품손해(휴대폰은 보상제외)', amount: '50만원' },
-              ],
+              coverages: coveragesMap[planType] || [],
             };
           } else {
             console.error(`보험료 계산 실패 (${planType}):`, data.message);
@@ -634,8 +684,8 @@ export default function PCDomesticPage() {
       }
 
       setPlanInfo(plans);
-      // 기본값은 실속플랜, 없으면 첫 번째 플랜
-      const defaultPlan = availablePlans.includes('실속플랜') ? '실속플랜' : availablePlans[0];
+      // 기본값: 실속플랜이 있으면 실속플랜, 없으면 첫 번째 플랜(어린이플랜/어르신플랜1 등)
+      const defaultPlan = (availablePlans.includes('실속플랜') ? '실속플랜' : availablePlans[0]) as PlanType;
       setSelectedPlan(defaultPlan);
       setShowPlanSelection(true);
     } catch (error) {
@@ -1223,6 +1273,12 @@ export default function PCDomesticPage() {
               }
               if (!travelPurpose) {
                 alert('여행목적을 선택해주세요.');
+                return;
+              }
+              if (['래프팅', '스키/스노보드'].includes(travelPurpose)) {
+                alert(
+                  '죄송합니다 고객님\n래프팅, 스키/스노보드를 목적으로 국내여행을 가는 경우에는 여행보험에 가입하실 수 없습니다.'
+                );
                 return;
               }
               setShowConsentModal(true);

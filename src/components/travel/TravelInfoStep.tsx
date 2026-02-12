@@ -121,6 +121,8 @@ export default function TravelInfoStep({
   const [isCountryModalOpen, setIsCountryModalOpen] = useState(false);
   const [hasSelectedDepartureDate, setHasSelectedDepartureDate] = useState(false);
   const [hasSelectedArrivalDate, setHasSelectedArrivalDate] = useState(false);
+  const initialDepartureDateRef = useRef(departureDate);
+  const initialArrivalDateRef = useRef(arrivalDate);
 
   // 단체여행보험 팝업 열기
   const openGroupInsurancePopup = () => {
@@ -153,18 +155,7 @@ export default function TravelInfoStep({
     }
   }, [onTravelPurposeChange, travelPurpose]);
 
-  // 날짜가 이미 선택되어 있을 때 상태 초기화
-  useEffect(() => {
-    if (departureDate) {
-      setHasSelectedDepartureDate(true);
-    }
-  }, [departureDate]);
-
-  useEffect(() => {
-    if (arrivalDate) {
-      setHasSelectedArrivalDate(true);
-    }
-  }, [arrivalDate]);
+  // 날짜는 초기값과 다른 값으로 변경되었을 때만 활성화 색상 적용
 
   return (
     <section className="form-section">
@@ -188,7 +179,7 @@ export default function TravelInfoStep({
                     if (date) {
                       const formattedDate = formatDate(date);
                       onDepartureDateChange(formattedDate);
-                      setHasSelectedDepartureDate(true);
+                      setHasSelectedDepartureDate(formattedDate !== initialDepartureDateRef.current);
                     } else {
                       onDepartureDateChange('');
                       setHasSelectedDepartureDate(false);
@@ -198,7 +189,7 @@ export default function TravelInfoStep({
                     if (date) {
                       const formattedDate = formatDate(date);
                       onDepartureDateChange(formattedDate);
-                      setHasSelectedDepartureDate(true);
+                      setHasSelectedDepartureDate(formattedDate !== initialDepartureDateRef.current);
                     }
                   }}
                   dateFormat="yyyy-MM-dd"
@@ -206,7 +197,7 @@ export default function TravelInfoStep({
                   locale="ko"
                   placeholderText="날짜 선택"
                   dateFormatCalendar="yyyy년 MM월"
-                  className={`field-input date-input ${hasSelectedDepartureDate ? 'has-value' : ''}`}
+                  className={`field-input date-input ${hasSelectedDepartureDate ? 'has-value user-selected' : ''}`}
                   wrapperClassName="date-picker-wrapper"
                   calendarClassName="custom-calendar"
                   popperClassName="custom-popper"
@@ -243,7 +234,7 @@ export default function TravelInfoStep({
                     if (date) {
                       const formattedDate = formatDate(date);
                       onArrivalDateChange(formattedDate);
-                      setHasSelectedArrivalDate(true);
+                      setHasSelectedArrivalDate(formattedDate !== initialArrivalDateRef.current);
                     } else {
                       onArrivalDateChange('');
                       setHasSelectedArrivalDate(false);
@@ -253,7 +244,7 @@ export default function TravelInfoStep({
                     if (date) {
                       const formattedDate = formatDate(date);
                       onArrivalDateChange(formattedDate);
-                      setHasSelectedArrivalDate(true);
+                      setHasSelectedArrivalDate(formattedDate !== initialArrivalDateRef.current);
                     }
                   }}
                   dateFormat="yyyy-MM-dd"
@@ -261,7 +252,7 @@ export default function TravelInfoStep({
                   locale="ko"
                   placeholderText="날짜 선택"
                   dateFormatCalendar="yyyy년 MM월"
-                  className={`field-input date-input ${hasSelectedArrivalDate ? 'has-value' : ''}`}
+                  className={`field-input date-input ${hasSelectedArrivalDate ? 'has-value user-selected' : ''}`}
                   wrapperClassName="date-picker-wrapper"
                   calendarClassName="custom-calendar"
                   popperClassName="custom-popper"
@@ -456,7 +447,7 @@ export default function TravelInfoStep({
           {/* Calculate Button */}
           <button 
             className="calculate-btn"
-            onClick={onCalculate}
+            onClick={() => onCalculate()}
             disabled={isCalculating || showPlanSelection}
           >
             {isCalculating ? '계산 중...' : '보험료 계산하기'}

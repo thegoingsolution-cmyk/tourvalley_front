@@ -4,16 +4,16 @@ import React, { useState, useEffect } from 'react';
 import '../../popup/page.css';
 import { calculateAgeAndGenderFromResidentNumber } from '@/utils/age';
 
-// 플랜 코드를 백엔드 API용 플랜 타입으로 변환
-const getPlanType = (planCd: string): string => {
+// 플랜 코드 또는 플랜명을 DB plan_type으로 정규화
+const normalizePlanType = (planCd: string): string => {
   const planMap: { [key: string]: string } = {
     'BAW': '실속플랜',
-    'HCW': '표준플랜', // 화면에는 "고보장플랜"으로 표시되지만 백엔드에는 "표준플랜"으로 전송
+    'HCW': '표준플랜',
     'CHW': '어린이플랜',
-    'OLW': '어르신플랜',
+    'OLW': '어르신플랜1',
     'O2W': '어르신플랜2',
   };
-  return planMap[planCd] || '실속플랜';
+  return planMap[planCd] || planCd || '실속플랜';
 };
 
 export default function DomesticInsuranceStep3Page() {
@@ -26,6 +26,29 @@ export default function DomesticInsuranceStep3Page() {
   const [endDate, setEndDate] = useState('');
   const [loading, setLoading] = useState(false);
   const [planGuideType, setPlanGuideType] = useState<'BAW' | 'HCW'>('BAW');
+  const [availablePlansByIndex, setAvailablePlansByIndex] = useState<{ [key: number]: string[] }>({});
+  const inflightRef = React.useRef(false);
+  const lastRequestKeyRef = React.useRef('');
+  const calcTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const calculatePremiumsRef = React.useRef<() => void>(() => {});
+  const sanitizeSelectedPlans = (plans: { [key: number]: string }) => {
+    if (insuredList.length === 0) return plans;
+    let changed = false;
+    const next = { ...plans };
+    insuredList.forEach((person) => {
+      const availablePlans = availablePlansByIndex[person.index];
+      if (!availablePlans || availablePlans.length === 0) return;
+      const normalized = normalizePlanType(next[person.index] || '');
+      if (!normalized || !availablePlans.includes(normalized)) {
+        next[person.index] = availablePlans[0];
+        changed = true;
+      } else if (normalized !== next[person.index]) {
+        next[person.index] = normalized;
+        changed = true;
+      }
+    });
+    return changed ? next : plans;
+  };
 
   // step1과 step2에서 전달받은 데이터 로드
   useEffect(() => {
@@ -70,10 +93,10 @@ export default function DomesticInsuranceStep3Page() {
         }
         setInsuredList(insuredPersons);
         
-        // 기본 플랜 설정
+        // 기본 플랜 설정 (초기값; 유효하지 않으면 플랜 목록 기준으로 보정)
         const defaultPlans: { [key: number]: string } = {};
         insuredPersons.forEach((person) => {
-          defaultPlans[person.index] = person.age < 15 ? 'CHW' : 'BAW';
+          defaultPlans[person.index] = '실속플랜';
         });
         setSelectedPlans(defaultPlans);
       } catch (error) {
@@ -82,33 +105,146 @@ export default function DomesticInsuranceStep3Page() {
     }
   }, []);
 
-  // 보험료 계산 API 호출
-  const calculatePremiums = async () => {
-    if (!startDate || !endDate || insuredList.length === 0) {
-      return;
-    }
-
-    setLoading(true);
+  const fetchAvailablePlans = async (age: number, gender: string) => {
     try {
-      const insuredPersons = insuredList.map(person => ({
-        age: person.age,
-        gender: person.gender,
-        plan_type: getPlanType(selectedPlans[person.index] || 'BAW'),
-        plan_variant: 'B',
-        has_medical_expense: true, // 국내실손 포함 여부 (플랜에 따라 다를 수 있음)
-      }));
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/travel/calculate-group-premium`, {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${apiBase}/api/travel/available-plans`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           insurance_type: '국내여행보험',
-          insured_persons: insuredPersons,
-          departure_date: startDate,
-          arrival_date: endDate,
+          age,
+          gender,
+          plan_variant: 'B',
+          has_medical_expense: 1,
         }),
+      });
+      const data = await response.json();
+      if (data?.success && Array.isArray(data.plan_types)) {
+        return data.plan_types as string[];
+      }
+    } catch (error) {
+      console.error('플랜 목록 조회 실패:', error);
+    }
+    return [];
+  };
+
+  const ensureAvailablePlans = async () => {
+    const missing = insuredList.filter((person) => {
+      const plans = availablePlansByIndex[person.index];
+      return !plans || plans.length === 0;
+    });
+    if (missing.length === 0) return false;
+
+    const entries = await Promise.all(
+      missing.map(async (person) => {
+        const plans = await fetchAvailablePlans(person.age, person.gender);
+        return [person.index, plans] as const;
+      })
+    );
+
+    setAvailablePlansByIndex((prev) => {
+      const next = { ...prev };
+      entries.forEach(([index, plans]) => {
+        next[index] = plans;
+      });
+      return next;
+    });
+    return true;
+  };
+
+  useEffect(() => {
+    if (insuredList.length === 0) return;
+    let isActive = true;
+
+    const loadPlans = async () => {
+      const entries = await Promise.all(
+        insuredList.map(async (person) => {
+          const plans = await fetchAvailablePlans(person.age, person.gender);
+          return [person.index, plans] as const;
+        })
+      );
+      if (!isActive) return;
+      const map: { [key: number]: string[] } = {};
+      entries.forEach(([index, plans]) => {
+        map[index] = plans;
+      });
+      setAvailablePlansByIndex(map);
+    };
+
+    loadPlans();
+    return () => {
+      isActive = false;
+    };
+  }, [insuredList]);
+
+  useEffect(() => {
+    if (insuredList.length === 0) return;
+    setSelectedPlans((prev) => sanitizeSelectedPlans(prev));
+  }, [availablePlansByIndex, insuredList]);
+
+  // 보험료 계산 API 호출
+  const calculatePremiums = async () => {
+    if (!startDate || !endDate || insuredList.length === 0) {
+      return;
+    }
+
+    if (await ensureAvailablePlans()) {
+      return;
+    }
+
+    const allPlansReady = insuredList.every(person => {
+      const availablePlans = availablePlansByIndex[person.index];
+      if (!availablePlans || availablePlans.length === 0) {
+        return false;
+      }
+      const normalized = normalizePlanType(selectedPlans[person.index] || '');
+      return !!normalized && availablePlans.includes(normalized);
+    });
+
+    if (!allPlansReady) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const insuredPersons = insuredList.map(person => {
+        const fallbackPlan = availablePlansByIndex[person.index]?.[0] || '실속플랜';
+        const planType = normalizePlanType(selectedPlans[person.index] || fallbackPlan);
+        return {
+          age: person.age,
+          gender: person.gender,
+          plan_type: planType,
+          plan_variant: 'B',
+          has_medical_expense: true,
+        };
+      });
+
+      const requestKey = JSON.stringify({
+        insurance_type: '국내여행보험',
+        insured_persons: insuredPersons,
+        departure_date: startDate,
+        arrival_date: endDate,
+      });
+
+      if (inflightRef.current && lastRequestKeyRef.current === requestKey) {
+        return;
+      }
+      if (lastRequestKeyRef.current === requestKey && loading) {
+        return;
+      }
+
+      inflightRef.current = true;
+      lastRequestKeyRef.current = requestKey;
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/travel/calculate-group-premium`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: requestKey,
       });
 
       const data = await response.json();
@@ -128,21 +264,43 @@ export default function DomesticInsuranceStep3Page() {
       console.error('보험료 계산 오류:', error);
       alert('보험료 계산 중 오류가 발생했습니다.');
     } finally {
+      inflightRef.current = false;
       setLoading(false);
     }
   };
 
-  // 보험료 자동 계산 (플랜 변경 시)
   useEffect(() => {
-    if (insuredList.length > 0 && Object.keys(selectedPlans).length === insuredList.length) {
-      calculatePremiums();
+    calculatePremiumsRef.current = calculatePremiums;
+  }, [calculatePremiums]);
+
+  const scheduleCalculate = React.useCallback(() => {
+    if (calcTimerRef.current) {
+      clearTimeout(calcTimerRef.current);
     }
-  }, [selectedPlans, insuredList]);
+    calcTimerRef.current = setTimeout(() => {
+      calculatePremiumsRef.current();
+    }, 150);
+  }, []);
+
+  // 보험료 자동 계산 (플랜/기간/플랜목록 준비 후)
+  useEffect(() => {
+    if (insuredList.length === 0) return;
+    if (!startDate || !endDate) return;
+    if (Object.keys(selectedPlans).length !== insuredList.length) return;
+
+    const allPlansLoaded = insuredList.every((person) => {
+      const plans = availablePlansByIndex[person.index];
+      return Array.isArray(plans) && plans.length > 0;
+    });
+    if (!allPlansLoaded) return;
+
+    scheduleCalculate();
+  }, [selectedPlans, insuredList, availablePlansByIndex, startDate, endDate, scheduleCalculate]);
 
   const handlePlanChange = (index: number, planCd: string) => {
     setSelectedPlans(prev => ({
       ...prev,
-      [index]: planCd
+      [index]: normalizePlanType(planCd)
     }));
   };
 
@@ -230,11 +388,18 @@ export default function DomesticInsuranceStep3Page() {
                               <span className="ps_box02 wd_100">
                                 <select 
                                   className="sel01" 
-                                  value={selectedPlans[insured.index] || 'BAW'}
+                                  value={selectedPlans[insured.index] || availablePlansByIndex[insured.index]?.[0] || '실속플랜'}
                                   onChange={(e) => handlePlanChange(insured.index, e.target.value)}
                                 >
-                                  <option value="BAW">실속플랜(국내실손 포함)</option>
-                                  <option value="HCW">표준플랜(국내실손 포함)</option>
+                                  {(() => {
+                                    const fallbackPlans = ['실속플랜', '표준플랜'];
+                                    const planOptions = (availablePlansByIndex[insured.index]?.length
+                                      ? availablePlansByIndex[insured.index]
+                                      : fallbackPlans) as string[];
+                                    return planOptions.map((plan) => (
+                                      <option key={plan} value={plan}>{plan}</option>
+                                    ));
+                                  })()}
                                 </select>
                               </span>
                             </div>

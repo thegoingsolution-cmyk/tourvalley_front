@@ -420,6 +420,15 @@
   color: #000;
 }
 
+/* 기본 날짜(초기값)는 회색 유지, 사용자가 선택했을 때만 검정 */
+.domestic-page-pc .date-picker-wrapper .react-datepicker__input-container input.date-input:not(.user-selected) {
+  color: #dddddd;
+}
+
+.domestic-page-pc .date-picker-wrapper .react-datepicker__input-container input.date-input.user-selected {
+  color: #000;
+}
+
 .domestic-page-pc .date-input::-webkit-calendar-picker-indicator {
   opacity: 0;
   position: absolute;

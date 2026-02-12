@@ -13,7 +13,6 @@
  */
 export const calculateInsuranceAge = (year: number, month: number, day: number): number => {
   const today = new Date();
-  const birthDate = new Date(year, month - 1, day);
 
   // 만나이 계산
   let age = today.getFullYear() - year;
@@ -22,7 +21,11 @@ export const calculateInsuranceAge = (year: number, month: number, day: number):
   }
 
   // 보험나이: 만나이에서 6개월이 경과하면 +1
-  const sixMonthsLater = new Date(birthDate);
+  const lastBirthday = new Date(today.getFullYear(), month - 1, day);
+  if (today < lastBirthday) {
+    lastBirthday.setFullYear(lastBirthday.getFullYear() - 1);
+  }
+  const sixMonthsLater = new Date(lastBirthday);
   sixMonthsLater.setMonth(sixMonthsLater.getMonth() + 6);
   if (today >= sixMonthsLater) {
     age++;

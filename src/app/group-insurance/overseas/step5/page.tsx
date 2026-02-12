@@ -45,17 +45,24 @@ export default function OverseasInsuranceStep5Page() {
   const yearOptions = Array.from({ length: 6 }, (_, i) => currentYear + i);
   const totalPremium = step3Data?.total_premium || 0;
   const isVirtualAccountAvailable = totalPremium >= 10000;
-  const getPlanDisplayName = (planCode: string, planType: string) => {
-    let baseName = '';
-    if (planCode === 'STW' || planCode === 'STM') {
-      baseName = '표준플랜';
-    } else if (planCode === 'BAW' || planCode === 'BAM') {
-      baseName = '실속플랜';
-    } else if (planCode === 'HCW' || planCode === 'HCM') {
-      baseName = '고보장플랜';
+  const normalizePlanType = (planCode: string) => {
+    const map: Record<string, string> = {
+      STW: '표준플랜',
+      STM: '표준플랜',
+      BAW: '실속플랜',
+      BAM: '실속플랜',
+      HCW: '고급플랜',
+      HCM: '고급플랜',
+    };
+    return map[planCode] || planCode || '표준플랜';
+  };
+  const getPlanDisplayName = (planCodeOrType: string, planType: string) => {
+    const normalized = normalizePlanType(planCodeOrType);
+    const display = normalized === '고급플랜' ? '고보장플랜' : normalized;
+    if (normalized === '실속플랜' || normalized === '표준플랜' || normalized === '고급플랜') {
+      return `${display}${planType === 'V' ? '(국내실손 포함)' : '(국내실손 제외)'}`;
     }
-
-    return `${baseName}${planType === 'V' ? '(국내실손 포함)' : '(국내실손 제외)'}`;
+    return display;
   };
 
   const continentPlaceLabels: { [key: string]: { value: string; label: string }[] } = {
@@ -472,14 +479,17 @@ export default function OverseasInsuranceStep5Page() {
           }
         }
 
-        // 플랜 타입 변환 (DB ENUM에 맞춤: '어린이플랜', '어르신플랜', '어르신플랜2', '실속플랜', '고보장플랜', '기준플랜')
+        // 플랜 타입 변환 (단체 해외 전용 스키마: 기준/실속/고보장)
         let planTypeName = '';
-        if (planCode === 'STW' || planCode === 'STM') {
-          planTypeName = '기준플랜'; // DB ENUM: '기준플랜' (표준플랜이 아님)
-        } else if (planCode === 'BAW' || planCode === 'BAM') {
+        const normalizedPlanType = normalizePlanType(planCode);
+        if (normalizedPlanType === '표준플랜') {
+          planTypeName = '기준플랜';
+        } else if (normalizedPlanType === '실속플랜') {
           planTypeName = '실속플랜';
-        } else if (planCode === 'HCW' || planCode === 'HCM') {
+        } else if (normalizedPlanType === '고급플랜') {
           planTypeName = '고보장플랜';
+        } else {
+          planTypeName = normalizedPlanType;
         }
 
         // 국적 정보 변환

@@ -18,9 +18,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 0;
-  border-bottom: 1px solid #eaebef;
+  padding-top: 14px;
+  border-bottom: 1px solid #dfdfdf;
   background: #fff;
+  height: 56px;
+  box-sizing: border-box;
 }
 
 .layer_header .layer_title {
@@ -87,8 +89,8 @@
   margin-top: 45px;
 }
 
-.tourG_mab03 {
-  margin-bottom: 10px !important;
+.tourG_mat10 {
+  margin-top: 35px;
 }
 
 .ag_left {

@@ -97,6 +97,19 @@ export default function PaymentStep({
     }
   };
 
+  const paymentLabelStyle: React.CSSProperties = {
+    paddingLeft: '24px',
+    paddingTop: '8px',
+    paddingBottom: '8px',
+  };
+  const paymentIconStyle: React.CSSProperties = {
+    width: '38px',
+    height: '38px',
+  };
+  const paymentTextStyle: React.CSSProperties = {
+    fontSize: '16px',
+  };
+
   // 무통장입금 선택 시 기본값으로 우리은행 설정
   useEffect(() => {
     if (paymentSubMethod === '무통장입금' && depositBank === '') {
@@ -115,13 +128,14 @@ export default function PaymentStep({
           {/* 결제 방법 선택 */}
           <div className="payment-methods-section">
             <div className="payment-method-option">
-              <label htmlFor="nicepay" className="payment-method-label">
+              <label htmlFor="nicepay" className="payment-method-label" style={paymentLabelStyle}>
                 <img 
                   src="/icons/payment-credit-card.png" 
                   alt="신용카드" 
                   className="payment-method-icon"
+                  style={paymentIconStyle}
                 />
-                <span>신용카드</span>
+                <span style={paymentTextStyle}>신용카드</span>
                 <input
                   type="radio"
                   name="paymentMethod"
@@ -136,13 +150,14 @@ export default function PaymentStep({
               </label>
             </div>
             <div className="payment-method-option">
-              <label htmlFor="naverpay" className="payment-method-label">
+              <label htmlFor="naverpay" className="payment-method-label" style={paymentLabelStyle}>
                 <img 
                   src="/icons/payment-naver-pay.png" 
                   alt="네이버페이" 
                   className="payment-method-icon"
+                  style={paymentIconStyle}
                 />
-                <span>네이버페이</span>
+                <span style={paymentTextStyle}>네이버페이</span>
                 <input
                   type="radio"
                   name="paymentMethod"
@@ -157,13 +172,14 @@ export default function PaymentStep({
               </label>
             </div>
             <div className="payment-method-option">
-              <label htmlFor="kakaopay" className="payment-method-label">
+              <label htmlFor="kakaopay" className="payment-method-label" style={paymentLabelStyle}>
                 <img 
                   src="/icons/payment-kakao-pay.png" 
                   alt="카카오페이" 
                   className="payment-method-icon"
+                  style={paymentIconStyle}
                 />
-                <span>카카오페이</span>
+                <span style={paymentTextStyle}>카카오페이</span>
                 <input
                   type="radio"
                   name="paymentMethod"
@@ -178,13 +194,14 @@ export default function PaymentStep({
               </label>
             </div>
             <div className="payment-method-option">
-              <label htmlFor="bank-transfer" className="payment-method-label">
+              <label htmlFor="bank-transfer" className="payment-method-label" style={paymentLabelStyle}>
                 <img 
                   src="/icons/payment-other.png" 
                   alt="무통장입금" 
                   className="payment-method-icon"
+                  style={paymentIconStyle}
                 />
-                <span>무통장입금</span>
+                <span style={paymentTextStyle}>무통장입금</span>
                 <input
                   type="radio"
                   name="paymentMethod"
@@ -197,13 +214,14 @@ export default function PaymentStep({
             </div>
             {receiptPremium >= 10000 && (
               <div className="payment-method-option">
-                <label htmlFor="virtual-account" className="payment-method-label">
+                <label htmlFor="virtual-account" className="payment-method-label" style={paymentLabelStyle}>
                   <img 
                     src="/icons/payment-other.png" 
                     alt="가상계좌" 
                     className="payment-method-icon"
+                    style={paymentIconStyle}
                   />
-                  <span>가상계좌</span>
+                  <span style={paymentTextStyle}>가상계좌</span>
                   <input
                     type="radio"
                     name="paymentMethod"
@@ -216,13 +234,14 @@ export default function PaymentStep({
               </div>
             )}
             <div className="payment-method-option">
-              <label htmlFor="manual-card" className="payment-method-label">
+              <label htmlFor="manual-card" className="payment-method-label" style={paymentLabelStyle}>
                 <img 
                   src="/icons/payment-other.png" 
                   alt="수기카드" 
                   className="payment-method-icon"
+                  style={paymentIconStyle}
                 />
-                <span>수기카드</span>
+                <span style={paymentTextStyle}>수기카드</span>
                 <input
                   type="radio"
                   name="paymentMethod"

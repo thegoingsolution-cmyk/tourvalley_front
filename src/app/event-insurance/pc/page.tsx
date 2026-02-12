@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ServiceModal from '@/components/ServiceModal';
@@ -43,8 +43,10 @@ export default function PCEventInsurancePage() {
   const [startHour, setStartHour] = useState(getDefaultHour());
   const [endDate, setEndDate] = useState<Date | null>(today);
   const [endHour, setEndHour] = useState(getDefaultHour());
-  const [hasSelectedStartDate, setHasSelectedStartDate] = useState(true); // today로 초기화되어 있으므로 true
-  const [hasSelectedEndDate, setHasSelectedEndDate] = useState(true); // today로 초기화되어 있으므로 true
+  const [hasSelectedStartDate, setHasSelectedStartDate] = useState(false);
+  const [hasSelectedEndDate, setHasSelectedEndDate] = useState(false);
+  const initialStartDateRef = useRef<Date | null>(startDate);
+  const initialEndDateRef = useRef<Date | null>(endDate);
   const [insuredCnt, setInsuredCnt] = useState('');
   const [actionInfo1, setActionInfo1] = useState<string | null>(null); // 운동경기
   const [actionInfo2, setActionInfo2] = useState<string | null>(null); // 불꽃놀이
@@ -682,15 +684,20 @@ export default function PCEventInsurancePage() {
                                   selected={startDate}
                                   onChange={(date: Date | null) => {
                                     setStartDate(date);
-                                    setHasSelectedStartDate(!!date);
+                                    setHasSelectedStartDate(
+                                      !!date && date.getTime() !== initialStartDateRef.current?.getTime()
+                                    );
                                     if (date && endDate && date > endDate) {
+                                      // 종료일 자동 보정 시에는 '사용자 선택'으로 처리하지 않음
                                       setEndDate(date);
-                                      setHasSelectedEndDate(true);
+                                      setHasSelectedEndDate(false);
                                     }
                                   }}
                                   onSelect={(date: Date | null) => {
                                     if (date) {
-                                      setHasSelectedStartDate(true);
+                                      setHasSelectedStartDate(
+                                        date.getTime() !== initialStartDateRef.current?.getTime()
+                                      );
                                     }
                                   }}
                                   dateFormat="yyyy-MM-dd"
@@ -699,7 +706,7 @@ export default function PCEventInsurancePage() {
                                   placeholderText="날짜 선택"
                                   dateFormatCalendar="yyyy년 MM월"
                                   minDate={today}
-                                  className={`field-input date-input ${hasSelectedStartDate ? 'has-value' : ''}`}
+                                  className={`field-input date-input ${hasSelectedStartDate ? 'has-value user-selected' : ''}`}
                                   wrapperClassName="date-picker-wrapper"
                                   calendarClassName="custom-calendar"
                                   popperClassName="custom-popper"
@@ -736,15 +743,20 @@ export default function PCEventInsurancePage() {
                                     if (date && startDate && date < startDate) {
                                       alert('종료일은 시작일보다 이전일 수 없습니다.');
                                       setEndDate(startDate);
-                                      setHasSelectedEndDate(true);
+                                      // 시작일로 되돌릴 때는 '사용자 선택'으로 처리하지 않음
+                                      setHasSelectedEndDate(false);
                                     } else {
                                       setEndDate(date);
-                                      setHasSelectedEndDate(!!date);
+                                      setHasSelectedEndDate(
+                                        !!date && date.getTime() !== initialEndDateRef.current?.getTime()
+                                      );
                                     }
                                   }}
                                   onSelect={(date: Date | null) => {
                                     if (date) {
-                                      setHasSelectedEndDate(true);
+                                      setHasSelectedEndDate(
+                                        date.getTime() !== initialEndDateRef.current?.getTime()
+                                      );
                                     }
                                   }}
                                   dateFormat="yyyy-MM-dd"
@@ -753,7 +765,7 @@ export default function PCEventInsurancePage() {
                                   placeholderText="날짜 선택"
                                   dateFormatCalendar="yyyy년 MM월"
                                   minDate={startDate || today}
-                                  className={`field-input date-input ${hasSelectedEndDate ? 'has-value' : ''}`}
+                                  className={`field-input date-input ${hasSelectedEndDate ? 'has-value user-selected' : ''}`}
                                   wrapperClassName="date-picker-wrapper"
                                   calendarClassName="custom-calendar"
                                   popperClassName="custom-popper"

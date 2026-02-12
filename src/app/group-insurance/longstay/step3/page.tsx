@@ -56,6 +56,29 @@ export default function LongStayInsuranceStep3Page() {
   const [endDate, setEndDate] = useState('');
   const [travelPurpose, setTravelPurpose] = useState('유학/어학연수');
   const [loading, setLoading] = useState(false);
+  const [availablePlanTypesByIndex, setAvailablePlanTypesByIndex] = useState<{ [key: number]: string[] }>({});
+  const calcTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const inflightRef = React.useRef(false);
+  const lastRequestKeyRef = React.useRef('');
+  const calculatePremiumsRef = React.useRef<() => void>(() => {});
+  const sanitizeSelectedPlans = (plans: { [key: number]: string }) => {
+    if (insuredList.length === 0) return plans;
+    let changed = false;
+    const next = { ...plans };
+    insuredList.forEach((person) => {
+      const availableTypes = availablePlanTypesByIndex[person.index];
+      const hasCurrencyPlans = travelPurpose !== '워킹홀리데이';
+      const planOptions = getAvailablePlansForPerson(hasCurrencyPlans, availableTypes);
+      const currentPlan = next[person.index];
+      if (!currentPlan || !planOptions.some(option => option.value === currentPlan)) {
+        if (planOptions[0]?.value) {
+          next[person.index] = planOptions[0].value;
+          changed = true;
+        }
+      }
+    });
+    return changed ? next : plans;
+  };
 
   useEffect(() => {
     const step1Data = localStorage.getItem('longstayInsuranceStep1');
@@ -114,8 +137,119 @@ export default function LongStayInsuranceStep3Page() {
     }
   }, []);
 
+  const fetchAvailablePlans = async (age: number, gender: string) => {
+    try {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${apiBase}/api/travel/available-plans`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          insurance_type: travelPurpose,
+          age,
+          gender,
+          plan_variant: 'B',
+          has_medical_expense: 1,
+          include_foreign_currency: true,
+        }),
+      });
+      const data = await response.json();
+      if (data?.success && Array.isArray(data.plan_types)) {
+        return data.plan_types as string[];
+      }
+    } catch (error) {
+      console.error('플랜 목록 조회 실패:', error);
+    }
+    return [];
+  };
+
+  const ensureAvailablePlans = async () => {
+    const missing = insuredList.filter((person) => {
+      const plans = availablePlanTypesByIndex[person.index];
+      return !plans || plans.length === 0;
+    });
+    if (missing.length === 0) return false;
+
+    const entries = await Promise.all(
+      missing.map(async (person) => {
+        const plans = await fetchAvailablePlans(person.age, person.gender);
+        return [person.index, plans] as const;
+      })
+    );
+
+    setAvailablePlanTypesByIndex((prev) => {
+      const next = { ...prev };
+      entries.forEach(([index, plans]) => {
+        next[index] = plans;
+      });
+      return next;
+    });
+    return true;
+  };
+
+  useEffect(() => {
+    if (insuredList.length === 0) return;
+    let isActive = true;
+
+    const loadPlans = async () => {
+      const map: { [key: number]: string[] } = {};
+      for (const person of insuredList) {
+        const plans = await fetchAvailablePlans(person.age, person.gender);
+        if (!isActive) return;
+        map[person.index] = plans;
+        setAvailablePlanTypesByIndex(prev => ({
+          ...prev,
+          [person.index]: plans,
+        }));
+      }
+      if (!isActive) return;
+      setAvailablePlanTypesByIndex(map);
+    };
+
+    loadPlans();
+    return () => {
+      isActive = false;
+    };
+  }, [insuredList, travelPurpose]);
+
+  const getAvailablePlansForPerson = (hasCurrencyPlans: boolean, availableTypes?: string[]) => {
+    const basePlans = hasCurrencyPlans
+      ? [
+          { value: 'BAS', label: '실속플랜(원화)' },
+          { value: 'STD', label: '표준플랜(원화)' },
+          { value: 'HCV', label: '고급플랜(원화)' },
+          { value: 'BAU', label: '실속플랜(U$달러)' },
+          { value: 'STU', label: '표준플랜(U$달러)' },
+          { value: 'HCU', label: '고급플랜(U$달러)' },
+        ]
+      : [
+          { value: 'BAW', label: '워킹홀리데이실속플랜' },
+          { value: 'HCW', label: '워킹홀리데이표준플랜' },
+          { value: 'HAW', label: '워킹홀리데이(유로화플랜)' },
+        ];
+
+    if (!availableTypes || availableTypes.length === 0) {
+      return basePlans;
+    }
+
+    const filteredPlans = basePlans.filter(plan => availableTypes.includes(getPlanType(plan.value, travelPurpose)));
+    return filteredPlans.length ? filteredPlans : basePlans;
+  };
+
+  useEffect(() => {
+    if (insuredList.length === 0) return;
+    setSelectedPlans((prev) => {
+      return sanitizeSelectedPlans(prev);
+    });
+  }, [availablePlanTypesByIndex, insuredList, travelPurpose]);
+
   const calculatePremiums = useCallback(async () => {
     if (!startDate || !endDate || insuredList.length === 0) {
+      return;
+    }
+
+    if (await ensureAvailablePlans()) {
       return;
     }
 
@@ -123,12 +257,31 @@ export default function LongStayInsuranceStep3Page() {
     const allPlansSelected = insuredList.every(person => {
       return selectedPlans[person.index];
     });
+    const hasAllPlanTypes = Object.keys(availablePlanTypesByIndex).length === insuredList.length;
+    const allPlansReady = insuredList.every(person => {
+      const availableTypes = availablePlanTypesByIndex[person.index];
+      if (!availableTypes || availableTypes.length === 0) {
+        return false;
+      }
+      const currentPlan = selectedPlans[person.index];
+      if (!currentPlan) {
+        return false;
+      }
+      const selectedPlanType = getPlanType(currentPlan, travelPurpose);
+      if (availableTypes.includes(selectedPlanType)) {
+        return true;
+      }
+      // 나이별 보정 플랜은 백엔드에서 처리되므로, 해당 플랜이 존재하면 통과
+      if (person.age >= 71 && (availableTypes.includes('어르신플랜1') || availableTypes.includes('어르신플랜2'))) {
+        return true;
+      }
+      return false;
+    });
 
-    if (!allPlansSelected) {
+    if (!allPlansSelected || !allPlansReady || !hasAllPlanTypes) {
       return;
     }
 
-    setLoading(true);
     try {
       // 워킹홀리데이를 제외한 모든 목적은 원화/외화 플랜 사용
       const hasCurrencyPlans = travelPurpose !== '워킹홀리데이';
@@ -144,18 +297,28 @@ export default function LongStayInsuranceStep3Page() {
           currency_plan: getCurrencyPlan(planCode, travelPurpose),
         };
       });
+      const requestKey = JSON.stringify({
+        insurance_type: travelPurpose,
+        departure_date: startDate,
+        arrival_date: endDate,
+        insured_persons: insuredPersons,
+      });
+      if (inflightRef.current && lastRequestKeyRef.current === requestKey) {
+        return;
+      }
+      if (lastRequestKeyRef.current === requestKey && loading) {
+        return;
+      }
+      inflightRef.current = true;
+      lastRequestKeyRef.current = requestKey;
+      setLoading(true);
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/travel/calculate-group-premium`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          insurance_type: travelPurpose,
-          insured_persons: insuredPersons,
-          departure_date: startDate,
-          arrival_date: endDate,
-        }),
+        body: requestKey,
       });
 
       const data = await response.json();
@@ -174,9 +337,23 @@ export default function LongStayInsuranceStep3Page() {
       console.error('보험료 계산 오류:', error);
       alert('보험료 계산 중 오류가 발생했습니다.');
     } finally {
+      inflightRef.current = false;
       setLoading(false);
     }
-  }, [startDate, endDate, insuredList, selectedPlans, travelPurpose]);
+  }, [startDate, endDate, insuredList, selectedPlans, travelPurpose, availablePlanTypesByIndex, getAvailablePlansForPerson, ensureAvailablePlans]);
+
+  useEffect(() => {
+    calculatePremiumsRef.current = calculatePremiums;
+  }, [calculatePremiums]);
+
+  const scheduleCalculate = useCallback(() => {
+    if (calcTimerRef.current) {
+      clearTimeout(calcTimerRef.current);
+    }
+    calcTimerRef.current = setTimeout(() => {
+      calculatePremiumsRef.current();
+    }, 150);
+  }, []);
 
   // selectedPlans 변경 감지를 위한 ref
   const prevSelectedPlansRef = React.useRef<string>('');
@@ -185,12 +362,22 @@ export default function LongStayInsuranceStep3Page() {
     const selectedPlansStr = JSON.stringify(selectedPlans);
     
     if (insuredList.length > 0 && 
+        startDate &&
+        endDate &&
         Object.keys(selectedPlans).length === insuredList.length &&
         selectedPlansStr !== prevSelectedPlansRef.current) {
       prevSelectedPlansRef.current = selectedPlansStr;
-      calculatePremiums();
+      scheduleCalculate();
     }
-  }, [calculatePremiums, insuredList.length, selectedPlans]);
+  }, [scheduleCalculate, insuredList.length, selectedPlans, startDate, endDate]);
+
+  useEffect(() => {
+    if (insuredList.length === 0) return;
+    if (!startDate || !endDate) return;
+    if (Object.keys(availablePlanTypesByIndex).length !== insuredList.length) return;
+    if (Object.keys(selectedPlans).length !== insuredList.length) return;
+    scheduleCalculate();
+  }, [availablePlanTypesByIndex, scheduleCalculate, insuredList.length, selectedPlans, startDate, endDate]);
 
   const handlePlanChange = (index: number, planCd: string) => {
     setSelectedPlans(prev => {
@@ -212,7 +399,7 @@ export default function LongStayInsuranceStep3Page() {
         });
       }
       
-      return newSelectedPlans;
+      return sanitizeSelectedPlans(newSelectedPlans);
     });
   };
 
@@ -293,20 +480,8 @@ export default function LongStayInsuranceStep3Page() {
                         // 워킹홀리데이를 제외한 모든 목적은 원화/외화 플랜 사용
                         const hasCurrencyPlans = travelPurpose !== '워킹홀리데이';
                         const defaultPlan = hasCurrencyPlans ? 'BAS' : 'BAW';
-                        const availablePlans = hasCurrencyPlans
-                          ? [
-                              { value: 'BAS', label: '실속플랜(원화)' },
-                              { value: 'STD', label: '표준플랜(원화)' },
-                              { value: 'HCV', label: '고급플랜(원화)' },
-                              { value: 'BAU', label: '실속플랜(U$달러)' },
-                              { value: 'STU', label: '표준플랜(U$달러)' },
-                              { value: 'HCU', label: '고급플랜(U$달러)' },
-                            ]
-                          : [
-                              { value: 'BAW', label: '실속플랜' },
-                              { value: 'HCW', label: '표준플랜' },
-                              { value: 'HAW', label: '고급플랜' },
-                            ];
+                        const availableTypes = availablePlanTypesByIndex[insured.index];
+                        const effectivePlans = getAvailablePlansForPerson(hasCurrencyPlans, availableTypes);
                         return (
                           <tr key={index}>
                             <td className="ag_center">{insured.index}</td>
@@ -317,10 +492,10 @@ export default function LongStayInsuranceStep3Page() {
                                 <span className="ps_box02 wd_100">
                                   <select 
                                     className="sel01" 
-                                    value={selectedPlans[insured.index] || defaultPlan}
+                                    value={selectedPlans[insured.index] || effectivePlans[0]?.value || defaultPlan}
                                     onChange={(e) => handlePlanChange(insured.index, e.target.value)}
                                   >
-                                    {availablePlans.map(plan => (
+                                    {effectivePlans.map(plan => (
                                       <option key={plan.value} value={plan.value}>{plan.label}</option>
                                     ))}
                                   </select>

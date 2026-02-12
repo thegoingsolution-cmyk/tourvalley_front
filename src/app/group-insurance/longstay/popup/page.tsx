@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { ko } from 'date-fns/locale';
 import { format, parse } from 'date-fns';
@@ -35,6 +35,8 @@ export default function LongStayInsurancePopupPage() {
   const [tourNum, setTourNum] = useState('1');
   const [hasSelectedStartDate, setHasSelectedStartDate] = useState(false);
   const [hasSelectedEndDate, setHasSelectedEndDate] = useState(false);
+  const initialStartDateRef = useRef('');
+  const initialEndDateRef = useRef('');
 
   useEffect(() => {
     const now = new Date();
@@ -60,8 +62,10 @@ export default function LongStayInsurancePopupPage() {
     setEndDate(formattedDate);
     setStartHour(defaultHour);
     setEndHour(defaultHour);
-    setHasSelectedStartDate(true);
-    setHasSelectedEndDate(true);
+    initialStartDateRef.current = formattedDate;
+    initialEndDateRef.current = formattedDate;
+    setHasSelectedStartDate(false);
+    setHasSelectedEndDate(false);
   }, []);
 
   const handleSubmit = () => {
@@ -216,7 +220,7 @@ export default function LongStayInsurancePopupPage() {
                               if (date) {
                                 const formattedDate = formatDate(date);
                                 setStartDate(formattedDate);
-                                setHasSelectedStartDate(true);
+                                setHasSelectedStartDate(formattedDate !== initialStartDateRef.current);
                               } else {
                                 setStartDate('');
                                 setHasSelectedStartDate(false);
@@ -226,7 +230,7 @@ export default function LongStayInsurancePopupPage() {
                               if (date) {
                                 const formattedDate = formatDate(date);
                                 setStartDate(formattedDate);
-                                setHasSelectedStartDate(true);
+                                setHasSelectedStartDate(formattedDate !== initialStartDateRef.current);
                               }
                             }}
                             dateFormat="yyyy-MM-dd"
@@ -234,7 +238,7 @@ export default function LongStayInsurancePopupPage() {
                             locale="ko"
                             placeholderText="출발일"
                             dateFormatCalendar="yyyy년 MM월"
-                            className={`tf_g dicon ${hasSelectedStartDate ? 'has-value' : ''}`}
+                            className={`tf_g dicon ${hasSelectedStartDate ? 'has-value user-selected' : ''}`}
                             wrapperClassName="date-picker-wrapper"
                             calendarClassName="custom-calendar"
                             popperClassName="custom-popper"
@@ -275,7 +279,7 @@ export default function LongStayInsurancePopupPage() {
                               if (date) {
                                 const formattedDate = formatDate(date);
                                 setEndDate(formattedDate);
-                                setHasSelectedEndDate(true);
+                                setHasSelectedEndDate(formattedDate !== initialEndDateRef.current);
                               } else {
                                 setEndDate('');
                                 setHasSelectedEndDate(false);
@@ -285,7 +289,7 @@ export default function LongStayInsurancePopupPage() {
                               if (date) {
                                 const formattedDate = formatDate(date);
                                 setEndDate(formattedDate);
-                                setHasSelectedEndDate(true);
+                                setHasSelectedEndDate(formattedDate !== initialEndDateRef.current);
                               }
                             }}
                             dateFormat="yyyy-MM-dd"
@@ -293,7 +297,7 @@ export default function LongStayInsurancePopupPage() {
                             locale="ko"
                             placeholderText="도착일"
                             dateFormatCalendar="yyyy년 MM월"
-                            className={`tf_g dicon ${hasSelectedEndDate ? 'has-value' : ''}`}
+                            className={`tf_g dicon ${hasSelectedEndDate ? 'has-value user-selected' : ''}`}
                             wrapperClassName="date-picker-wrapper"
                             calendarClassName="custom-calendar"
                             popperClassName="custom-popper"

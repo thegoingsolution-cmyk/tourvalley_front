@@ -211,7 +211,7 @@ export default function ParticipantInfoStep({
 
               <div className="participant-form-fields">
                 {/* 이름, 국적 */}
-                <section className="tourGuard_Info">
+                <section className="tourGuard_Info" style={{ margin: 0, position: 'static' }}>
                   <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line">
                     <label htmlFor={`insured_name_${index + 1}`}>이름</label>
                     <input

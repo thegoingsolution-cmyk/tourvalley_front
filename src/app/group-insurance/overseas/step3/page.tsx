@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import '../../popup/page.css';
 import { calculateAgeAndGenderFromResidentNumber } from '@/utils/age';
 
-const getPlanType = (planCd: string): string => {
+const normalizePlanType = (planCd: string): string => {
   const planMap: { [key: string]: string } = {
     'STW': '표준플랜', // 국내실손 포함
     'BAW': '실속플랜', // 국내실손 포함
@@ -13,7 +13,7 @@ const getPlanType = (planCd: string): string => {
     'BAM': '실속플랜', // 국내실손 제외
     'HCM': '고급플랜', // 국내실손 제외 - 화면에는 "고보장플랜"으로 표시되지만 백엔드에는 "고급플랜"으로 전송
   };
-  return planMap[planCd] || '실속플랜';
+  return planMap[planCd] || planCd || '실속플랜';
 };
 
 export default function OverseasInsuranceStep3Page() {
@@ -26,6 +26,29 @@ export default function OverseasInsuranceStep3Page() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [loading, setLoading] = useState(false);
+  const [availablePlansByIndex, setAvailablePlansByIndex] = useState<{ [key: number]: string[] }>({});
+  const inflightRef = React.useRef(false);
+  const lastRequestKeyRef = React.useRef('');
+  const calcTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const calculatePremiumsRef = React.useRef<() => void>(() => {});
+  const sanitizeSelectedPlans = (plans: { [key: number]: string }) => {
+    if (insuredList.length === 0) return plans;
+    let changed = false;
+    const next = { ...plans };
+    insuredList.forEach((person) => {
+      const availablePlans = availablePlansByIndex[person.index];
+      if (!availablePlans || availablePlans.length === 0) return;
+      const normalized = normalizePlanType(next[person.index] || '');
+      if (!normalized || !availablePlans.includes(normalized)) {
+        next[person.index] = availablePlans[0];
+        changed = true;
+      } else if (normalized !== next[person.index]) {
+        next[person.index] = normalized;
+        changed = true;
+      }
+    });
+    return changed ? next : plans;
+  };
 
   useEffect(() => {
     const step1Data = localStorage.getItem('overseasInsuranceStep1');
@@ -72,7 +95,7 @@ export default function OverseasInsuranceStep3Page() {
         const defaultPlanTypes: { [key: number]: 'V' | 'N' } = {};
         insuredPersons.forEach((person) => {
           defaultPlanTypes[person.index] = 'V'; // 기본값: 국내실손 담보
-          defaultPlans[person.index] = 'STW'; // 기본값: 표준플랜(국내실손 포함)
+          defaultPlans[person.index] = '표준플랜'; // 기본값: 표준플랜
         });
         setPlanTypes(defaultPlanTypes);
         setSelectedPlans(defaultPlans);
@@ -82,45 +105,160 @@ export default function OverseasInsuranceStep3Page() {
     }
   }, []);
 
-  const calculatePremiums = useCallback(async () => {
-    if (!startDate || !endDate || insuredList.length === 0) {
-      return;
-    }
-
-    // 모든 피보험자의 플랜이 선택되었는지 확인
-    const allPlansSelected = insuredList.every(person => {
-      return selectedPlans[person.index] && planTypes[person.index];
-    });
-
-    if (!allPlansSelected) {
-      return;
-    }
-
-    setLoading(true);
+  const fetchAvailablePlans = async (age: number, gender: string, hasMedicalExpense: boolean) => {
     try {
-      const insuredPersons = insuredList.map(person => {
-        const planType = planTypes[person.index] || 'V';
-        const hasMedicalExpense = planType === 'V'; // V면 국내실손 담보(true), N이면 부담보(false)
-        return {
-          age: person.age,
-          gender: person.gender,
-          plan_type: getPlanType(selectedPlans[person.index] || 'STW'),
-          plan_variant: 'B',
-          has_medical_expense: hasMedicalExpense,
-        };
-      });
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/travel/calculate-group-premium`, {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${apiBase}/api/travel/available-plans`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           insurance_type: '해외여행보험',
-          insured_persons: insuredPersons,
-          departure_date: startDate,
-          arrival_date: endDate,
+          age,
+          gender,
+          plan_variant: 'B',
+          has_medical_expense: hasMedicalExpense ? 1 : 0,
         }),
+      });
+      const data = await response.json();
+      if (data?.success && Array.isArray(data.plan_types)) {
+        return data.plan_types as string[];
+      }
+    } catch (error) {
+      console.error('플랜 목록 조회 실패:', error);
+    }
+    return [];
+  };
+
+  const ensureAvailablePlans = async (types: { [key: number]: 'V' | 'N' } = planTypes) => {
+    const missing = insuredList.filter((person) => {
+      const plans = availablePlansByIndex[person.index];
+      return !plans || plans.length === 0;
+    });
+    if (missing.length === 0) return false;
+
+    const entries = await Promise.all(
+      missing.map(async (person) => {
+        const planType = types[person.index] || 'V';
+        const hasMedicalExpense = planType === 'V';
+        const plans = await fetchAvailablePlans(person.age, person.gender, hasMedicalExpense);
+        return [person.index, plans] as const;
+      })
+    );
+
+    setAvailablePlansByIndex((prev) => {
+      const next = { ...prev };
+      entries.forEach(([index, plans]) => {
+        next[index] = plans;
+      });
+      return next;
+    });
+    return true;
+  };
+
+  useEffect(() => {
+    if (insuredList.length === 0) return;
+    let isActive = true;
+
+    const loadPlans = async () => {
+      const entries = await Promise.all(
+        insuredList.map(async (person) => {
+          const planType = planTypes[person.index] || 'V';
+          const hasMedicalExpense = planType === 'V';
+          const plans = await fetchAvailablePlans(person.age, person.gender, hasMedicalExpense);
+          return [person.index, plans] as const;
+        })
+      );
+      if (!isActive) return;
+      const map: { [key: number]: string[] } = {};
+      entries.forEach(([index, plans]) => {
+        map[index] = plans;
+      });
+      setAvailablePlansByIndex(map);
+    };
+
+    loadPlans();
+    return () => {
+      isActive = false;
+    };
+  }, [insuredList, planTypes]);
+
+  useEffect(() => {
+    if (insuredList.length === 0) return;
+    setSelectedPlans((prev) => sanitizeSelectedPlans(prev));
+  }, [availablePlansByIndex, insuredList]);
+
+  const calculatePremiums = useCallback(async (
+    plans: { [key: number]: string } = selectedPlans,
+    types: { [key: number]: 'V' | 'N' } = planTypes
+  ) => {
+    if (!startDate || !endDate || insuredList.length === 0) {
+      return;
+    }
+
+    if (await ensureAvailablePlans(types)) {
+      return;
+    }
+
+    // 모든 피보험자의 플랜이 선택되었는지 확인
+    const allPlansSelected = insuredList.every(person => {
+      return plans[person.index] && types[person.index];
+    });
+    const readinessByPerson = insuredList.map(person => {
+      const availablePlans = availablePlansByIndex[person.index];
+      const normalized = normalizePlanType(plans[person.index] || '');
+      return {
+        index: person.index,
+        selected: plans[person.index],
+        normalized,
+        availablePlans,
+        ready: !!availablePlans?.length && !!normalized && availablePlans.includes(normalized),
+      };
+    });
+    const allPlansReady = readinessByPerson.every(entry => entry.ready);
+
+    if (!allPlansSelected || !allPlansReady) {
+      return;
+    }
+
+    try {
+      const insuredPersons = insuredList.map(person => {
+        const planType = types[person.index] || 'V';
+        const hasMedicalExpense = planType === 'V'; // V면 국내실손 담보(true), N이면 부담보(false)
+        return {
+          age: person.age,
+          gender: person.gender,
+          plan_type: normalizePlanType(plans[person.index] || '표준플랜'),
+          plan_variant: 'B',
+          has_medical_expense: hasMedicalExpense,
+        };
+      });
+
+      const requestKey = JSON.stringify({
+        insurance_type: '해외여행보험',
+        insured_persons: insuredPersons,
+        departure_date: startDate,
+        arrival_date: endDate,
+      });
+
+      if (inflightRef.current && lastRequestKeyRef.current === requestKey) {
+        return;
+      }
+      if (lastRequestKeyRef.current === requestKey && loading) {
+        return;
+      }
+
+      inflightRef.current = true;
+      lastRequestKeyRef.current = requestKey;
+      setLoading(true);
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/travel/calculate-group-premium`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: requestKey,
       });
 
       const data = await response.json();
@@ -139,27 +277,46 @@ export default function OverseasInsuranceStep3Page() {
       console.error('보험료 계산 오류:', error);
       alert('보험료 계산 중 오류가 발생했습니다.');
     } finally {
+      inflightRef.current = false;
       setLoading(false);
     }
-  }, [startDate, endDate, insuredList, selectedPlans, planTypes]);
-
-  // selectedPlans와 planTypes 변경 감지를 위한 ref
-  const prevSelectedPlansRef = React.useRef<string>('');
-  const prevPlanTypesRef = React.useRef<string>('');
+  }, [startDate, endDate, insuredList, selectedPlans, planTypes, availablePlansByIndex, ensureAvailablePlans]);
 
   useEffect(() => {
-    const selectedPlansStr = JSON.stringify(selectedPlans);
-    const planTypesStr = JSON.stringify(planTypes);
-    
-    if (insuredList.length > 0 && 
-        Object.keys(selectedPlans).length === insuredList.length && 
-        Object.keys(planTypes).length === insuredList.length &&
-        (selectedPlansStr !== prevSelectedPlansRef.current || planTypesStr !== prevPlanTypesRef.current)) {
-      prevSelectedPlansRef.current = selectedPlansStr;
-      prevPlanTypesRef.current = planTypesStr;
-      calculatePremiums();
+    calculatePremiumsRef.current = () => calculatePremiums();
+  }, [calculatePremiums]);
+
+  const scheduleCalculate = useCallback(() => {
+    if (calcTimerRef.current) {
+      clearTimeout(calcTimerRef.current);
     }
-  }, [calculatePremiums, insuredList.length, selectedPlans, planTypes]);
+    calcTimerRef.current = setTimeout(() => {
+      calculatePremiumsRef.current();
+    }, 150);
+  }, []);
+
+  useEffect(() => {
+    if (insuredList.length === 0) return;
+    if (!startDate || !endDate) return;
+    if (Object.keys(selectedPlans).length !== insuredList.length) return;
+    if (Object.keys(planTypes).length !== insuredList.length) return;
+
+    const allPlansLoaded = insuredList.every((person) => {
+      const plans = availablePlansByIndex[person.index];
+      return Array.isArray(plans) && plans.length > 0;
+    });
+    if (!allPlansLoaded) return;
+
+    scheduleCalculate();
+  }, [
+    insuredList,
+    selectedPlans,
+    planTypes,
+    availablePlansByIndex,
+    startDate,
+    endDate,
+    scheduleCalculate,
+  ]);
 
   const handlePlanTypeChange = (index: number, planType: 'V' | 'N') => {
     setPlanTypes(prev => {
@@ -169,14 +326,10 @@ export default function OverseasInsuranceStep3Page() {
       };
       
       // 플랜 타입 변경 시 기본 플랜 설정
-      let defaultPlan = '';
-      if (planType === 'V') {
-        defaultPlan = 'STW'; // 국내실손 담보: 표준플랜
-      } else {
-        defaultPlan = 'STM'; // 국내실손 부담보: 표준플랜
-      }
+      const availablePlans = availablePlansByIndex[index];
+      const defaultPlan = availablePlans?.[0] || '표준플랜';
       
-      setSelectedPlans(prevPlans => ({
+      setSelectedPlans(prevPlans => sanitizeSelectedPlans({
         ...prevPlans,
         [index]: defaultPlan
       }));
@@ -187,29 +340,44 @@ export default function OverseasInsuranceStep3Page() {
 
   const handlePlanChange = (index: number, planCd: string) => {
     setSelectedPlans(prev => {
+      const normalizedPlan = normalizePlanType(planCd);
+      const canUsePlan = (personIndex: number, plan: string) => {
+        const availablePlans = availablePlansByIndex[personIndex];
+        if (!availablePlans || availablePlans.length === 0) {
+          return true;
+        }
+        return availablePlans.includes(plan);
+      };
+      if (!canUsePlan(index, normalizedPlan)) {
+        return prev;
+      }
       const newSelectedPlans = {
         ...prev,
-        [index]: planCd
+        [index]: normalizedPlan
       };
       
       // 변경된 피보험자의 플랜 타입 확인
       const changedPlanType = planTypes[index];
       
       // 일반 플랜 코드 (어린이/어르신 플랜 제외)
-      const normalPlans = ['STW', 'BAW', 'HCW', 'STM', 'BAM', 'HCM'];
+      const normalPlans = ['실속플랜', '표준플랜', '고급플랜'];
       
       // 일반 플랜인 경우에만 일괄 적용
-      if (normalPlans.includes(planCd)) {
+      if (normalPlans.includes(normalizedPlan)) {
         // 같은 플랜 타입을 가진 다른 피보험자들에게도 동일한 플랜 적용
         insuredList.forEach(person => {
           if (person.index !== index && planTypes[person.index] === changedPlanType) {
             // 같은 플랜 타입이면 동일한 플랜으로 변경
-            newSelectedPlans[person.index] = planCd;
+            if (canUsePlan(person.index, normalizedPlan)) {
+              newSelectedPlans[person.index] = normalizedPlan;
+            }
           }
         });
       }
       
-      return newSelectedPlans;
+      const sanitizedPlans = sanitizeSelectedPlans(newSelectedPlans);
+      scheduleCalculate();
+      return sanitizedPlans;
     });
   };
 
@@ -294,17 +462,18 @@ export default function OverseasInsuranceStep3Page() {
                       </tr>
                       {insuredList.map((insured, index) => {
                         const planType = planTypes[insured.index] || 'V';
-                        const availablePlans = planType === 'V' 
-                          ? [
-                              { value: 'STW', label: '표준플랜(국내실손 포함)' },
-                              { value: 'BAW', label: '실속플랜(국내실손 포함)' },
-                              { value: 'HCW', label: '고보장플랜(국내실손 포함)' }
-                            ]
-                          : [
-                              { value: 'STM', label: '표준플랜(국내실손 제외)' },
-                              { value: 'BAM', label: '실속플랜(국내실손 제외)' },
-                              { value: 'HCM', label: '고보장플랜(국내실손 제외)' }
-                            ];
+                        const fallbackPlans = ['표준플랜', '실속플랜', '고급플랜'];
+                        const availablePlans = availablePlansByIndex[insured.index]?.length
+                          ? availablePlansByIndex[insured.index]
+                          : fallbackPlans;
+                        const getPlanLabel = (plan: string) => {
+                          const display =
+                            plan === '고급플랜' ? '고보장플랜' : plan;
+                          if (plan === '실속플랜' || plan === '표준플랜' || plan === '고급플랜') {
+                            return `${display}(${planType === 'V' ? '국내실손 포함' : '국내실손 제외'})`;
+                          }
+                          return display;
+                        };
                         return (
                           <tr key={index}>
                             <td className="ag_center">{insured.index}</td>
@@ -329,11 +498,11 @@ export default function OverseasInsuranceStep3Page() {
                                 <span className="ps_box02 wd_100">
                                   <select 
                                     className="sel01" 
-                                    value={selectedPlans[insured.index] || (planType === 'V' ? 'STW' : 'STM')}
+                                    value={selectedPlans[insured.index] || '표준플랜'}
                                     onChange={(e) => handlePlanChange(insured.index, e.target.value)}
                                   >
                                     {availablePlans.map(plan => (
-                                      <option key={plan.value} value={plan.value}>{plan.label}</option>
+                                      <option key={plan} value={plan}>{getPlanLabel(plan)}</option>
                                     ))}
                                   </select>
                                 </span>
@@ -360,7 +529,6 @@ export default function OverseasInsuranceStep3Page() {
                 <dl>
                   <dt>플랜선택 가이드</dt>
                   <dd>15세-70세는 <span className="font_red">국내실손 의료비담보 기준플랜</span>이 기본으로 설정되어 있습니다.</dd>
-                  <dd>15세 미만은 어린이플랜, 71 ~ 90세는 어르신플랜으로 자동 설정됩니다.</dd>
                   <dd>플랜명을 클릭하시면 플랜을 변경하실 수 있습니다.<br />(동일연령대는 동일한 플랜으로 가입하셔야 합니다. 예- 기준플랜은 모두 기준플랜으로)</dd>
                   <dd>여행국가 중에 체코가 포함되어 있는 경우 고보장플랜으로 선택하시기 바랍니다. (의료비, 특별비용 3만유로 이상 플랜)</dd>
                 </dl>

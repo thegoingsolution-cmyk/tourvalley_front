@@ -45,8 +45,17 @@ export default function LongStayInsuranceStep5Page() {
   const yearOptions = Array.from({ length: 6 }, (_, i) => currentYear + i);
   const totalPremium = step3Data?.total_premium || 0;
   const isVirtualAccountAvailable = totalPremium >= 10000;
-  const getPlanDisplayName = (planCode: string) =>
-    planCode === 'BAW' ? '실속플랜' : '표준플랜';
+  const travelPurpose = step2Data?.travel_purpose || '유학/어학연수';
+  const getPlanType = (planCode: string, purpose?: string): string => {
+    const p = purpose ?? travelPurpose;
+    if (p === '워킹홀리데이') {
+      const map: Record<string, string> = { 'BAW': '워킹홀리데이실속플랜', 'HCW': '워킹홀리데이표준플랜', 'HAW': '워킹홀리데이(유로화플랜)' };
+      return map[planCode] || '워킹홀리데이실속플랜';
+    }
+    const map: Record<string, string> = { 'BAW': '실속플랜', 'HCW': '표준플랜', 'BAS': '실속플랜', 'STD': '표준플랜', 'BAU': '실속플랜', 'STU': '표준플랜' };
+    return map[planCode] || '실속플랜';
+  };
+  const getPlanDisplayName = (planCode: string) => getPlanType(planCode);
   const [insuredList, setInsuredList] = useState<any[]>([]);
 
   useEffect(() => {
@@ -451,7 +460,7 @@ export default function LongStayInsuranceStep5Page() {
           resident_number: birthDate ? `${birthDate}-${genderCode}******` : '',
           gender: gender,
           age: age,
-          plan_type: planCode === 'BAW' ? '실속플랜' : '표준플랜',
+          plan_type: getPlanType(planCode),
           plan_variant: 'B',
           premium: premium,
           has_medical_expense: 1,

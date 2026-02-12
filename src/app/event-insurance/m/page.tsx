@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { ko } from 'date-fns/locale';
 import { format, parse } from 'date-fns';
@@ -84,8 +84,10 @@ export default function MobileEventInsurancePage() {
   const [overviewName, setOverviewName] = useState('');
   const [licenseFile, setLicenseFile] = useState<File | null>(null);
   const [overviewFile, setOverviewFile] = useState<File | null>(null);
-  const [hasSelectedStartDate, setHasSelectedStartDate] = useState(true);
-  const [hasSelectedEndDate, setHasSelectedEndDate] = useState(true);
+  const [hasSelectedStartDate, setHasSelectedStartDate] = useState(false);
+  const [hasSelectedEndDate, setHasSelectedEndDate] = useState(false);
+  const initialStartDateRef = useRef(todayString);
+  const initialEndDateRef = useRef(todayString);
 
   // 컴포넌트 마운트 시 스타일 강제 재적용 (다른 페이지에서 돌아올 때 CSS 깨짐 방지)
   useEffect(() => {
@@ -387,6 +389,10 @@ export default function MobileEventInsurancePage() {
           dt_cover1: '10',
           agree: false,
         });
+        initialStartDateRef.current = todayString;
+        initialEndDateRef.current = todayString;
+        setHasSelectedStartDate(false);
+        setHasSelectedEndDate(false);
         setLicenseName('');
         setOverviewName('');
         setLicenseFile(null);
@@ -576,7 +582,7 @@ export default function MobileEventInsurancePage() {
                             if (date) {
                               const formattedDate = formatDate(date);
                               setFormData(prev => ({ ...prev, start_date: formattedDate }));
-                              setHasSelectedStartDate(true);
+                              setHasSelectedStartDate(formattedDate !== initialStartDateRef.current);
                             } else {
                               setFormData(prev => ({ ...prev, start_date: '' }));
                               setHasSelectedStartDate(false);
@@ -586,7 +592,7 @@ export default function MobileEventInsurancePage() {
                             if (date) {
                               const formattedDate = formatDate(date);
                               setFormData(prev => ({ ...prev, start_date: formattedDate }));
-                              setHasSelectedStartDate(true);
+                              setHasSelectedStartDate(formattedDate !== initialStartDateRef.current);
                             }
                           }}
                           dateFormat="yyyy-MM-dd"
@@ -594,7 +600,7 @@ export default function MobileEventInsurancePage() {
                           locale="ko"
                           placeholderText="날짜 선택"
                           dateFormatCalendar="yyyy년 MM월"
-                          className={`tourGuard_input_w01 ${hasSelectedStartDate ? 'has-value' : ''}`}
+                          className={`tourGuard_input_w01 ${hasSelectedStartDate ? 'has-value user-selected' : ''}`}
                           wrapperClassName="date-picker-wrapper"
                           calendarClassName="custom-calendar"
                           popperClassName="custom-popper"
@@ -633,7 +639,7 @@ export default function MobileEventInsurancePage() {
                             if (date) {
                               const formattedDate = formatDate(date);
                               setFormData(prev => ({ ...prev, end_date: formattedDate }));
-                              setHasSelectedEndDate(true);
+                              setHasSelectedEndDate(formattedDate !== initialEndDateRef.current);
                             } else {
                               setFormData(prev => ({ ...prev, end_date: '' }));
                               setHasSelectedEndDate(false);
@@ -643,7 +649,7 @@ export default function MobileEventInsurancePage() {
                             if (date) {
                               const formattedDate = formatDate(date);
                               setFormData(prev => ({ ...prev, end_date: formattedDate }));
-                              setHasSelectedEndDate(true);
+                              setHasSelectedEndDate(formattedDate !== initialEndDateRef.current);
                             }
                           }}
                           dateFormat="yyyy-MM-dd"
@@ -651,7 +657,7 @@ export default function MobileEventInsurancePage() {
                           locale="ko"
                           placeholderText="날짜 선택"
                           dateFormatCalendar="yyyy년 MM월"
-                          className={`tourGuard_input_w01 ${hasSelectedEndDate ? 'has-value' : ''}`}
+                          className={`tourGuard_input_w01 ${hasSelectedEndDate ? 'has-value user-selected' : ''}`}
                           wrapperClassName="date-picker-wrapper"
                           calendarClassName="custom-calendar"
                           popperClassName="custom-popper"

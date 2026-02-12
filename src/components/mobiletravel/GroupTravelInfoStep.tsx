@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import type { ReactDatePickerCustomHeaderProps } from 'react-datepicker';
 import { ko } from 'date-fns/locale';
@@ -122,19 +122,8 @@ export default function MobileGroupTravelInfoStep({
 }: GroupTravelInfoStepProps) {
   const [hasSelectedDepartureDate, setHasSelectedDepartureDate] = useState(false);
   const [hasSelectedArrivalDate, setHasSelectedArrivalDate] = useState(false);
-
-  // 날짜가 이미 선택되어 있을 때 상태 초기화
-  useEffect(() => {
-    if (departureDate) {
-      setHasSelectedDepartureDate(true);
-    }
-  }, [departureDate]);
-
-  useEffect(() => {
-    if (arrivalDate) {
-      setHasSelectedArrivalDate(true);
-    }
-  }, [arrivalDate]);
+  const initialDepartureDateRef = useRef(departureDate);
+  const initialArrivalDateRef = useRef(arrivalDate);
 
   const handleParticipantCountInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9]/g, '');
@@ -156,7 +145,7 @@ export default function MobileGroupTravelInfoStep({
                 if (date) {
                   const formattedDate = formatDate(date);
                   onDepartureDateChange(formattedDate);
-                  setHasSelectedDepartureDate(true);
+                  setHasSelectedDepartureDate(formattedDate !== initialDepartureDateRef.current);
                 } else {
                   onDepartureDateChange('');
                   setHasSelectedDepartureDate(false);
@@ -166,7 +155,7 @@ export default function MobileGroupTravelInfoStep({
                 if (date) {
                   const formattedDate = formatDate(date);
                   onDepartureDateChange(formattedDate);
-                  setHasSelectedDepartureDate(true);
+                  setHasSelectedDepartureDate(formattedDate !== initialDepartureDateRef.current);
                 }
               }}
               dateFormat="yyyy-MM-dd"
@@ -174,7 +163,7 @@ export default function MobileGroupTravelInfoStep({
               locale="ko"
               placeholderText="날짜 선택"
               dateFormatCalendar="yyyy년 MM월"
-              className={`tourGuard_input_w01 ${hasSelectedDepartureDate ? 'has-value' : ''}`}
+              className={`tourGuard_input_w01 ${hasSelectedDepartureDate ? 'has-value user-selected' : ''}`}
               wrapperClassName="date-picker-wrapper"
               calendarClassName="custom-calendar"
               popperClassName="custom-popper"
@@ -216,7 +205,7 @@ export default function MobileGroupTravelInfoStep({
                 if (date) {
                   const formattedDate = formatDate(date);
                   onArrivalDateChange(formattedDate);
-                  setHasSelectedArrivalDate(true);
+                  setHasSelectedArrivalDate(formattedDate !== initialArrivalDateRef.current);
                 } else {
                   onArrivalDateChange('');
                   setHasSelectedArrivalDate(false);
@@ -226,7 +215,7 @@ export default function MobileGroupTravelInfoStep({
                 if (date) {
                   const formattedDate = formatDate(date);
                   onArrivalDateChange(formattedDate);
-                  setHasSelectedArrivalDate(true);
+                  setHasSelectedArrivalDate(formattedDate !== initialArrivalDateRef.current);
                 }
               }}
               dateFormat="yyyy-MM-dd"
@@ -234,7 +223,7 @@ export default function MobileGroupTravelInfoStep({
               locale="ko"
               placeholderText="날짜 선택"
               dateFormatCalendar="yyyy년 MM월"
-              className={`tourGuard_input_w01 ${hasSelectedArrivalDate ? 'has-value' : ''}`}
+              className={`tourGuard_input_w01 ${hasSelectedArrivalDate ? 'has-value user-selected' : ''}`}
               wrapperClassName="date-picker-wrapper"
               calendarClassName="custom-calendar"
               popperClassName="custom-popper"
@@ -266,9 +255,9 @@ export default function MobileGroupTravelInfoStep({
         </div>
 
         {/* 가입자 수 */}
-        <div className="tourGuard_form_tt mag5 tourG_mab03">
+        <div className="tourGuard_form_tt mag5 tourG_mab03 group-participant-row">
           <label>가입자</label>
-          <div style={{ display: 'flex', alignItems: 'center', marginTop: '15px', marginLeft: '10px' }}>
+          <div className="group-participant-input" style={{ display: 'flex', alignItems: 'center', marginTop: '15px', marginLeft: '10px' }}>
             <input
               type="tel"
               name="group_participant_count"

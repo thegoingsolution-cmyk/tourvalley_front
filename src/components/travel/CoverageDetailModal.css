@@ -101,6 +101,12 @@
 }
 
 .coverage-help-link {
+  background: none;
+  border: none;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
   text-decoration: none;
 }
 
@@ -167,3 +173,66 @@
   justify-content: center;
 }
 
+.coverage-help-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+}
+
+.coverage-help-modal-content {
+  background: #fff;
+  border-radius: 12px;
+  width: min(720px, 92vw);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.coverage-help-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eaebef;
+  background: #f7f7f7;
+}
+
+.coverage-help-modal-title {
+  font-size: 18px;
+  color: #333;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+.coverage-help-modal-close {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 6px 8px;
+}
+
+.coverage-help-modal-body {
+  padding: 20px 24px 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.coverage-help-modal-footer {
+  padding: 20px 24px;
+  border-top: 1px solid #eaebef;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fff;
+}

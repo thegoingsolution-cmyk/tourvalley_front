@@ -23,12 +23,6 @@ import { PlanType, PlanInfo, Participant, CalculatedPremiums, PaymentMethod, Pay
 import { allCountries, frequentCountries } from '@/components/travel/utils/countries';
 import './page.css';
 
-const WORKING_HOLIDAY_PLAN_MAPPING: Record<string, string> = {
-  '실속플랜': '워킹홀리데이실속플랜',
-  '표준플랜': '워킹홀리데이표준플랜',
-  '고급플랜': '워킹홀리데이(유로화플랜)',
-};
-
 function MobileLongTermStayContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -263,7 +257,7 @@ function MobileLongTermStayContent() {
   };
 
   // 성별 변환 함수
-  const getGenderFromBirthDate = (birthDateStr: string, gender: 'M' | 'W'): string => {
+  const getGenderFromBirthDate = (birthDateStr: string, gender: 'M' | 'W'): '남자' | '여자' => {
     return gender === 'M' ? '남자' : '여자';
   };
 
@@ -306,140 +300,203 @@ function MobileLongTermStayContent() {
     return { valid: true };
   };
 
-  // 보장 내용 설정 헬퍼 함수
-  const getCoveragesForPlan = (planType: string, insuranceType: string, currentCurrencyPlan: string): { label: string; amount: string }[] => {
-    // 유학/어학연수 또는 해외출장/주재원/교환교수인 경우 플랜별 보장 내용
-    if (insuranceType === '유학/어학연수' || insuranceType === '해외출장/주재원/교환교수') {
-      if (currentCurrencyPlan === '원화') {
-        // 원화 플랜
-        if (planType === '실속플랜') {
-          return [
-            { label: '상해사망후유장해', amount: '1억원' },
-            { label: '해외의료비(상해)', amount: '2,000만원' },
-            { label: '해외의료비(질병)', amount: '2,000만원' },
-            { label: '중대사고구조송환비용', amount: '2,000만원' },
-          ];
-        } else if (planType === '표준플랜') {
-          return [
-            { label: '상해사망후유장해', amount: '1억원' },
-            { label: '해외의료비(상해)', amount: '5,000만원' },
-            { label: '해외의료비(질병)', amount: '5,000만원' },
-            { label: '중대사고구조송환비용', amount: '2,000만원' },
-          ];
-        } else if (planType === '고급플랜') {
-          return [
-            { label: '상해사망후유장해', amount: '2억원' },
-            { label: '해외의료비(상해)', amount: '1억원' },
-            { label: '해외의료비(질병)', amount: '1억원' },
-            { label: '중대사고구조송환비용', amount: '5,000만원' },
-          ];
-        } else {
-          // 기타 플랜 기존 구조 유지
-          return [
-            { label: '상해사망후유장해', amount: '1억원' },
-            { label: '상해입원의료비', amount: '1,000만원' },
-            { label: '상해통원의료비', amount: '10만원' },
-            { label: '질병입원의료비', amount: '1,000만원' },
-            { label: '질병통원의료비', amount: '10만원' },
-            { label: '휴대품손해(휴대폰은 보상제외)', amount: '50만원' },
-          ];
+  const fetchAvailablePlans = async (
+    insuranceType: string,
+    age: number,
+    genderValue: string,
+    medicalExpenseValue: boolean = hasMedicalExpense
+  ) => {
+    try {
+      const response = await fetch('/api/travel/available-plans', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          insurance_type: insuranceType,
+          age: age,
+          gender: genderValue,
+          plan_variant: 'B',
+          has_medical_expense: medicalExpenseValue ? 1 : 0,
+          include_foreign_currency: true,
+        }),
+      });
+      const data = await response.json();
+      if (data?.success && Array.isArray(data.plan_types)) {
+        return data.plan_types as PlanType[];
+      }
+    } catch (error) {
+      console.error('플랜 목록 조회 실패:', error);
+    }
+    return [];
+  };
+
+  const recalculatePremiums = async (medicalExpenseValue?: boolean) => {
+    if (!planInfo || !selectedPlan || !birthDate || birthDate.length !== 8) return;
+    if (!departureDate || !arrivalDate || !travelCountry) return;
+
+    const durationValidation = validateDuration();
+    if (!durationValidation.valid) return;
+
+    const age = calculateAgeFromBirthDate(birthDate);
+    if (age === null) return;
+
+    const isWorkingHoliday = travelPurposeLong === 'N010003';
+    if (isWorkingHoliday && (age < 15 || age > 35)) return;
+
+    setIsCalculating(true);
+
+    try {
+      let departureDateFormatted = departureDate;
+      let departureHour = parseInt(departureTime);
+      if (departureHour === 24) {
+        const date = new Date(departureDate);
+        date.setDate(date.getDate() + 1);
+        departureDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        departureHour = 0;
+      }
+
+      let arrivalDateFormatted = arrivalDate;
+      let arrivalHour = parseInt(arrivalTime);
+      if (arrivalHour === 24) {
+        const date = new Date(arrivalDate);
+        date.setDate(date.getDate() + 1);
+        arrivalDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        arrivalHour = 0;
+      }
+
+      const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
+      const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
+      const genderValue = getGenderFromBirthDate(birthDate, gender);
+      const insuranceType = getTravelPurposeText(travelPurposeLong);
+      const medicalExpense = medicalExpenseValue !== undefined ? medicalExpenseValue : hasMedicalExpense;
+
+      let availablePlans: PlanType[] = planInfo ? (Object.keys(planInfo) as PlanType[]) : [];
+      if (availablePlans.length === 0) {
+        availablePlans = await fetchAvailablePlans(insuranceType, age, genderValue, medicalExpense);
+      }
+      if (availablePlans.length === 0) {
+        setPlanInfo({});
+        return;
+      }
+
+      const fetchPlanCoverages = async (planTypes: PlanType[], currencyPlanValue?: string) => {
+        try {
+          const response = await fetch('/api/travel/plan-coverages', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              insurance_type: insuranceType,
+              plan_types: planTypes,
+              currency_plan: currencyPlanValue,
+            }),
+          });
+          const data = await response.json();
+          if (data?.success && data.coverages) {
+            return data.coverages as Record<string, { label: string; amount: string }[]>;
+          }
+        } catch (error) {
+          console.error('보장내용 조회 실패:', error);
         }
-      } else if (currentCurrencyPlan === '외화') {
-        // 외화 플랜
-        if (planType === '실속플랜') {
-          return [
-            { label: '상해사망후유장해', amount: '1억원' },
-            { label: '해외의료비(상해)', amount: '20,000USD' },
-            { label: '해외의료비(질병)', amount: '20,000USD' },
-            { label: '중대사고구조송환비용', amount: '20,000USD' },
-          ];
-        } else if (planType === '표준플랜') {
-          return [
-            { label: '상해사망후유장해', amount: '1억원' },
-            { label: '해외의료비(상해)', amount: '50,000USD' },
-            { label: '해외의료비(질병)', amount: '50,000USD' },
-            { label: '중대사고구조송환비용', amount: '75,000USD' },
-          ];
-        } else if (planType === '고급플랜') {
-          return [
-            { label: '상해사망후유장해', amount: '2억원' },
-            { label: '해외의료비(상해)', amount: '100,000USD' },
-            { label: '해외의료비(질병)', amount: '100,000USD' },
-            { label: '중대사고구조송환비용', amount: '75,000USD' },
-          ];
-        } else {
-          // 기타 플랜 기존 구조 유지
-          return [
-            { label: '상해사망후유장해', amount: '1억원' },
-            { label: '상해입원의료비', amount: '1,000만원' },
-            { label: '상해통원의료비', amount: '10만원' },
-            { label: '질병입원의료비', amount: '1,000만원' },
-            { label: '질병통원의료비', amount: '10만원' },
-            { label: '휴대품손해(휴대폰은 보상제외)', amount: '50만원' },
-          ];
+        return {};
+      };
+
+      const plans: Record<string, PlanInfo> = {};
+
+      if (isWorkingHoliday) {
+        const holidayPlans = availablePlans.filter(plan => plan.startsWith('워킹홀리데이'));
+        if (holidayPlans.length === 0) {
+          setPlanInfo({});
+          return;
+        }
+        const coveragesMap = await fetchPlanCoverages(holidayPlans);
+        for (const dbPlanType of holidayPlans) {
+          const requestCurrencyPlan = dbPlanType === '워킹홀리데이(유로화플랜)' ? '외화' : '원화';
+          try {
+            const response = await fetch('/api/travel/calculate-premium', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                insurance_type: insuranceType,
+                age: age,
+                birth_date: birthDate,
+                gender: genderValue,
+                plan_type: dbPlanType,
+                plan_variant: 'B',
+                has_medical_expense: medicalExpense ? 1 : 0,
+                departure_date: departureDateTime,
+                arrival_date: arrivalDateTime,
+                currency_plan: requestCurrencyPlan,
+                travel_country: travelCountry,
+              }),
+            });
+            const data = await response.json();
+            if (data.success) {
+              plans[dbPlanType] = {
+                type: dbPlanType as PlanType,
+                premium: data.premium,
+                coverages: coveragesMap[dbPlanType] || planInfo?.[dbPlanType]?.coverages || [],
+              };
+            }
+          } catch (error) {
+            console.error(`보험료 계산 오류 (${dbPlanType}):`, error);
+          }
         }
       } else {
-        // 기존 구조 유지
-        return [
-          { label: '상해사망후유장해', amount: '1억원' },
-          { label: '상해입원의료비', amount: '1,000만원' },
-          { label: '상해통원의료비', amount: '10만원' },
-          ...(planType !== '실속플랜' ? [
-            { label: '질병입원의료비', amount: '1,000만원' },
-            { label: '질병통원의료비', amount: '10만원' },
-          ] : []),
-          { label: '휴대품손해(휴대폰은 보상제외)', amount: '50만원' },
-        ];
+        const normalPlans = availablePlans.filter(plan => !plan.startsWith('워킹홀리데이'));
+        if (normalPlans.length === 0) {
+          setPlanInfo({});
+          return;
+        }
+        const coveragesMap = await fetchPlanCoverages(normalPlans, currencyPlan);
+        for (const planType of normalPlans) {
+          try {
+            const response = await fetch('/api/travel/calculate-premium', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                insurance_type: insuranceType,
+                age: age,
+                birth_date: birthDate,
+                gender: genderValue,
+                plan_type: planType,
+                plan_variant: 'B',
+                has_medical_expense: medicalExpense ? 1 : 0,
+                departure_date: departureDateTime,
+                arrival_date: arrivalDateTime,
+                currency_plan: currencyPlan,
+                travel_country: travelCountry,
+              }),
+            });
+            const data = await response.json();
+            if (data.success) {
+              plans[planType] = {
+                type: planType,
+                premium: data.premium,
+                coverages: coveragesMap[planType] || planInfo?.[planType]?.coverages || [],
+              };
+            }
+          } catch (error) {
+            console.error(`보험료 계산 오류 (${planType}):`, error);
+          }
+        }
       }
-    } else if (insuranceType === '워킹홀리데이') {
-      // 워킹홀리데이인 경우
-      if (planType === '실속플랜') {
-        // 실속 플랜: 원화 플랜
-        return [
-          { label: '상해사망후유장해', amount: '2,000만원' },
-          { label: '해외의료비(상해)', amount: '2,000만원' },
-          { label: '해외의료비(질병)', amount: '2,000만원' },
-          { label: '중대사고구조송환비용', amount: '1,000만원' },
-        ];
-      } else if (planType === '표준플랜') {
-        // 표준 플랜: 원화 플랜
-        return [
-          { label: '상해사망후유장해', amount: '5,000만원' },
-          { label: '해외의료비(상해)', amount: '5,000만원' },
-          { label: '해외의료비(질병)', amount: '5,000만원' },
-          { label: '중대사고구조송환비용', amount: '5,000만원' },
-        ];
-      } else if (planType === '고급플랜') {
-        // 고급 플랜: 외화 플랜 (EUR)
-        return [
-          { label: '상해사망후유장해', amount: '30,000EUR' },
-          { label: '해외의료비(상해)', amount: '30,000EUR' },
-          { label: '해외의료비(질병)', amount: '30,000EUR' },
-          { label: '중대사고구조송환비용', amount: '30,000EUR' },
-        ];
-      } else {
-        // 기타 플랜 기존 구조 유지
-        return [
-          { label: '상해사망후유장해', amount: '1억원' },
-          { label: '상해입원의료비', amount: '1,000만원' },
-          { label: '상해통원의료비', amount: '10만원' },
-          { label: '질병입원의료비', amount: '1,000만원' },
-          { label: '질병통원의료비', amount: '10만원' },
-          { label: '휴대품손해(휴대폰은 보상제외)', amount: '50만원' },
-        ];
+
+      setPlanInfo(plans);
+      if (selectedPlan && !plans[selectedPlan]) {
+        const nextPlan = Object.keys(plans)[0] as PlanType | undefined;
+        if (nextPlan) {
+          setSelectedPlan(nextPlan);
+        }
       }
-    } else {
-      // 기존 구조 유지
-      return [
-        { label: '상해사망후유장해', amount: '1억원' },
-        { label: '상해입원의료비', amount: '1,000만원' },
-        { label: '상해통원의료비', amount: '10만원' },
-        ...(planType !== '실속플랜' ? [
-          { label: '질병입원의료비', amount: '1,000만원' },
-          { label: '질병통원의료비', amount: '10만원' },
-        ] : []),
-        { label: '휴대품손해(휴대폰은 보상제외)', amount: '50만원' },
-      ];
+    } catch (error) {
+      console.error('보험료 재계산 오류:', error);
+    } finally {
+      setIsCalculating(false);
     }
   };
 
@@ -505,19 +562,50 @@ function MobileLongTermStayContent() {
 
       const plans: Record<string, PlanInfo> = {};
 
-      // 워킹홀리데이인 경우: 원화(실속, 표준) + 외화(고급) 플랜 계산
+      const availablePlans = await fetchAvailablePlans(insuranceType, age, genderValue);
+      if (availablePlans.length === 0) {
+        alert('가입 가능한 플랜이 없습니다.');
+        setIsCalculating(false);
+        return;
+      }
+      const fetchPlanCoverages = async (planTypes: PlanType[], currencyPlanValue?: string) => {
+        try {
+          const response = await fetch('/api/travel/plan-coverages', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              insurance_type: insuranceType,
+              plan_types: planTypes,
+              currency_plan: currencyPlanValue,
+            }),
+          });
+          const data = await response.json();
+          if (data?.success && data.coverages) {
+            return data.coverages as Record<string, { label: string; amount: string }[]>;
+          }
+        } catch (error) {
+          console.error('보장내용 조회 실패:', error);
+        }
+        return {};
+      };
+
+      // 워킹홀리데이: DB plan_type 그대로 사용·표시
       if (isWorkingHoliday) {
-        // 워킹홀리데이 플랜명 매핑: 프론트엔드 표시명 -> DB 저장명
-        // 원화 플랜: 실속, 표준
-        const wonPlans: PlanType[] = ['실속플랜', '표준플랜'];
-        for (const displayPlanType of wonPlans) {
+        const holidayPlans = availablePlans.filter(plan => plan.startsWith('워킹홀리데이'));
+        if (holidayPlans.length === 0) {
+          alert('가입 가능한 플랜이 없습니다.');
+          setIsCalculating(false);
+          return;
+        }
+        const coveragesMap = await fetchPlanCoverages(holidayPlans);
+        for (const dbPlanType of holidayPlans) {
+          const currencyPlan = dbPlanType === '워킹홀리데이(유로화플랜)' ? '외화' : '원화';
           try {
-            const dbPlanType = WORKING_HOLIDAY_PLAN_MAPPING[displayPlanType] || displayPlanType;
             const response = await fetch('/api/travel/calculate-premium', {
               method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
+              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 insurance_type: insuranceType,
                 age: age,
@@ -528,82 +616,33 @@ function MobileLongTermStayContent() {
                 has_medical_expense: hasMedicalExpense ? 1 : 0,
                 departure_date: departureDateTime,
                 arrival_date: arrivalDateTime,
-                currency_plan: '원화',
+                currency_plan: currencyPlan,
                 travel_country: travelCountry,
               }),
             });
-
             const data = await response.json();
             if (data.success) {
-              const coverages = getCoveragesForPlan(displayPlanType, insuranceType, '원화');
-              plans[displayPlanType] = {
-                type: displayPlanType,
+              plans[dbPlanType] = {
+                type: dbPlanType as PlanType,
                 premium: data.premium,
-                coverages: coverages,
+                coverages: coveragesMap[dbPlanType] || [],
               };
             }
           } catch (error) {
-            console.error(`보험료 계산 오류 (${displayPlanType}):`, error);
+            console.error(`보험료 계산 오류 (${dbPlanType}):`, error);
           }
-        }
-
-        // 외화 플랜: 고급
-        try {
-          const dbPlanType = WORKING_HOLIDAY_PLAN_MAPPING['고급플랜'] || '고급플랜';
-          const response = await fetch('/api/travel/calculate-premium', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              insurance_type: insuranceType,
-              age: age,
-              birth_date: birthDate,
-              gender: genderValue,
-              plan_type: dbPlanType,
-              plan_variant: 'B',
-              has_medical_expense: hasMedicalExpense ? 1 : 0,
-              departure_date: departureDateTime,
-              arrival_date: arrivalDateTime,
-              currency_plan: '외화',
-              travel_country: travelCountry,
-            }),
-          });
-
-          const data = await response.json();
-          if (data.success) {
-            const coverages = getCoveragesForPlan('고급플랜', insuranceType, '외화');
-            plans['고급플랜'] = {
-              type: '고급플랜',
-              premium: data.premium,
-              coverages: coverages,
-            };
-          }
-        } catch (error) {
-          console.error(`보험료 계산 오류 (고급플랜):`, error);
         }
       } else {
-        // 일반적인 경우: 나이에 따라 사용 가능한 플랜 필터링
-        let availablePlans: PlanType[] = [];
-        if (age >= 0 && age < 15) {
-          availablePlans = ['어린이플랜'];
-        } else if (age >= 15 && age <= 70) {
-          availablePlans = ['실속플랜', '표준플랜', '고급플랜'];
-        } else if (age >= 71 && age <= 90) {
-          availablePlans = ['어르신플랜1', '어르신플랜2'];
-        } else {
-          alert('가입 가능한 나이 범위를 벗어났습니다.');
-          setIsCalculating(false);
-          return;
-        }
-
-        if (availablePlans.length === 0) {
+        const normalPlans = availablePlans.filter(plan => !plan.startsWith('워킹홀리데이'));
+        if (normalPlans.length === 0) {
           alert('가입 가능한 플랜이 없습니다.');
           setIsCalculating(false);
           return;
         }
+        const currentCurrencyPlan = overrideCurrencyPlan || currencyPlan;
+        const coveragesMap = await fetchPlanCoverages(normalPlans, currentCurrencyPlan);
 
-        for (const planType of availablePlans) {
+        for (const planType of normalPlans) {
           try {
             const response = await fetch('/api/travel/calculate-premium', {
               method: 'POST',
@@ -627,14 +666,10 @@ function MobileLongTermStayContent() {
 
             const data = await response.json();
             if (data.success) {
-              // 플랜별 보장 내용 설정
-              const currentCurrencyPlan = overrideCurrencyPlan || currencyPlan;
-              const coverages = getCoveragesForPlan(planType, insuranceType, currentCurrencyPlan);
-              
               plans[planType] = {
                 type: planType,
                 premium: data.premium,
-                coverages: coverages,
+                coverages: coveragesMap[planType] || [],
               };
             }
           } catch (error) {
@@ -645,7 +680,7 @@ function MobileLongTermStayContent() {
 
       setPlanInfo(plans);
       const planKeys = Object.keys(plans);
-      const defaultPlan = planKeys.includes('실속플랜') ? '실속플랜' : (planKeys[0] || null);
+      const defaultPlan = planKeys.includes('실속플랜') ? '실속플랜' : planKeys.includes('워킹홀리데이실속플랜') ? '워킹홀리데이실속플랜' : (planKeys[0] || null);
       setSelectedPlan(defaultPlan as PlanType | null);
       setShowPlanSelection(true);
       
@@ -662,6 +697,13 @@ function MobileLongTermStayContent() {
       setIsCalculating(false);
     }
   };
+
+  useEffect(() => {
+    if (showPlanSelection && planInfo && selectedPlan) {
+      recalculatePremiums();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasMedicalExpense]);
 
   // 가입자 보험료 계산
   const handleCalculateParticipants = async () => {
@@ -707,10 +749,21 @@ function MobileLongTermStayContent() {
         const displayPlanType = selectedPlan || '실속플랜';
         let dbPlanType: string = displayPlanType;
         let currencyPlanValue = currencyPlan;
-
         if (isWorkingHoliday) {
-          dbPlanType = WORKING_HOLIDAY_PLAN_MAPPING[displayPlanType] || displayPlanType;
-          currencyPlanValue = displayPlanType === '고급플랜' ? '외화' : '원화';
+          dbPlanType = displayPlanType;
+          currencyPlanValue = displayPlanType === '워킹홀리데이(유로화플랜)' ? '외화' : '원화';
+        } else {
+          if (age <= 14) {
+            dbPlanType = '어린이플랜';
+          } else if (age >= 71) {
+            dbPlanType = selectedPlan === '어르신플랜2' ? '어르신플랜2' : '어르신플랜1';
+          } else {
+            const basePlan =
+              selectedPlan && !['어린이플랜', '어르신플랜1', '어르신플랜2'].includes(selectedPlan)
+                ? selectedPlan
+                : '표준플랜';
+            dbPlanType = basePlan;
+          }
         }
         
         // 24시는 다음날 00시로 변환
@@ -763,7 +816,7 @@ function MobileLongTermStayContent() {
             name: participant.name,
             gender: participant.gender,
             birthDate: participant.birthDate,
-            planType: displayPlanType,
+            planType: dbPlanType,
             premium: data.premium,
           });
           totalPremium += data.premium;
@@ -1463,6 +1516,13 @@ function MobileLongTermStayContent() {
               }
               if (!travelPurposeLong) {
                 alert('여행목적을 선택해주세요.');
+                return;
+              }
+              const travelPurposeText = getTravelPurposeText(travelPurposeLong);
+              if (['래프팅', '스키/스노보드'].includes(travelPurposeText)) {
+                alert(
+                  '죄송합니다 고객님\n래프팅, 스키/스노보드를 목적으로 국내여행을 가는 경우에는 여행보험에 가입하실 수 없습니다.'
+                );
                 return;
               }
               setShowConsentModal(true);

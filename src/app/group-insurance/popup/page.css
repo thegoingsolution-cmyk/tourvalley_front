@@ -617,6 +617,24 @@ body {
   margin: 2px 0 3px 0;
 }
 
+/* 기본 날짜(초기값)는 회색 유지, 사용자가 선택했을 때만 검정 */
+.speed_Wrap .date-picker-wrapper .react-datepicker__input-container input.tf_g.dicon:not(.user-selected) {
+  color: #dddddd !important;
+}
+
+.speed_Wrap .date-picker-wrapper .react-datepicker__input-container input.tf_g.dicon.user-selected {
+  color: #000 !important;
+}
+
+/* 전역 규칙(.input_cell_01 ... has-value/not(:placeholder-shown)) override */
+.speed_Wrap .input_cell_01 .date-picker-wrapper .react-datepicker__input-container input.dicon:not(.user-selected) {
+  color: #dddddd !important;
+}
+
+.speed_Wrap .input_cell_01 .date-picker-wrapper .react-datepicker__input-container input.dicon.user-selected {
+  color: #000 !important;
+}
+
 .ps_box02 {
   display: flex;
   align-items: center;

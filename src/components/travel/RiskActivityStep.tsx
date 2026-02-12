@@ -86,6 +86,12 @@ export default function RiskActivityStep({
                   아니요
                 </button>
               </div>
+              <p
+                className="font_blue"
+                style={{ marginTop: '10px' }}
+              >
+                ※ 현재 출국하였거나 해외에 체류 중인 경우 해외여행보험에 가입하실 수 없습니다.
+              </p>
             </div>
           )}
 
@@ -122,6 +128,12 @@ export default function RiskActivityStep({
                 아니요
               </button>
             </div>
+            <p
+              className="font_blue"
+              style={{ marginTop: '10px' }}
+            >
+              ※ 위험한 활동이 포함된 여행인 경우 해외여행보험에 가입하실 수 없습니다.
+            </p>
           </div>
 
           {/* 해외여행보험일 경우: 제한국가 확인 질문 */}
@@ -175,16 +187,21 @@ export default function RiskActivityStep({
                   onChange={(e) => handleTravelPurposeChange(e.target.value)}
                 >
                   <option value="">선택해 주세요</option>
-                  {travelPurposeOptions && travelPurposeOptions.length > 0 ? (
-                    travelPurposeOptions.map((option) => (
-                      <option key={option} value={option}>{option}</option>
-                    ))
-                  ) : (
-                    <>
-                      <option value="일반관광">일반관광</option>
-                      <option value="출장/연수/교육">출장/연수/교육</option>
-                    </>
-                  )}
+                  {(() => {
+                    const defaultOrder = ['일반관광', '래프팅', '스키/스노보드', '출장/연수/교육'];
+                    const source = travelPurposeOptions && travelPurposeOptions.length > 0
+                      ? travelPurposeOptions
+                      : defaultOrder;
+                    const ordered = [
+                      ...defaultOrder.filter((option) => source.includes(option)),
+                      ...source.filter((option) => !defaultOrder.includes(option)),
+                    ];
+                    return ordered.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ));
+                  })()}
                 </select>
               </div>
             </div>

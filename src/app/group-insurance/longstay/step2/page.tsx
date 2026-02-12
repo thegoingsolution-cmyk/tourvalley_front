@@ -238,7 +238,7 @@ export default function LongStayInsuranceStep2Page() {
     loadCorporateInfo();
   }, [isLoggedIn, member]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // 계약자(법인/단체) 정보 수집
     const contractCompanyInput = document.querySelector('input[name="contract_company"]') as HTMLInputElement;
     const resno1Input = document.querySelector('input[name="resno1"]') as HTMLInputElement;
@@ -286,6 +286,29 @@ export default function LongStayInsuranceStep2Page() {
         default:
           return '유학/어학연수'; // 기본값
       }
+    };
+
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+    const fetchAvailablePlans = async (insuranceType: string, age: number, gender: string) => {
+      const response = await fetch(`${apiBase}/api/travel/available-plans`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          insurance_type: insuranceType,
+          age,
+          gender,
+          plan_variant: 'B',
+          has_medical_expense: 1,
+          include_foreign_currency: true,
+        }),
+      });
+      const data = await response.json();
+      if (data?.success && Array.isArray(data.plan_types)) {
+        return data.plan_types as string[];
+      }
+      return [];
     };
 
     // 피보험자 정보 수집
@@ -372,6 +395,33 @@ export default function LongStayInsuranceStep2Page() {
         if (country2Select) {
           step2Data[`insured_country2_${i}`] = country2Select.value;
         }
+      }
+
+      const birthValue = birthInput?.value || '';
+      const genderValue = genderInput?.value === '1' ? '남자' : '여자';
+      if (birthValue.length !== 8 || !genderInput) {
+        alert(`${i}번 피보험자의 생년월일/성별을 확인해주세요.`);
+        return;
+      }
+      const birthYear = parseInt(birthValue.substring(0, 4));
+      const birthMonth = parseInt(birthValue.substring(4, 6));
+      const birthDay = parseInt(birthValue.substring(6, 8));
+      const today = new Date();
+      let age = today.getFullYear() - birthYear;
+      if (today.getMonth() + 1 < birthMonth || (today.getMonth() + 1 === birthMonth && today.getDate() < birthDay)) {
+        age--;
+      }
+
+      try {
+        const planTypes = await fetchAvailablePlans(getTravelPurpose(tourGoal), age, genderValue);
+        if (!planTypes.length) {
+          alert(`${i}번 피보험자는 가입 가능한 보험상품이 없습니다.`);
+          return;
+        }
+      } catch (error) {
+        console.error('플랜 목록 조회 실패:', error);
+        alert('플랜 목록 조회 중 오류가 발생했습니다.');
+        return;
       }
     }
     

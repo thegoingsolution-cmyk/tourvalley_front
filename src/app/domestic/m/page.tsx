@@ -125,7 +125,7 @@ function MobileDomesticStep1Content() {
   const planSelectionRef = useRef<HTMLDivElement>(null);
 
   // 성별에 따른 주민등록번호 성별코드 계산
-  const getGenderFromBirthDate = (birthDateStr: string, selectedGender: 'M' | 'W'): string => {
+  const getGenderFromBirthDate = (birthDateStr: string, selectedGender: 'M' | 'W'): '남자' | '여자' => {
     if (birthDateStr.length < 8) return selectedGender === 'M' ? '남자' : '여자';
     
     const year = parseInt(birthDateStr.substring(0, 4));
@@ -221,6 +221,32 @@ function MobileDomesticStep1Content() {
     return { valid: true };
   };
 
+  const fetchAvailablePlans = async (age: number, genderValue: '남자' | '여자', medicalExpenseValue: boolean = hasMedicalExpense) => {
+    try {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const response = await fetch(`${apiBase}/api/travel/available-plans`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          insurance_type: '국내여행보험',
+          age,
+          gender: genderValue,
+          plan_variant: 'B',
+          has_medical_expense: medicalExpenseValue ? 1 : 0,
+        }),
+      });
+      const data = await response.json();
+      if (data?.success && Array.isArray(data.plan_types)) {
+        return data.plan_types as PlanType[];
+      }
+    } catch (error) {
+      console.error('플랜 목록 조회 실패:', error);
+    }
+    return [];
+  };
+
   // 보험료 계산 함수 (재사용 가능)
   const calculatePremiums = async () => {
     if (!planInfo || !selectedPlan) return;
@@ -229,8 +255,8 @@ function MobileDomesticStep1Content() {
     const age = calculateAgeFromBirthDate(birthDate);
     if (age === null) return;
 
-    // 사용 가능한 플랜 (국내여행보험은 실속플랜, 표준플랜만)
-    const availablePlans: PlanType[] = ['실속플랜', '표준플랜'];
+    // 현재 화면에 표시된 플랜 그대로 재계산 (planInfo 키 기준)
+    let availablePlans: PlanType[] = planInfo ? (Object.keys(planInfo) as PlanType[]) : ['실속플랜', '표준플랜'];
 
     // 기본 보장 항목 정의
     const baseCoverages = [
@@ -265,6 +291,15 @@ function MobileDomesticStep1Content() {
       const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
       const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
       const genderValue = getGenderFromBirthDate(birthDate, gender);
+
+      if (availablePlans.length === 0) {
+        const refreshedPlans = await fetchAvailablePlans(age, genderValue);
+        if (refreshedPlans.length === 0) {
+          setPlanInfo({});
+          return;
+        }
+        availablePlans = refreshedPlans;
+      }
 
       // 각 플랜별 보험료 계산 (모든 availablePlans를 계산)
       const plans: Record<string, PlanInfo> = {};
@@ -381,8 +416,35 @@ function MobileDomesticStep1Content() {
       return;
     }
 
-    // 국내여행보험 플랜 (실속플랜, 표준플랜만)
-    const availablePlans: PlanType[] = ['실속플랜', '표준플랜'];
+    const genderValue = getGenderFromBirthDate(birthDate, gender);
+    const availablePlans = await fetchAvailablePlans(age, genderValue);
+    if (availablePlans.length === 0) {
+      alert('가입 가능한 플랜이 없습니다.');
+      return;
+    }
+    const fetchPlanCoverages = async (planTypes: PlanType[]) => {
+      try {
+        const response = await fetch('/api/travel/plan-coverages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            insurance_type: '국내여행보험',
+            plan_types: planTypes,
+            has_medical_expense: hasMedicalExpense ? 1 : 0,
+          }),
+        });
+        const data = await response.json();
+        if (data?.success && data.coverages) {
+          return data.coverages as Record<string, { label: string; amount: string }[]>;
+        }
+      } catch (error) {
+        console.error('보장내용 조회 실패:', error);
+      }
+      return {};
+    };
+    const coveragesMap = await fetchPlanCoverages(availablePlans);
 
     setIsCalculating(true);
 
@@ -408,18 +470,8 @@ function MobileDomesticStep1Content() {
       
       const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
       const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
-      const genderValue = getGenderFromBirthDate(birthDate, gender);
-
       // 보험 타입
       const insuranceType = '국내여행보험';
-
-      // 기본 보장 항목 정의
-      const baseCoverages = [
-        { label: '상해사망/후유장해', amount: '3,000만원' },
-        { label: '상해의료비', amount: '100만원' },
-        { label: '질병사망', amount: '100만원' },
-        { label: '배상책임', amount: '1,000만원' },
-      ];
 
       const plans: Record<string, PlanInfo> = {};
 
@@ -451,7 +503,7 @@ function MobileDomesticStep1Content() {
             plans[planType] = {
               type: planType,
               premium: data.premium,
-              coverages: baseCoverages,
+              coverages: coveragesMap[planType] || [],
             };
           }
         } catch (error) {
@@ -567,8 +619,19 @@ function MobileDomesticStep1Content() {
           return;
         }
 
-        // 플랜 타입 결정 (STEP1에서 선택한 플랜 사용)
-        const planType = selectedPlan === '실속플랜' ? '실속플랜' : '표준플랜';
+        // 플랜 타입: 나이에 따라 백엔드에 보내는 플랜명 사용 (STEP1 선택 플랜 또는 나이별 자동)
+        let planType: string;
+        if (age <= 14) {
+          planType = '어린이플랜';
+        } else if (age >= 71) {
+          planType = selectedPlan === '어르신플랜2' ? '어르신플랜2' : '어르신플랜1';
+        } else {
+          const basePlan =
+            selectedPlan && !['어린이플랜', '어르신플랜1', '어르신플랜2'].includes(selectedPlan)
+              ? selectedPlan
+              : '실속플랜';
+          planType = basePlan;
+        }
 
         // 보험료 계산 API 호출
         // 24시는 다음날 00시로 변환
@@ -683,6 +746,12 @@ function MobileDomesticStep1Content() {
 
     if (!travelPurpose) {
       alert('여행목적을 선택해주세요.');
+      return;
+    }
+    if (['래프팅', '스키/스노보드'].includes(travelPurpose)) {
+      alert(
+        '죄송합니다 고객님\n래프팅, 스키/스노보드를 목적으로 국내여행을 가는 경우에는 여행보험에 가입하실 수 없습니다.'
+      );
       return;
     }
 
