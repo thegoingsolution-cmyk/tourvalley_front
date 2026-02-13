@@ -8,6 +8,7 @@ function MobilePremiumDetailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const returnUrl = searchParams.get('returnUrl');
+  const decodedReturnUrl = returnUrl ? decodeURIComponent(returnUrl) : null;
   const [participants, setParticipants] = useState<Array<{
     id: number;
     name: string;
@@ -113,15 +114,15 @@ function MobilePremiumDetailContent() {
                 <button
                   className="modal-close-btn"
                   onClick={() => {
-                    if (returnUrl) {
-                      if (returnUrl.startsWith('/group-insurance/m')) {
+                    if (decodedReturnUrl) {
+                      if (decodedReturnUrl.startsWith('/group-insurance/m')) {
                         try {
                           sessionStorage.setItem('groupInsuranceReturn', '1');
                         } catch (error) {
                           console.error('복귀 플래그 저장 오류:', error);
                         }
                       }
-                      router.push(returnUrl);
+                      router.push(decodedReturnUrl);
                       return;
                     }
                     window.close();
@@ -191,15 +192,15 @@ function MobilePremiumDetailContent() {
         <button
           className="confirm-btn"
           onClick={() => {
-            if (returnUrl) {
-              if (returnUrl.startsWith('/group-insurance/m')) {
+            if (decodedReturnUrl) {
+              if (decodedReturnUrl.startsWith('/group-insurance/m')) {
                 try {
                   sessionStorage.setItem('groupInsuranceReturn', '1');
                 } catch (error) {
                   console.error('복귀 플래그 저장 오류:', error);
                 }
               }
-              router.push(returnUrl);
+              router.push(decodedReturnUrl);
               return;
             }
             window.close();

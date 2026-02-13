@@ -9,7 +9,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import MobileStepIndicator from '@/components/mobiletravel/StepIndicator';
 import MobileGroupTravelInfoStep from '@/components/mobiletravel/GroupTravelInfoStep';
-import MobilePlanSelection from '@/components/mobiletravel/PlanSelection';
+import GroupPlanSelection from '@/components/mobiletravel/GroupPlanSelection';
 import ParticipantInfoStep from '@/components/travel/ParticipantInfoStep';
 import GroupParticipantInfoStep, { GroupInfo } from '@/components/mobiletravel/GroupParticipantInfoStep';
 import RiskActivityStep from '@/components/travel/RiskActivityStep';
@@ -26,6 +26,7 @@ import './page.css';
 
 // 워킹홀리데이 DB plan_type (화면에 그대로 표시)
 const WORKING_HOLIDAY_DB_PLANS = ['워킹홀리데이실속플랜', '워킹홀리데이표준플랜', '워킹홀리데이(유로화플랜)'] as const;
+const GROUP_PLAN_TIER_LABELS: PlanType[] = ['실속플랜', '표준플랜', '고급플랜'];
 
 const getDomesticCoverages = (planType: PlanType): { label: string; amount: string }[] => [
   { label: '상해사망후유장해', amount: '1억원' },
@@ -222,6 +223,34 @@ function MobileGroupInsuranceContent() {
   const [isCalculating, setIsCalculating] = useState(false);
   const [currencyPlan, setCurrencyPlan] = useState<'원화' | '외화'>('원화');
   const [isNoticeExpanded, setIsNoticeExpanded] = useState(false);
+
+  const fetchPlanCoverages = async (
+    insuranceType: string,
+    planTypes: PlanType[],
+    currencyPlanValue?: '원화' | '외화'
+  ) => {
+    try {
+      const response = await fetch('/api/travel/plan-coverages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          insurance_type: insuranceType,
+          plan_types: planTypes,
+          currency_plan: currencyPlanValue,
+          ...(activeTab !== 'FL' ? { has_medical_expense: hasMedicalExpense ? 1 : 0 } : {}),
+        }),
+      });
+      const data = await response.json();
+      if (data?.success && data.coverages) {
+        return data.coverages as Record<string, { label: string; amount: string }[]>;
+      }
+    } catch (error) {
+      console.error('보장내용 조회 실패:', error);
+    }
+    return {};
+  };
 
   const expandedNoticeExtraItemsByType: Record<'DS' | 'FS' | 'FL', React.ReactNode[]> = {
     DS: [
@@ -774,10 +803,6 @@ function MobileGroupInsuranceContent() {
       willClear: (!isLoginFlow && !dataRestored && !hasRestoredData && !isReturningFromCoverageDetail && !hasSavedState) || (pageLeft && !isReturningFromCoverageDetail && !hasSavedState)
     });
     
-    if (isReturningFromPremiumDetail) {
-      sessionStorage.removeItem('groupInsuranceReturn');
-    }
-
     // 새로 진입한 경우 로컬 상태 정리 (coverage-detail/premium-detail 복귀 제외)
     if (!isReturningFromCoverageDetail && !isReturningFromPremiumDetail) {
       localStorage.removeItem('group_insurance_m_state');
@@ -960,6 +985,52 @@ function MobileGroupInsuranceContent() {
     }
   }, [searchParams]);
 
+  useEffect(() => {
+    const shouldRecalculate = sessionStorage.getItem('groupInsuranceReturn') === '1';
+    if (!shouldRecalculate) return;
+
+    if (!hasGroupParticipants || groupInsuredData.length === 0) {
+      try {
+        const storedDetail = localStorage.getItem('premiumDetailData');
+        if (storedDetail) {
+          const parsed = JSON.parse(storedDetail);
+          if (Array.isArray(parsed.insuredData) && parsed.insuredData.length > 0) {
+            setGroupInsuredData(parsed.insuredData);
+          }
+          if (Array.isArray(parsed.participants) && parsed.participants.length > 0) {
+            setGroupParticipantsData(parsed.participants);
+          }
+          if (parsed.participantCount) {
+            setGroupParticipantCount(String(parsed.participantCount));
+          }
+          setHasGroupParticipants(true);
+        }
+      } catch (error) {
+        console.error('프리미엄 상세 데이터 복원 오류:', error);
+      }
+    }
+
+    if (!hasGroupParticipants || groupInsuredData.length === 0) return;
+    if (!departureDate || !arrivalDate) return;
+    if (activeTab !== 'DS' && !travelCountry) return;
+    const durationValidation = validateDuration();
+    if (!durationValidation.valid) return;
+
+    recalculateGroupPremiums().finally(() => {
+      sessionStorage.removeItem('groupInsuranceReturn');
+      setTimeout(() => {
+        if (planSelectionRef.current) {
+          const elementPosition = planSelectionRef.current.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.scrollY - 80;
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+        }
+      }, 100);
+    });
+  }, [hasGroupParticipants, groupInsuredData, departureDate, arrivalDate, activeTab, travelCountry]);
+
   // 법인 회원 정보 로드
   useEffect(() => {
     const loadCorporateInfo = async () => {
@@ -1117,8 +1188,12 @@ function MobileGroupInsuranceContent() {
     if (activeTab === 'FS' && diffDays > 90) {
       return { valid: false, message: '해외여행보험은 최대 3개월(90일)까지 가능합니다.' };
     }
-    if (activeTab === 'FL' && diffDays < 90) {
-      return { valid: false, message: '해외장기체류보험은 최소 3개월 이상부터 가능합니다.' };
+    // 해외장기체류보험: 최소 3개월 초과(91일 이상), 최대 1년(365일) 이하 (long-term-stay/pc, group-insurance/longstay/popup과 동일)
+    if (activeTab === 'FL' && diffDays <= 90) {
+      return { valid: false, message: '해외장기체류보험은 3개월 초과시 가능합니다.' };
+    }
+    if (activeTab === 'FL' && diffDays > 365) {
+      return { valid: false, message: '해외장기체류보험은 최대 1년(365일)까지 가능합니다.' };
     }
     
     return { valid: true };
@@ -1163,6 +1238,11 @@ function MobileGroupInsuranceContent() {
       const isDomestic = activeTab === 'DS';
       const isLongTermStay = activeTab === 'FL';
       const insuranceType = getInsuranceType();
+      const coveragesMap = await fetchPlanCoverages(
+        insuranceType,
+        availablePlans,
+        activeTab === 'FL' && !isWorkingHoliday ? currencyPlan : undefined
+      );
 
       for (const planType of availablePlans) {
         const { dbPlanType, requestCurrencyPlan } = getPlanRequestInfo(planType);
@@ -1196,7 +1276,7 @@ function MobileGroupInsuranceContent() {
             plans[planType] = {
               type: planType,
               premium: data.premium,
-              coverages: planInfo?.[planType]?.coverages || fallbackCoverages,
+              coverages: coveragesMap[planType] || planInfo?.[planType]?.coverages || fallbackCoverages,
             };
           }
         } catch (error) {
@@ -1219,6 +1299,145 @@ function MobileGroupInsuranceContent() {
   };
 
   // 그룹 가입자용 보험료 재계산 함수
+  const buildTieredGroupPlans = async (
+    departureDateTime: string,
+    arrivalDateTime: string
+  ) => {
+    const isWorkingHoliday = activeTab === 'FL' && travelPurposeLong === 'N010003';
+    const getPlanRequestInfo = (planType: string) => {
+      const dbPlanType = planType;
+      const requestCurrencyPlan = activeTab !== 'FL'
+        ? '원화'
+        : (isWorkingHoliday ? (planType === '워킹홀리데이(유로화플랜)' ? '외화' : '원화') : currencyPlan);
+
+      return { dbPlanType, requestCurrencyPlan };
+    };
+
+    const isDomestic = activeTab === 'DS';
+    const isLongTermStay = activeTab === 'FL';
+    const insuranceType = getInsuranceType();
+    const plans: Record<string, PlanInfo> = {};
+    const newParticipantPremiumsByPlan: Record<string, Array<{ id: number; name: string; gender: string; birthDate: string; planType: string; premium: number }>> = {};
+
+    GROUP_PLAN_TIER_LABELS.forEach((label) => {
+      newParticipantPremiumsByPlan[label] = [];
+    });
+
+    const firstPlanInfoByTier: Record<string, { planType: string; requestCurrencyPlan: '원화' | '외화' }> = {};
+
+    for (let index = 0; index < groupInsuredData.length; index++) {
+      const insured = groupInsuredData[index];
+      const age = calculateAgeFromBirthDate(insured.birthDate);
+      if (age === null) {
+        return null;
+      }
+
+      const genderValue = insured.gender === 'W' ? '여자' : '남자';
+      const availablePlans = isWorkingHoliday
+        ? [...WORKING_HOLIDAY_DB_PLANS]
+        : await fetchAvailablePlans(age, genderValue);
+
+      if (availablePlans.length === 0) {
+        return null;
+      }
+
+      const planPremiums: Array<{ planType: string; premium: number; requestCurrencyPlan: '원화' | '외화' }> = [];
+
+      for (const planType of availablePlans) {
+        const { dbPlanType, requestCurrencyPlan } = getPlanRequestInfo(planType);
+        try {
+          const response = await fetch('/api/travel/calculate-premium', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              insurance_type: getInsuranceType(),
+              age: age,
+              birth_date: insured.birthDate,
+              gender: genderValue,
+              plan_type: dbPlanType,
+              plan_variant: 'B',
+              has_medical_expense: hasMedicalExpense ? 1 : 0,
+              departure_date: departureDateTime,
+              arrival_date: arrivalDateTime,
+              currency_plan: requestCurrencyPlan,
+              travel_country: activeTab !== 'DS' ? travelCountry : null,
+            }),
+          });
+
+          const data = await response.json();
+          if (data.success) {
+            planPremiums.push({
+              planType,
+              premium: data.premium,
+              requestCurrencyPlan,
+            });
+          }
+        } catch (error) {
+          console.error(`보험료 계산 오류 (${insured.name}, ${planType}):`, error);
+        }
+      }
+
+      if (planPremiums.length === 0) {
+        return null;
+      }
+
+      planPremiums.sort((a, b) => a.premium - b.premium);
+
+      GROUP_PLAN_TIER_LABELS.forEach((tierLabel, tierIndex) => {
+        const selectedPlan = planPremiums[Math.min(tierIndex, planPremiums.length - 1)];
+        if (!selectedPlan) return;
+
+        newParticipantPremiumsByPlan[tierLabel].push({
+          id: index + 1,
+          name: insured.name,
+          gender: genderValue,
+          birthDate: insured.birthDate,
+          planType: selectedPlan.planType,
+          premium: selectedPlan.premium,
+        });
+
+        if (!firstPlanInfoByTier[tierLabel]) {
+          firstPlanInfoByTier[tierLabel] = {
+            planType: selectedPlan.planType,
+            requestCurrencyPlan: selectedPlan.requestCurrencyPlan,
+          };
+        }
+      });
+    }
+
+    const uniquePlanTypes = Object.values(firstPlanInfoByTier).map((info) => info.planType as PlanType);
+    const coveragesMap = uniquePlanTypes.length > 0
+      ? await fetchPlanCoverages(
+          insuranceType,
+          uniquePlanTypes,
+          activeTab === 'FL' && !isWorkingHoliday ? currencyPlan : undefined
+        )
+      : {};
+
+    GROUP_PLAN_TIER_LABELS.forEach((tierLabel) => {
+      const participants = newParticipantPremiumsByPlan[tierLabel];
+      if (participants.length === 0) return;
+
+      const totalPremium = participants.reduce((sum, participant) => sum + participant.premium, 0);
+      const planSeed = firstPlanInfoByTier[tierLabel];
+      const coverages = planSeed
+        ? (coveragesMap[planSeed.planType] || (isLongTermStay
+          ? getLongTermStayCoverages(planSeed.planType as PlanType, insuranceType, planSeed.requestCurrencyPlan)
+          : (isDomestic ? getDomesticCoverages(planSeed.planType as PlanType) : getOverseasCoverages(planSeed.planType as PlanType))))
+        : [];
+
+      plans[tierLabel] = {
+        type: tierLabel,
+        premium: totalPremium,
+        coverages: coverages,
+      };
+    });
+
+    return { plans, newParticipantPremiumsByPlan };
+  };
+
   const recalculateGroupPremiums = async () => {
     if (!hasGroupParticipants || groupInsuredData.length === 0 || !showPlanSelection) {
       return;
@@ -1240,133 +1459,29 @@ function MobileGroupInsuranceContent() {
     setIsCalculating(true);
 
     try {
-      const isWorkingHoliday = activeTab === 'FL' && travelPurposeLong === 'N010003';
-      const getPlanRequestInfo = (planType: string) => {
-        const dbPlanType = planType;
-        const requestCurrencyPlan = activeTab !== 'FL'
-          ? '원화'
-          : (isWorkingHoliday ? (planType === '워킹홀리데이(유로화플랜)' ? '외화' : '원화') : currencyPlan);
-
-        return { dbPlanType, requestCurrencyPlan };
-      };
-
-      let availablePlans: PlanType[] = [];
-      if (isWorkingHoliday) {
-        availablePlans = [...WORKING_HOLIDAY_DB_PLANS];
-      } else {
-        const target = groupInsuredData[0];
-        const age = calculateAgeFromBirthDate(target.birthDate);
-        if (age === null) {
-          setIsCalculating(false);
-          return;
-        }
-        const genderValue = target.gender === 'W' ? '여자' : '남자';
-        availablePlans = await fetchAvailablePlans(age, genderValue);
-      }
-      if (availablePlans.length === 0) {
+      const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
+      const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
+      const result = await buildTieredGroupPlans(departureDateTime, arrivalDateTime);
+      if (!result || Object.keys(result.plans).length === 0) {
         setIsCalculating(false);
         return;
       }
 
-      const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
-      const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
-
-      const isDomestic = activeTab === 'DS';
-      const isLongTermStay = activeTab === 'FL';
-      const insuranceType = getInsuranceType();
-
-      const plans: Record<string, PlanInfo> = {};
-      const newParticipantPremiumsByPlan: Record<string, Array<{ id: number; name: string; gender: string; birthDate: string; planType: string; premium: number }>> = {};
-
-      for (const planType of availablePlans) {
-        let totalPremium = 0;
-        let hasError = false;
-        const participantPremiums: Array<{ id: number; name: string; gender: string; birthDate: string; planType: string; premium: number }> = [];
-        const { dbPlanType, requestCurrencyPlan } = getPlanRequestInfo(planType);
-
-        for (let index = 0; index < groupInsuredData.length; index++) {
-          const insured = groupInsuredData[index];
-          const age = calculateAgeFromBirthDate(insured.birthDate);
-          if (age === null) {
-            hasError = true;
-            break;
-          }
-
-          const genderValue = insured.gender === 'W' ? '여자' : '남자';
-
-          try {
-            const response = await fetch('/api/travel/calculate-premium', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                insurance_type: getInsuranceType(),
-                age: age,
-                birth_date: insured.birthDate,
-                gender: genderValue,
-                plan_type: dbPlanType,
-                plan_variant: 'B',
-                has_medical_expense: hasMedicalExpense ? 1 : 0,
-                departure_date: departureDateTime,
-                arrival_date: arrivalDateTime,
-                currency_plan: requestCurrencyPlan,
-                travel_country: activeTab !== 'DS' ? travelCountry : null,
-              }),
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-              totalPremium += data.premium;
-              participantPremiums.push({
-                id: index + 1,
-                name: insured.name,
-                gender: genderValue,
-                birthDate: insured.birthDate,
-                planType: planType,
-                premium: data.premium,
-              });
-            } else {
-              hasError = true;
-              console.error(`보험료 계산 실패 (${insured.name}, ${planType}):`, data.message);
-            }
-          } catch (error) {
-            hasError = true;
-            console.error(`보험료 계산 오류 (${insured.name}, ${planType}):`, error);
-          }
-        }
-
-        if (!hasError && totalPremium > 0) {
-          const coverages = isLongTermStay
-            ? getLongTermStayCoverages(planType, insuranceType, requestCurrencyPlan)
-            : (isDomestic ? getDomesticCoverages(planType) : getOverseasCoverages(planType));
-          plans[planType] = {
-            type: planType,
-            premium: totalPremium,
-            coverages: coverages,
-          };
-          newParticipantPremiumsByPlan[planType] = participantPremiums;
-        }
+      setPlanInfo(result.plans);
+      setParticipantPremiumsByPlan(result.newParticipantPremiumsByPlan);
+      const currentPlan = selectedPlan && result.plans[selectedPlan]
+        ? selectedPlan
+        : (Object.keys(result.plans)[0] as PlanType);
+      if (!selectedPlan || !result.plans[selectedPlan]) {
+        setSelectedPlan(currentPlan);
       }
 
-      if (Object.keys(plans).length > 0) {
-        setPlanInfo(plans);
-        setParticipantPremiumsByPlan(newParticipantPremiumsByPlan);
-        // 현재 선택된 플랜이 새로운 plans에 있으면 유지, 없으면 첫 번째 플랜 선택
-        const currentPlan = selectedPlan && plans[selectedPlan] ? selectedPlan : (Object.keys(plans)[0] as PlanType);
-        if (!selectedPlan || !plans[selectedPlan]) {
-          setSelectedPlan(currentPlan);
-        }
-        
-        // calculatedPremiums 업데이트
-        if (plans[currentPlan] && newParticipantPremiumsByPlan[currentPlan]) {
-          const roundedTotalPremium = Math.floor(plans[currentPlan].premium / 10) * 10;
-          setCalculatedPremiums({
-            participants: newParticipantPremiumsByPlan[currentPlan],
-            totalPremium: roundedTotalPremium,
-          });
-        }
+      if (result.plans[currentPlan] && result.newParticipantPremiumsByPlan[currentPlan]) {
+        const roundedTotalPremium = Math.floor(result.plans[currentPlan].premium / 10) * 10;
+        setCalculatedPremiums({
+          participants: result.newParticipantPremiumsByPlan[currentPlan],
+          totalPremium: roundedTotalPremium,
+        });
       }
     } catch (error) {
       console.error('보험료 재계산 오류:', error);
@@ -1420,148 +1535,31 @@ function MobileGroupInsuranceContent() {
       setIsCalculating(true);
       
       try {
-        const isWorkingHoliday = activeTab === 'FL' && travelPurposeLong === 'N010003';
-        const getPlanRequestInfo = (planType: string) => {
-          const dbPlanType = planType;
-          const requestCurrencyPlan = activeTab !== 'FL'
-            ? '원화'
-            : (isWorkingHoliday ? (planType === '워킹홀리데이(유로화플랜)' ? '외화' : '원화') : currencyPlan);
+        const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
+        const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
 
-          return { dbPlanType, requestCurrencyPlan };
-        };
-
-        let availablePlans: PlanType[] = [];
-        if (isWorkingHoliday) {
-          availablePlans = [...WORKING_HOLIDAY_DB_PLANS];
-        } else {
-          const target = groupInsuredData[0];
-          const age = calculateAgeFromBirthDate(target.birthDate);
-          if (age === null) {
-            alert('생년월일을 올바르게 입력해주세요.');
-            setIsCalculating(false);
-            return;
-          }
-          const genderValue = target.gender === 'W' ? '여자' : '남자';
-          availablePlans = await fetchAvailablePlans(age, genderValue);
-        }
-        if (availablePlans.length === 0) {
+        const result = await buildTieredGroupPlans(departureDateTime, arrivalDateTime);
+        if (!result || Object.keys(result.plans).length === 0) {
           alert('가입 가능한 플랜이 없습니다.');
           setIsCalculating(false);
           return;
         }
 
-        const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
-        const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
-
-        const isDomestic = activeTab === 'DS';
-        const isLongTermStay = activeTab === 'FL';
-        const insuranceType = getInsuranceType();
-
-        const plans: Record<string, PlanInfo> = {};
-
-        // 그룹 가입자의 경우 각 가입자별로 보험료 계산 후 합산
-        // groupInsuredData를 사용 (gender가 'M' | 'W' 형식)
-        // 각 플랜별로 가입자별 보험료를 저장
-        const newParticipantPremiumsByPlan: Record<string, Array<{ id: number; name: string; gender: string; birthDate: string; planType: string; premium: number }>> = {};
-        
-        for (const planType of availablePlans) {
-          let totalPremium = 0;
-          let hasError = false;
-          const participantPremiums: Array<{ id: number; name: string; gender: string; birthDate: string; planType: string; premium: number }> = [];
-          const { dbPlanType, requestCurrencyPlan } = getPlanRequestInfo(planType);
-
-          // 각 가입자에 대해 API 호출
-          for (let index = 0; index < groupInsuredData.length; index++) {
-            const insured = groupInsuredData[index];
-            const age = calculateAgeFromBirthDate(insured.birthDate);
-            if (age === null) {
-              alert(`${insured.name}의 생년월일을 올바르게 입력해주세요.`);
-              setIsCalculating(false);
-              return;
-            }
-
-            // InsuredData의 gender는 'M' | 'W' 형식, API는 '남자' | '여자' 형식 필요
-            const genderValue = insured.gender === 'W' ? '여자' : '남자';
-
-            try {
-              const response = await fetch('/api/travel/calculate-premium', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  insurance_type: getInsuranceType(),
-                  age: age,
-                  birth_date: insured.birthDate,
-                  gender: genderValue,
-                  plan_type: dbPlanType,
-                  plan_variant: 'B',
-                  has_medical_expense: hasMedicalExpense ? 1 : 0,
-                  departure_date: departureDateTime,
-                  arrival_date: arrivalDateTime,
-                  currency_plan: requestCurrencyPlan,
-                  travel_country: activeTab !== 'DS' ? travelCountry : null,
-                }),
-              });
-
-              const data = await response.json();
-
-              if (data.success) {
-                totalPremium += data.premium;
-                participantPremiums.push({
-                  id: index + 1,
-                  name: insured.name,
-                  gender: genderValue,
-                  birthDate: insured.birthDate,
-                  planType: planType,
-                  premium: data.premium,
-                });
-              } else {
-                hasError = true;
-                console.error(`보험료 계산 실패 (${insured.name}, ${planType}):`, data.message);
-              }
-            } catch (error) {
-              hasError = true;
-              console.error(`보험료 계산 오류 (${insured.name}, ${planType}):`, error);
-            }
-          }
-
-          if (!hasError && totalPremium > 0) {
-          const coverages = isLongTermStay
-            ? getLongTermStayCoverages(planType, insuranceType, requestCurrencyPlan)
-            : (isDomestic ? getDomesticCoverages(planType) : getOverseasCoverages(planType));
-            plans[planType] = {
-              type: planType,
-              premium: totalPremium, // 모든 가입자의 보험료 합산
-              coverages: coverages,
-            };
-            newParticipantPremiumsByPlan[planType] = participantPremiums;
-          }
-        }
-
-        if (Object.keys(plans).length === 0) {
-          alert('보험료 계산에 실패했습니다.');
-          setIsCalculating(false);
-          return;
-        }
-
-        setPlanInfo(plans);
-        setParticipantPremiumsByPlan(newParticipantPremiumsByPlan);
-        const firstPlan = availablePlans[0];
+        setPlanInfo(result.plans);
+        setParticipantPremiumsByPlan(result.newParticipantPremiumsByPlan);
+        const firstPlan = Object.keys(result.plans)[0] as PlanType;
         setSelectedPlan(firstPlan);
         
-        // calculatedPremiums 설정 (첫 번째 플랜의 보험료로 초기화)
-        if (plans[firstPlan] && newParticipantPremiumsByPlan[firstPlan]) {
-          const roundedTotalPremium = Math.floor(plans[firstPlan].premium / 10) * 10;
+        if (result.plans[firstPlan] && result.newParticipantPremiumsByPlan[firstPlan]) {
+          const roundedTotalPremium = Math.floor(result.plans[firstPlan].premium / 10) * 10;
           const calculatedPremiumsData = {
-            participants: newParticipantPremiumsByPlan[firstPlan],
+            participants: result.newParticipantPremiumsByPlan[firstPlan],
             totalPremium: roundedTotalPremium,
           };
           setCalculatedPremiums(calculatedPremiumsData);
           
-          // sessionStorage에도 저장
-          sessionStorage.setItem('planInfo', JSON.stringify(plans));
-          sessionStorage.setItem('participantPremiumsByPlan', JSON.stringify(newParticipantPremiumsByPlan));
+          sessionStorage.setItem('planInfo', JSON.stringify(result.plans));
+          sessionStorage.setItem('participantPremiumsByPlan', JSON.stringify(result.newParticipantPremiumsByPlan));
           sessionStorage.setItem('selectedPlan', firstPlan);
           sessionStorage.setItem('calculatedPremiums', JSON.stringify(calculatedPremiumsData));
           sessionStorage.setItem('showPlanSelection', '1');
@@ -1963,7 +1961,7 @@ function MobileGroupInsuranceContent() {
               resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}******`,
               gender: p.gender,
               age: age || 0,
-              plan_type: selectedPlan || '실속플랜',
+              plan_type: participantPremium?.planType || selectedPlan || '실속플랜',
               premium: participantPremium?.premium || 0,
               has_medical_expense: hasMedicalExpense ? 1 : 0,
             };
@@ -2136,7 +2134,7 @@ function MobileGroupInsuranceContent() {
               resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}******`,
               gender: p.gender,
               age: age || 0,
-              plan_type: selectedPlan || '실속플랜',
+              plan_type: participantPremium?.planType || selectedPlan || '실속플랜',
               premium: participantPremium?.premium || 0,
               has_medical_expense: hasMedicalExpense ? 1 : 0,
             };
@@ -2639,7 +2637,7 @@ function MobileGroupInsuranceContent() {
           {/* 플랜 선택 영역 */}
           <div ref={planSelectionRef}>
             {showPlanSelection && planInfo && (
-              <MobilePlanSelection
+              <GroupPlanSelection
                 planInfo={planInfo}
                 selectedPlan={selectedPlan}
                 onPlanSelect={(plan) => {

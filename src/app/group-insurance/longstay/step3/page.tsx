@@ -15,6 +15,19 @@ const getPlanType = (planCd: string, travelPurpose?: string): string => {
     return workingHolidayPlanMap[planCd] || '워킹홀리데이실속플랜';
   }
   
+  // 어린이/어르신 플랜 (나이별 API 반환 plan_types와 동일한 이름 사용, U suffix = 외화)
+  const agePlanMap: { [key: string]: string } = {
+    'CH1': '어린이플랜',
+    'CH2': '어린이플랜2',
+    'CH1U': '어린이플랜',
+    'CH2U': '어린이플랜2',
+    'SR1': '어르신플랜1',
+    'SR2': '어르신플랜2',
+    'SR1U': '어르신플랜1',
+    'SR2U': '어르신플랜2',
+  };
+  if (agePlanMap[planCd]) return agePlanMap[planCd];
+
   // 일반 플랜
   const planMap: { [key: string]: string } = {
     // 일반 플랜
@@ -36,6 +49,14 @@ const getCurrencyPlan = (planCd: string, travelPurpose?: string): '원화' | '�
   // 워킹홀리데이인 경우: 고급플랜(HAW)만 외화
   if (travelPurpose === '워킹홀리데이') {
     return planCd === 'HAW' ? '외화' : '원화';
+  }
+  
+  // 어린이/어르신 플랜: U suffix = 외화(U$달러), 없으면 원화
+  if (planCd === 'CH1U' || planCd === 'CH2U' || planCd === 'SR1U' || planCd === 'SR2U') {
+    return '외화';
+  }
+  if (planCd === 'CH1' || planCd === 'CH2' || planCd === 'SR1' || planCd === 'SR2') {
+    return '원화';
   }
   
   // 외화 플랜: BAU, STU, HCU
@@ -229,11 +250,24 @@ export default function LongStayInsuranceStep3Page() {
           { value: 'HAW', label: '워킹홀리데이(유로화플랜)' },
         ];
 
+    // 어린이/어르신 전용 플랜 옵션 (원화·외화 구분, 일반 플랜과 동일한 라벨 형식)
+    const agePlans = [
+      { value: 'CH1', label: '어린이플랜(원화)' },
+      { value: 'CH2', label: '어린이플랜2(원화)' },
+      { value: 'CH1U', label: '어린이플랜(U$달러)' },
+      { value: 'CH2U', label: '어린이플랜2(U$달러)' },
+      { value: 'SR1', label: '어르신플랜1(원화)' },
+      { value: 'SR2', label: '어르신플랜2(원화)' },
+      { value: 'SR1U', label: '어르신플랜1(U$달러)' },
+      { value: 'SR2U', label: '어르신플랜2(U$달러)' },
+    ];
+    const allPlans = hasCurrencyPlans ? [...basePlans, ...agePlans] : basePlans;
+
     if (!availableTypes || availableTypes.length === 0) {
       return basePlans;
     }
 
-    const filteredPlans = basePlans.filter(plan => availableTypes.includes(getPlanType(plan.value, travelPurpose)));
+    const filteredPlans = allPlans.filter(plan => availableTypes.includes(getPlanType(plan.value, travelPurpose)));
     return filteredPlans.length ? filteredPlans : basePlans;
   };
 

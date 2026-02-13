@@ -68,6 +68,29 @@ export default function LongStayInsurancePopupPage() {
     setHasSelectedEndDate(false);
   }, []);
 
+  // 기간 검증 (해외장기체류보험 최소 3개월 초과, 최대 1년) - long-term-stay/pc와 동일
+  const validateDuration = (): { valid: boolean; message?: string } => {
+    const departure = new Date(`${startDate}T${startHour}:00:00`);
+    const arrival = new Date(`${endDate}T${endHour}:00:00`);
+
+    if (arrival <= departure) {
+      return { valid: false, message: '도착일시는 출발일시보다 이후여야 합니다.' };
+    }
+
+    const diffTime = arrival.getTime() - departure.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    // 해외장기체류보험은 최소 3개월 초과(91일 이상), 최대 1년(365일) 이하
+    if (diffDays <= 90) {
+      return { valid: false, message: '해외장기체류보험은 3개월 초과시 가능합니다.' };
+    }
+    if (diffDays > 365) {
+      return { valid: false, message: '해외장기체류보험은 최대 1년(365일)까지 가능합니다.' };
+    }
+
+    return { valid: true };
+  };
+
   const handleSubmit = () => {
     if (!startDate || !endDate) {
       alert('출발일과 도착일을 입력해주세요.');
@@ -79,6 +102,12 @@ export default function LongStayInsurancePopupPage() {
     }
     if (!tourGoal) {
       alert('여행목적을 선택해주세요.');
+      return;
+    }
+
+    const durationValidation = validateDuration();
+    if (!durationValidation.valid) {
+      alert(durationValidation.message);
       return;
     }
     
