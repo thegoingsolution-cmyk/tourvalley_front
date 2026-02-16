@@ -86,6 +86,9 @@ export default function MobileEventInsurancePage() {
   const [overviewFile, setOverviewFile] = useState<File | null>(null);
   const [hasSelectedStartDate, setHasSelectedStartDate] = useState(false);
   const [hasSelectedEndDate, setHasSelectedEndDate] = useState(false);
+  /** 달력에서 날짜를 한 번이라도 선택했으면 true (초기값과 같아도) → CSS 적용용 */
+  const [userHasInteractedWithStartDate, setUserHasInteractedWithStartDate] = useState(false);
+  const [userHasInteractedWithEndDate, setUserHasInteractedWithEndDate] = useState(false);
   const initialStartDateRef = useRef(todayString);
   const initialEndDateRef = useRef(todayString);
 
@@ -583,6 +586,7 @@ export default function MobileEventInsurancePage() {
                               const formattedDate = formatDate(date);
                               setFormData(prev => ({ ...prev, start_date: formattedDate }));
                               setHasSelectedStartDate(formattedDate !== initialStartDateRef.current);
+                              setUserHasInteractedWithStartDate(true);
                             } else {
                               setFormData(prev => ({ ...prev, start_date: '' }));
                               setHasSelectedStartDate(false);
@@ -593,6 +597,7 @@ export default function MobileEventInsurancePage() {
                               const formattedDate = formatDate(date);
                               setFormData(prev => ({ ...prev, start_date: formattedDate }));
                               setHasSelectedStartDate(formattedDate !== initialStartDateRef.current);
+                              setUserHasInteractedWithStartDate(true);
                             }
                           }}
                           dateFormat="yyyy-MM-dd"
@@ -600,7 +605,7 @@ export default function MobileEventInsurancePage() {
                           locale="ko"
                           placeholderText="날짜 선택"
                           dateFormatCalendar="yyyy년 MM월"
-                          className={`tourGuard_input_w01 ${hasSelectedStartDate ? 'has-value user-selected' : ''}`}
+                          className={`tourGuard_input_w01 ${(hasSelectedStartDate || userHasInteractedWithStartDate) ? 'has-value user-selected' : ''}`}
                           wrapperClassName="date-picker-wrapper"
                           calendarClassName="custom-calendar"
                           popperClassName="custom-popper"
@@ -640,6 +645,7 @@ export default function MobileEventInsurancePage() {
                               const formattedDate = formatDate(date);
                               setFormData(prev => ({ ...prev, end_date: formattedDate }));
                               setHasSelectedEndDate(formattedDate !== initialEndDateRef.current);
+                              setUserHasInteractedWithEndDate(true);
                             } else {
                               setFormData(prev => ({ ...prev, end_date: '' }));
                               setHasSelectedEndDate(false);
@@ -650,6 +656,7 @@ export default function MobileEventInsurancePage() {
                               const formattedDate = formatDate(date);
                               setFormData(prev => ({ ...prev, end_date: formattedDate }));
                               setHasSelectedEndDate(formattedDate !== initialEndDateRef.current);
+                              setUserHasInteractedWithEndDate(true);
                             }
                           }}
                           dateFormat="yyyy-MM-dd"
@@ -657,7 +664,7 @@ export default function MobileEventInsurancePage() {
                           locale="ko"
                           placeholderText="날짜 선택"
                           dateFormatCalendar="yyyy년 MM월"
-                          className={`tourGuard_input_w01 ${hasSelectedEndDate ? 'has-value user-selected' : ''}`}
+                          className={`tourGuard_input_w01 ${(hasSelectedEndDate || userHasInteractedWithEndDate) ? 'has-value user-selected' : ''}`}
                           wrapperClassName="date-picker-wrapper"
                           calendarClassName="custom-calendar"
                           popperClassName="custom-popper"

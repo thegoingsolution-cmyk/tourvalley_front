@@ -45,6 +45,9 @@ export default function PCEventInsurancePage() {
   const [endHour, setEndHour] = useState(getDefaultHour());
   const [hasSelectedStartDate, setHasSelectedStartDate] = useState(false);
   const [hasSelectedEndDate, setHasSelectedEndDate] = useState(false);
+  /** 달력에서 날짜를 한 번이라도 선택했으면 true (초기값과 같아도) → CSS 적용용 */
+  const [userHasInteractedWithStartDate, setUserHasInteractedWithStartDate] = useState(false);
+  const [userHasInteractedWithEndDate, setUserHasInteractedWithEndDate] = useState(false);
   const initialStartDateRef = useRef<Date | null>(startDate);
   const initialEndDateRef = useRef<Date | null>(endDate);
   const [insuredCnt, setInsuredCnt] = useState('');
@@ -687,6 +690,7 @@ export default function PCEventInsurancePage() {
                                     setHasSelectedStartDate(
                                       !!date && date.getTime() !== initialStartDateRef.current?.getTime()
                                     );
+                                    if (date) setUserHasInteractedWithStartDate(true);
                                     if (date && endDate && date > endDate) {
                                       // 종료일 자동 보정 시에는 '사용자 선택'으로 처리하지 않음
                                       setEndDate(date);
@@ -698,6 +702,7 @@ export default function PCEventInsurancePage() {
                                       setHasSelectedStartDate(
                                         date.getTime() !== initialStartDateRef.current?.getTime()
                                       );
+                                      setUserHasInteractedWithStartDate(true);
                                     }
                                   }}
                                   dateFormat="yyyy-MM-dd"
@@ -706,7 +711,7 @@ export default function PCEventInsurancePage() {
                                   placeholderText="날짜 선택"
                                   dateFormatCalendar="yyyy년 MM월"
                                   minDate={today}
-                                  className={`field-input date-input ${hasSelectedStartDate ? 'has-value user-selected' : ''}`}
+                                  className={`field-input date-input ${(hasSelectedStartDate || userHasInteractedWithStartDate) ? 'has-value user-selected' : ''}`}
                                   wrapperClassName="date-picker-wrapper"
                                   calendarClassName="custom-calendar"
                                   popperClassName="custom-popper"
@@ -750,6 +755,7 @@ export default function PCEventInsurancePage() {
                                       setHasSelectedEndDate(
                                         !!date && date.getTime() !== initialEndDateRef.current?.getTime()
                                       );
+                                      if (date) setUserHasInteractedWithEndDate(true);
                                     }
                                   }}
                                   onSelect={(date: Date | null) => {
@@ -757,6 +763,7 @@ export default function PCEventInsurancePage() {
                                       setHasSelectedEndDate(
                                         date.getTime() !== initialEndDateRef.current?.getTime()
                                       );
+                                      setUserHasInteractedWithEndDate(true);
                                     }
                                   }}
                                   dateFormat="yyyy-MM-dd"
@@ -765,7 +772,7 @@ export default function PCEventInsurancePage() {
                                   placeholderText="날짜 선택"
                                   dateFormatCalendar="yyyy년 MM월"
                                   minDate={startDate || today}
-                                  className={`field-input date-input ${hasSelectedEndDate ? 'has-value user-selected' : ''}`}
+                                  className={`field-input date-input ${(hasSelectedEndDate || userHasInteractedWithEndDate) ? 'has-value user-selected' : ''}`}
                                   wrapperClassName="date-picker-wrapper"
                                   calendarClassName="custom-calendar"
                                   popperClassName="custom-popper"

@@ -36,6 +36,9 @@ export default function OverseasInsurancePopupPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasSelectedStartDate, setHasSelectedStartDate] = useState(false);
   const [hasSelectedEndDate, setHasSelectedEndDate] = useState(false);
+  /** 달력에서 날짜를 한 번이라도 선택했으면 true (초기값과 같아도) → CSS 적용용 */
+  const [userHasInteractedWithStartDate, setUserHasInteractedWithStartDate] = useState(false);
+  const [userHasInteractedWithEndDate, setUserHasInteractedWithEndDate] = useState(false);
   const initialStartDateRef = useRef('');
   const initialEndDateRef = useRef('');
 
@@ -222,6 +225,7 @@ export default function OverseasInsurancePopupPage() {
                                 const formattedDate = formatDate(date);
                                 setStartDate(formattedDate);
                                 setHasSelectedStartDate(formattedDate !== initialStartDateRef.current);
+                                setUserHasInteractedWithStartDate(true);
                               } else {
                                 setStartDate('');
                                 setHasSelectedStartDate(false);
@@ -232,6 +236,7 @@ export default function OverseasInsurancePopupPage() {
                                 const formattedDate = formatDate(date);
                                 setStartDate(formattedDate);
                                 setHasSelectedStartDate(formattedDate !== initialStartDateRef.current);
+                                setUserHasInteractedWithStartDate(true);
                               }
                             }}
                             dateFormat="yyyy-MM-dd"
@@ -239,7 +244,7 @@ export default function OverseasInsurancePopupPage() {
                             locale="ko"
                             placeholderText="출발일"
                             dateFormatCalendar="yyyy년 MM월"
-                            className={`tf_g dicon ${hasSelectedStartDate ? 'has-value user-selected' : ''}`}
+                            className={`tf_g dicon ${(hasSelectedStartDate || userHasInteractedWithStartDate) ? 'has-value user-selected' : ''}`}
                             wrapperClassName="date-picker-wrapper"
                             calendarClassName="custom-calendar"
                             popperClassName="custom-popper"
@@ -281,6 +286,7 @@ export default function OverseasInsurancePopupPage() {
                                 const formattedDate = formatDate(date);
                                 setEndDate(formattedDate);
                                 setHasSelectedEndDate(formattedDate !== initialEndDateRef.current);
+                                setUserHasInteractedWithEndDate(true);
                               } else {
                                 setEndDate('');
                                 setHasSelectedEndDate(false);
@@ -291,6 +297,7 @@ export default function OverseasInsurancePopupPage() {
                                 const formattedDate = formatDate(date);
                                 setEndDate(formattedDate);
                                 setHasSelectedEndDate(formattedDate !== initialEndDateRef.current);
+                                setUserHasInteractedWithEndDate(true);
                               }
                             }}
                             dateFormat="yyyy-MM-dd"
@@ -298,7 +305,7 @@ export default function OverseasInsurancePopupPage() {
                             locale="ko"
                             placeholderText="도착일"
                             dateFormatCalendar="yyyy년 MM월"
-                            className={`tf_g dicon ${hasSelectedEndDate ? 'has-value user-selected' : ''}`}
+                            className={`tf_g dicon ${(hasSelectedEndDate || userHasInteractedWithEndDate) ? 'has-value user-selected' : ''}`}
                             wrapperClassName="date-picker-wrapper"
                             calendarClassName="custom-calendar"
                             popperClassName="custom-popper"

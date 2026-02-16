@@ -121,6 +121,9 @@ export default function MobileTravelInfoStep({
 }: TravelInfoStepProps) {
   const [hasSelectedDepartureDate, setHasSelectedDepartureDate] = useState(false);
   const [hasSelectedArrivalDate, setHasSelectedArrivalDate] = useState(false);
+  /** 달력에서 날짜를 한 번이라도 선택했으면 true (오늘 선택 포함) → CSS 적용용 */
+  const [userHasInteractedWithDepartureDate, setUserHasInteractedWithDepartureDate] = useState(false);
+  const [userHasInteractedWithArrivalDate, setUserHasInteractedWithArrivalDate] = useState(false);
   const initialDepartureDateRef = useRef(departureDate);
   const initialArrivalDateRef = useRef(arrivalDate);
 
@@ -145,6 +148,7 @@ export default function MobileTravelInfoStep({
                   const formattedDate = formatDate(date);
                   onDepartureDateChange(formattedDate);
                   setHasSelectedDepartureDate(formattedDate !== initialDepartureDateRef.current);
+                  setUserHasInteractedWithDepartureDate(true);
                 } else {
                   onDepartureDateChange('');
                   setHasSelectedDepartureDate(false);
@@ -155,6 +159,7 @@ export default function MobileTravelInfoStep({
                   const formattedDate = formatDate(date);
                   onDepartureDateChange(formattedDate);
                   setHasSelectedDepartureDate(formattedDate !== initialDepartureDateRef.current);
+                  setUserHasInteractedWithDepartureDate(true);
                 }
               }}
               dateFormat="yyyy-MM-dd"
@@ -162,7 +167,7 @@ export default function MobileTravelInfoStep({
               locale="ko"
               placeholderText="날짜 선택"
               dateFormatCalendar="yyyy년 MM월"
-              className={`tourGuard_input_w01 ${hasSelectedDepartureDate ? 'has-value user-selected' : ''}`}
+              className={`tourGuard_input_w01 ${(hasSelectedDepartureDate || userHasInteractedWithDepartureDate) ? 'has-value user-selected' : ''}`}
               wrapperClassName="date-picker-wrapper"
               calendarClassName="custom-calendar"
               popperClassName="custom-popper"
@@ -205,6 +210,7 @@ export default function MobileTravelInfoStep({
                   const formattedDate = formatDate(date);
                   onArrivalDateChange(formattedDate);
                   setHasSelectedArrivalDate(formattedDate !== initialArrivalDateRef.current);
+                  setUserHasInteractedWithArrivalDate(true);
                 } else {
                   onArrivalDateChange('');
                   setHasSelectedArrivalDate(false);
@@ -215,6 +221,7 @@ export default function MobileTravelInfoStep({
                   const formattedDate = formatDate(date);
                   onArrivalDateChange(formattedDate);
                   setHasSelectedArrivalDate(formattedDate !== initialArrivalDateRef.current);
+                  setUserHasInteractedWithArrivalDate(true);
                 }
               }}
               dateFormat="yyyy-MM-dd"
@@ -222,7 +229,7 @@ export default function MobileTravelInfoStep({
               locale="ko"
               placeholderText="날짜 선택"
               dateFormatCalendar="yyyy년 MM월"
-              className={`tourGuard_input_w01 ${hasSelectedArrivalDate ? 'has-value user-selected' : ''}`}
+              className={`tourGuard_input_w01 ${(hasSelectedArrivalDate || userHasInteractedWithArrivalDate) ? 'has-value user-selected' : ''}`}
               wrapperClassName="date-picker-wrapper"
               calendarClassName="custom-calendar"
               popperClassName="custom-popper"
