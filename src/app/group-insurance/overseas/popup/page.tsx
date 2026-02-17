@@ -85,7 +85,13 @@ export default function OverseasInsurancePopupPage() {
       alert('여행목적을 선택해주세요.');
       return;
     }
-    
+    if (tourGoal === '013' || tourGoal === '006') {
+      alert(
+        '일정 중 전문등반, 글라이더조정, 스카이다이빙, 스쿠버다이빙, 행글라이딩, 래프팅, 제트스키, 번지점프, 스키/스노보드, 수상스키 활동이 포함될 경우 보험가입이 불가능합니다.'
+      );
+      return;
+    }
+
     // 입력한 정보를 localStorage에 저장
     const formData = {
       startDate,
@@ -105,67 +111,67 @@ export default function OverseasInsurancePopupPage() {
 
   const continentPlaces: { [key: string]: { value: string; label: string }[] } = {
     EU: [
-      { value: 'DE', label: '독일' },
-      { value: 'FR', label: '프랑스' },
-      { value: 'GB', label: '영국' },
-      { value: 'IT', label: '이탈리아' },
-      { value: 'ES', label: '스페인' },
-      { value: 'NL', label: '네덜란드' },
-      { value: 'BE', label: '벨기에' },
-      { value: 'CH', label: '스위스' },
-      { value: 'AT', label: '오스트리아' },
       { value: 'GR', label: '그리스' },
-      { value: 'PT', label: '포르투갈' },
-      { value: 'CZ', label: '체코' },
-      { value: 'PL', label: '폴란드' },
-      { value: 'HU', label: '헝가리' },
-      { value: 'SE', label: '스웨덴' },
+      { value: 'NL', label: '네덜란드' },
       { value: 'NO', label: '노르웨이' },
       { value: 'DK', label: '덴마크' },
-      { value: 'FI', label: '핀란드' },
+      { value: 'DE', label: '독일' },
       { value: 'RU', label: '러시아' },
+      { value: 'BE', label: '벨기에' },
+      { value: 'SE', label: '스웨덴' },
+      { value: 'ES', label: '스페인' },
+      { value: 'CH', label: '스위스' },
+      { value: 'GB', label: '영국' },
+      { value: 'AT', label: '오스트리아' },
+      { value: 'IT', label: '이탈리아' },
+      { value: 'CZ', label: '체코' },
+      { value: 'PT', label: '포르투갈' },
+      { value: 'PL', label: '폴란드' },
+      { value: 'FI', label: '핀란드' },
+      { value: 'FR', label: '프랑스' },
+      { value: 'HU', label: '헝가리' },
     ],
     AS: [
+      { value: 'TW', label: '대만' },
+      { value: 'MY', label: '말레이시아' },
+      { value: 'MN', label: '몽골' },
+      { value: 'VN', label: '베트남' },
+      { value: 'SG', label: '싱가포르' },
+      { value: 'IN', label: '인도' },
+      { value: 'ID', label: '인도네시아' },
+      { value: 'UZ', label: '우즈베키스탄' },
       { value: 'JP', label: '일본' },
       { value: 'CN', label: '중국' },
-      { value: 'TW', label: '대만' },
-      { value: 'HK', label: '홍콩' },
-      { value: 'SG', label: '싱가포르' },
-      { value: 'TH', label: '태국' },
-      { value: 'VN', label: '베트남' },
-      { value: 'PH', label: '필리핀' },
-      { value: 'ID', label: '인도네시아' },
-      { value: 'MY', label: '말레이시아' },
-      { value: 'IN', label: '인도' },
-      { value: 'MN', label: '몽골' },
       { value: 'KZ', label: '카자흐스탄' },
-      { value: 'UZ', label: '우즈베키스탄' },
+      { value: 'TH', label: '태국' },
+      { value: 'PH', label: '필리핀' },
+      { value: 'HK', label: '홍콩' },
     ],
     AF: [
       { value: 'ZA', label: '남아프리카공화국' },
-      { value: 'EG', label: '이집트' },
       { value: 'MA', label: '모로코' },
+      { value: 'EG', label: '이집트' },
       { value: 'KE', label: '케냐' },
       { value: 'TZ', label: '탄자니아' },
     ],
     AU: [
-      { value: 'AU', label: '호주' },
       { value: 'NZ', label: '뉴질랜드' },
-      { value: 'FJ', label: '피지' },
       { value: 'PG', label: '파푸아뉴기니' },
+      { value: 'FJ', label: '피지' },
+      { value: 'AU', label: '호주' },
     ],
     NA: [
-      { value: 'US', label: '미국' },
-      { value: 'CA', label: '캐나다' },
       { value: 'MX', label: '멕시코' },
+      { value: 'US', label: '미국' },
       { value: 'CU', label: '쿠바' },
+      { value: 'CA', label: '캐나다' },
     ],
     SA: [
       { value: 'BR', label: '브라질' },
       { value: 'AR', label: '아르헨티나' },
       { value: 'CL', label: '칠레' },
-      { value: 'PE', label: '페루' },
       { value: 'CO', label: '콜롬비아' },
+      { value: 'PE', label: '페루' },
     ],
   };
 
@@ -467,11 +473,11 @@ export default function OverseasInsurancePopupPage() {
           <a href="#" onClick={(e) => { e.preventDefault(); handleSubmit(); }}>설계하기</a>
         </div>
 
-        {/* <section className="tour2023_pc_insuBox">
+        <section className="tour2023_pc_insuBox">
           <div className="tour2023_pc_insuBox01">
             <span className="tour2023_pc_txt01">투어밸리 회원님은 회원 로그인후 이용하세요. (마일리지 적립)</span>
           </div>
-          <a href="#" className="tour2023PC_btn_b tour2023_pc_btnLogin">회원 LOGIN</a>
+          <a href="/login" className="tour2023PC_btn_b tour2023_pc_btnLogin">회원 LOGIN</a>
         </section>
 
         <section className="tour2023_pc_joinBox">
@@ -481,8 +487,21 @@ export default function OverseasInsurancePopupPage() {
               보다 편리하게 여행자보험을 관리할 수 있습니다.
             </span>
           </div>
-          <a href="#"><span className="tour2023_pc_joinTxt01">회원가입&nbsp;&gt;</span></a>
-        </section> */}
+          <a
+            href="/signup"
+            onClick={(e) => {
+              e.preventDefault();
+              if (window.opener) {
+                window.opener.location.href = '/signup';
+                window.close();
+              } else {
+                window.location.href = '/signup';
+              }
+            }}
+          >
+            <span className="tour2023_pc_joinTxt01">회원가입&nbsp;&gt;</span>
+          </a>
+        </section>
 
         <div className="Box_line01 mtb20">
           <p className="txt">

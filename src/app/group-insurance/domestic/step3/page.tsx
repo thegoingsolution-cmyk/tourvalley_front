@@ -375,7 +375,7 @@ export default function DomesticInsuranceStep3Page() {
                         <td className="sName"><strong>순번</strong></td>
                         <td className="sName"><strong>성명</strong></td>
                         <td className="sName"><strong>보험나이</strong></td>
-                        <td className="sName bgcolor_02"><strong>플랜선택</strong></td>
+                        <td className="sName bgcolor_02" style={{ backgroundColor: '#fff0ab' }}><strong>플랜선택</strong></td>
                         <td className="sName"><strong>보험료</strong></td>
                       </tr>
                       {insuredList.map((insured, index) => (
@@ -383,7 +383,7 @@ export default function DomesticInsuranceStep3Page() {
                           <td className="ag_center">{insured.index}</td>
                           <td className="ag_center">{insured.name}</td>
                           <td className="ag_center">{insured.age}</td>
-                          <td className="ag_center box bgcolor_02" style={{ paddingLeft: '4px' }}>
+                          <td className="ag_center box bgcolor_02" style={{ paddingLeft: '4px', backgroundColor: '#fff0ab' }}>
                             <div className="bg_join input_cell_01">
                               <span className="ps_box02 wd_100">
                                 <select 

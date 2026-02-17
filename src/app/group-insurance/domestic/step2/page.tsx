@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { ko } from 'date-fns/locale';
 import { format, parse } from 'date-fns';
@@ -43,6 +43,16 @@ export default function DomesticInsuranceStep2Page() {
   const [countryTypes, setCountryTypes] = useState<{ [key: number]: string }>({});
   // 대륙별 국가 목록 (각 피보험자별)
   const [countryLists, setCountryLists] = useState<{ [key: number]: { value: string; label: string }[] }>({});
+  // 사업자번호 입력칸 자동 포커스 이동용 ref
+  const resno1Ref = useRef<HTMLInputElement>(null);
+  const resno2Ref = useRef<HTMLInputElement>(null);
+  const resno3Ref = useRef<HTMLInputElement>(null);
+  const telno1Ref = useRef<HTMLInputElement>(null);
+  const telno2Ref = useRef<HTMLInputElement>(null);
+  const telno3Ref = useRef<HTMLInputElement>(null);
+  const ctelNo1Ref = useRef<HTMLSelectElement>(null);
+  const ctelNo2Ref = useRef<HTMLInputElement>(null);
+  const ctelNo3Ref = useRef<HTMLInputElement>(null);
 
   // 대륙별 국가 목록 (해외 step2와 동일)
   const continentPlaces: { [key: string]: { value: string; label: string }[] } = {
@@ -559,15 +569,56 @@ export default function DomesticInsuranceStep2Page() {
                         <td className="ddT ag_left box bgcolor_red">
                           <div className="in_wrap01">
                             <div className="bg_join input_cell_01 wd_48">
-                              <input type="tel" maxLength={3} className="tf_g" name="resno1" />
+                              <input
+                                ref={resno1Ref}
+                                type="tel"
+                                maxLength={3}
+                                className="tf_g"
+                                name="resno1"
+                                inputMode="numeric"
+                                onInput={(e) => {
+                                  const v = (e.target as HTMLInputElement).value.replace(/\D/g, '');
+                                  (e.target as HTMLInputElement).value = v;
+                                  if (v.length >= 3) resno2Ref.current?.focus();
+                                }}
+                              />
                             </div>
                             <span className="fff-bar"> - </span>
                             <div className="bg_join input_cell_01 wd_48">
-                              <input type="tel" maxLength={2} className="tf_g" name="resno2" />
+                              <input
+                                ref={resno2Ref}
+                                type="tel"
+                                maxLength={2}
+                                className="tf_g"
+                                name="resno2"
+                                inputMode="numeric"
+                                onInput={(e) => {
+                                  const v = (e.target as HTMLInputElement).value.replace(/\D/g, '');
+                                  (e.target as HTMLInputElement).value = v;
+                                  if (v.length >= 2) resno3Ref.current?.focus();
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Backspace' && !(e.target as HTMLInputElement).value) resno1Ref.current?.focus();
+                                }}
+                              />
                             </div>
                             <span className="fff-bar"> - </span>
                             <div className="bg_join input_cell_01 wd_48">
-                              <input type="tel" maxLength={5} className="tf_g" name="resno3" />
+                              <input
+                                ref={resno3Ref}
+                                type="tel"
+                                maxLength={5}
+                                className="tf_g"
+                                name="resno3"
+                                inputMode="numeric"
+                                onInput={(e) => {
+                                  const v = (e.target as HTMLInputElement).value.replace(/\D/g, '');
+                                  (e.target as HTMLInputElement).value = v;
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Backspace' && !(e.target as HTMLInputElement).value) resno2Ref.current?.focus();
+                                }}
+                              />
                             </div>
                           </div>
                         </td>
@@ -595,15 +646,56 @@ export default function DomesticInsuranceStep2Page() {
                         <td className="ag_left box bgcolor_red">
                           <div className="in_wrap01">
                             <div className="bg_join input_cell_01 wd_32">
-                              <input type="tel" maxLength={4} className="tf_g" name="contract_telno1" />
+                              <input
+                                ref={telno1Ref}
+                                type="tel"
+                                maxLength={4}
+                                className="tf_g"
+                                name="contract_telno1"
+                                inputMode="numeric"
+                                onInput={(e) => {
+                                  const v = (e.target as HTMLInputElement).value.replace(/\D/g, '');
+                                  (e.target as HTMLInputElement).value = v;
+                                  if (v.length >= 4) telno2Ref.current?.focus();
+                                }}
+                              />
                             </div>
                             <span className="fff-bar"> - </span>
                             <div className="bg_join input_cell_01 wd_32">
-                              <input type="tel" maxLength={4} className="tf_g" name="contract_telno2" />
+                              <input
+                                ref={telno2Ref}
+                                type="tel"
+                                maxLength={4}
+                                className="tf_g"
+                                name="contract_telno2"
+                                inputMode="numeric"
+                                onInput={(e) => {
+                                  const v = (e.target as HTMLInputElement).value.replace(/\D/g, '');
+                                  (e.target as HTMLInputElement).value = v;
+                                  if (v.length >= 4) telno3Ref.current?.focus();
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Backspace' && !(e.target as HTMLInputElement).value) telno1Ref.current?.focus();
+                                }}
+                              />
                             </div>
                             <span className="fff-bar"> - </span>
                             <div className="bg_join input_cell_01 wd_32">
-                              <input type="tel" maxLength={4} className="tf_g" name="contract_telno3" />
+                              <input
+                                ref={telno3Ref}
+                                type="tel"
+                                maxLength={4}
+                                className="tf_g"
+                                name="contract_telno3"
+                                inputMode="numeric"
+                                onInput={(e) => {
+                                  const v = (e.target as HTMLInputElement).value.replace(/\D/g, '');
+                                  (e.target as HTMLInputElement).value = v;
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Backspace' && !(e.target as HTMLInputElement).value) telno2Ref.current?.focus();
+                                }}
+                              />
                             </div>
                           </div>
                         </td>
@@ -612,7 +704,12 @@ export default function DomesticInsuranceStep2Page() {
                           <div className="in_wrap01">
                             <div className="bg_join input_cell_01 wd_32">
                               <span className="ps_box02 wd_100">
-                                <select className="sel01" name="contract_ctel_no1">
+                                <select
+                                  ref={ctelNo1Ref}
+                                  className="sel01"
+                                  name="contract_ctel_no1"
+                                  onChange={() => ctelNo2Ref.current?.focus()}
+                                >
                                   <option value="010">010</option>
                                   <option value="011">011</option>
                                   <option value="016">016</option>
@@ -624,11 +721,40 @@ export default function DomesticInsuranceStep2Page() {
                             </div>
                             <span className="fff-bar"> - </span>
                             <div className="bg_join input_cell_01 wd_32">
-                              <input type="tel" maxLength={4} className="tf_g" name="contract_ctel_no2" />
+                              <input
+                                ref={ctelNo2Ref}
+                                type="tel"
+                                maxLength={4}
+                                className="tf_g"
+                                name="contract_ctel_no2"
+                                inputMode="numeric"
+                                onInput={(e) => {
+                                  const v = (e.target as HTMLInputElement).value.replace(/\D/g, '');
+                                  (e.target as HTMLInputElement).value = v;
+                                  if (v.length >= 4) ctelNo3Ref.current?.focus();
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Backspace' && !(e.target as HTMLInputElement).value) ctelNo1Ref.current?.focus();
+                                }}
+                              />
                             </div>
                             <span className="fff-bar"> - </span>
                             <div className="bg_join input_cell_01 wd_32">
-                              <input type="tel" maxLength={4} className="tf_g" name="contract_ctel_no3" />
+                              <input
+                                ref={ctelNo3Ref}
+                                type="tel"
+                                maxLength={4}
+                                className="tf_g"
+                                name="contract_ctel_no3"
+                                inputMode="numeric"
+                                onInput={(e) => {
+                                  const v = (e.target as HTMLInputElement).value.replace(/\D/g, '');
+                                  (e.target as HTMLInputElement).value = v;
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Backspace' && !(e.target as HTMLInputElement).value) ctelNo2Ref.current?.focus();
+                                }}
+                              />
                             </div>
                           </div>
                         </td>
@@ -669,6 +795,8 @@ export default function DomesticInsuranceStep2Page() {
                                   <option value="naver.com">naver.com</option>
                                   <option value="gmail.com">gmail.com</option>
                                   <option value="daum.net">daum.net</option>
+                                  <option value="hanmail.net">hanmail.net</option>
+                                  <option value="nate.com">nate.com</option>
                                 </select>
                               </span>
                             </div>

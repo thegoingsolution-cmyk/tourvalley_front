@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { ko } from 'date-fns/locale';
 import { format, parse } from 'date-fns';
@@ -44,71 +44,80 @@ export default function LongStayInsuranceStep2Page() {
   const [countryTypes, setCountryTypes] = useState<{ [key: number]: string }>({});
   // 대륙별 국가 목록 (각 피보험자별)
   const [countryLists, setCountryLists] = useState<{ [key: number]: any[] }>({});
+  const resno1Ref = useRef<HTMLInputElement>(null);
+  const resno2Ref = useRef<HTMLInputElement>(null);
+  const resno3Ref = useRef<HTMLInputElement>(null);
+  const telno1Ref = useRef<HTMLInputElement>(null);
+  const telno2Ref = useRef<HTMLInputElement>(null);
+  const telno3Ref = useRef<HTMLInputElement>(null);
+  const ctelNo1Ref = useRef<HTMLSelectElement>(null);
+  const ctelNo2Ref = useRef<HTMLInputElement>(null);
+  const ctelNo3Ref = useRef<HTMLInputElement>(null);
 
-  // 대륙별 국가 목록 (popup 페이지와 동일하게 통일)
+  // 대륙별 국가 목록 (popup 페이지와 동일하게 통일, 가나다순)
   const continentPlaces: { [key: string]: { value: string; label: string }[] } = {
     EU: [
-      { value: 'DE', label: '독일' },
-      { value: 'FR', label: '프랑스' },
-      { value: 'GB', label: '영국' },
-      { value: 'IT', label: '이탈리아' },
-      { value: 'ES', label: '스페인' },
-      { value: 'NL', label: '네덜란드' },
-      { value: 'BE', label: '벨기에' },
-      { value: 'CH', label: '스위스' },
-      { value: 'AT', label: '오스트리아' },
       { value: 'GR', label: '그리스' },
-      { value: 'PT', label: '포르투갈' },
-      { value: 'CZ', label: '체코' },
-      { value: 'PL', label: '폴란드' },
-      { value: 'HU', label: '헝가리' },
-      { value: 'SE', label: '스웨덴' },
+      { value: 'NL', label: '네덜란드' },
       { value: 'NO', label: '노르웨이' },
       { value: 'DK', label: '덴마크' },
-      { value: 'FI', label: '핀란드' },
+      { value: 'DE', label: '독일' },
       { value: 'RU', label: '러시아' },
+      { value: 'BE', label: '벨기에' },
+      { value: 'SE', label: '스웨덴' },
+      { value: 'ES', label: '스페인' },
+      { value: 'CH', label: '스위스' },
+      { value: 'GB', label: '영국' },
+      { value: 'AT', label: '오스트리아' },
+      { value: 'IT', label: '이탈리아' },
+      { value: 'CZ', label: '체코' },
+      { value: 'PT', label: '포르투갈' },
+      { value: 'PL', label: '폴란드' },
+      { value: 'FI', label: '핀란드' },
+      { value: 'FR', label: '프랑스' },
+      { value: 'HU', label: '헝가리' },
     ],
     AS: [
+      { value: 'TW', label: '대만' },
+      { value: 'MY', label: '말레이시아' },
+      { value: 'MN', label: '몽골' },
+      { value: 'VN', label: '베트남' },
+      { value: 'SG', label: '싱가포르' },
+      { value: 'IN', label: '인도' },
+      { value: 'ID', label: '인도네시아' },
+      { value: 'UZ', label: '우즈베키스탄' },
       { value: 'JP', label: '일본' },
       { value: 'CN', label: '중국' },
-      { value: 'TW', label: '대만' },
-      { value: 'HK', label: '홍콩' },
-      { value: 'SG', label: '싱가포르' },
-      { value: 'TH', label: '태국' },
-      { value: 'VN', label: '베트남' },
-      { value: 'PH', label: '필리핀' },
-      { value: 'ID', label: '인도네시아' },
-      { value: 'MY', label: '말레이시아' },
-      { value: 'IN', label: '인도' },
-      { value: 'MN', label: '몽골' },
       { value: 'KZ', label: '카자흐스탄' },
-      { value: 'UZ', label: '우즈베키스탄' },
+      { value: 'TH', label: '태국' },
+      { value: 'PH', label: '필리핀' },
+      { value: 'HK', label: '홍콩' },
     ],
     AF: [
       { value: 'ZA', label: '남아프리카공화국' },
-      { value: 'EG', label: '이집트' },
       { value: 'MA', label: '모로코' },
+      { value: 'EG', label: '이집트' },
       { value: 'KE', label: '케냐' },
       { value: 'TZ', label: '탄자니아' },
     ],
     AU: [
-      { value: 'AU', label: '호주' },
       { value: 'NZ', label: '뉴질랜드' },
-      { value: 'FJ', label: '피지' },
       { value: 'PG', label: '파푸아뉴기니' },
+      { value: 'FJ', label: '피지' },
+      { value: 'AU', label: '호주' },
     ],
     NA: [
-      { value: 'US', label: '미국' },
-      { value: 'CA', label: '캐나다' },
       { value: 'MX', label: '멕시코' },
+      { value: 'US', label: '미국' },
       { value: 'CU', label: '쿠바' },
+      { value: 'CA', label: '캐나다' },
     ],
     SA: [
       { value: 'BR', label: '브라질' },
       { value: 'AR', label: '아르헨티나' },
       { value: 'CL', label: '칠레' },
-      { value: 'PE', label: '페루' },
       { value: 'CO', label: '콜롬비아' },
+      { value: 'PE', label: '페루' },
     ],
   };
 
@@ -723,15 +732,56 @@ export default function LongStayInsuranceStep2Page() {
                         <td className="ddT ag_left box bgcolor_red">
                           <div className="in_wrap01">
                             <div className="bg_join input_cell_01 wd_48">
-                              <input type="tel" maxLength={3} className="tf_g" name="resno1" />
+                              <input
+                                ref={resno1Ref}
+                                type="tel"
+                                maxLength={3}
+                                className="tf_g"
+                                name="resno1"
+                                inputMode="numeric"
+                                onInput={(e) => {
+                                  const v = (e.target as HTMLInputElement).value.replace(/\D/g, '');
+                                  (e.target as HTMLInputElement).value = v;
+                                  if (v.length >= 3) resno2Ref.current?.focus();
+                                }}
+                              />
                             </div>
                             <span className="fff-bar"> - </span>
                             <div className="bg_join input_cell_01 wd_48">
-                              <input type="tel" maxLength={2} className="tf_g" name="resno2" />
+                              <input
+                                ref={resno2Ref}
+                                type="tel"
+                                maxLength={2}
+                                className="tf_g"
+                                name="resno2"
+                                inputMode="numeric"
+                                onInput={(e) => {
+                                  const v = (e.target as HTMLInputElement).value.replace(/\D/g, '');
+                                  (e.target as HTMLInputElement).value = v;
+                                  if (v.length >= 2) resno3Ref.current?.focus();
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Backspace' && !(e.target as HTMLInputElement).value) resno1Ref.current?.focus();
+                                }}
+                              />
                             </div>
                             <span className="fff-bar"> - </span>
                             <div className="bg_join input_cell_01 wd_48">
-                              <input type="tel" maxLength={5} className="tf_g" name="resno3" />
+                              <input
+                                ref={resno3Ref}
+                                type="tel"
+                                maxLength={5}
+                                className="tf_g"
+                                name="resno3"
+                                inputMode="numeric"
+                                onInput={(e) => {
+                                  const v = (e.target as HTMLInputElement).value.replace(/\D/g, '');
+                                  (e.target as HTMLInputElement).value = v;
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Backspace' && !(e.target as HTMLInputElement).value) resno2Ref.current?.focus();
+                                }}
+                              />
                             </div>
                           </div>
                         </td>
@@ -759,15 +809,56 @@ export default function LongStayInsuranceStep2Page() {
                         <td className="ag_left box bgcolor_red">
                           <div className="in_wrap01">
                             <div className="bg_join input_cell_01 wd_32">
-                              <input type="tel" maxLength={4} className="tf_g" name="contract_telno1" />
+                              <input
+                                ref={telno1Ref}
+                                type="tel"
+                                maxLength={4}
+                                className="tf_g"
+                                name="contract_telno1"
+                                inputMode="numeric"
+                                onInput={(e) => {
+                                  const v = (e.target as HTMLInputElement).value.replace(/\D/g, '');
+                                  (e.target as HTMLInputElement).value = v;
+                                  if (v.length >= 4) telno2Ref.current?.focus();
+                                }}
+                              />
                             </div>
                             <span className="fff-bar"> - </span>
                             <div className="bg_join input_cell_01 wd_32">
-                              <input type="tel" maxLength={4} className="tf_g" name="contract_telno2" />
+                              <input
+                                ref={telno2Ref}
+                                type="tel"
+                                maxLength={4}
+                                className="tf_g"
+                                name="contract_telno2"
+                                inputMode="numeric"
+                                onInput={(e) => {
+                                  const v = (e.target as HTMLInputElement).value.replace(/\D/g, '');
+                                  (e.target as HTMLInputElement).value = v;
+                                  if (v.length >= 4) telno3Ref.current?.focus();
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Backspace' && !(e.target as HTMLInputElement).value) telno1Ref.current?.focus();
+                                }}
+                              />
                             </div>
                             <span className="fff-bar"> - </span>
                             <div className="bg_join input_cell_01 wd_32">
-                              <input type="tel" maxLength={4} className="tf_g" name="contract_telno3" />
+                              <input
+                                ref={telno3Ref}
+                                type="tel"
+                                maxLength={4}
+                                className="tf_g"
+                                name="contract_telno3"
+                                inputMode="numeric"
+                                onInput={(e) => {
+                                  const v = (e.target as HTMLInputElement).value.replace(/\D/g, '');
+                                  (e.target as HTMLInputElement).value = v;
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Backspace' && !(e.target as HTMLInputElement).value) telno2Ref.current?.focus();
+                                }}
+                              />
                             </div>
                           </div>
                         </td>
@@ -776,7 +867,12 @@ export default function LongStayInsuranceStep2Page() {
                           <div className="in_wrap01">
                             <div className="bg_join input_cell_01 wd_32">
                               <span className="ps_box02 wd_100">
-                                <select className="sel01" name="contract_ctel_no1">
+                                <select
+                                  ref={ctelNo1Ref}
+                                  className="sel01"
+                                  name="contract_ctel_no1"
+                                  onChange={() => ctelNo2Ref.current?.focus()}
+                                >
                                   <option value="010">010</option>
                                   <option value="011">011</option>
                                   <option value="016">016</option>
@@ -788,11 +884,40 @@ export default function LongStayInsuranceStep2Page() {
                             </div>
                             <span className="fff-bar"> - </span>
                             <div className="bg_join input_cell_01 wd_32">
-                              <input type="tel" maxLength={4} className="tf_g" name="contract_ctel_no2" />
+                              <input
+                                ref={ctelNo2Ref}
+                                type="tel"
+                                maxLength={4}
+                                className="tf_g"
+                                name="contract_ctel_no2"
+                                inputMode="numeric"
+                                onInput={(e) => {
+                                  const v = (e.target as HTMLInputElement).value.replace(/\D/g, '');
+                                  (e.target as HTMLInputElement).value = v;
+                                  if (v.length >= 4) ctelNo3Ref.current?.focus();
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Backspace' && !(e.target as HTMLInputElement).value) ctelNo1Ref.current?.focus();
+                                }}
+                              />
                             </div>
                             <span className="fff-bar"> - </span>
                             <div className="bg_join input_cell_01 wd_32">
-                              <input type="tel" maxLength={4} className="tf_g" name="contract_ctel_no3" />
+                              <input
+                                ref={ctelNo3Ref}
+                                type="tel"
+                                maxLength={4}
+                                className="tf_g"
+                                name="contract_ctel_no3"
+                                inputMode="numeric"
+                                onInput={(e) => {
+                                  const v = (e.target as HTMLInputElement).value.replace(/\D/g, '');
+                                  (e.target as HTMLInputElement).value = v;
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Backspace' && !(e.target as HTMLInputElement).value) ctelNo2Ref.current?.focus();
+                                }}
+                              />
                             </div>
                           </div>
                         </td>
@@ -833,6 +958,8 @@ export default function LongStayInsuranceStep2Page() {
                                   <option value="naver.com">naver.com</option>
                                   <option value="gmail.com">gmail.com</option>
                                   <option value="daum.net">daum.net</option>
+                                  <option value="hanmail.net">hanmail.net</option>
+                                  <option value="nate.com">nate.com</option>
                                 </select>
                               </span>
                             </div>

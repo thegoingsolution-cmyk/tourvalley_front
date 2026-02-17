@@ -1,19 +1,97 @@
 'use client';
 
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import './page.css';
+
+interface CoverageItem {
+  label: string;
+  amount: string;
+  note?: string;
+}
+
+interface CoverageSection {
+  title: string;
+  helpUrl: string | null;
+  items: CoverageItem[];
+}
+
+interface CoverageDetailResponse {
+  success: boolean;
+  planName: string;
+  sections: CoverageSection[];
+}
+
+type InsuranceType = '국내여행보험' | '해외여행보험' | '유학/어학연수' | '워킹홀리데이' | '해외출장/주재원/교환교수';
 
 function PCCoverageDetailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const hasMedicalExpense = searchParams.get('hasMedicalExpense') === 'true';
+  const planType = searchParams.get('planType') || '표준플랜';
+  const hasMedicalExpense = searchParams.get('hasMedicalExpense') !== 'false';
+  const insuranceType = (searchParams.get('insuranceType') as InsuranceType) || '국내여행보험';
+  const currencyPlan = searchParams.get('currencyPlan') as '원화플랜' | '외화플랜' | undefined;
+
+  const [data, setData] = useState<CoverageDetailResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchDetail = async () => {
+      setLoading(true);
+      setError(false);
+      try {
+        const res = await fetch('/api/travel/coverage-details', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            insurance_type: insuranceType,
+            plan_type: planType,
+            is_medical_expense: hasMedicalExpense,
+            currency_plan: currencyPlan || undefined,
+            plan_variant: 'B',
+          }),
+        });
+
+        const json = await res.json();
+        if (isMounted && res.ok && json.success) {
+          setData({
+            success: json.success,
+            planName: json.planName,
+            sections: json.sections || [],
+          });
+        } else if (isMounted) {
+          setError(true);
+        }
+      } catch {
+        if (isMounted) {
+          setError(true);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchDetail();
+    return () => {
+      isMounted = false;
+    };
+  }, [planType, hasMedicalExpense, insuranceType, currencyPlan]);
+
+  const handleClose = () => {
+    if (typeof window !== 'undefined' && window.opener) {
+      window.close();
+      return;
+    }
+    router.back();
+  };
 
   return (
     <div className="domestic-page-pc">
-      <Header />
       <div className="domestic-content-pc">
         <div className="form-section">
           <div className="form-container">
@@ -22,138 +100,65 @@ function PCCoverageDetailContent() {
                 <h2 className="modal-title">보장 상세보기</h2>
                 <button
                   className="modal-close-btn"
-                  onClick={() => router.back()}
+                  onClick={handleClose}
                 >
                   ×
                 </button>
               </div>
 
               <div className="modal-body">
-                <div className="coverage-plan-title">기준플랜</div>
-                
-                {/* 상해보장 */}
-                <div className="coverage-section">
-                  <div className="coverage-section-header">
-                    <span className="coverage-section-icon">?</span>
-                    <h3 className="coverage-section-title">상해보장</h3>
-                  </div>
-                  <div className="coverage-items">
-                    <div className="coverage-item-row">
-                      <span className="coverage-item-name">상해사망</span>
-                      <span className="coverage-item-amount">1억원</span>
-                    </div>
-                    <div className="coverage-item-row">
-                      <span className="coverage-item-name">상해후유장해</span>
-                      <span className="coverage-item-amount">-</span>
-                    </div>
-                  </div>
-                </div>
+                <div className="coverage-plan-title">{data?.planName ?? planType}</div>
 
-                {/* 질병보장 */}
-                <div className="coverage-section">
-                  <div className="coverage-section-header">
-                    <span className="coverage-section-icon">?</span>
-                    <h3 className="coverage-section-title">질병보장</h3>
+                {loading && (
+                  <div style={{ padding: '24px', textAlign: 'center', color: '#666' }}>
+                    보장 내용을 불러오는 중입니다...
                   </div>
-                  <div className="coverage-items">
-                    <div className="coverage-item-row">
-                      <span className="coverage-item-name">해외의료비</span>
-                      <span className="coverage-item-amount">-</span>
-                    </div>
-                    <div className="coverage-item-row">
-                      <span className="coverage-item-name">입원(급여/비급여)</span>
-                      <span className="coverage-item-amount">-</span>
-                    </div>
-                    <div className="coverage-item-row">
-                      <span className="coverage-item-name">통원(급여/비급여)</span>
-                      <span className="coverage-item-amount">-</span>
-                    </div>
-                    <div className="coverage-item-row">
-                      <span className="coverage-item-name">사망 및 80%이상 고도후유장해</span>
-                      <span className="coverage-item-amount">1,000만원</span>
-                    </div>
-                  </div>
-                </div>
+                )}
 
-                {/* 상해질병 3대 비급여 국내의료비 */}
-                <div className="coverage-section">
-                  <div className="coverage-section-header">
-                    <span className="coverage-section-icon">?</span>
-                    <h3 className="coverage-section-title">상해질병 3대 비급여 국내의료비</h3>
+                {error && !loading && (
+                  <div style={{ padding: '24px', textAlign: 'center', color: '#c00' }}>
+                    보장 내용을 불러오지 못했습니다.
                   </div>
-                  <div className="coverage-items">
-                    <div className="coverage-item-row">
-                      <span className="coverage-item-name">도수, 체외충격파, 증식치료</span>
-                      <span className="coverage-item-amount">-</span>
-                    </div>
-                    <div className="coverage-item-row">
-                      <span className="coverage-item-name">주사치료</span>
-                      <span className="coverage-item-amount">-</span>
-                    </div>
-                    <div className="coverage-item-row">
-                      <span className="coverage-item-name">자기공명진단(MRA/MRI)</span>
-                      <span className="coverage-item-amount">-</span>
-                    </div>
-                  </div>
-                </div>
+                )}
 
-                {/* 기타보장 */}
-                <div className="coverage-section">
-                  <div className="coverage-section-header">
-                    <span className="coverage-section-icon">?</span>
-                    <h3 className="coverage-section-title">기타보장</h3>
-                  </div>
-                  <div className="coverage-items">
-                    <div className="coverage-item-row">
-                      <span className="coverage-item-name">휴대품손해(본인부담금 1만원)</span>
-                      <span className="coverage-item-amount">50만원</span>
+                {!loading && !error && data && data.sections && data.sections.length > 0 && data.sections.map((section, sectionIndex) => (
+                  <div key={sectionIndex} className="coverage-section">
+                    <div className="coverage-section-header">
+                      {section.helpUrl ? (
+                        <a
+                          href={section.helpUrl}
+                          className="coverage-section-icon"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`${section.title} 도움말`}
+                        >
+                          ?
+                        </a>
+                      ) : (
+                        <span className="coverage-section-icon">?</span>
+                      )}
+                      <h3 className="coverage-section-title">{section.title}</h3>
                     </div>
-                    <div className="coverage-item-note">
-                      1개 20만원한도, 이동통신단말기 보상제외
-                    </div>
-                    <div className="coverage-item-row">
-                      <span className="coverage-item-name">골절(치아파절제외)진단비</span>
-                      <span className="coverage-item-amount">10만원</span>
-                    </div>
-                    <div className="coverage-item-row">
-                      <span className="coverage-item-name">화상진단비</span>
-                      <span className="coverage-item-amount">10만원</span>
-                    </div>
-                    <div className="coverage-item-row">
-                      <span className="coverage-item-name">배상책임(본인부담금 1만원)</span>
-                      <span className="coverage-item-amount">1,000만원</span>
-                    </div>
-                    <div className="coverage-item-row">
-                      <span className="coverage-item-name">상해입원일당(4일이상 30일한도)</span>
-                      <span className="coverage-item-amount">2만원</span>
-                    </div>
-                    <div className="coverage-item-row">
-                      <span className="coverage-item-name">상해응급실내원(응급)의료비</span>
-                      <span className="coverage-item-amount">3만원</span>
-                    </div>
-                    <div className="coverage-item-row">
-                      <span className="coverage-item-name">상해응급실내원(비응급)의료비</span>
-                      <span className="coverage-item-amount">-</span>
-                    </div>
-                    <div className="coverage-item-row">
-                      <span className="coverage-item-name">골절수술비(동일사고 1회한)</span>
-                      <span className="coverage-item-amount">20만원</span>
-                    </div>
-                    <div className="coverage-item-row">
-                      <span className="coverage-item-name">상해수술비(동일사고 1회한)</span>
-                      <span className="coverage-item-amount">20만원</span>
-                    </div>
-                    <div className="coverage-item-row">
-                      <span className="coverage-item-name">깁스치료비(동일사고 또는 질병 1회한)</span>
-                      <span className="coverage-item-amount">20만원</span>
+                    <div className="coverage-items">
+                      {section.items.map((item, itemIndex) => (
+                        <React.Fragment key={itemIndex}>
+                          <div className="coverage-item-row">
+                            <span className="coverage-item-name">{item.label}</span>
+                            <span className="coverage-item-amount">{item.amount}</span>
+                          </div>
+                          {item.note && (
+                            <div className="coverage-item-note">{item.note}</div>
+                          )}
+                        </React.Fragment>
+                      ))}
                     </div>
                   </div>
-                </div>
+                ))}
 
                 <div className="modal-footer">
                   <button
                     className="confirm-btn"
-                    onClick={() => router.back()}
+                    onClick={handleClose}
                   >
                     확인
                   </button>
@@ -163,7 +168,6 @@ function PCCoverageDetailContent() {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 }
@@ -172,15 +176,12 @@ export default function PCCoverageDetailPage() {
   return (
     <Suspense fallback={
       <div className="domestic-page-pc">
-        <Header />
         <div className="domestic-content-pc" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
           <div>로딩 중...</div>
         </div>
-        <Footer />
       </div>
     }>
       <PCCoverageDetailContent />
     </Suspense>
   );
 }
-

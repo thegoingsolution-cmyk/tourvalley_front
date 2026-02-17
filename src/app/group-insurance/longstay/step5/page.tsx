@@ -379,67 +379,67 @@ export default function LongStayInsuranceStep5Page() {
           if (country1Code && country2Code) {
             const continentPlacesForNationality: { [key: string]: { value: string; label: string }[] } = {
               EU: [
-                { value: 'DE', label: '독일' },
-                { value: 'FR', label: '프랑스' },
-                { value: 'GB', label: '영국' },
-                { value: 'IT', label: '이탈리아' },
-                { value: 'ES', label: '스페인' },
-                { value: 'NL', label: '네덜란드' },
-                { value: 'BE', label: '벨기에' },
-                { value: 'CH', label: '스위스' },
-                { value: 'AT', label: '오스트리아' },
                 { value: 'GR', label: '그리스' },
-                { value: 'PT', label: '포르투갈' },
-                { value: 'CZ', label: '체코' },
-                { value: 'PL', label: '폴란드' },
-                { value: 'HU', label: '헝가리' },
-                { value: 'SE', label: '스웨덴' },
+                { value: 'NL', label: '네덜란드' },
                 { value: 'NO', label: '노르웨이' },
                 { value: 'DK', label: '덴마크' },
-                { value: 'FI', label: '핀란드' },
+                { value: 'DE', label: '독일' },
                 { value: 'RU', label: '러시아' },
+                { value: 'BE', label: '벨기에' },
+                { value: 'SE', label: '스웨덴' },
+                { value: 'ES', label: '스페인' },
+                { value: 'CH', label: '스위스' },
+                { value: 'GB', label: '영국' },
+                { value: 'AT', label: '오스트리아' },
+                { value: 'IT', label: '이탈리아' },
+                { value: 'CZ', label: '체코' },
+                { value: 'PT', label: '포르투갈' },
+                { value: 'PL', label: '폴란드' },
+                { value: 'FI', label: '핀란드' },
+                { value: 'FR', label: '프랑스' },
+                { value: 'HU', label: '헝가리' },
               ],
               AS: [
+                { value: 'TW', label: '대만' },
+                { value: 'MY', label: '말레이시아' },
+                { value: 'MN', label: '몽골' },
+                { value: 'VN', label: '베트남' },
+                { value: 'SG', label: '싱가포르' },
+                { value: 'IN', label: '인도' },
+                { value: 'ID', label: '인도네시아' },
+                { value: 'UZ', label: '우즈베키스탄' },
                 { value: 'JP', label: '일본' },
                 { value: 'CN', label: '중국' },
-                { value: 'TW', label: '대만' },
-                { value: 'HK', label: '홍콩' },
-                { value: 'SG', label: '싱가포르' },
-                { value: 'TH', label: '태국' },
-                { value: 'VN', label: '베트남' },
-                { value: 'PH', label: '필리핀' },
-                { value: 'ID', label: '인도네시아' },
-                { value: 'MY', label: '말레이시아' },
-                { value: 'IN', label: '인도' },
-                { value: 'MN', label: '몽골' },
                 { value: 'KZ', label: '카자흐스탄' },
-                { value: 'UZ', label: '우즈베키스탄' },
+                { value: 'TH', label: '태국' },
+                { value: 'PH', label: '필리핀' },
+                { value: 'HK', label: '홍콩' },
               ],
               AF: [
                 { value: 'ZA', label: '남아프리카공화국' },
-                { value: 'EG', label: '이집트' },
                 { value: 'MA', label: '모로코' },
+                { value: 'EG', label: '이집트' },
                 { value: 'KE', label: '케냐' },
                 { value: 'TZ', label: '탄자니아' },
               ],
               AU: [
-                { value: 'AU', label: '호주' },
                 { value: 'NZ', label: '뉴질랜드' },
-                { value: 'FJ', label: '피지' },
                 { value: 'PG', label: '파푸아뉴기니' },
+                { value: 'FJ', label: '피지' },
+                { value: 'AU', label: '호주' },
               ],
               NA: [
-                { value: 'US', label: '미국' },
-                { value: 'CA', label: '캐나다' },
                 { value: 'MX', label: '멕시코' },
+                { value: 'US', label: '미국' },
                 { value: 'CU', label: '쿠바' },
+                { value: 'CA', label: '캐나다' },
               ],
               SA: [
                 { value: 'BR', label: '브라질' },
                 { value: 'AR', label: '아르헨티나' },
                 { value: 'CL', label: '칠레' },
-                { value: 'PE', label: '페루' },
                 { value: 'CO', label: '콜롬비아' },
+                { value: 'PE', label: '페루' },
               ],
             };
             
@@ -493,67 +493,67 @@ export default function LongStayInsuranceStep5Page() {
 
       const continentPlaces: { [key: string]: { value: string; label: string }[] } = {
         EU: [
-          { value: 'DE', label: '독일' },
-          { value: 'FR', label: '프랑스' },
-          { value: 'GB', label: '영국' },
-          { value: 'IT', label: '이탈리아' },
-          { value: 'ES', label: '스페인' },
-          { value: 'NL', label: '네덜란드' },
-          { value: 'BE', label: '벨기에' },
-          { value: 'CH', label: '스위스' },
-          { value: 'AT', label: '오스트리아' },
           { value: 'GR', label: '그리스' },
-          { value: 'PT', label: '포르투갈' },
-          { value: 'CZ', label: '체코' },
-          { value: 'PL', label: '폴란드' },
-          { value: 'HU', label: '헝가리' },
-          { value: 'SE', label: '스웨덴' },
+          { value: 'NL', label: '네덜란드' },
           { value: 'NO', label: '노르웨이' },
           { value: 'DK', label: '덴마크' },
-          { value: 'FI', label: '핀란드' },
+          { value: 'DE', label: '독일' },
           { value: 'RU', label: '러시아' },
+          { value: 'BE', label: '벨기에' },
+          { value: 'SE', label: '스웨덴' },
+          { value: 'ES', label: '스페인' },
+          { value: 'CH', label: '스위스' },
+          { value: 'GB', label: '영국' },
+          { value: 'AT', label: '오스트리아' },
+          { value: 'IT', label: '이탈리아' },
+          { value: 'CZ', label: '체코' },
+          { value: 'PT', label: '포르투갈' },
+          { value: 'PL', label: '폴란드' },
+          { value: 'FI', label: '핀란드' },
+          { value: 'FR', label: '프랑스' },
+          { value: 'HU', label: '헝가리' },
         ],
         AS: [
+          { value: 'TW', label: '대만' },
+          { value: 'MY', label: '말레이시아' },
+          { value: 'MN', label: '몽골' },
+          { value: 'VN', label: '베트남' },
+          { value: 'SG', label: '싱가포르' },
+          { value: 'IN', label: '인도' },
+          { value: 'ID', label: '인도네시아' },
+          { value: 'UZ', label: '우즈베키스탄' },
           { value: 'JP', label: '일본' },
           { value: 'CN', label: '중국' },
-          { value: 'TW', label: '대만' },
-          { value: 'HK', label: '홍콩' },
-          { value: 'SG', label: '싱가포르' },
-          { value: 'TH', label: '태국' },
-          { value: 'VN', label: '베트남' },
-          { value: 'PH', label: '필리핀' },
-          { value: 'ID', label: '인도네시아' },
-          { value: 'MY', label: '말레이시아' },
-          { value: 'IN', label: '인도' },
-          { value: 'MN', label: '몽골' },
           { value: 'KZ', label: '카자흐스탄' },
-          { value: 'UZ', label: '우즈베키스탄' },
+          { value: 'TH', label: '태국' },
+          { value: 'PH', label: '필리핀' },
+          { value: 'HK', label: '홍콩' },
         ],
         AF: [
           { value: 'ZA', label: '남아프리카공화국' },
-          { value: 'EG', label: '이집트' },
           { value: 'MA', label: '모로코' },
+          { value: 'EG', label: '이집트' },
           { value: 'KE', label: '케냐' },
           { value: 'TZ', label: '탄자니아' },
         ],
         AU: [
-          { value: 'AU', label: '호주' },
           { value: 'NZ', label: '뉴질랜드' },
-          { value: 'FJ', label: '피지' },
           { value: 'PG', label: '파푸아뉴기니' },
+          { value: 'FJ', label: '피지' },
+          { value: 'AU', label: '호주' },
         ],
         NA: [
-          { value: 'US', label: '미국' },
-          { value: 'CA', label: '캐나다' },
           { value: 'MX', label: '멕시코' },
+          { value: 'US', label: '미국' },
           { value: 'CU', label: '쿠바' },
+          { value: 'CA', label: '캐나다' },
         ],
         SA: [
           { value: 'BR', label: '브라질' },
           { value: 'AR', label: '아르헨티나' },
           { value: 'CL', label: '칠레' },
-          { value: 'PE', label: '페루' },
           { value: 'CO', label: '콜롬비아' },
+          { value: 'PE', label: '페루' },
         ],
       };
 
@@ -950,8 +950,9 @@ export default function LongStayInsuranceStep5Page() {
                       <span style={{ color: '#f2fbfa' }}>▶ </span>가입 시 유의 바랍니다. 영업시간 내에 확인, 안내되며 결제된 보험료는 환불하여 드립니다.<br />
                     </div>
                   </li>
-                  <li>보험기간이 3개월을 초과한 해외장기체류보험에 가입하신 경우 청약서류를 메일로 발송해 드리며 청약서류를 회신해 주시면 보험료 결제(수납) 및 보험증서가 발급됩니다.</li>
-                  <li>계약내용 변경 및 취소를 하셔야 할 경우에는 마이페이지 계약상세보기에서 하실 수 있습니다. <br />(이 경우 보험기간이 시작되는 시점의 2시간 전까지 가능합니다.)</li>
+                  <li style={{ color: 'red' }}>※ 보험기간, 인원 등의 계약내용이 변경되는 경우 계약취소 신청 후 재가입하시기 바랍니다.</li>
+                  <li>※ 계약취소 신청은 보험기간이 시작되는 시점의 2시간 전까지 가능합니다.</li>
+                  <li>※ 계약취소 신청은 계약조회 후 계약상세보기에서 신청하거나 고객센터로 전화로 신청하실 수있습니다.</li>
                 </ul>
               </div>
             </div>
@@ -1374,42 +1375,46 @@ export default function LongStayInsuranceStep5Page() {
                         </div>
                       </td>
                     </tr>
-                    <tr>
-                      <td className="sName01">소유자 이름</td>
-                      <td className="dd ag_left">
-                        <div className="in_wrap01">
-                          <div className="bg_join input_cell_01 wd_30" style={{ width: '55%' }}>
-                            <input 
-                              type="text" 
-                              className="tf_g" 
-                              name="card_owner_name" 
-                              size={15} 
-                              maxLength={15}
-                              value={cardholderName}
-                              onChange={(e) => setCardholderName(e.target.value)}
-                            />
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="sName01">소유자 생년월일 / 사업자번호</td>
-                      <td className="dd ag_left">
-                        <div className="in_wrap01">
-                          <div className="bg_join input_cell_01 wd_30" style={{ width: '55%' }}>
-                            <input 
-                              type="text" 
-                              className="tf_g" 
-                              name="card_owner_ssn" 
-                              size={15} 
-                              maxLength={13}
-                              value={cardholderResidentNumber}
-                              onChange={(e) => setCardholderResidentNumber(e.target.value.replace(/[^0-9-]/g, ''))}
-                            />
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
+                    {cardType === '기타카드' && (
+                      <>
+                        <tr>
+                          <td className="sName01">소유자 이름</td>
+                          <td className="dd ag_left">
+                            <div className="in_wrap01">
+                              <div className="bg_join input_cell_01 wd_30" style={{ width: '55%' }}>
+                                <input 
+                                  type="text" 
+                                  className="tf_g" 
+                                  name="card_owner_name" 
+                                  size={15} 
+                                  maxLength={15}
+                                  value={cardholderName}
+                                  onChange={(e) => setCardholderName(e.target.value)}
+                                />
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="sName01">소유자 생년월일 / 사업자번호</td>
+                          <td className="dd ag_left">
+                            <div className="in_wrap01">
+                              <div className="bg_join input_cell_01 wd_30" style={{ width: '55%' }}>
+                                <input 
+                                  type="text" 
+                                  className="tf_g" 
+                                  name="card_owner_ssn" 
+                                  size={15} 
+                                  maxLength={13}
+                                  value={cardholderResidentNumber}
+                                  onChange={(e) => setCardholderResidentNumber(e.target.value.replace(/[^0-9-]/g, ''))}
+                                />
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      </>
+                    )}
                   </tbody>
                 </table>
               </div>

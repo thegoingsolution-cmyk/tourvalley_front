@@ -157,7 +157,17 @@ function PCPremiumDetailContent() {
                             <button 
                               className="plan-badge-btn"
                               onClick={() => {
-                                window.open(`/coverage-detail?planType=${participant.planType}&hasMedicalExpense=${hasMedicalExpense}`, '_blank');
+                                const url = `/coverage-detail?planType=${participant.planType}&hasMedicalExpense=${hasMedicalExpense}`;
+                                const w = 620;
+                                const h = 540;
+                                const left = Math.max(0, (window.screen.width - w) / 2);
+                                const top = Math.max(0, (window.screen.height - h) / 2);
+                                const popup = window.open(
+                                  url,
+                                  'coverageDetailPopup',
+                                  `width=${w},height=${h},left=${left},top=${top},scrollbars=yes,resizable=yes,toolbar=no,menubar=no,location=no,status=no`
+                                );
+                                if (popup) popup.focus();
                               }}
                             >
                               {participant.planType || '-'}

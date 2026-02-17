@@ -78,7 +78,13 @@ export default function DomesticInsurancePopupPage() {
       alert('여행목적을 선택해주세요.');
       return;
     }
-    
+    if (tourGoal === '013' || tourGoal === '006') {
+      alert(
+        '일정 중 전문등반, 글라이더조정, 스카이다이빙, 스쿠버다이빙, 행글라이딩, 래프팅, 제트스키, 번지점프, 스키/스노보드, 수상스키 활동이 포함될 경우 보험가입이 불가능합니다.'
+      );
+      return;
+    }
+
     // 입력한 정보를 localStorage에 저장
     const formData = {
       startDate,
@@ -334,11 +340,11 @@ export default function DomesticInsurancePopupPage() {
           <a href="#" onClick={(e) => { e.preventDefault(); handleSubmit(); }}>설계하기</a>
         </div>
 
-        {/* <section className="tour2023_pc_insuBox">
+        <section className="tour2023_pc_insuBox">
           <div className="tour2023_pc_insuBox01">
             <span className="tour2023_pc_txt01">투어밸리 회원님은 회원 로그인후 이용하세요. (마일리지 적립)</span>
           </div>
-          <a href="#" className="tour2023PC_btn_b tour2023_pc_btnLogin">회원 LOGIN</a>
+          <a href="/login" className="tour2023PC_btn_b tour2023_pc_btnLogin">회원 LOGIN</a>
         </section>
 
         <section className="tour2023_pc_joinBox">
@@ -348,8 +354,21 @@ export default function DomesticInsurancePopupPage() {
               보다 편리하게 여행자보험을 관리할 수 있습니다.
             </span>
           </div>
-          <a href="#"><span className="tour2023_pc_joinTxt01">회원가입&nbsp;&gt;</span></a>
-        </section> */}
+          <a
+            href="/signup"
+            onClick={(e) => {
+              e.preventDefault();
+              if (window.opener) {
+                window.opener.location.href = '/signup';
+                window.close();
+              } else {
+                window.location.href = '/signup';
+              }
+            }}
+          >
+            <span className="tour2023_pc_joinTxt01">회원가입&nbsp;&gt;</span>
+          </a>
+        </section>
 
         <div className="Box_line01 mtb20">
           <p className="txt">

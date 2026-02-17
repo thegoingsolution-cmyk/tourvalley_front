@@ -758,8 +758,9 @@ export default function DomesticInsuranceStep5Page() {
                       <span style={{ color: '#f2fbfa' }}>▶ </span>가입 시 유의 바랍니다. 영업시간 내에 확인, 안내되며 결제된 보험료는 환불하여 드립니다.<br />
                     </div>
                   </li>
-                  <li>보험기간이 3개월을 초과한 해외장기체류보험에 가입하신 경우 청약서류를 메일로 발송해 드리며 청약서류를 회신해 주시면 보험료 결제(수납) 및 보험증서가 발급됩니다.</li>
-                  <li>계약내용 변경 및 취소를 하셔야 할 경우에는 마이페이지 계약상세보기에서 하실 수 있습니다. <br />(이 경우 보험기간이 시작되는 시점의 2시간 전까지 가능합니다.)</li>
+                  <li style={{ color: 'red' }}>※ 보험기간, 인원 등의 계약내용이 변경되는 경우 계약취소 신청 후 재가입하시기 바랍니다.</li>
+                  <li>※ 계약취소 신청은 보험기간이 시작되는 시점의 2시간 전까지 가능합니다.</li>
+                  <li>※ 계약취소 신청은 계약조회 후 계약상세보기에서 신청하거나 고객센터로 전화로 신청하실 수있습니다.</li>
                 </ul>
               </div>
             </div>
@@ -850,10 +851,14 @@ export default function DomesticInsuranceStep5Page() {
                           if (detailData) {
                             localStorage.setItem('premiumDetailData', JSON.stringify(detailData));
                           }
+                          const w = 620;
+                          const h = 540;
+                          const left = Math.max(0, (window.screen.width - w) / 2);
+                          const top = Math.max(0, (window.screen.height - h) / 2);
                           const popup = window.open(
                             '/premium-detail/pc',
                             'premiumDetailPopup',
-                            'width=720,height=640,scrollbars=yes'
+                            `width=${w},height=${h},left=${left},top=${top},scrollbars=yes,resizable=yes,toolbar=no,menubar=no,location=no,status=no`
                           );
                           if (popup) popup.focus();
                         }}
@@ -1184,42 +1189,46 @@ export default function DomesticInsuranceStep5Page() {
                         </div>
                       </td>
                     </tr>
-                    <tr>
-                      <td className="sName01">소유자 이름</td>
-                      <td className="dd ag_left">
-                        <div className="in_wrap01">
-                          <div className="bg_join input_cell_01 wd_30" style={{ width: '55%' }}>
-                            <input 
-                              type="text" 
-                              className="tf_g" 
-                              name="card_owner_name" 
-                              size={15} 
-                              maxLength={15}
-                              value={cardholderName}
-                              onChange={(e) => setCardholderName(e.target.value)}
-                            />
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="sName01">소유자 생년월일 / 사업자번호</td>
-                      <td className="dd ag_left">
-                        <div className="in_wrap01">
-                          <div className="bg_join input_cell_01 wd_30" style={{ width: '55%' }}>
-                            <input 
-                              type="text" 
-                              className="tf_g" 
-                              name="card_owner_ssn" 
-                              size={15} 
-                              maxLength={13}
-                              value={cardholderResidentNumber}
-                              onChange={(e) => setCardholderResidentNumber(e.target.value.replace(/[^0-9-]/g, ''))}
-                            />
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
+                    {cardType === '기타카드' && (
+                      <>
+                        <tr>
+                          <td className="sName01">소유자 이름</td>
+                          <td className="dd ag_left">
+                            <div className="in_wrap01">
+                              <div className="bg_join input_cell_01 wd_30" style={{ width: '55%' }}>
+                                <input 
+                                  type="text" 
+                                  className="tf_g" 
+                                  name="card_owner_name" 
+                                  size={15} 
+                                  maxLength={15}
+                                  value={cardholderName}
+                                  onChange={(e) => setCardholderName(e.target.value)}
+                                />
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="sName01">소유자 생년월일 / 사업자번호</td>
+                          <td className="dd ag_left">
+                            <div className="in_wrap01">
+                              <div className="bg_join input_cell_01 wd_30" style={{ width: '55%' }}>
+                                <input 
+                                  type="text" 
+                                  className="tf_g" 
+                                  name="card_owner_ssn" 
+                                  size={15} 
+                                  maxLength={13}
+                                  value={cardholderResidentNumber}
+                                  onChange={(e) => setCardholderResidentNumber(e.target.value.replace(/[^0-9-]/g, ''))}
+                                />
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      </>
+                    )}
                   </tbody>
                 </table>
               </div>

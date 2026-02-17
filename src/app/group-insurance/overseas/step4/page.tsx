@@ -24,7 +24,7 @@ export default function OverseasInsuranceStep4Page() {
       return;
     }
     if (agree1 === 'Y') {
-      alert('죄송합니다. 고객님\n여행보험에 가입할 수 없습니다.');
+      alert('죄송합니다. 고객님.\n현재 출국하였거나 해외체류중인 경우 여행보험에 가입하실 수 없습니다.');
       return;
     }
 
@@ -34,7 +34,7 @@ export default function OverseasInsuranceStep4Page() {
       return;
     }
     if (agree2 === 'Y') {
-      alert('죄송합니다. 고객님\n여행보험에 가입할 수 없습니다.');
+      alert('죄송합니다. 고객님.\n외교통상부에서 정한 여행금지 국가로의 여행인 경우 여행보험에 가입하실 수 없습니다.');
       return;
     }
 
@@ -44,25 +44,25 @@ export default function OverseasInsuranceStep4Page() {
       return;
     }
     if (agree3 === 'Y') {
-      alert('죄송합니다. 고객님\n여행보험에 가입할 수 없습니다.');
+      alert('죄송합니다. 고객님.\n위험한 활동이 포함된 경우 여행보험에 가입하실 수 없습니다.');
       return;
     }
 
     // 4. 실손 의료보험 계약체결을 위한 사전 동의
     if (agree4 !== 'Y') {
-      alert('4번 항목의 실손 의료보험 계약체결을 위한 사전 동의를 해주세요.');
+      alert(agree4 === 'N' ? '죄송합니다. 고객님.\n실손의료보험 중복과 비례보상에 내용에 동의하지 않는 경우 여행보험에 가입하실 수 없습니다.' : '4번 항목의 실손 의료보험 계약체결을 위한 사전 동의를 해주세요.');
       return;
     }
 
     // 5. 여행보험 약관보기
     if (agree5 !== 'Y') {
-      alert('5번 항목의 여행보험 약관보기를 읽어보고 선택해주세요.');
+      alert(agree5 === 'N' ? '죄송합니다. 고객님.\n해당약관을 읽고 확인 하신 다음 여행보험에 가입하실 수 없습니다.' : '5번 항목의 여행보험 약관보기를 읽어보고 선택해주세요.');
       return;
     }
 
     // 6. 여행보험 가입시 알아두어야 할 사항
     if (agree6 !== 'Y') {
-      alert('6번 항목의 여행보험 가입시 알아두어야 할 사항을 읽어보고 선택해주세요.');
+      alert(agree6 === 'N' ? '죄송합니다. 고객님.\n여행보험 가입시 알아두어야 할 사항을 숙지하고 동의하셔야 여행보험에 가입하실 수 없습니다.' : '6번 항목의 여행보험 가입시 알아두어야 할 사항을 읽어보고 선택해주세요.');
       return;
     }
 
@@ -156,7 +156,13 @@ export default function OverseasInsuranceStep4Page() {
                       value="Y"
                       name="agree1"
                       checked={agree1 === 'Y'}
-                      onChange={(e) => setAgree1(e.target.value)}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setAgree1(val);
+                        if (val === 'Y') {
+                          alert('죄송합니다. 고객님.\n현재 출국하였거나 해외체류중인 경우 여행보험에 가입하실 수 없습니다.');
+                        }
+                      }}
                     />
                     <label htmlFor="a01">예</label>
                   </span>
@@ -198,7 +204,13 @@ export default function OverseasInsuranceStep4Page() {
                       value="Y"
                       name="agree2"
                       checked={agree2 === 'Y'}
-                      onChange={(e) => setAgree2(e.target.value)}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setAgree2(val);
+                        if (val === 'Y') {
+                          alert('죄송합니다. 고객님.\n외교통상부에서 정한 여행금지 국가로의 여행인 경우 여행보험에 가입하실 수 없습니다.');
+                        }
+                      }}
                     />
                     <label htmlFor="b01">예</label>
                   </span>
@@ -274,7 +286,13 @@ export default function OverseasInsuranceStep4Page() {
                       value="Y"
                       name="agree3"
                       checked={agree3 === 'Y'}
-                      onChange={(e) => setAgree3(e.target.value)}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setAgree3(val);
+                        if (val === 'Y') {
+                          alert('죄송합니다. 고객님.\n위험한 활동이 포함된 경우 여행보험에 가입하실 수 없습니다.');
+                        }
+                      }}
                     />
                     <label htmlFor="c01">예</label>
                   </span>
@@ -341,7 +359,13 @@ export default function OverseasInsuranceStep4Page() {
                       value="N"
                       name="agree4"
                       checked={agree4 === 'N'}
-                      onChange={(e) => setAgree4(e.target.value)}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setAgree4(val);
+                        if (val === 'N') {
+                          alert('죄송합니다. 고객님.\n실손의료보험 중복과 비례보상에 내용에 동의하지 않는 경우 여행보험에 가입하실 수 없습니다.');
+                        }
+                      }}
                     />
                     <label htmlFor="d02">아니요</label>
                   </span>
@@ -386,7 +410,13 @@ export default function OverseasInsuranceStep4Page() {
                       value="N"
                       name="agree5"
                       checked={agree5 === 'N'}
-                      onChange={(e) => setAgree5(e.target.value)}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setAgree5(val);
+                        if (val === 'N') {
+                          alert('죄송합니다. 고객님.\n해당약관을 읽고 확인 하신 다음 여행보험에 가입하실 수 없습니다.');
+                        }
+                      }}
                     />
                     <label htmlFor="e02">아니요</label>
                   </span>
@@ -539,7 +569,13 @@ export default function OverseasInsuranceStep4Page() {
                       value="N"
                       name="agree6"
                       checked={agree6 === 'N'}
-                      onChange={(e) => setAgree6(e.target.value)}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setAgree6(val);
+                        if (val === 'N') {
+                          alert('죄송합니다. 고객님.\n여행보험 가입시 알아두어야 할 사항을 숙지하고 동의하셔야 여행보험에 가입하실 수 없습니다.');
+                        }
+                      }}
                     />
                     <label htmlFor="f02">아니요</label>
                   </span>
