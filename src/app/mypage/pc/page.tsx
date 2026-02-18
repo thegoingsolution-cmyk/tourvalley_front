@@ -736,9 +736,9 @@ export default function PCMyPage() {
 
                   {/* 파일 업로드 - 포괄계약 신청 시에만 표시 */}
                   {comprehensiveContract && (
-                    <div className="file-upload-section">
+                    <div className="form-field file-upload-section">
                       <label className="form-label">사업자등록증/고유번호증 첨부</label>
-                      
+                      <div className="file-upload-inner">
                       {/* 기존 파일이 있는 경우 표시 */}
                       {existingFilePath && !businessFile && (
                         <div className="existing-file-wrapper">
@@ -785,6 +785,7 @@ export default function PCMyPage() {
                             </button>
                           </>
                         )}
+                      </div>
                       </div>
                     </div>
                   )}

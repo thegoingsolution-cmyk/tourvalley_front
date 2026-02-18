@@ -477,7 +477,7 @@ export default function OverseasInsurancePopupPage() {
           <div className="tour2023_pc_insuBox01">
             <span className="tour2023_pc_txt01">투어밸리 회원님은 회원 로그인후 이용하세요. (마일리지 적립)</span>
           </div>
-          <a href="/login" className="tour2023PC_btn_b tour2023_pc_btnLogin">회원 LOGIN</a>
+          <a href="/login?from=group-insurance&returnTo=overseas" className="tour2023PC_btn_b tour2023_pc_btnLogin">회원 LOGIN</a>
         </section>
 
         <section className="tour2023_pc_joinBox">

@@ -74,6 +74,8 @@
   display: flex;
   flex-direction: column;
   gap: 0;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .form-field {
@@ -498,6 +500,8 @@
   margin-top: 24px;
   padding-top: 24px;
   border-top: 1px solid #eee;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .section-title {
@@ -613,6 +617,19 @@
 /* 파일 업로드 섹션 */
 .file-upload-section {
   margin-top: 16px;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  clear: both;
+  box-sizing: border-box;
+}
+
+.file-upload-section.form-field {
+  margin-bottom: 16px;
+  border: none !important;
+  outline: none;
+  box-shadow: none;
 }
 
 .file-upload-section .form-label {
@@ -620,12 +637,24 @@
   font-size: 13px;
   color: #666;
   margin-bottom: 8px;
+  width: 100%;
+}
+
+.file-upload-section .file-upload-inner {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .file-input-wrapper {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+  max-width: 100%;
+  flex-wrap: wrap;
 }
 
 .file-input {
@@ -668,6 +697,9 @@
   border: 1px solid #e1e5e9;
   border-radius: 8px;
   margin-bottom: 12px;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .existing-file-info {
@@ -675,10 +707,13 @@
   align-items: center;
   gap: 8px;
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .file-icon {
   font-size: 18px;
+  flex-shrink: 0;
 }
 
 .existing-file-name {
@@ -686,7 +721,7 @@
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
-  max-width: 300px;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -708,6 +743,7 @@
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .file-change-btn:hover {

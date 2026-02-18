@@ -1,19 +1,28 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { login } from '@/services/authService';
+import { login, getCorporateMemberInfo } from '@/services/authService';
 import { useAuth } from '@/contexts/AuthContext';
 import './page.css';
 
 export default function MobileLoginPage() {
+  const router = useRouter();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
-  // 인증 컨텍스트에서 login 함수 가져오기
-  const { login: authLogin } = useAuth();
+
+  // 인증 컨텍스트에서 login 함수 및 로그인 여부 가져오기
+  const { login: authLogin, isLoggedIn, isLoading: authLoading } = useAuth();
+
+  // 이미 로그인된 경우 메인 페이지로 리다이렉트
+  useEffect(() => {
+    if (!authLoading && isLoggedIn) {
+      router.replace('/main');
+    }
+  }, [authLoading, isLoggedIn, router]);
 
   // 로그인 처리
   const handleLogin = async (e: React.FormEvent) => {
@@ -36,8 +45,21 @@ export default function MobileLoginPage() {
       if (result.success && result.member) {
         // 로그인 성공 시 세션에 회원 정보 저장
         authLogin(result.member);
-        
-        alert(`${result.member.name}님, 환영합니다!`);
+
+        // 개인: 이름, 법인: 회사명으로 환영 문구 표시
+        const isCorporate = result.member.member_type === '법인';
+        let displayName = result.member.name;
+        if (isCorporate) {
+          try {
+            const corpResult = await getCorporateMemberInfo(result.member.id);
+            if (corpResult.success && corpResult.corporate?.company_name) {
+              displayName = corpResult.corporate.company_name;
+            }
+          } catch {
+            // 조회 실패 시 이름 유지
+          }
+        }
+        alert(`${displayName}님, 환영합니다!`);
         window.location.href = '/main';
       } else {
         alert(result.message);
@@ -54,6 +76,15 @@ export default function MobileLoginPage() {
   const handleNavigate = (path: string) => {
     window.location.href = path;
   };
+
+  // 인증 상태 확인 중이거나 이미 로그인된 경우(리다이렉트 대기) 로딩 표시
+  if (authLoading || isLoggedIn) {
+    return (
+      <div className="login-page-mobile" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+        <p style={{ color: '#666' }}>잠시만 기다려주세요...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="login-page-mobile">
