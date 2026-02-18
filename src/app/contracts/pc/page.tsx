@@ -44,7 +44,7 @@ export default function PCContractPage() {
     totalPages: number;
     totalCount: number;
     pageSize: number;
-  }>({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
+  }>({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 3 });
   
   // 행사보험 계약 목록 데이터
   interface EventContract {
@@ -531,7 +531,7 @@ export default function PCContractPage() {
 
     try {
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-      const response = await fetch(`${API_BASE_URL}/api/contracts/list?member_id=${member.id}&inyear=${inYear}&block_type=C&str_cur_page=${page}`, {
+      const response = await fetch(`${API_BASE_URL}/api/contracts/list?member_id=${member.id}&inyear=${inYear}&block_type=C&str_cur_page=${page}&str_page_size=3`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -545,26 +545,21 @@ export default function PCContractPage() {
 
       const data = await response.json();
       if (data.success) {
-        // 백엔드에서 받은 데이터를 최대 3개로 제한 (UI 표시용)
-        const contractsData = data.contracts || [];
-        const limitedContracts = contractsData.slice(0, 3);
-        setContracts(limitedContracts);
-        
-        // 페이지네이션 정보는 백엔드에서 받은 값을 그대로 사용 (백엔드는 pageSize=10으로 계산)
+        setContracts(data.contracts || []);
         setContractPagination({
           currentPage: data.pagination?.currentPage || page,
           totalPages: data.pagination?.totalPages || 0,
           totalCount: data.pagination?.totalCount || 0,
-          pageSize: data.pagination?.pageSize || 10
+          pageSize: data.pagination?.pageSize || 3
         });
       } else {
         setContracts([]);
-        setContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
+        setContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 3 });
       }
     } catch (error) {
       console.error('계약 목록 조회 오류:', error);
       setContracts([]);
-      setContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
+      setContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 3 });
     }
   };
 

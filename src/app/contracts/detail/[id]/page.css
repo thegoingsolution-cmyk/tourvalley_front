@@ -4,12 +4,12 @@
   background: #fff;
 }
 
-/* 헤더 */
-#header {
+/* 헤더 - 상세 페이지만 적용 */
+.contract-detail-page #header {
   position: relative;
 }
 
-.tour2023_header_inner {
+.contract-detail-page .tour2023_header_inner {
   position: relative;
   height: 56px;
   box-sizing: border-box;
@@ -17,11 +17,11 @@
   border-bottom: 1px solid #eaebef;
 }
 
-.tour2023_header_line {
+.contract-detail-page .tour2023_header_line {
   border-bottom: 1px solid #eaebef;
 }
 
-.tourTop_title {
+.contract-detail-page .tourTop_title {
   position: relative;
   display: block;
   font-size: 18px;
@@ -31,7 +31,7 @@
   font-weight: 500;
 }
 
-.close {
+.contract-detail-page .close {
   position: absolute;
   top: 19px;
   right: 20px;
@@ -41,12 +41,12 @@
   cursor: pointer;
 }
 
-.close:hover {
+.contract-detail-page .close:hover {
   color: #333;
 }
 
 /* 패딩 */
-.prow_01 {
+.contract-detail-page .prow_01 {
   padding: 0 20px;
   position: relative;
   width: 100%;
@@ -54,7 +54,7 @@
 }
 
 /* 타이틀 */
-.tour2023_title02 {
+.contract-detail-page .tour2023_title02 {
   font-size: 24px;
   color: #202020;
   letter-spacing: -1.2px;
@@ -65,7 +65,7 @@
 }
 
 /* 리스트 */
-.tour2023_conList_Wrap {
+.contract-detail-page .tour2023_conList_Wrap {
   position: relative;
   width: 100%;
   display: block;
@@ -74,22 +74,22 @@
   padding: 0;
 }
 
-.tour2023_conList {
+.contract-detail-page .tour2023_conList {
   position: relative;
   width: 97%;
   display: inline-flex;
   justify-content: space-between;
 }
 
-.tour2023_conList_Wrap li {
+.contract-detail-page .tour2023_conList_Wrap li {
   margin: 17px 0 0 0;
 }
 
-.tour2023_conList_Wrap li:first-child {
+.contract-detail-page .tour2023_conList_Wrap li:first-child {
   margin-top: 0;
 }
 
-.tour2023_txt09 {
+.contract-detail-page .tour2023_txt09 {
   font-size: 16px;
   color: #999999;
   text-align: left;
@@ -98,7 +98,7 @@
   vertical-align: top;
 }
 
-.tour2023_txt10 {
+.contract-detail-page .tour2023_txt10 {
   font-size: 16px;
   color: #333;
   text-align: right;
@@ -108,19 +108,19 @@
 }
 
 /* 라인 */
-.tourG_line05 {
+.contract-detail-page .tourG_line05 {
   border-top: 1px solid #dde1e5;
 }
 
-/* 버튼 */
-.tour2023_btn_b02 {
+/* 버튼 - 상세 전용 스코프로 리스트 페이지 CSS 충돌 방지 */
+.contract-detail-page .tour2023_btn_b02 {
   position: relative;
   display: inline-block;
   width: auto;
   margin: 0;
 }
 
-.tour2023_btn08 {
+.contract-detail-page .tour2023_btn08 {
   font-size: 15px;
   letter-spacing: -1px;
   width: 93px;
@@ -138,22 +138,23 @@
   display: inline-block;
 }
 
-.tour2023_btn08:hover {
+.contract-detail-page .tour2023_btn08:hover {
   background-color: #4284e1;
   color: #fff !important;
   border-color: #4284e1;
 }
 
-.tourGuard_btn_b {
+.contract-detail-page .tourGuard_btn_b {
   position: relative;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   text-decoration: none;
 }
 
-.tour2023_btn06_gray {
+.contract-detail-page .tour2023_btn06_gray {
   font-size: 18px;
-  padding-top: 15px;
   letter-spacing: -1px;
   height: 55px;
   background-color: #f5f6f8;
@@ -163,65 +164,67 @@
   text-align: center;
   border: 1px solid #e1e1e1;
   cursor: pointer;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.tour2023_btn06_gray:hover {
+.contract-detail-page .tour2023_btn06_gray:hover {
   background-color: #e8e9eb;
 }
 
-.tour2023_arr01 {
-  display: inline-block;
+.contract-detail-page .tour2023_arr01 {
+  display: inline-flex;
+  align-items: center;
   border-width: 9px 7px 0;
   border-style: solid;
   border-color: #333 transparent transparent;
-  vertical-align: baseline;
+  vertical-align: middle;
   transform: rotate(90deg);
   margin-left: 8px;
-  margin-bottom: -2px;
 }
 
-/* 마진 유틸리티 */
-.tourG_mat04 {
+/* 마진 유틸리티 - 상세 전용 */
+.contract-detail-page .tourG_mat04 {
   margin-top: 20px !important;
 }
 
-.tourG_mat07 {
+.contract-detail-page .tourG_mat07 {
   margin-top: 10px;
 }
 
-.tourG_mat09 {
+.contract-detail-page .tourG_mat09 {
   margin-top: 25px;
 }
 
-.tourG_mat10 {
+.contract-detail-page .tourG_mat10 {
   margin-top: 35px;
 }
 
-.tourG_mat13 {
+.contract-detail-page .tourG_mat13 {
   margin-top: 40px !important;
 }
 
-.tourG_mat17 {
+.contract-detail-page .tourG_mat17 {
   margin-top: 160px;
 }
 
-.tourG_mab01 {
+.contract-detail-page .tourG_mab01 {
   margin-bottom: 25px;
 }
 
-.tourG_Wrap {
+.contract-detail-page .tourG_Wrap {
   position: relative;
 }
 
 /* 인쇄 스타일 */
 @media print {
-  .tour2023_header_inner {
+  .contract-detail-page .tour2023_header_inner {
     display: none;
   }
   
-  .tour2023_btn_b02,
-  .tourGuard_btn_b {
+  .contract-detail-page .tour2023_btn_b02,
+  .contract-detail-page .tourGuard_btn_b {
     display: none;
   }
 }

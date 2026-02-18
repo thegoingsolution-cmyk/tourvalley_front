@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -11,7 +11,7 @@ import { login, getCorporateMemberInfo } from '@/services/authService';
 import { useAuth } from '@/contexts/AuthContext';
 import './page.css';
 
-export default function PCLoginPage() {
+function PCLoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const fromGroupInsurance = searchParams.get('from') === 'group-insurance';
@@ -238,6 +238,22 @@ export default function PCLoginPage() {
         onClose={() => setShowCashModal(false)}
       />
     </div>
+  );
+}
+
+function PCLoginPageFallback() {
+  return (
+    <div className="login-page-pc" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+      <p style={{ color: '#666' }}>잠시만 기다려주세요...</p>
+    </div>
+  );
+}
+
+export default function PCLoginPage() {
+  return (
+    <Suspense fallback={<PCLoginPageFallback />}>
+      <PCLoginPageContent />
+    </Suspense>
   );
 }
 

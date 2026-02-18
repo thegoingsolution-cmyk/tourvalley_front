@@ -47,7 +47,12 @@ export default function ContractDetailPage() {
   };
 
   const handleClose = () => {
-    window.close();
+    // 팝업으로 열린 경우에만 창 닫기, 모바일 등 페이지 이동으로 진입한 경우 뒤로 가기
+    if (typeof window !== 'undefined' && window.opener) {
+      window.close();
+    } else {
+      router.back();
+    }
   };
 
   const handleReceiptClick = async (event: React.MouseEvent<HTMLAnchorElement>) => {
