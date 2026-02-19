@@ -441,7 +441,7 @@ export default function PCEventInsurancePage() {
     switch (type) {
       case 'insured_cnt':
         title = '예상참여인원';
-        content = '행사에 참여하는 예상 인원을 입력해주세요.';
+        content = '행사기간 동안 예상되는 총참여인원수를 말합니다.<br>(예시: 1일 100명 행사기간 10일<br>예상참여인원 1,000명)<br><br>* 행사관계자, 임직원은 제외 후 입력 바랍니다.<br>(관계자,임직원은 부담보)';
         break;
       case 'bi':
         title = '대인배상';
@@ -802,8 +802,8 @@ export default function PCEventInsurancePage() {
                             <div className="tourGuard_form_tt mag5 tourG_mab03">
                               <label htmlFor="insured_cnt">
                                 예상참여인원{' '}
-                                <a href="#" onClick={(e) => { e.preventDefault(); showHelpLayer('insured_cnt'); }}>
-                                  <span className="help_tip">도움말 보기</span>
+                                <a href="#" onClick={(e) => { e.preventDefault(); showHelpLayer('insured_cnt'); }} className="help_tip">
+                                  <img src="/images/heip_tip.png" alt="도움말 보기" />
                                 </a>
                               </label>
                               <input
@@ -1475,11 +1475,11 @@ export default function PCEventInsurancePage() {
           </div>
         </section>
 
-        {/* 도움말 레이어 */}
+        {/* 도움말 레이어 - 화면 가운데 모달 */}
         {showInfoLayer && (
           <section
             className="tour2023_guide_Wrap"
-            style={{ display: 'block' }}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             onClick={() => setShowInfoLayer(false)}
           >
             <div className="tour2023_help_Layer" id="infoLayerDiv" onClick={(e) => e.stopPropagation()}>

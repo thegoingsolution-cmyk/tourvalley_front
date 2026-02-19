@@ -324,12 +324,25 @@
 }
 
 .event-insurance-page-pc .icon_tip01::before,
-.event-insurance-page-pc .help_tip::before {
+.event-insurance-page-pc .help_tip:not(:has(img))::before {
   content: "?";
   position: absolute;
   left: 0;
   right: 0;
   text-indent: 0;
+}
+
+/* 예상참여인원 - heip_tip.png 이미지 사용 */
+.event-insurance-page-pc .help_tip:has(img) {
+  background: none;
+  text-indent: 0;
+}
+
+.event-insurance-page-pc .help_tip img {
+  display: block;
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
 }
 
 .event-insurance-page-pc .tourGuard_blue {

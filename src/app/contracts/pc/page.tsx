@@ -2057,11 +2057,22 @@ export default function PCContractPage() {
                       {/* 보험약관보기 */}
                       <div className="tourG_mat04">
                         <a 
-                          href="/tour/tourvalley/event_insu/downloadFile.jsp?file_name=N52_eventInsu_stipulation.pdf&file_type=stipulation" 
+                          href="/pdf/N52_eventInsu_stipulation.pdf" 
+                          download="N52_eventInsu_stipulation.pdf"
                           className="tourGuard_btn_b tour2023_btn06_gray"
                         >
                           보험약관보기<span className="tour2023_arr01"></span>
                         </a>
+                      </div>
+
+                      {/* 행사보험견적신청 */}
+                      <div className="tourG_mat04">
+                        <Link 
+                          href="/event-insurance"
+                          className="tourGuard_btn_b tour2023_btn_event_estimate"
+                        >
+                          행사보험견적신청
+                        </Link>
                       </div>
                     </>
                   )

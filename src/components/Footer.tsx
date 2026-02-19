@@ -37,7 +37,7 @@ export default function Footer({ isMobile = false }: FooterProps) {
               <p>투어밸리 여행보험센터 T.1599-2541 (평일 10시 ~ 17시)</p>
               <p>㈜빨주노초파남보 대리점등록번호 2022120036 (대리점등록증)</p>
               <p>통신판매업신고번호 제2023-서울중구-0084호</p>
-              <p>tourvalley@insvalley.com</p>
+              <p>admin@tourvalley.net</p>
             </div>
           </div>
         </footer>
@@ -103,7 +103,7 @@ export default function Footer({ isMobile = false }: FooterProps) {
             </p>
             <p>(04543) 서울시 중구 을지로11길 15 동화빌딩 603호 사업자등록번호 256-81-03026</p>
             <p>
-              <span className="footer-pc-info-company">고객센터 1599-2541</span> 팩스번호 02)2261-0098 이메일 admin@Tourvalley.net
+              <span className="footer-pc-info-company">고객센터 1599-2541</span> 팩스번호 02)2261-0098 이메일 admin@tourvalley.net
             </p>
             <p>보험대리점등록번호:제2002120036호(대리점등록증) 통신판매업신고:서울중구-0084호</p>
             <p>Copyrightⓒsince 2008 Tourvalley.net. All Rights Reserved</p>

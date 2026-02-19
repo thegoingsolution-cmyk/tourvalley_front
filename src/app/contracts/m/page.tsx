@@ -1872,13 +1872,33 @@ export default function MobileContractPage() {
                             </li>
                           </ul>
                           <div className="tourG_line05 tourG_mat09 tourG_mab04"></div>
-                          <Link href={`/contracts/event-detail/${contract.id}`}>
-                            <span className="tour2023_txt19">자세히보기&nbsp;&gt;</span>
-                          </Link>
                           <div className="tourG_mat14 tourG_Wrap"></div>
                         </div>
                       ));
                     })()}
+
+                    {/* 보험약관보기 & 행사보험견적신청 */}
+                    <div className="tourG_mat04">
+                      <a 
+                        href="/pdf/N52_eventInsu_stipulation.pdf" 
+                        download="N52_eventInsu_stipulation.pdf"
+                        className="tourGuard_btn_b tour2023_btn06_gray"
+                      >
+                        보험약관보기<span className="tour2023_arr01"></span>
+                      </a>
+                    </div>
+                    <div className="tourG_mat04">
+                      <a 
+                        href="/event-insurance"
+                        className="tourGuard_btn_b tour2023_btn_event_estimate"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          window.location.href = '/event-insurance';
+                        }}
+                      >
+                        행사보험견적신청
+                      </a>
+                    </div>
 
                     {/* 페이지네이션 */}
                     {eventContractPagination.totalPages > 0 && (

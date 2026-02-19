@@ -92,11 +92,45 @@ export default function MobileEventInsurancePage() {
   const initialStartDateRef = useRef(todayString);
   const initialEndDateRef = useRef(todayString);
 
+  // 예상참여인원 도움말 모달
+  const [showInfoLayer, setShowInfoLayer] = useState(false);
+  const [layerTitle, setLayerTitle] = useState('');
+  const [layerContent, setLayerContent] = useState('');
+  const showHelpLayer = (type: string) => {
+    let title = '';
+    let content = '';
+    switch (type) {
+      case 'insured_cnt':
+        title = '예상참여인원';
+        content = '행사기간 동안 예상되는 총참여인원수를 말합니다.<br>(예시: 1일 100명 행사기간 10일<br>예상참여인원 1,000명)<br><br>* 행사관계자, 임직원은 제외 후 입력 바랍니다.<br>(관계자,임직원은 부담보)';
+        break;
+      case 'bi':
+        title = '대인배상';
+        content = '보험기간 중 발생한 보험사고로 인하여<br/>제3자에게 발생한 신체손해에 대한<br/>법률상의 책임을 말합니다.';
+        break;
+      case 'pi':
+        title = '대물배상';
+        content = '보험기간 중 발생한 보험사고로 인하여<br/>제3자에게 발생한 재물손해에 대한<br/>법률상의 책임을 말합니다.';
+        break;
+      case 'me':
+        title = '참가자치료비';
+        content = '행사 참가자가 행사장 내에서 상해를 입은 경우<br/>발생한 치료비를 보상합니다.';
+        break;
+      case 'dt':
+        title = '자기부담금';
+        content = '사고 발생 시 계약자가 부담하는 금액을<br/>말합니다.';
+        break;
+    }
+    setLayerTitle(title);
+    setLayerContent(content);
+    setShowInfoLayer(true);
+  };
+
   // 컴포넌트 마운트 시 스타일 강제 재적용 (다른 페이지에서 돌아올 때 CSS 깨짐 방지)
   useEffect(() => {
     // 스타일이 제대로 적용되도록 강제 리플로우 및 클래스 재적용
     const forceReflow = () => {
-      const elements = document.querySelectorAll('.event-insurance-mobile .tourGuard_form_tt.tourG_line');
+      const elements = document.querySelectorAll('.event-insurance-mobile .tourGuard_form_tt.tourG_line.event-insurance-radio-group');
       elements.forEach((el) => {
         const htmlEl = el as HTMLElement;
         // 강제 리플로우 트리거
@@ -695,7 +729,12 @@ export default function MobileEventInsurancePage() {
                     </div>
 
                     <div className="tourGuard_form_tt mag5 tourG_mab03">
-                      <label htmlFor="insured_cnt">예상참여인원</label>
+                      <label htmlFor="insured_cnt">
+                        예상참여인원{' '}
+                        <a href="#" onClick={(e) => { e.preventDefault(); showHelpLayer('insured_cnt'); }} className="help_tip">
+                          <img src="/images/heip_tip.png" alt="도움말 보기" />
+                        </a>
+                      </label>
                       <input 
                         type="tel" 
                         id="insured_cnt" 
@@ -709,10 +748,10 @@ export default function MobileEventInsurancePage() {
                       <div className="tourGuard_txt21">명</div>
                     </div>
 
-                    <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line tourG_line-with-radio">
+                    <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line tourG_line-with-radio event-insurance-radio-group">
                       <div className="tourG_rdo_area">
                         <label htmlFor="action_info_1_Y">운동경기/체육활동 유무</label>
-                        <span className="tourG_inp_rdo">
+                        <span className="tourG_inp_rdo event-insurance-inp-rdo">
                           <input 
                             type="radio" 
                             id="action_info_1_Y" 
@@ -723,7 +762,7 @@ export default function MobileEventInsurancePage() {
                           />
                           <label htmlFor="action_info_1_Y">유</label>
                         </span>
-                        <span className="tourG_inp_rdo">
+                        <span className="tourG_inp_rdo event-insurance-inp-rdo">
                           <input 
                             type="radio" 
                             id="action_info_1_N" 
@@ -738,7 +777,7 @@ export default function MobileEventInsurancePage() {
 
                       <div className="tourG_rdo_area">
                         <label htmlFor="action_info_2_Y">불꽃놀이 유무</label>
-                        <span className="tourG_inp_rdo">
+                        <span className="tourG_inp_rdo event-insurance-inp-rdo">
                           <input 
                             type="radio" 
                             id="action_info_2_Y" 
@@ -749,7 +788,7 @@ export default function MobileEventInsurancePage() {
                           />
                           <label htmlFor="action_info_2_Y">유</label>
                         </span>
-                        <span className="tourG_inp_rdo">
+                        <span className="tourG_inp_rdo event-insurance-inp-rdo">
                           <input 
                             type="radio" 
                             id="action_info_2_N" 
@@ -763,10 +802,10 @@ export default function MobileEventInsurancePage() {
                       </div>
                     </div>
 
-                    <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line tourG_line-with-radio">
+                    <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line tourG_line-with-radio event-insurance-radio-group">
                       <div className="tourG_rdo_area">
                         <label htmlFor="action_info_3_Y">수상위험 유무</label>
-                        <span className="tourG_inp_rdo">
+                        <span className="tourG_inp_rdo event-insurance-inp-rdo">
                           <input 
                             type="radio" 
                             id="action_info_3_Y" 
@@ -777,7 +816,7 @@ export default function MobileEventInsurancePage() {
                           />
                           <label htmlFor="action_info_3_Y">유</label>
                         </span>
-                        <span className="tourG_inp_rdo">
+                        <span className="tourG_inp_rdo event-insurance-inp-rdo">
                           <input 
                             type="radio" 
                             id="action_info_3_N" 
@@ -792,7 +831,7 @@ export default function MobileEventInsurancePage() {
 
                       <div className="tourG_rdo_area">
                         <label htmlFor="action_info_4_Y">놀이시설(에어바운스) 유무</label>
-                        <span className="tourG_inp_rdo">
+                        <span className="tourG_inp_rdo event-insurance-inp-rdo">
                           <input 
                             type="radio" 
                             id="action_info_4_Y" 
@@ -803,7 +842,7 @@ export default function MobileEventInsurancePage() {
                           />
                           <label htmlFor="action_info_4_Y">유</label>
                         </span>
-                        <span className="tourG_inp_rdo">
+                        <span className="tourG_inp_rdo event-insurance-inp-rdo">
                           <input 
                             type="radio" 
                             id="action_info_4_N" 
@@ -817,10 +856,10 @@ export default function MobileEventInsurancePage() {
                       </div>
                     </div>
 
-                    <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line tourG_line-with-radio">
+                    <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line tourG_line-with-radio event-insurance-radio-group">
                       <div className="tourG_rdo_area">
                         <label htmlFor="action_info_5_Y">드론 유무</label>
-                        <span className="tourG_inp_rdo">
+                        <span className="tourG_inp_rdo event-insurance-inp-rdo">
                           <input 
                             type="radio" 
                             id="action_info_5_Y" 
@@ -831,7 +870,7 @@ export default function MobileEventInsurancePage() {
                           />
                           <label htmlFor="action_info_5_Y">유</label>
                         </span>
-                        <span className="tourG_inp_rdo">
+                        <span className="tourG_inp_rdo event-insurance-inp-rdo">
                           <input 
                             type="radio" 
                             id="action_info_5_N" 
@@ -846,7 +885,7 @@ export default function MobileEventInsurancePage() {
 
                       <div className="tourG_rdo_area">
                         <label htmlFor="action_info_6_Y">기타 위험활동 유무</label>
-                        <span className="tourG_inp_rdo">
+                        <span className="tourG_inp_rdo event-insurance-inp-rdo">
                           <input 
                             type="radio" 
                             id="action_info_6_Y" 
@@ -857,7 +896,7 @@ export default function MobileEventInsurancePage() {
                           />
                           <label htmlFor="action_info_6_Y">유</label>
                         </span>
-                        <span className="tourG_inp_rdo">
+                        <span className="tourG_inp_rdo event-insurance-inp-rdo">
                           <input 
                             type="radio" 
                             id="action_info_6_N" 
@@ -913,7 +952,12 @@ export default function MobileEventInsurancePage() {
                       <tr>
                         <td className="ag_center tour2024_ListB_bg02">필수</td>
                         <td className="ag_center tour2024_ListB_bg02">
-                          <div className="tour2023_insuBox01">대인배상</div>
+                          <div className="tour2023_insuBox01">
+                            대인배상{' '}
+                            <a href="#" onClick={(e) => { e.preventDefault(); showHelpLayer('bi'); }} className="help_tip">
+                              <img src="/images/heip_tip.png" alt="도움말 보기" />
+                            </a>
+                          </div>
                         </td>
                         <td className="ag_center">1억원</td>
                         <td className="ag_center">2억원</td>
@@ -921,7 +965,12 @@ export default function MobileEventInsurancePage() {
                       <tr>
                         <td className="ag_center tour2024_ListB_bg02">필수</td>
                         <td className="ag_center tour2024_ListB_bg02">
-                          <div className="tour2023_insuBox01">대물배상</div>
+                          <div className="tour2023_insuBox01">
+                            대물배상{' '}
+                            <a href="#" onClick={(e) => { e.preventDefault(); showHelpLayer('pi'); }} className="help_tip">
+                              <img src="/images/heip_tip.png" alt="도움말 보기" />
+                            </a>
+                          </div>
                         </td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">1,000만원</td>
@@ -941,7 +990,12 @@ export default function MobileEventInsurancePage() {
                           </ul>
                         </td>
                         <td className="ag_center tour2024_ListB_bg02">
-                          <div className="tour2023_insuBox01">참가자치료비<br />(구내치료비)</div>
+                          <div className="tour2023_insuBox01">
+                            참가자치료비<br />(구내치료비){' '}
+                            <a href="#" onClick={(e) => { e.preventDefault(); showHelpLayer('me'); }} className="help_tip">
+                              <img src="/images/heip_tip.png" alt="도움말 보기" />
+                            </a>
+                          </div>
                         </td>
                         <td className="ag_center"><span className="tourGuard_blue">100만원</span></td>
                         <td className="ag_center"><span className="tourGuard_blue">1,000만원</span></td>
@@ -949,7 +1003,12 @@ export default function MobileEventInsurancePage() {
                       <tr>
                         <td className="ag_center tour2024_ListB_bg02">필수</td>
                         <td className="ag_center tour2024_ListB_bg02">
-                          <div className="tour2023_insuBox01">자기부담금</div>
+                          <div className="tour2023_insuBox01">
+                            자기부담금{' '}
+                            <a href="#" onClick={(e) => { e.preventDefault(); showHelpLayer('dt'); }} className="help_tip">
+                              <img src="/images/heip_tip.png" alt="도움말 보기" />
+                            </a>
+                          </div>
                         </td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">10만원</td>
@@ -969,7 +1028,12 @@ export default function MobileEventInsurancePage() {
                       <tr>
                         <td className="ag_center tour2024_ListB_bg02">필수</td>
                         <td className="ag_center tour2024_ListB_bg02">
-                          <div className="tour2023_insuBox01">대인배상</div>
+                          <div className="tour2023_insuBox01">
+                            대인배상{' '}
+                            <a href="#" onClick={(e) => { e.preventDefault(); showHelpLayer('bi'); }} className="help_tip">
+                              <img src="/images/heip_tip.png" alt="도움말 보기" />
+                            </a>
+                          </div>
                         </td>
                         <td className="ag_center">
                           <div className="tour2023_sel">
@@ -1019,7 +1083,12 @@ export default function MobileEventInsurancePage() {
                       <tr>
                         <td className="ag_center tour2024_ListB_bg02">필수</td>
                         <td className="ag_center tour2024_ListB_bg02">
-                          <div className="tour2023_insuBox01">대물배상</div>
+                          <div className="tour2023_insuBox01">
+                            대물배상{' '}
+                            <a href="#" onClick={(e) => { e.preventDefault(); showHelpLayer('pi'); }} className="help_tip">
+                              <img src="/images/heip_tip.png" alt="도움말 보기" />
+                            </a>
+                          </div>
                         </td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">
@@ -1061,7 +1130,12 @@ export default function MobileEventInsurancePage() {
                           </ul>
                         </td>
                         <td className="ag_center tour2024_ListB_bg02">
-                          <div className="tour2023_insuBox01">참가자치료비<br />(구내치료비)</div>
+                          <div className="tour2023_insuBox01">
+                            참가자치료비<br />(구내치료비){' '}
+                            <a href="#" onClick={(e) => { e.preventDefault(); showHelpLayer('me'); }} className="help_tip">
+                              <img src="/images/heip_tip.png" alt="도움말 보기" />
+                            </a>
+                          </div>
                         </td>
                         <td className="ag_center">
                           <div className="tour2023_sel">
@@ -1109,7 +1183,12 @@ export default function MobileEventInsurancePage() {
                       <tr>
                         <td className="ag_center tour2024_ListB_bg02">필수</td>
                         <td className="ag_center tour2024_ListB_bg02">
-                          <div className="tour2023_insuBox01">자기부담금</div>
+                          <div className="tour2023_insuBox01">
+                            자기부담금{' '}
+                            <a href="#" onClick={(e) => { e.preventDefault(); showHelpLayer('dt'); }} className="help_tip">
+                              <img src="/images/heip_tip.png" alt="도움말 보기" />
+                            </a>
+                          </div>
                         </td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">
@@ -1294,6 +1373,35 @@ export default function MobileEventInsurancePage() {
           </form>
         </div>
       </div>
+
+      {/* 예상참여인원 도움말 모달 - 화면 가운데 */}
+      {showInfoLayer && (
+        <section
+          className="tour2023_guide_Wrap event-insurance-help-modal"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          onClick={() => setShowInfoLayer(false)}
+        >
+          <div className="tour2023_help_Layer" onClick={(e) => e.stopPropagation()}>
+            <div className="tour2023_help_Box prow_02">
+              <a
+                className="close"
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowInfoLayer(false);
+                }}
+              >
+                닫기
+              </a>
+              <div className="tour2023_help_txt01">{layerTitle}</div>
+              <div
+                className="tour2023_help_txt02"
+                dangerouslySetInnerHTML={{ __html: layerContent }}
+              />
+            </div>
+          </div>
+        </section>
+      )}
 
       <Footer isMobile={true} />
     </div>

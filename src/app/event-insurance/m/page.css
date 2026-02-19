@@ -32,17 +32,19 @@
   font-size: 16px !important;
 }
 
-.bgcolor_white {
+/* 스코프: 다른 페이지(contracts 등)와의 CSS 충돌 방지 - 전역 선택자 사용 금지 */
+.event-insurance-mobile.bgcolor_white,
+.event-insurance-mobile .bgcolor_white {
   background-color: #fff;
 }
 
-#isbwrapper {
+.event-insurance-mobile #isbwrapper {
   width: 100%;
   max-width: 100%;
   margin: 0 auto;
 }
 
-.prow_01 {
+.event-insurance-mobile .prow_01 {
   padding: 0 20px;
   padding-bottom: 80px;
 }
@@ -329,8 +331,8 @@
   transform: translateY(-50%);
 }
 
-/* 라디오 버튼 영역 - 모바일용 세로 배치 */
-.event-insurance-mobile .tourG_rdo_area {
+/* 라디오 버튼 영역 - 모바일용 세로 배치 (contracts/group-insurance CSS 충돌 방지용 event-insurance-radio-group) */
+.event-insurance-mobile .event-insurance-radio-group .tourG_rdo_area {
   width: 48% !important;
   margin-right: 0 !important;
   text-align: left !important;
@@ -339,7 +341,7 @@
   box-sizing: border-box !important;
 }
 
-.event-insurance-mobile .tourG_rdo_area > label:first-child {
+.event-insurance-mobile .event-insurance-radio-group .tourG_rdo_area > label:first-child {
   font-size: 10px !important;
   color: #9797a3 !important;
   white-space: nowrap;
@@ -354,7 +356,8 @@
 }
 
 /* 유/무 버튼 컨테이너 - 가로 배치 */
-.event-insurance-mobile .tourG_rdo_area > .tourG_inp_rdo {
+.event-insurance-mobile .event-insurance-radio-group .tourG_rdo_area > .tourG_inp_rdo,
+.event-insurance-mobile .event-insurance-radio-group .tourG_rdo_area > .event-insurance-inp-rdo {
   display: inline-block !important;
   width: 40% !important;
   vertical-align: top !important;
@@ -373,7 +376,8 @@
 
 /* 라디오 버튼이 있는 경우만 flex-start - 더 구체적인 선택자로 격리 */
 .event-insurance-mobile .tourGuard_form_tt.tourG_line:has(.tourG_rdo_area),
-.event-insurance-mobile .tourGuard_form_tt.tourG_line.tourG_line-with-radio {
+.event-insurance-mobile .tourGuard_form_tt.tourG_line.tourG_line-with-radio,
+.event-insurance-mobile .tourGuard_form_tt.tourG_line.event-insurance-radio-group {
   align-items: flex-start !important;
   display: flex !important;
   justify-content: space-between !important;
@@ -395,17 +399,20 @@
   z-index: 1;
 }
 
-.event-insurance-mobile .tourG_inp_rdo {
-  position: relative;
-  width: 38%;
-  display: inline-block;
-  vertical-align: middle;
+/* event-insurance-inp-rdo: contracts/group-insurance/overseas 전역 .tourG_inp_rdo와 완전 격리 */
+.event-insurance-mobile .event-insurance-radio-group .tourG_inp_rdo,
+.event-insurance-mobile .event-insurance-radio-group .event-insurance-inp-rdo {
+  position: relative !important;
+  width: 38% !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
   align-items: center;
   text-align: center;
-  background: transparent;
+  background: transparent !important;
 }
 
-.event-insurance-mobile .tourG_inp_rdo input[type="radio"] {
+.event-insurance-mobile .event-insurance-radio-group .tourG_inp_rdo input[type="radio"],
+.event-insurance-mobile .event-insurance-radio-group .event-insurance-inp-rdo input[type="radio"] {
   position: absolute;
   display: block;
   width: 1px;
@@ -418,27 +425,51 @@
   cursor: pointer;
 }
 
-.event-insurance-mobile .tourG_inp_rdo input + label {
-  width: 100%;
-  height: 32px;
-  display: inline-block;
-  text-align: left;
-  font-size: 14px;
-  vertical-align: middle;
-  color: #dddddd;
-  box-sizing: border-box;
-  margin: 0;
-  line-height: 32px;
-  cursor: pointer;
+/* label::after 차단 - 다른 페이지(tour2023_inp_rdo 등) pseudo-element가 콜론/이상문자 주입 방지 */
+.event-insurance-mobile .event-insurance-radio-group .tourG_inp_rdo input + label::before,
+.event-insurance-mobile .event-insurance-radio-group .tourG_inp_rdo input + label::after,
+.event-insurance-mobile .event-insurance-radio-group .event-insurance-inp-rdo input + label::before,
+.event-insurance-mobile .event-insurance-radio-group .event-insurance-inp-rdo input + label::after {
+  content: none !important;
+  display: none !important;
 }
 
-.event-insurance-mobile .tourG_inp_rdo input:checked + label {
-  color: #0000ff;
-  font-weight: 500;
+/* input+label: contracts margin:22px, font-size:17px 덮어쓰기 - !important로 확실히 우선 */
+.event-insurance-mobile .event-insurance-radio-group .tourG_inp_rdo input + label,
+.event-insurance-mobile .event-insurance-radio-group .event-insurance-inp-rdo input + label {
+  width: 100% !important;
+  height: 32px !important;
+  display: inline-block !important;
+  text-align: left !important;
+  font-size: 14px !important;
+  vertical-align: middle !important;
+  color: #dddddd !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  line-height: 32px !important;
+  cursor: pointer !important;
+  letter-spacing: -0.8px !important;
 }
 
-.event-insurance-mobile .one_line0 {
-  white-space: nowrap;
+.event-insurance-mobile .event-insurance-radio-group .tourG_inp_rdo input:checked + label,
+.event-insurance-mobile .event-insurance-radio-group .event-insurance-inp-rdo input:checked + label {
+  color: #0000ff !important;
+  font-weight: 500 !important;
+  background: transparent !important;
+  border: none !important;
+  z-index: 1 !important;
+}
+
+/* one_line0: contracts 전역 .one_line0 { border-left:0 !important } 충돌 방지 */
+.event-insurance-mobile .event-insurance-radio-group .one_line0 {
+  white-space: nowrap !important;
+  border-left: 0 !important;
+}
+
+.event-insurance-mobile .event-insurance-radio-group .tourG_inp_rdo input:checked + label.one_line0,
+.event-insurance-mobile .event-insurance-radio-group .event-insurance-inp-rdo input:checked + label.one_line0 {
+  color: #0000ff !important;
+  border: none !important;
 }
 
 /* 보험가입조건 테이블 - PC와 동일 */
@@ -883,7 +914,7 @@
 
 /* 반응형 - 모바일에서만 약간의 조정 */
 @media (max-width: 768px) {
-  .prow_01 {
+  .event-insurance-mobile .prow_01 {
     padding: 0 16px;
     padding-bottom: 70px;
   }
@@ -912,12 +943,13 @@
   }
 
   .event-insurance-mobile .tourGuard_form_tt.tourG_line:has(.tourG_rdo_area),
-  .event-insurance-mobile .tourGuard_form_tt.tourG_line.tourG_line-with-radio {
+  .event-insurance-mobile .tourGuard_form_tt.tourG_line.tourG_line-with-radio,
+  .event-insurance-mobile .tourGuard_form_tt.tourG_line.event-insurance-radio-group {
     align-items: flex-start !important;
     min-height: 65px !important;
   }
 
-  .event-insurance-mobile .tourG_rdo_area {
+  .event-insurance-mobile .event-insurance-radio-group .tourG_rdo_area {
     width: 48%;
     margin-right: 0;
     display: block;
@@ -925,7 +957,7 @@
     text-align: left;
   }
 
-  .event-insurance-mobile .tourG_rdo_area > label:first-child {
+  .event-insurance-mobile .event-insurance-radio-group .tourG_rdo_area > label:first-child {
     font-size: 9px !important;
     color: #9797a3 !important;
     margin-top: 6px;
@@ -938,18 +970,20 @@
     line-height: normal;
   }
 
-  .event-insurance-mobile .tourG_rdo_area > .tourG_inp_rdo {
+  .event-insurance-mobile .event-insurance-radio-group .tourG_rdo_area > .tourG_inp_rdo,
+  .event-insurance-mobile .event-insurance-radio-group .tourG_rdo_area > .event-insurance-inp-rdo {
     width: 42% !important;
     display: inline-block !important;
     vertical-align: top;
     margin-left: 15px;
   }
 
-  .event-insurance-mobile .tourG_inp_rdo input + label {
-    font-size: 13px;
-    height: 28px;
-    margin-top: 0;
-    line-height: 28px;
+  .event-insurance-mobile .event-insurance-radio-group .tourG_inp_rdo input + label,
+  .event-insurance-mobile .event-insurance-radio-group .event-insurance-inp-rdo input + label {
+    font-size: 13px !important;
+    height: 28px !important;
+    margin: 0 !important;
+    line-height: 28px !important;
   }
 
   .event-insurance-mobile .tourG_line::after {
@@ -979,7 +1013,7 @@
 }
 
 @media (max-width: 480px) {
-  .prow_01 {
+  .event-insurance-mobile .prow_01 {
     padding: 0 12px;
     padding-bottom: 70px;
   }
@@ -1035,12 +1069,13 @@
   }
 
   .event-insurance-mobile .tourGuard_form_tt.tourG_line:has(.tourG_rdo_area),
-  .event-insurance-mobile .tourGuard_form_tt.tourG_line.tourG_line-with-radio {
+  .event-insurance-mobile .tourGuard_form_tt.tourG_line.tourG_line-with-radio,
+  .event-insurance-mobile .tourGuard_form_tt.tourG_line.event-insurance-radio-group {
     align-items: flex-start !important;
     min-height: 65px !important;
   }
 
-  .event-insurance-mobile .tourG_rdo_area {
+  .event-insurance-mobile .event-insurance-radio-group .tourG_rdo_area {
     top: 6px;
     left: 8px;
     width: 48%;
@@ -1050,7 +1085,7 @@
     text-align: left;
   }
 
-  .event-insurance-mobile .tourG_rdo_area > label:first-child {
+  .event-insurance-mobile .event-insurance-radio-group .tourG_rdo_area > label:first-child {
     font-size: 12px !important;
     color: #9797a3 !important;
     margin-top: 0px;
@@ -1063,7 +1098,8 @@
     line-height: normal;
   }
 
-  .event-insurance-mobile .tourG_rdo_area > .tourG_inp_rdo {
+  .event-insurance-mobile .event-insurance-radio-group .tourG_rdo_area > .tourG_inp_rdo,
+  .event-insurance-mobile .event-insurance-radio-group .tourG_rdo_area > .event-insurance-inp-rdo {
     width: 40% !important;
     display: inline-block !important;
     vertical-align: top;
@@ -1071,8 +1107,9 @@
     margin-top: 5px;
   }
 
-  .event-insurance-mobile .tourG_inp_rdo input + label {
-    font-size: 12px;
+  .event-insurance-mobile .event-insurance-radio-group .tourG_inp_rdo input + label,
+  .event-insurance-mobile .event-insurance-radio-group .event-insurance-inp-rdo input + label {
+    font-size: 12px !important;
     height: 26px;
     margin-top: 0;
     line-height: 26px;
@@ -1109,7 +1146,7 @@
 }
 
 @media (max-width: 360px) {
-  .prow_01 {
+  .event-insurance-mobile .prow_01 {
     padding: 0 10px;
     padding-bottom: 70px;
   }
@@ -1124,12 +1161,13 @@
   }
 
   .event-insurance-mobile .tourGuard_form_tt.tourG_line:has(.tourG_rdo_area),
-  .event-insurance-mobile .tourGuard_form_tt.tourG_line.tourG_line-with-radio {
+  .event-insurance-mobile .tourGuard_form_tt.tourG_line.tourG_line-with-radio,
+  .event-insurance-mobile .tourGuard_form_tt.tourG_line.event-insurance-radio-group {
     align-items: flex-start !important;
     min-height: 65px !important;
   }
 
-  .event-insurance-mobile .tourG_rdo_area {
+  .event-insurance-mobile .event-insurance-radio-group .tourG_rdo_area {
     width: 48%;
     margin-right: 0;
     display: block;
@@ -1137,7 +1175,7 @@
     text-align: left;
   }
 
-  .event-insurance-mobile .tourG_rdo_area > label:first-child {
+  .event-insurance-mobile .event-insurance-radio-group .tourG_rdo_area > label:first-child {
     font-size: 7px !important;
     color: #9797a3 !important;
     margin-top: 6px;
@@ -1150,15 +1188,17 @@
     line-height: normal;
   }
 
-  .event-insurance-mobile .tourG_rdo_area > .tourG_inp_rdo {
+  .event-insurance-mobile .event-insurance-radio-group .tourG_rdo_area > .tourG_inp_rdo,
+  .event-insurance-mobile .event-insurance-radio-group .tourG_rdo_area > .event-insurance-inp-rdo {
     width: 38% !important;
     display: inline-block !important;
     vertical-align: top;
     margin-left: 15px;
   }
 
-  .event-insurance-mobile .tourG_inp_rdo input + label {
-    font-size: 11px;
+  .event-insurance-mobile .event-insurance-radio-group .tourG_inp_rdo input + label,
+  .event-insurance-mobile .event-insurance-radio-group .event-insurance-inp-rdo input + label {
+    font-size: 11px !important;
     height: 24px;
     margin-top: 0;
     line-height: 24px;
@@ -1211,5 +1251,82 @@
   .event-insurance-mobile .tourGuard_sel {
     font-size: 11px;
   }
+}
+
+/* ===== 예상참여인원 도움말 아이콘 & 모달 (PC와 동일) ===== */
+.event-insurance-mobile .help_tip {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  position: relative;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+.event-insurance-mobile .help_tip img {
+  display: block;
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+/* 도움말 모달 - 화면 가운데 */
+.event-insurance-mobile .tour2023_guide_Wrap.event-insurance-help-modal {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+}
+
+.event-insurance-mobile .tour2023_guide_Wrap.event-insurance-help-modal .tour2023_help_Layer {
+  position: relative;
+  display: block;
+  text-align: center;
+}
+
+.event-insurance-mobile .tour2023_guide_Wrap.event-insurance-help-modal .tour2023_help_Box {
+  position: relative;
+  display: block;
+  background: #fff;
+  height: auto;
+  width: 285px;
+  border-radius: 13px;
+  box-sizing: border-box;
+  padding: 27px 23px 21px 23px;
+}
+
+.event-insurance-mobile .tour2023_guide_Wrap.event-insurance-help-modal .tour2023_help_Box .close {
+  position: absolute;
+  top: 18px;
+  right: 4.68%;
+  width: 20px;
+  height: 20px;
+  background: url(/icons/ico_btn_close_bl.png) no-repeat 50% 50%;
+  background-size: contain;
+  text-indent: -9999px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.event-insurance-mobile .tour2023_guide_Wrap.event-insurance-help-modal .tour2023_help_txt01 {
+  font-size: 17px;
+  color: #202020;
+  letter-spacing: -1.2px;
+  line-height: 132%;
+  padding: 2px 1px 15px 1px;
+  text-align: left;
+}
+
+.event-insurance-mobile .tour2023_guide_Wrap.event-insurance-help-modal .tour2023_help_txt02 {
+  font-size: 14px;
+  color: #3e3e3e;
+  letter-spacing: -0.4px;
+  line-height: 140%;
+  padding: 0 0 12px 0;
+  text-align: left;
 }
 
