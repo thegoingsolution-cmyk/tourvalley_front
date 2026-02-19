@@ -63,9 +63,15 @@ export default function ContractDetailPage() {
       return;
     }
 
-    const supportedMethods = ['나이스페이먼츠', '네이버페이', '카카오페이'];
-    if (!supportedMethods.includes(contractDetail.paymentMethod)) {
-      alert('해당 결제 수단의 영수증은 준비 중입니다.');
+    if (
+      contractDetail.paymentMethod === '기타결제' &&
+      contractDetail.paymentSubMethod === '무통장입금'
+    ) {
+      window.open(
+        `/payments/bank-transfer-receipt?contractId=${contractId}`,
+        '_blank',
+        'noopener,noreferrer'
+      );
       return;
     }
 
@@ -171,6 +177,31 @@ export default function ContractDetailPage() {
     }
     return '라이나손해 해외여행보험';
   };
+
+  const getTermsPdfPath = (insuranceType?: string | null) => {
+    if (!insuranceType) return null;
+    const longTermTypes = ['유학/어학연수', '해외출장/주재원/교환교수', '워킹홀리데이'];
+    if (longTermTypes.includes(insuranceType) || insuranceType.includes('장기')) {
+      return '/pdf/해외장기체류보험_약관.pdf';
+    }
+    if (insuranceType.includes('국내')) {
+      return '/pdf/ACE손해_국내여행보험약관.pdf';
+    }
+    if (insuranceType.includes('해외')) {
+      return '/pdf/ACE손해_해외여행보험약관.pdf';
+    }
+    return null;
+  };
+
+  const isPaymentCompleted = (() => {
+    const rawStatus = contractDetail?.paymentStatus;
+    if (!rawStatus) return false;
+    const normalized = String(rawStatus).trim().toLowerCase();
+    const paidStatuses = new Set(['결제완료', '완료', 'paid', 'success']);
+    return paidStatuses.has(normalized) || paidStatuses.has(String(rawStatus).trim());
+  })();
+
+  const termsPdfPath = getTermsPdfPath(contractDetail?.insuranceType);
 
   return (
     <div id="isbwrapper" className="contract-detail-page">
@@ -284,7 +315,11 @@ export default function ContractDetailPage() {
           <ul className="tour2023_conList_Wrap">
             <li className="tour2023_conList">
               <span className="tour2023_txt09">결제방법</span>
-              <span className="tour2023_txt10">{contractDetail.paymentMethod || '무통장입금'}</span>
+              <span className="tour2023_txt10">
+                {contractDetail.paymentMethod === '기타결제'
+                  ? (contractDetail.paymentSubMethod || '기타결제')
+                  : (contractDetail.paymentMethod || '무통장입금')}
+              </span>
             </li>
             <li className="tour2023_conList">
               <span className="tour2023_txt09">결제여부</span>
@@ -300,22 +335,43 @@ export default function ContractDetailPage() {
 
         <div className="tourG_mat13">
           <a 
-            href="#" 
-            onClick={(e) => { e.preventDefault(); alert('약관 다운로드'); }}
+            href={termsPdfPath || '#'}
+            target={termsPdfPath ? '_blank' : undefined}
+            rel={termsPdfPath ? 'noopener noreferrer' : undefined}
+            onClick={(e) => {
+              if (!termsPdfPath) {
+                e.preventDefault();
+                alert('약관 파일을 찾을 수 없습니다.');
+              }
+            }}
             className="tourGuard_btn_b tour2023_btn06_gray"
           >
             약관 PDF로 다운로드 받기<span className="tour2023_arr01"></span>
           </a>
           
-          <div className="tourG_mat04">
-            <a 
-              href="#" 
-              onClick={handleReceiptClick}
-              className="tourGuard_btn_b tour2023_btn06_gray"
-            >
-              보험료입금증<span className="tour2023_arr01"></span>
-            </a>
-          </div>
+          {contractDetail?.subscriptionCertificateUrl && (
+            <div className="tourG_mat04">
+              <a
+                href={contractDetail.subscriptionCertificateUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="tourGuard_btn_b tour2023_btn06_gray"
+              >
+                증권 다운로드 받기<span className="tour2023_arr01"></span>
+              </a>
+            </div>
+          )}
+          {isPaymentCompleted && contractDetail?.paymentSubMethod !== '수기카드' && (
+            <div className="tourG_mat04">
+              <a 
+                href="#" 
+                onClick={handleReceiptClick}
+                className="tourGuard_btn_b tour2023_btn06_gray"
+              >
+                보험료입금증<span className="tour2023_arr01"></span>
+              </a>
+            </div>
+          )}
         </div>
         <div className="tourG_mat17 tourG_Wrap"></div>
       </div>

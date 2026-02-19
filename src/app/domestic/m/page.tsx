@@ -778,8 +778,16 @@ function MobileDomesticStep1Content() {
       }
 
       if (paymentSubMethod === '무통장입금') {
-        if (!depositBank || !depositorName || expectedDepositYear === 0 || expectedDepositMonth === 0 || expectedDepositDay === 0) {
-          alert('입금 정보를 모두 입력해주세요.');
+        if (!depositBank) {
+          alert('입금은행을 선택해주세요.');
+          return;
+        }
+        if (!depositorName) {
+          alert('입금자명을 입력해주세요.');
+          return;
+        }
+        if (expectedDepositYear === 0 || expectedDepositMonth === 0 || expectedDepositDay === 0) {
+          alert('입금예정일을 선택해주세요.');
           return;
         }
       } else if (paymentSubMethod === '가상계좌') {
@@ -787,11 +795,29 @@ function MobileDomesticStep1Content() {
           alert('입금은행을 선택해주세요.');
           return;
         }
+        if (!/^\d{3}$/.test(depositBank)) {
+          alert('가상계좌 은행코드를 다시 선택해주세요.');
+          return;
+        }
       } else if (paymentSubMethod === '수기카드') {
-        if (!cardNumber1 || !cardNumber2 || !cardNumber3 || !cardNumber4 ||
-            !cardExpiryMonth || !cardExpiryYear || !cardholderName || !cardholderResidentNumber ||
-            approvalYear === 0 || approvalMonth === 0 || approvalDay === 0) {
-          alert('카드 정보를 모두 입력해주세요.');
+        if (!cardCategory) {
+          alert('카드종류를 선택해주세요.');
+          return;
+        }
+        if (!cardNumber1 || !cardNumber2 || !cardNumber3 || !cardNumber4) {
+          alert('카드번호를 모두 입력해주세요.');
+          return;
+        }
+        if (!cardExpiryMonth || !cardExpiryYear) {
+          alert('유효기간을 선택해주세요.');
+          return;
+        }
+        if (!cardholderName) {
+          alert('카드소유자명을 입력해주세요.');
+          return;
+        }
+        if (!cardholderResidentNumber || cardholderResidentNumber.length < 14) {
+          alert('카드소유자 주민번호를 입력해주세요.');
           return;
         }
       }

@@ -305,6 +305,7 @@ export default function PaymentStep({
                         value={expectedDepositYear}
                         onChange={(e) => onExpectedDepositDateChange(Number(e.target.value), expectedDepositMonth, expectedDepositDay)}
                       >
+                      <option value={0}>연도 선택</option>
                         {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() + i).map(year => (
                           <option key={year} value={year}>{year}년</option>
                         ))}
@@ -313,6 +314,7 @@ export default function PaymentStep({
                         value={expectedDepositMonth}
                         onChange={(e) => onExpectedDepositDateChange(expectedDepositYear, Number(e.target.value), expectedDepositDay)}
                       >
+                      <option value={0}>월 선택</option>
                         {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
                           <option key={month} value={month}>{month}월</option>
                         ))}
@@ -321,6 +323,7 @@ export default function PaymentStep({
                         value={expectedDepositDay}
                         onChange={(e) => onExpectedDepositDateChange(expectedDepositYear, expectedDepositMonth, Number(e.target.value))}
                       >
+                      <option value={0}>일 선택</option>
                         {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
                           <option key={day} value={day}>{day}일</option>
                         ))}

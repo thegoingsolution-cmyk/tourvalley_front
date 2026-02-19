@@ -116,9 +116,9 @@ function MobileOverseasStep1Content() {
   // 무통장입금 관련 상태
   const [depositBank, setDepositBank] = useState<string>('');
   const [depositorName, setDepositorName] = useState<string>('');
-  const [expectedDepositYear, setExpectedDepositYear] = useState<number>(new Date().getFullYear());
-  const [expectedDepositMonth, setExpectedDepositMonth] = useState<number>(new Date().getMonth() + 1);
-  const [expectedDepositDay, setExpectedDepositDay] = useState<number>(new Date().getDate());
+  const [expectedDepositYear, setExpectedDepositYear] = useState<number>(0);
+  const [expectedDepositMonth, setExpectedDepositMonth] = useState<number>(0);
+  const [expectedDepositDay, setExpectedDepositDay] = useState<number>(0);
   
   // 수기카드 관련 상태
   const [cardType, setCardType] = useState<'본인카드' | '기타카드'>('본인카드');
@@ -715,10 +715,18 @@ function MobileOverseasStep1Content() {
         alert('입금자명을 입력해주세요.');
         return;
       }
+      if (expectedDepositYear === 0 || expectedDepositMonth === 0 || expectedDepositDay === 0) {
+        alert('입금예정일을 선택해주세요.');
+        return;
+      }
     }
     if (paymentMethod === '기타결제' && paymentSubMethod === '가상계좌') {
       if (!depositBank) {
         alert('입금은행을 선택해주세요.');
+        return;
+      }
+      if (!/^\d{3}$/.test(depositBank)) {
+        alert('가상계좌 은행코드를 다시 선택해주세요.');
         return;
       }
     }
