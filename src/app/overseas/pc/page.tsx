@@ -327,7 +327,14 @@ export default function PCOverseasPage() {
       const updatedPlans: Record<string, PlanInfo> = {};
       const medicalExpense = medicalExpenseValue !== undefined ? medicalExpenseValue : hasMedicalExpense;
       let planTypesToRecalc = Object.keys(planInfo) as PlanType[];
-      if (planTypesToRecalc.length === 0) {
+      if (medicalExpenseValue !== undefined) {
+        const availablePlans = await fetchAvailablePlans(age, genderValue, medicalExpense);
+        if (availablePlans.length === 0) {
+          setPlanInfo({});
+          return;
+        }
+        planTypesToRecalc = availablePlans;
+      } else if (planTypesToRecalc.length === 0) {
         const availablePlans = await fetchAvailablePlans(age, genderValue, medicalExpense);
         if (availablePlans.length === 0) {
           setPlanInfo({});

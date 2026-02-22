@@ -346,7 +346,14 @@ export default function PCLongTermStayPage() {
       const medicalExpense = medicalExpenseValue !== undefined ? medicalExpenseValue : hasMedicalExpense;
       const insuranceType = travelPurpose || '유학/어학연수';
       let planKeys = Object.keys(planInfo) as PlanType[];
-      if (planKeys.length === 0) {
+      if (medicalExpenseValue !== undefined) {
+        const availablePlans = await fetchAvailablePlans(insuranceType, age, genderValue, medicalExpense);
+        if (availablePlans.length === 0) {
+          setPlanInfo({});
+          return;
+        }
+        planKeys = availablePlans;
+      } else if (planKeys.length === 0) {
         const availablePlans = await fetchAvailablePlans(insuranceType, age, genderValue, medicalExpense);
         if (availablePlans.length === 0) {
           setPlanInfo({});

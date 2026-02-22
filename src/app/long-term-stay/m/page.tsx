@@ -372,7 +372,9 @@ function MobileLongTermStayContent() {
       const medicalExpense = medicalExpenseValue !== undefined ? medicalExpenseValue : hasMedicalExpense;
 
       let availablePlans: PlanType[] = planInfo ? (Object.keys(planInfo) as PlanType[]) : [];
-      if (availablePlans.length === 0) {
+      if (medicalExpenseValue !== undefined) {
+        availablePlans = await fetchAvailablePlans(insuranceType, age, genderValue, medicalExpense);
+      } else if (availablePlans.length === 0) {
         availablePlans = await fetchAvailablePlans(insuranceType, age, genderValue, medicalExpense);
       }
       if (availablePlans.length === 0) {
@@ -700,7 +702,7 @@ function MobileLongTermStayContent() {
 
   useEffect(() => {
     if (showPlanSelection && planInfo && selectedPlan) {
-      recalculatePremiums();
+      recalculatePremiums(hasMedicalExpense);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasMedicalExpense]);

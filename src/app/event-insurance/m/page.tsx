@@ -612,7 +612,7 @@ export default function MobileEventInsurancePage() {
 
                     <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line departure-date-field">
                       <label htmlFor="start_date">행사시작일</label>
-                      <div className="date-picker-wrapper" style={{ width: '38%', display: 'inline-block' }}>
+                      <div className="date-picker-wrapper" style={{ width: '45%', display: 'inline-block' }}>
                         <DatePicker
                           selected={formData.start_date ? parseDate(formData.start_date) : null}
                           onChange={(date: Date | null) => {
@@ -671,7 +671,7 @@ export default function MobileEventInsurancePage() {
 
                     <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line arrival-date-field">
                       <label htmlFor="end_date">행사종료일</label>
-                      <div className="date-picker-wrapper" style={{ width: '38%', display: 'inline-block' }}>
+                      <div className="date-picker-wrapper" style={{ width: '45%', display: 'inline-block' }}>
                         <DatePicker
                           selected={formData.end_date ? parseDate(formData.end_date) : null}
                           onChange={(date: Date | null) => {
@@ -750,7 +750,7 @@ export default function MobileEventInsurancePage() {
 
                     <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line tourG_line-with-radio event-insurance-radio-group">
                       <div className="tourG_rdo_area">
-                        <label htmlFor="action_info_1_Y">운동경기/체육활동 유무</label>
+                        <label htmlFor="action_info_1_Y" className="event-insurance-rdo-label">운동경기/체육활동 유무</label>
                         <span className="tourG_inp_rdo event-insurance-inp-rdo">
                           <input 
                             type="radio" 
@@ -776,7 +776,7 @@ export default function MobileEventInsurancePage() {
                       </div>
 
                       <div className="tourG_rdo_area">
-                        <label htmlFor="action_info_2_Y">불꽃놀이 유무</label>
+                        <label htmlFor="action_info_2_Y" className="event-insurance-rdo-label">불꽃놀이 유무</label>
                         <span className="tourG_inp_rdo event-insurance-inp-rdo">
                           <input 
                             type="radio" 
@@ -804,7 +804,7 @@ export default function MobileEventInsurancePage() {
 
                     <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line tourG_line-with-radio event-insurance-radio-group">
                       <div className="tourG_rdo_area">
-                        <label htmlFor="action_info_3_Y">수상위험 유무</label>
+                        <label htmlFor="action_info_3_Y" className="event-insurance-rdo-label">수상위험 유무</label>
                         <span className="tourG_inp_rdo event-insurance-inp-rdo">
                           <input 
                             type="radio" 
@@ -830,7 +830,7 @@ export default function MobileEventInsurancePage() {
                       </div>
 
                       <div className="tourG_rdo_area">
-                        <label htmlFor="action_info_4_Y">놀이시설(에어바운스) 유무</label>
+                        <label htmlFor="action_info_4_Y" className="event-insurance-rdo-label">놀이시설(에어바운스) 유무</label>
                         <span className="tourG_inp_rdo event-insurance-inp-rdo">
                           <input 
                             type="radio" 
@@ -858,7 +858,7 @@ export default function MobileEventInsurancePage() {
 
                     <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line tourG_line-with-radio event-insurance-radio-group">
                       <div className="tourG_rdo_area">
-                        <label htmlFor="action_info_5_Y">드론 유무</label>
+                        <label htmlFor="action_info_5_Y" className="event-insurance-rdo-label">드론 유무</label>
                         <span className="tourG_inp_rdo event-insurance-inp-rdo">
                           <input 
                             type="radio" 
@@ -884,7 +884,7 @@ export default function MobileEventInsurancePage() {
                       </div>
 
                       <div className="tourG_rdo_area">
-                        <label htmlFor="action_info_6_Y">기타 위험활동 유무</label>
+                        <label htmlFor="action_info_6_Y" className="event-insurance-rdo-label">기타 위험활동 유무</label>
                         <span className="tourG_inp_rdo event-insurance-inp-rdo">
                           <input 
                             type="radio" 

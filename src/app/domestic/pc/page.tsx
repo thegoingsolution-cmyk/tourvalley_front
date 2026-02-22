@@ -337,11 +337,19 @@ export default function PCDomesticPage() {
 
       const medicalExpense = medicalExpenseValue !== undefined ? medicalExpenseValue : hasMedicalExpense;
 
-      // 빈 객체로 시작하여 성공한 플랜만 추가 (현재 화면에 있는 플랜명 그대로 재계산)
+      // 빈 객체로 시작하여 성공한 플랜만 추가
       const updatedPlans: Record<string, PlanInfo> = {};
       let planTypesToRecalc = Object.keys(planInfo) as PlanType[];
 
-      if (planTypesToRecalc.length === 0) {
+      // 실손 포함/제외 변경 시에는 현재 플랜이 아니라 신규 가능한 플랜 목록으로 재계산
+      if (medicalExpenseValue !== undefined) {
+        const availablePlans = await fetchAvailablePlans(age, genderValue, medicalExpense);
+        if (availablePlans.length === 0) {
+          setPlanInfo({});
+          return;
+        }
+        planTypesToRecalc = availablePlans;
+      } else if (planTypesToRecalc.length === 0) {
         const availablePlans = await fetchAvailablePlans(age, genderValue, medicalExpense);
         if (availablePlans.length === 0) {
           setPlanInfo({});

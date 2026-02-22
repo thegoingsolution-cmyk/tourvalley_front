@@ -248,13 +248,14 @@ function MobileDomesticStep1Content() {
   };
 
   // 보험료 계산 함수 (재사용 가능)
-  const calculatePremiums = async () => {
+  const calculatePremiums = async (medicalExpenseValue?: boolean) => {
     if (!planInfo || !selectedPlan) return;
 
     // 나이 계산
     const age = calculateAgeFromBirthDate(birthDate);
     if (age === null) return;
 
+    const medicalExpense = medicalExpenseValue !== undefined ? medicalExpenseValue : hasMedicalExpense;
     // 현재 화면에 표시된 플랜 그대로 재계산 (planInfo 키 기준)
     let availablePlans: PlanType[] = planInfo ? (Object.keys(planInfo) as PlanType[]) : ['실속플랜', '표준플랜'];
 
@@ -292,8 +293,15 @@ function MobileDomesticStep1Content() {
       const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
       const genderValue = getGenderFromBirthDate(birthDate, gender);
 
-      if (availablePlans.length === 0) {
-        const refreshedPlans = await fetchAvailablePlans(age, genderValue);
+      if (medicalExpenseValue !== undefined) {
+        const refreshedPlans = await fetchAvailablePlans(age, genderValue, medicalExpense);
+        if (refreshedPlans.length === 0) {
+          setPlanInfo({});
+          return;
+        }
+        availablePlans = refreshedPlans;
+      } else if (availablePlans.length === 0) {
+        const refreshedPlans = await fetchAvailablePlans(age, genderValue, medicalExpense);
         if (refreshedPlans.length === 0) {
           setPlanInfo({});
           return;
@@ -318,7 +326,7 @@ function MobileDomesticStep1Content() {
               gender: genderValue,
               plan_type: planType,
               plan_variant: 'B',
-              has_medical_expense: hasMedicalExpense ? 1 : 0,
+              has_medical_expense: medicalExpense ? 1 : 0,
               departure_date: departureDateTime,
               arrival_date: arrivalDateTime,
               currency_plan: '원화',
@@ -350,7 +358,7 @@ function MobileDomesticStep1Content() {
   // hasMedicalExpense 변경 시 보험료 재계산
   useEffect(() => {
     if (showPlanSelection && planInfo && selectedPlan) {
-      calculatePremiums();
+      calculatePremiums(hasMedicalExpense);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasMedicalExpense]);

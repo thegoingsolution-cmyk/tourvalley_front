@@ -506,6 +506,7 @@
 }
 
 .tour2023_joinTit01 {
+  font-family: 'NanumSquareNeoTTF-dEb';
   font-size: 25px;
   color: #202020;
   letter-spacing: -0.8px;
@@ -562,6 +563,7 @@
   left: 20px;
   color: #9797a3;
   font-size: 12px;
+  font-family: 'Malgun Gothic', '맑은고딕', dotum, '돋움', AppleGothic, sans-serif;
   letter-spacing: -0.8px;
 }
 
@@ -675,6 +677,7 @@
   left: 20px;
   color: #9797a3;
   font-size: 12px;
+  font-family: 'Malgun Gothic', '맑은고딕', dotum, '돋움', AppleGothic, sans-serif;
   letter-spacing: -0.8px;
 }
 
@@ -740,6 +743,7 @@
 }
 
 .tour2023_title16 {
+  font-family: 'NanumSquareNeoTTF-cBd';
   font-size: 17px;
   line-height: 130%;
   color: #202020;
@@ -900,4 +904,3 @@
 .mag5 {
   margin: 0;
 }
-

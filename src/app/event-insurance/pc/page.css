@@ -146,6 +146,11 @@
   padding: 0 !important;
 }
 
+/* 라디오 영역 구분자 - 행사시작일/종료일(field-row)과 동일 스타일 */
+.event-insurance-page-pc .tourGuard_form_tt.tourG_line:has(.tourG_rdo_area)::after {
+  top: -4px;
+}
+
 .event-insurance-page-pc .tourGuard_form_tt label {
   position: absolute;
   top: 6px;
