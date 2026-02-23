@@ -71,7 +71,7 @@ export default function CoverageAccidentPage() {
         </div>
       </header>
 
-      <div id="contentWrap">
+      <div id="contentWrap" style={{ marginTop: '16px' }}>
         <section className="tourGuard_bg ag_center prow_01">
           <div className="tourGuard_Topbg01">
             {coverageItems.map((item, index) => (

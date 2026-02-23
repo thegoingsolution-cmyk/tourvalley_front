@@ -9,7 +9,15 @@ export default function PremiumDetailPage() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    setIsMobile(isMobileDevice());
+    let mobile = isMobileDevice();
+    if (typeof window !== 'undefined' && window.opener && !window.opener.closed) {
+      try {
+        mobile = window.opener.innerWidth <= 768;
+      } catch {
+        // If we cannot access opener (e.g., cross-origin), fall back.
+      }
+    }
+    setIsMobile(mobile);
   }, []);
 
   if (isMobile) {

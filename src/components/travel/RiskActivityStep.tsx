@@ -188,14 +188,10 @@ export default function RiskActivityStep({
                 >
                   <option value="">선택해 주세요</option>
                   {(() => {
-                    const defaultOrder = ['일반관광', '래프팅', '스키/스노보드', '출장/연수/교육'];
-                    const source = travelPurposeOptions && travelPurposeOptions.length > 0
-                      ? travelPurposeOptions
-                      : defaultOrder;
-                    const ordered = [
-                      ...defaultOrder.filter((option) => source.includes(option)),
-                      ...source.filter((option) => !defaultOrder.includes(option)),
-                    ];
+                    const domesticOptions = ['일반관광', '래프팅', '스키/스노보드', '출장/연수/교육'];
+                    const overseasOptions = ['일반관광', '출장/연수/교육'];
+                    const isOverseasInsurance = isOverseas || insuranceType === '해외여행보험';
+                    const ordered = isOverseasInsurance ? overseasOptions : domesticOptions;
                     return ordered.map((option) => (
                       <option key={option} value={option}>
                         {option}

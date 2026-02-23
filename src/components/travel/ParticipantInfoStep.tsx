@@ -53,6 +53,59 @@ export default function ParticipantInfoStep({
   gender,
   hideFormHeader = false,
 }: ParticipantInfoStepProps) {
+  const openEmailSelect = (index: number) => {
+    const selectEl = document.getElementById(`select_email_${index}`) as HTMLSelectElement | null;
+    if (!selectEl) return;
+
+    if (typeof (selectEl as HTMLSelectElement & { showPicker?: () => void }).showPicker === 'function') {
+      try {
+        (selectEl as HTMLSelectElement & { showPicker: () => void }).showPicker();
+        return;
+      } catch {
+        // Some browsers require a direct user gesture for showPicker.
+      }
+    }
+
+    selectEl.focus();
+    selectEl.click();
+  };
+  const validateRepresentativeEmail = () => {
+    const representative = participants[0];
+    if (!representative) return true;
+
+    const emailId = (representative.email1 || '').trim();
+    const emailDomain =
+      representative.email2 === '직접입력'
+        ? (representative.customEmail || '').trim()
+        : (representative.email2 || '').trim();
+
+    if (!emailId || !emailDomain) {
+      alert('이메일 주소를 입력해주세요.');
+      return false;
+    }
+
+    if (emailId.includes('@') || emailDomain.includes('@')) {
+      alert('이메일은 아이디와 도메인을 나눠서 입력해주세요.');
+      return false;
+    }
+
+    const emailIdPattern = /^[A-Za-z0-9._%+-]+$/;
+    const domainPattern = /^[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    if (!emailIdPattern.test(emailId) || !domainPattern.test(emailDomain)) {
+      alert('이메일 형식이 올바르지 않습니다.');
+      return false;
+    }
+
+    return true;
+  };
+  const handleCalculateClick = async () => {
+    if (!validateRepresentativeEmail()) return;
+    await onCalculate();
+  };
+  const handleApplyClick = () => {
+    if (!validateRepresentativeEmail()) return;
+    onApply();
+  };
   const [verificationSent, setVerificationSent] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
   const [remainingTime, setRemainingTime] = useState(0);
@@ -409,14 +462,21 @@ export default function ParticipantInfoStep({
                         verticalAlign: 'middle',
                       }}
                     >
-                      <span className="tourGuard_ps_box" style={{
-                        position: 'relative',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        height: '32px',
-                        lineHeight: '32px',
-                      }}>
+                      <span
+                        className="tourGuard_ps_box"
+                        onMouseDown={(event) => {
+                          event.preventDefault();
+                          openEmailSelect(index);
+                        }}
+                        style={{
+                          position: 'relative',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          height: '32px',
+                          lineHeight: '32px',
+                        }}
+                      >
                         <select
                           className="tourGuard_sel"
                           id={`select_email_${index}`}
@@ -447,7 +507,15 @@ export default function ParticipantInfoStep({
                           <option value="hotmail.com">hotmail.com</option>
                           <option value="직접입력">직접입력</option>
                         </select>
-                        <img src="/icons/icon_sel.png" alt="선택" style={{ width: 'auto', height: '7px', marginLeft: '8px', pointerEvents: 'none' }} />
+                        <img
+                          src="/icons/icon_sel.png"
+                          alt="선택"
+                          onMouseDown={(event) => {
+                            event.preventDefault();
+                            openEmailSelect(index);
+                          }}
+                          style={{ width: 'auto', height: '7px', marginLeft: '8px', cursor: 'pointer' }}
+                        />
                       </span>
                     </div>
                   </div>
@@ -614,7 +682,7 @@ export default function ParticipantInfoStep({
           <button
             type="button"
             className={`calculate-final-btn ${calculatedPremiums ? 'calculated' : ''}`}
-            onClick={onCalculate}
+            onClick={handleCalculateClick}
             disabled={isCalculating || !!calculatedPremiums}
             style={{ marginTop: participantCount === 1 ? '0px' : '24px' }}
           >
@@ -660,7 +728,7 @@ export default function ParticipantInfoStep({
             <button
               type="button"
               className="apply-btn"
-              onClick={onApply}
+              onClick={handleApplyClick}
             >
               신청하기
             </button>

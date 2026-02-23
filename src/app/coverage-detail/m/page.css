@@ -5,7 +5,14 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f5f7fb;
+}
+
+.coverage-detail-mobile-page .coverage-detail-section {
+  margin-top: 20px;
+}
+
+.coverage-detail-mobile-page .coverage-detail-section:first-of-type {
+  margin-top: 0;
 }
 
 .coverage-detail-loading {

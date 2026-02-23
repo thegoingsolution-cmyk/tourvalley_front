@@ -38,6 +38,20 @@ function MobileCoverageDetailContent() {
   const insuranceType = insuranceTypeParam as InsuranceType;
   const planType = planTypeParam as PlanType;
   const needsMedicalExpenseDistinction = insuranceType === '국내여행보험' || insuranceType === '해외여행보험';
+  const openGuidePopup = (url: string) => {
+    const w = 650;
+    const h = 700;
+    const left = Math.max(0, (window.screen.width - w) / 2);
+    const top = Math.max(0, (window.screen.height - h) / 2);
+    const features = `popup=yes,width=${w},height=${h},left=${left},top=${top},scrollbars=yes,resizable=yes,toolbar=no,menubar=no,location=no,status=no`;
+    const popup = window.open('about:blank', 'guidePopup', features);
+    if (!popup) {
+      alert('팝업이 차단되었습니다. 브라우저 설정에서 팝업을 허용해주세요.');
+      return;
+    }
+    popup.location.replace(url);
+    popup.focus();
+  };
   const needsCurrencyPlanDistinction = insuranceType === '유학/어학연수' || insuranceType === '해외출장/주재원/교환교수';
 
   const [coverageData, setCoverageData] = useState<PlanCoverage | null>(null);
@@ -130,11 +144,17 @@ function MobileCoverageDetailContent() {
               <p className="tour2023_title04">{coverageData.planName}</p>
               <p className="tour2023_Line01"></p>
               {coverageData.sections.map((section: CoverageSection, sectionIndex: number) => (
-                <section key={sectionIndex}>
+                <section key={sectionIndex} className="coverage-detail-section">
                   <p className="tour2023_txt18">
                     <span className="tour2023_blue">{section.title}</span>
                     {section.helpUrl ? (
-                      <a href={section.helpUrl} target="_blank" rel="noopener noreferrer">
+                      <a
+                        href={section.helpUrl}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          openGuidePopup(section.helpUrl as string);
+                        }}
+                      >
                         <img src="/images/icon_tip.png" alt="도움말 보기" className="icon_tip icon_tip01" />
                       </a>
                     ) : (

@@ -158,8 +158,8 @@ function PCPremiumDetailContent() {
                               className="plan-badge-btn"
                               onClick={() => {
                                 const url = `/coverage-detail?planType=${participant.planType}&hasMedicalExpense=${hasMedicalExpense}`;
-                                const w = 620;
-                                const h = 540;
+                                const w = 650;
+                                const h = 700;
                                 const left = Math.max(0, (window.screen.width - w) / 2);
                                 const top = Math.max(0, (window.screen.height - h) / 2);
                                 const popup = window.open(

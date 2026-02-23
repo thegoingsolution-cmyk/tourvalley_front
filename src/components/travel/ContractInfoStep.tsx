@@ -241,7 +241,15 @@ export default function ContractInfoStep({
                         hasMedicalExpense: hasMedicalExpense,
                       };
                       localStorage.setItem('premiumDetailData', JSON.stringify(data));
-                      window.open('/premium-detail', '_blank');
+                      const width = 650;
+                      const height = 700;
+                      const left = (window.screen.width - width) / 2;
+                      const top = (window.screen.height - height) / 2;
+                      window.open(
+                        '/premium-detail',
+                        'premiumDetail',
+                        `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
+                      );
                     }}
                   >
                     자세히보기
