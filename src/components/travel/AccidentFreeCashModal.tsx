@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 interface AccidentFreeCashModalProps {
   isOpen: boolean;
@@ -29,14 +30,13 @@ const AccidentFreeCashModal: React.FC<AccidentFreeCashModalProps> = ({ isOpen, o
             <img src="/images/cash01.png" alt="무사고캐시" className="cash_icon_pc" />
           </p>
           <div>
-            <a 
+            <Link 
               href="/contracts" 
-              target="_blank" 
-              rel="noopener noreferrer"
               className="btn_b tour2023PC_btn01"
+              onClick={onClose}
             >
               무사고캐시 조회/적립하기
-            </a>
+            </Link>
           </div>
         </div>
         
