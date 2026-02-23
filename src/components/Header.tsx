@@ -20,18 +20,19 @@ export default function Header({ isMobile = false, onOpenAccidentFreeCashModal }
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const pathname = usePathname();
 
-  // 단체여행보험 팝업 열기
+  // 단체여행보험 팝업 열기 (화면 가운데, 멀티모니터·태스크바 고려)
   const openGroupInsurancePopup = () => {
     const width = 870;
     const height = 930;
-    const left = (window.screen.width - width) / 2;
-    const top = (window.screen.height - height) / 2;
-    
-    window.open(
-      '/group-insurance/domestic/popup',
-      'groupInsurancePopup',
-      `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
-    );
+    const screenObj = typeof window !== 'undefined' ? (window.screen as Screen & { availLeft?: number; availTop?: number }) : { availLeft: 0, availTop: 0 };
+    const availLeft = screenObj.availLeft ?? 0;
+    const availTop = screenObj.availTop ?? 0;
+    const availWidth = window.screen.availWidth;
+    const availHeight = window.screen.availHeight;
+    const left = availLeft + Math.max(0, Math.round((availWidth - width) / 2));
+    const top = availTop + Math.max(0, Math.round((availHeight - height) / 2));
+    const features = `width=${width},height=${height},left=${left},top=${top},screenX=${left},screenY=${top},scrollbars=yes,resizable=yes`;
+    window.open('/group-insurance/domestic/popup', 'groupInsurancePopup', features);
   };
   
   // 인증 상태 가져오기

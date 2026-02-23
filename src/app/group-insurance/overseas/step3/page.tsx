@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import '../../popup/page.css';
+import { useAuth } from '@/contexts/AuthContext';
+import { getCorporateMemberInfo } from '@/services/authService';
 import { calculateAgeAndGenderFromResidentNumber } from '@/utils/age';
 
 const normalizePlanType = (planCd: string): string => {
@@ -17,6 +19,8 @@ const normalizePlanType = (planCd: string): string => {
 };
 
 export default function OverseasInsuranceStep3Page() {
+  const { isLoggedIn, member, isLoading } = useAuth();
+  const [corporateName, setCorporateName] = useState<string | null>(null);
   const [tourNum, setTourNum] = useState(1);
   const [insuredList, setInsuredList] = useState<any[]>([]);
   const [planTypes, setPlanTypes] = useState<{ [key: number]: 'V' | 'N' }>({}); // V: 국내실손 담보, N: 국내실손 부담보
@@ -49,6 +53,18 @@ export default function OverseasInsuranceStep3Page() {
     });
     return changed ? next : plans;
   };
+
+  useEffect(() => {
+    if (isLoggedIn && member?.member_type === '법인') {
+      getCorporateMemberInfo(member.id)
+        .then((result) => {
+          if (result.success && result.corporate) setCorporateName(result.corporate.company_name);
+        })
+        .catch(() => setCorporateName(null));
+    } else {
+      setCorporateName(null);
+    }
+  }, [isLoggedIn, member]);
 
   useEffect(() => {
     const step1Data = localStorage.getItem('overseasInsuranceStep1');
@@ -419,10 +435,20 @@ export default function OverseasInsuranceStep3Page() {
         <div className="tour2023_pc_SpeedTop">
           <p className="tour2023_pc_SpeedTop_icon"></p>
           <p className="tour2023_pc_SpeedTop01">
-            <span className="tour2023_pc_SpeedTop_title">단체여행자보험<em className="tour2023_pc_SpeedTop_title01">(법인/단체)</em></span>
+            <span
+              className="tour2023_pc_SpeedTop_title"
+              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', flexWrap: 'wrap', gap: 8 }}
+            >
+              <span>단체여행자보험<em className="tour2023_pc_SpeedTop_title01">(법인/단체)</em></span>
+              {!isLoading && isLoggedIn && member && (
+                <span className="tour2023_pc_SpeedTop_loginUser" style={{ fontSize: 14, color: '#4d60d6', fontWeight: 500 }}>
+                  {member.member_type === '법인' && corporateName ? corporateName : member.name}님
+                </span>
+              )}
+            </span>
             <span className="tour2023_pc_SpeedTop_title02">사업자등록증(고유번호증) 있는 법인/단체 포괄회원 가입으로 보다 편리하게 이용하실 수 있습니다.</span>
           </p>
-          <a className="close" href="javascript:window.close();">닫기</a>
+          <a className="close" href="#" onClick={(e) => { e.preventDefault(); window.close(); }} style={{ top: 8 }}>닫기</a>
         </div>
       </section>
 

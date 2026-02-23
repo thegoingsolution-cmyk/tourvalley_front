@@ -2,11 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { getCorporateMemberInfo } from '@/services/authService';
 import { requestNicepayPayment, openNicepayWindow, processNaverPayPayment, processKakaoPayPayment } from '@/services/paymentService';
 import '../../popup/page.css';
 
 export default function LongStayInsuranceStep5Page() {
-  const { member, isLoggedIn } = useAuth();
+  const { isLoggedIn, member, isLoading } = useAuth();
+  const [corporateName, setCorporateName] = useState<string | null>(null);
   const [payMethod, setPayMethod] = useState('C');
   const [allAgree, setAllAgree] = useState(false);
   const [step1Data, setStep1Data] = useState<any>(null);
@@ -56,7 +58,93 @@ export default function LongStayInsuranceStep5Page() {
     return map[planCode] || '실속플랜';
   };
   const getPlanDisplayName = (planCode: string) => getPlanType(planCode);
+
+  const continentPlaceLabels: { [key: string]: { value: string; label: string }[] } = {
+    EU: [
+      { value: 'GR', label: '그리스' },
+      { value: 'NL', label: '네덜란드' },
+      { value: 'NO', label: '노르웨이' },
+      { value: 'DK', label: '덴마크' },
+      { value: 'DE', label: '독일' },
+      { value: 'RU', label: '러시아' },
+      { value: 'BE', label: '벨기에' },
+      { value: 'SE', label: '스웨덴' },
+      { value: 'ES', label: '스페인' },
+      { value: 'CH', label: '스위스' },
+      { value: 'GB', label: '영국' },
+      { value: 'AT', label: '오스트리아' },
+      { value: 'IT', label: '이탈리아' },
+      { value: 'CZ', label: '체코' },
+      { value: 'PT', label: '포르투갈' },
+      { value: 'PL', label: '폴란드' },
+      { value: 'FI', label: '핀란드' },
+      { value: 'FR', label: '프랑스' },
+      { value: 'HU', label: '헝가리' },
+    ],
+    AS: [
+      { value: 'TW', label: '대만' },
+      { value: 'MY', label: '말레이시아' },
+      { value: 'MN', label: '몽골' },
+      { value: 'VN', label: '베트남' },
+      { value: 'SG', label: '싱가포르' },
+      { value: 'IN', label: '인도' },
+      { value: 'ID', label: '인도네시아' },
+      { value: 'UZ', label: '우즈베키스탄' },
+      { value: 'JP', label: '일본' },
+      { value: 'CN', label: '중국' },
+      { value: 'KZ', label: '카자흐스탄' },
+      { value: 'TH', label: '태국' },
+      { value: 'PH', label: '필리핀' },
+      { value: 'HK', label: '홍콩' },
+    ],
+    AF: [
+      { value: 'ZA', label: '남아프리카공화국' },
+      { value: 'MA', label: '모로코' },
+      { value: 'EG', label: '이집트' },
+      { value: 'KE', label: '케냐' },
+      { value: 'TZ', label: '탄자니아' },
+    ],
+    AU: [
+      { value: 'NZ', label: '뉴질랜드' },
+      { value: 'PG', label: '파푸아뉴기니' },
+      { value: 'FJ', label: '피지' },
+      { value: 'AU', label: '호주' },
+    ],
+    NA: [
+      { value: 'MX', label: '멕시코' },
+      { value: 'US', label: '미국' },
+      { value: 'CU', label: '쿠바' },
+      { value: 'CA', label: '캐나다' },
+    ],
+    SA: [
+      { value: 'BR', label: '브라질' },
+      { value: 'AR', label: '아르헨티나' },
+      { value: 'CL', label: '칠레' },
+      { value: 'CO', label: '콜롬비아' },
+      { value: 'PE', label: '페루' },
+    ],
+  };
+
+  const getTourPlaceLabel = (continentCode?: string, placeCode?: string) => {
+    if (!continentCode || !placeCode) return '';
+    const places = continentPlaceLabels[continentCode];
+    const selected = places?.find((place) => place.value === placeCode);
+    return selected?.label || '';
+  };
+
   const [insuredList, setInsuredList] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (isLoggedIn && member?.member_type === '법인') {
+      getCorporateMemberInfo(member.id)
+        .then((result) => {
+          if (result.success && result.corporate) setCorporateName(result.corporate.company_name);
+        })
+        .catch(() => setCorporateName(null));
+    } else {
+      setCorporateName(null);
+    }
+  }, [isLoggedIn, member]);
 
   useEffect(() => {
     // 결제 완료 후 리다이렉트 확인
@@ -851,14 +939,22 @@ export default function LongStayInsuranceStep5Page() {
           <div className="tour2023_pc_SpeedTop">
             <p className="tour2023_pc_SpeedTop_icon"></p>
             <p className="tour2023_pc_SpeedTop01">
-              <span className="tour2023_pc_SpeedTop_title">
-                단체여행자보험<em className="tour2023_pc_SpeedTop_title01">(법인/단체)</em>
+              <span
+                className="tour2023_pc_SpeedTop_title"
+                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', flexWrap: 'wrap', gap: 8 }}
+              >
+                <span>단체여행자보험<em className="tour2023_pc_SpeedTop_title01">(법인/단체)</em></span>
+                {!isLoading && isLoggedIn && member && (
+                  <span className="tour2023_pc_SpeedTop_loginUser" style={{ fontSize: 14, color: '#4d60d6', fontWeight: 500 }}>
+                    {member.member_type === '법인' && corporateName ? corporateName : member.name}님
+                  </span>
+                )}
               </span>
               <span className="tour2023_pc_SpeedTop_title02">
                 사업자등록증(고유번호증) 있는 법인/단체 포괄회원 가입으로 보다 편리하게 이용하실 수 있습니다.
               </span>
             </p>
-            <a className="close" href="#" onClick={(e) => { e.preventDefault(); window.close(); }}>
+            <a className="close" href="#" onClick={(e) => { e.preventDefault(); window.close(); }} style={{ top: 8 }}>
               닫기
             </a>
           </div>
@@ -976,14 +1072,22 @@ export default function LongStayInsuranceStep5Page() {
         <div className="tour2023_pc_SpeedTop">
           <p className="tour2023_pc_SpeedTop_icon"></p>
           <p className="tour2023_pc_SpeedTop01">
-            <span className="tour2023_pc_SpeedTop_title">
-              단체여행자보험<em className="tour2023_pc_SpeedTop_title01">(법인/단체)</em>
+            <span
+              className="tour2023_pc_SpeedTop_title"
+              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', flexWrap: 'wrap', gap: 8 }}
+            >
+              <span>단체여행자보험<em className="tour2023_pc_SpeedTop_title01">(법인/단체)</em></span>
+              {!isLoading && isLoggedIn && member && (
+                <span className="tour2023_pc_SpeedTop_loginUser" style={{ fontSize: 14, color: '#4d60d6', fontWeight: 500 }}>
+                  {member.member_type === '법인' && corporateName ? corporateName : member.name}님
+                </span>
+              )}
             </span>
             <span className="tour2023_pc_SpeedTop_title02">
               사업자등록증(고유번호증) 있는 법인/단체 포괄회원 가입으로 보다 편리하게 이용하실 수 있습니다.
             </span>
           </p>
-          <a className="close" href="#" onClick={(e) => { e.preventDefault(); window.close(); }}>
+          <a className="close" href="#" onClick={(e) => { e.preventDefault(); window.close(); }} style={{ top: 8 }}>
             닫기
           </a>
         </div>
@@ -1028,7 +1132,7 @@ export default function LongStayInsuranceStep5Page() {
                   </tr>
                   <tr>
                     <td className="sName01">여행지</td>
-                    <td className="dd ag_left">{step1Data.tourPlace || '-'}</td>
+                    <td className="dd ag_left">{getTourPlaceLabel(step1Data.tourContinent, step1Data.tourPlace) || step1Data.tourPlace || '-'}</td>
                   </tr>
                   <tr>
                     <td className="sName01">가입인원</td>

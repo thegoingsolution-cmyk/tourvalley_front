@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { sendVerificationCode, verifyCode } from '@/services/smsService';
 import { confirmResetPassword, findMemberId, verifyResetPassword } from '@/services/authService';
@@ -41,6 +41,9 @@ export default function IdPasswordRecoveryForm({
   const [timerSeconds, setTimerSeconds] = useState(0);
   const [hasSentCode, setHasSentCode] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
+  const resno2Ref = useRef<HTMLInputElement>(null);
+  const resno3Ref = useRef<HTMLInputElement>(null);
+  const ctelRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (timerSeconds <= 0) return;
@@ -181,7 +184,7 @@ export default function IdPasswordRecoveryForm({
         memberType,
         name: memberType === 'I' ? name : undefined,
         companyName: memberType === 'C' ? name : undefined,
-        businessNumber: memberType === 'C' ? `${resno1}${resno2}${resno3}` : undefined,
+        businessNumber: memberType === 'C' ? `${resno1}-${resno2}-${resno3}` : undefined,
         birthDate: memberType === 'I' ? birthDate : undefined,
         gender: memberType === 'I' ? gender : undefined,
         phoneNumber,
@@ -203,7 +206,7 @@ export default function IdPasswordRecoveryForm({
       username: memberId,
       name: memberType === 'I' ? name : undefined,
       companyName: memberType === 'C' ? name : undefined,
-      businessNumber: memberType === 'C' ? `${resno1}${resno2}${resno3}` : undefined,
+      businessNumber: memberType === 'C' ? `${resno1}-${resno2}-${resno3}` : undefined,
       birthDate: memberType === 'I' ? birthDate : undefined,
       gender: memberType === 'I' ? gender : undefined,
       phoneNumber,
@@ -238,7 +241,7 @@ export default function IdPasswordRecoveryForm({
       username: memberId,
       name: memberType === 'I' ? name : undefined,
       companyName: memberType === 'C' ? name : undefined,
-      businessNumber: memberType === 'C' ? `${resno1}${resno2}${resno3}` : undefined,
+      businessNumber: memberType === 'C' ? `${resno1}-${resno2}-${resno3}` : undefined,
       birthDate: memberType === 'I' ? birthDate : undefined,
       gender: memberType === 'I' ? gender : undefined,
       phoneNumber,
@@ -318,7 +321,7 @@ export default function IdPasswordRecoveryForm({
                       </a>
                     </div>
                     <p className="tour2023_txt24">
-                      위 방법으로 확인이 안될시 02-1234-1234로 문의주시면
+                      위 방법으로 확인이 안될시 02-1599-2541로 문의주시면
                       <br />
                       본인 확인 후 처리 해드리겠습니다.
                     </p>
@@ -454,41 +457,50 @@ export default function IdPasswordRecoveryForm({
                         </div>
                       </div>
                     ) : (
-                      <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line03">
+                      <div className="tourGuard_form_tt mag5 tourG_mab03 idpass-business-number">
                         <label htmlFor="resno1">사업자번호</label>
-                        <input
-                          type="tel"
-                          id="resno1"
-                          name="resno1"
-                          maxLength={3}
-                          value={resno1}
-                          className="tourGuard_input_w03"
-                          onChange={(event) =>
-                            setResno1(normalizeNumberInput(event.target.value, 3))
-                          }
-                        />
-                        <input
-                          type="tel"
-                          id="resno2"
-                          name="resno2"
-                          maxLength={2}
-                          value={resno2}
-                          className="tourGuard_input_w03"
-                          onChange={(event) =>
-                            setResno2(normalizeNumberInput(event.target.value, 2))
-                          }
-                        />
-                        <input
-                          type="tel"
-                          id="resno3"
-                          name="resno3"
-                          maxLength={5}
-                          value={resno3}
-                          className="tourGuard_input_w03"
-                          onChange={(event) =>
-                            setResno3(normalizeNumberInput(event.target.value, 5))
-                          }
-                        />
+                        <div className="idpass-business-number-row">
+                          <input
+                            type="tel"
+                            id="resno1"
+                            name="resno1"
+                            maxLength={3}
+                            value={resno1}
+                            onChange={(event) => {
+                              const v = normalizeNumberInput(event.target.value, 3);
+                              setResno1(v);
+                              if (v.length === 3) resno2Ref.current?.focus();
+                            }}
+                          />
+                          <span className="idpass-business-number-sep" aria-hidden />
+                          <input
+                            ref={resno2Ref}
+                            type="tel"
+                            id="resno2"
+                            name="resno2"
+                            maxLength={2}
+                            value={resno2}
+                            onChange={(event) => {
+                              const v = normalizeNumberInput(event.target.value, 2);
+                              setResno2(v);
+                              if (v.length === 2) resno3Ref.current?.focus();
+                            }}
+                          />
+                          <span className="idpass-business-number-sep" aria-hidden />
+                          <input
+                            ref={resno3Ref}
+                            type="tel"
+                            id="resno3"
+                            name="resno3"
+                            maxLength={5}
+                            value={resno3}
+                            onChange={(event) => {
+                              const v = normalizeNumberInput(event.target.value, 5);
+                              setResno3(v);
+                              if (v.length === 5) ctelRef.current?.focus();
+                            }}
+                          />
+                        </div>
                       </div>
                     )}
 
@@ -497,6 +509,7 @@ export default function IdPasswordRecoveryForm({
                         {memberType === 'C' ? '담당자 휴대폰 번호' : '휴대폰 번호'}
                       </label>
                       <input
+                        ref={ctelRef}
                         type="tel"
                         id="ctel_no"
                         name="ctel_no"
@@ -548,7 +561,7 @@ export default function IdPasswordRecoveryForm({
                       </a>
                     </div>
                     <p className="tour2023_txt24">
-                      위 방법으로 확인이 안될시 02-1234-1234로 문의주시면
+                      위 방법으로 확인이 안될시 02-1599-2541로 문의주시면
                       <br />
                       본인 확인 후 처리 해드리겠습니다.
                     </p>

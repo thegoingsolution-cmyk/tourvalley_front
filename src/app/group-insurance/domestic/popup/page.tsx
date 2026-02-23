@@ -5,6 +5,8 @@ import DatePicker, { registerLocale } from 'react-datepicker';
 import { ko } from 'date-fns/locale';
 import { format, parse } from 'date-fns';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useAuth } from '@/contexts/AuthContext';
+import { getCorporateMemberInfo } from '@/services/authService';
 import '../../popup/page.css';
 
 // 한국어 locale 등록
@@ -25,6 +27,8 @@ const parseDate = (dateString: string): Date | null => {
 };
 
 export default function DomesticInsurancePopupPage() {
+  const { isLoggedIn, member, isLoading } = useAuth();
+  const [corporateName, setCorporateName] = useState<string | null>(null);
   const [startDate, setStartDate] = useState('');
   const [startHour, setStartHour] = useState('01');
   const [endDate, setEndDate] = useState('');
@@ -38,6 +42,21 @@ export default function DomesticInsurancePopupPage() {
   const [userHasInteractedWithEndDate, setUserHasInteractedWithEndDate] = useState(false);
   const initialStartDateRef = useRef('');
   const initialEndDateRef = useRef('');
+
+  // 법인 회원일 경우 법인명 가져오기
+  useEffect(() => {
+    if (isLoggedIn && member?.member_type === '법인') {
+      getCorporateMemberInfo(member.id)
+        .then((result) => {
+          if (result.success && result.corporate) {
+            setCorporateName(result.corporate.company_name);
+          }
+        })
+        .catch(() => setCorporateName(null));
+    } else {
+      setCorporateName(null);
+    }
+  }, [isLoggedIn, member]);
 
   useEffect(() => {
     const now = new Date();
@@ -106,14 +125,22 @@ export default function DomesticInsurancePopupPage() {
         <div className="tour2023_pc_SpeedTop">
           <p className="tour2023_pc_SpeedTop_icon"></p>
           <p className="tour2023_pc_SpeedTop01">
-            <span className="tour2023_pc_SpeedTop_title">
-              단체여행자보험<em className="tour2023_pc_SpeedTop_title01">(법인/단체)</em>
+            <span
+              className="tour2023_pc_SpeedTop_title"
+              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', flexWrap: 'wrap', gap: 8 }}
+            >
+              <span>단체여행자보험<em className="tour2023_pc_SpeedTop_title01">(법인/단체)</em></span>
+              {!isLoading && isLoggedIn && member && (
+                <span className="tour2023_pc_SpeedTop_loginUser" style={{ fontSize: 14, color: '#4d60d6', fontWeight: 500 }}>
+                  {member.member_type === '법인' && corporateName ? corporateName : member.name}님
+                </span>
+              )}
             </span>
             <span className="tour2023_pc_SpeedTop_title02">
               사업자등록증(고유번호증) 있는 법인/단체 포괄회원 가입으로 보다 편리하게 이용하실 수 있습니다.
             </span>
           </p>
-          <a className="close" href="#" onClick={(e) => { e.preventDefault(); window.close(); }}>닫기</a>
+          <a className="close" href="#" onClick={(e) => { e.preventDefault(); window.close(); }} style={{ top: 8 }}>닫기</a>
         </div>
       </section>
 

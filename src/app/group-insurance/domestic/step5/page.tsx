@@ -2,11 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { getCorporateMemberInfo } from '@/services/authService';
 import { requestNicepayPayment, openNicepayWindow, processNaverPayPayment, processKakaoPayPayment } from '@/services/paymentService';
 import '../../popup/page.css';
 
 export default function DomesticInsuranceStep5Page() {
-  const { member, isLoggedIn } = useAuth();
+  const { member, isLoggedIn, isLoading } = useAuth();
+  const [corporateName, setCorporateName] = useState<string | null>(null);
   const [payMethod, setPayMethod] = useState('C');
   const [allAgree, setAllAgree] = useState(false);
   const [step1Data, setStep1Data] = useState<any>(null);
@@ -51,6 +53,18 @@ export default function DomesticInsuranceStep5Page() {
     return map[planCode] || planCode || '실속플랜';
   };
   const getPlanDisplayName = (planCode: string) => getPlanType(planCode);
+
+  useEffect(() => {
+    if (isLoggedIn && member?.member_type === '법인') {
+      getCorporateMemberInfo(member.id)
+        .then((result) => {
+          if (result.success && result.corporate) setCorporateName(result.corporate.company_name);
+        })
+        .catch(() => setCorporateName(null));
+    } else {
+      setCorporateName(null);
+    }
+  }, [isLoggedIn, member]);
 
   useEffect(() => {
     // 결제 완료 후 리다이렉트 확인
@@ -659,14 +673,22 @@ export default function DomesticInsuranceStep5Page() {
           <div className="tour2023_pc_SpeedTop">
             <p className="tour2023_pc_SpeedTop_icon"></p>
             <p className="tour2023_pc_SpeedTop01">
-              <span className="tour2023_pc_SpeedTop_title">
-                단체여행자보험<em className="tour2023_pc_SpeedTop_title01">(법인/단체)</em>
+              <span
+                className="tour2023_pc_SpeedTop_title"
+                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', flexWrap: 'wrap', gap: 8 }}
+              >
+                <span>단체여행자보험<em className="tour2023_pc_SpeedTop_title01">(법인/단체)</em></span>
+                {!isLoading && isLoggedIn && member && (
+                  <span className="tour2023_pc_SpeedTop_loginUser" style={{ fontSize: 14, color: '#4d60d6', fontWeight: 500 }}>
+                    {member.member_type === '법인' && corporateName ? corporateName : member.name}님
+                  </span>
+                )}
               </span>
               <span className="tour2023_pc_SpeedTop_title02">
                 사업자등록증(고유번호증) 있는 법인/단체 포괄회원 가입으로 보다 편리하게 이용하실 수 있습니다.
               </span>
             </p>
-            <a className="close" href="#" onClick={(e) => { e.preventDefault(); window.close(); }}>
+            <a className="close" href="#" onClick={(e) => { e.preventDefault(); window.close(); }} style={{ top: 8 }}>
               닫기
             </a>
           </div>
@@ -784,14 +806,22 @@ export default function DomesticInsuranceStep5Page() {
         <div className="tour2023_pc_SpeedTop">
           <p className="tour2023_pc_SpeedTop_icon"></p>
           <p className="tour2023_pc_SpeedTop01">
-            <span className="tour2023_pc_SpeedTop_title">
-              단체여행자보험<em className="tour2023_pc_SpeedTop_title01">(법인/단체)</em>
+            <span
+              className="tour2023_pc_SpeedTop_title"
+              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', flexWrap: 'wrap', gap: 8 }}
+            >
+              <span>단체여행자보험<em className="tour2023_pc_SpeedTop_title01">(법인/단체)</em></span>
+              {!isLoading && isLoggedIn && member && (
+                <span className="tour2023_pc_SpeedTop_loginUser" style={{ fontSize: 14, color: '#4d60d6', fontWeight: 500 }}>
+                  {member.member_type === '법인' && corporateName ? corporateName : member.name}님
+                </span>
+              )}
             </span>
             <span className="tour2023_pc_SpeedTop_title02">
               사업자등록증(고유번호증) 있는 법인/단체 포괄회원 가입으로 보다 편리하게 이용하실 수 있습니다.
             </span>
           </p>
-          <a className="close" href="#" onClick={(e) => { e.preventDefault(); window.close(); }}>
+          <a className="close" href="#" onClick={(e) => { e.preventDefault(); window.close(); }} style={{ top: 8 }}>
             닫기
           </a>
         </div>
