@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import '../../../agreement/pc/page.css';
+import '../coverage.css';
 
 const coverageItems = [
   {
@@ -36,6 +36,15 @@ export default function CoverageDiseasePage() {
   const router = useRouter();
 
   const handleClose = () => {
+    if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
+      try {
+        window.parent.postMessage({ type: 'COVERAGE_HELP_CLOSE_MODAL' }, window.location.origin);
+      } catch (error) {
+        console.error('도움말 모달 닫기 메시지 전송 오류:', error);
+      }
+      return;
+    }
+
     if (window.opener) {
       window.close();
     } else {

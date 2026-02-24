@@ -479,10 +479,18 @@ export default function PCEventInsurancePage() {
             href="#" 
             onClick={(e) => {
               e.preventDefault();
+              const popupWidth = 450;
+              const popupHeight = 800;
+              const screenX = window.screenX ?? window.screenLeft ?? 0;
+              const screenY = window.screenY ?? window.screenTop ?? 0;
+              const outerWidth = window.outerWidth ?? document.documentElement.clientWidth;
+              const outerHeight = window.outerHeight ?? document.documentElement.clientHeight;
+              const left = Math.max(0, Math.round(screenX + (outerWidth - popupWidth) / 2));
+              const top = Math.max(0, Math.round(screenY + (outerHeight - popupHeight) / 2));
               window.open(
                 '/event-insurance/guide',
                 'eventGuide',
-                'width=450,height=800,scrollbars=yes,resizable=yes'
+                `width=${popupWidth},height=${popupHeight},left=${left},top=${top},scrollbars=yes,resizable=yes`
               );
             }}
           >

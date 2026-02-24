@@ -314,10 +314,37 @@ export default function DomesticInsuranceStep3Page() {
   }, [selectedPlans, insuredList, availablePlansByIndex, startDate, endDate, scheduleCalculate]);
 
   const handlePlanChange = (index: number, planCd: string) => {
-    setSelectedPlans(prev => ({
-      ...prev,
-      [index]: normalizePlanType(planCd)
-    }));
+    setSelectedPlans(prev => {
+      const normalizedPlan = normalizePlanType(planCd);
+      const canUsePlan = (personIndex: number, plan: string) => {
+        const availablePlans = availablePlansByIndex[personIndex];
+        if (!availablePlans || availablePlans.length === 0) {
+          return true;
+        }
+        return availablePlans.includes(plan);
+      };
+      if (!canUsePlan(index, normalizedPlan)) {
+        return prev;
+      }
+      const newSelectedPlans = {
+        ...prev,
+        [index]: normalizedPlan
+      };
+
+      // 일반 플랜(실속/표준)인 경우에만 다른 피보험자들에게도 동일 플랜 일괄 적용
+      const normalPlans = ['실속플랜', '표준플랜'];
+      if (normalPlans.includes(normalizedPlan)) {
+        insuredList.forEach(person => {
+          if (person.index !== index && canUsePlan(person.index, normalizedPlan)) {
+            newSelectedPlans[person.index] = normalizedPlan;
+          }
+        });
+      }
+
+      const sanitizedPlans = sanitizeSelectedPlans(newSelectedPlans);
+      scheduleCalculate();
+      return sanitizedPlans;
+    });
   };
 
   const handleSubmit = () => {

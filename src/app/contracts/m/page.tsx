@@ -348,6 +348,26 @@ export default function MobileContractPage() {
 
   // 계약 리스트 영역 스크롤용 ref
   const contractListRef = useRef<HTMLDivElement>(null);
+  const memberContractListRef = useRef<HTMLDivElement>(null);
+  const eventContractListRef = useRef<HTMLDivElement>(null);
+
+  const scrollToNonMemberContractList = () => {
+    if (contractListRef.current) {
+      contractListRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const scrollToMemberContractList = () => {
+    if (memberContractListRef.current) {
+      memberContractListRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const scrollToEventContractList = () => {
+    if (eventContractListRef.current) {
+      eventContractListRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   // 로그인하지 않은 유저용: 계약 목록 조회
   const getNonMemberContractList = async (page: number = 1) => {
@@ -1333,6 +1353,7 @@ export default function MobileContractPage() {
                                 href="#" 
                                 onClick={(e) => {
                                   e.preventDefault();
+                                  scrollToNonMemberContractList();
                                   getNonMemberContractList(1);
                                 }}
                                 className="paging-nav-first"
@@ -1353,6 +1374,7 @@ export default function MobileContractPage() {
                                 href="#" 
                                 onClick={(e) => {
                                   e.preventDefault();
+                                  scrollToNonMemberContractList();
                                   getNonMemberContractList(nonMemberContractPagination.currentPage - 1);
                                 }}
                                 className="paging-nav-prev"
@@ -1386,6 +1408,7 @@ export default function MobileContractPage() {
                                   onClick={(e) => {
                                     e.preventDefault();
                                     if (page !== currentPage) {
+                                    scrollToNonMemberContractList();
                                       getNonMemberContractList(page);
                                     }
                                   }}
@@ -1403,6 +1426,7 @@ export default function MobileContractPage() {
                                 href="#" 
                                 onClick={(e) => {
                                   e.preventDefault();
+                                  scrollToNonMemberContractList();
                                   getNonMemberContractList(nonMemberContractPagination.currentPage + 1);
                                 }}
                                 className="paging-nav-next"
@@ -1420,6 +1444,7 @@ export default function MobileContractPage() {
                                 href="#" 
                                 onClick={(e) => {
                                   e.preventDefault();
+                                  scrollToNonMemberContractList();
                                   getNonMemberContractList(nonMemberContractPagination.totalPages);
                                 }}
                                 className="paging-nav-last"
@@ -1548,7 +1573,7 @@ export default function MobileContractPage() {
             </div>
 
             {/* 계약 리스트 */}
-            <div id="contractList" className="tourG_mat10" style={{}}>
+            <div id="contractList" ref={memberContractListRef} className="tourG_mat10" style={{}}>
               {searchType === 'contract' ? (
                 contracts.length === 0 ? (
                   <>
@@ -1684,6 +1709,7 @@ export default function MobileContractPage() {
                                 href="#" 
                                 onClick={(e) => {
                                   e.preventDefault();
+                                    scrollToMemberContractList();
                                   getContractList(1);
                                 }}
                                 className="paging-nav-first"
@@ -1704,6 +1730,7 @@ export default function MobileContractPage() {
                                 href="#" 
                                 onClick={(e) => {
                                   e.preventDefault();
+                                    scrollToMemberContractList();
                                   getContractList(contractPagination.currentPage - 1);
                                 }}
                                 className="paging-nav-prev"
@@ -1737,6 +1764,7 @@ export default function MobileContractPage() {
                                   onClick={(e) => {
                                     e.preventDefault();
                                     if (page !== currentPage) {
+                                      scrollToMemberContractList();
                                       getContractList(page);
                                     }
                                   }}
@@ -1754,6 +1782,7 @@ export default function MobileContractPage() {
                                 href="#" 
                                 onClick={(e) => {
                                   e.preventDefault();
+                                    scrollToMemberContractList();
                                   getContractList(contractPagination.currentPage + 1);
                                 }}
                                 className="paging-nav-next"
@@ -1771,6 +1800,7 @@ export default function MobileContractPage() {
                                 href="#" 
                                 onClick={(e) => {
                                   e.preventDefault();
+                                    scrollToMemberContractList();
                                   getContractList(contractPagination.totalPages);
                                 }}
                                 className="paging-nav-last"
@@ -1799,6 +1829,7 @@ export default function MobileContractPage() {
                   </>
                 ) : (
                   <>
+                    <div ref={eventContractListRef}></div>
                     {(() => {
                       const formatEventDate = (dateStr: string) => {
                         if (!dateStr) return '-';
@@ -1911,6 +1942,7 @@ export default function MobileContractPage() {
                                 href="#" 
                                 onClick={(e) => {
                                   e.preventDefault();
+                                    scrollToEventContractList();
                                   getEventContractList(1);
                                 }}
                                 className="paging-nav-first"
@@ -1931,6 +1963,7 @@ export default function MobileContractPage() {
                                 href="#" 
                                 onClick={(e) => {
                                   e.preventDefault();
+                                    scrollToEventContractList();
                                   getEventContractList(eventContractPagination.currentPage - 1);
                                 }}
                                 className="paging-nav-prev"
@@ -1964,6 +1997,7 @@ export default function MobileContractPage() {
                                   onClick={(e) => {
                                     e.preventDefault();
                                     if (page !== currentPage) {
+                                      scrollToEventContractList();
                                       getEventContractList(page);
                                     }
                                   }}
@@ -1981,6 +2015,7 @@ export default function MobileContractPage() {
                                 href="#" 
                                 onClick={(e) => {
                                   e.preventDefault();
+                                    scrollToEventContractList();
                                   getEventContractList(eventContractPagination.currentPage + 1);
                                 }}
                                 className="paging-nav-next"
@@ -1998,6 +2033,7 @@ export default function MobileContractPage() {
                                 href="#" 
                                 onClick={(e) => {
                                   e.preventDefault();
+                                    scrollToEventContractList();
                                   getEventContractList(eventContractPagination.totalPages);
                                 }}
                                 className="paging-nav-last"

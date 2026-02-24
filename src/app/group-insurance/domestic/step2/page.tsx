@@ -272,7 +272,6 @@ export default function DomesticInsuranceStep2Page() {
     
     for (let i = 1; i <= tourNum; i++) {
       const nameInput = document.querySelector(`input[name="insured_name_${i}"]`) as HTMLInputElement;
-      const engNameInput = document.querySelector(`input[name="insured_engname_${i}"]`) as HTMLInputElement;
       const birthInput = document.querySelector(`input[name="birth_${i}"]`) as HTMLInputElement;
       const genderInput = document.querySelector(`input[name="gender_${i}"]:checked`) as HTMLInputElement;
       const countryTypeSelect = document.querySelector(`select[name="country_type_${i}"]`) as HTMLSelectElement;
@@ -283,11 +282,6 @@ export default function DomesticInsuranceStep2Page() {
       
       if (nameInput) {
         step2Data[`insured_name_${i}`] = nameInput.value;
-      }
-      
-      // 영문 이름 저장
-      if (engNameInput) {
-        step2Data[`insured_engname_${i}`] = engNameInput.value;
       }
       
       const countryType = countryTypeSelect?.value || 'D';
@@ -837,7 +831,6 @@ export default function DomesticInsuranceStep2Page() {
                     <colgroup>
                       <col width="7%" />
                       <col width="15%" />
-                      <col width="17%" />
                       <col width="34%" />
                       <col width="15%" />
                     </colgroup>
@@ -845,7 +838,6 @@ export default function DomesticInsuranceStep2Page() {
                       <tr>
                         <td className="sName ag_center">순번</td>
                         <td className="sName ag_center">성명</td>
-                        <td className="sName ag_center">영문이름</td>
                         <td className="sName ag_center">생년월일 / 성별</td>
                         <td className="sName ag_center">국적</td>
                       </tr>
@@ -862,13 +854,6 @@ export default function DomesticInsuranceStep2Page() {
                                 <div className="in_wrap01">
                                   <div className="bg_join input_cell_01">
                                     <input type="text" maxLength={15} className="tf_g" name={`insured_name_${index}`} style={{ imeMode: 'active' }} />
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="ag_center box line_03">
-                                <div className="in_wrap01">
-                                  <div className="bg_join input_cell_01">
-                                    <input type="text" maxLength={25} className="tf_g" name={`insured_engname_${index}`} style={{ imeMode: 'disabled' }} />
                                   </div>
                                 </div>
                               </td>
@@ -967,7 +952,6 @@ export default function DomesticInsuranceStep2Page() {
                 </div>
                 <div className="login_Btxt box01">
                   <dl>
-                    <dd className="font_red">영문증서가 필요한 경우에는 영문이름을 입력해 주시기 바랍니다.</dd>
                     <dd className="font_gray">외국인은 외국인 등록번호가 있어야 보험가입이 가능합니다.</dd>
                     <dd className="font_gray">여행자보험은 여행기간(보험기간)중 발생한 사고를 보장하는 보험입니다. 현재 치료중이거나 보험기간 이전 과거 상병으로 인한 치료는 보상받으실 수 없으며, 이를 보험계약시 알리지 않았다면 보상에 제한받으실 수도 있습니다.</dd>
                   </dl>

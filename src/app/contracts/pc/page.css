@@ -531,11 +531,36 @@
   border: none;
 }
 
-/* 인증받기 버튼 */
+/* 인증 입력란: 입력 + 확인/타이머 영역 감싸기 */
+.contract-page-pc .tourGuard_input_wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+/* 인증번호 행에서 확인 버튼 + 타이머를 한 줄로 배치 */
+.contract-page-pc .tourGuard_verify_right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.contract-page-pc .tourGuard_verify_right .tour2023_event_file {
+  position: static;
+  right: auto;
+  bottom: auto;
+  margin-right: 0;
+}
+
+/* 인증받기 버튼 (휴대폰 번호 행 등) */
 .contract-page-pc .tour2023_event_file {
   position: absolute;
   right: 10px;
-  bottom: 12px;  
+  bottom: 12px;
   margin-right: 0;
 }
 
@@ -566,8 +591,12 @@
   border-color: #4284e1;
 }
 
-/* 인증번호 입력 영역 */
+/* 인증번호 입력 영역 - 타이머 */
 .contract-page-pc .tour2023_timer {
+  margin-right: 0;
+}
+
+.contract-page-pc .tourGuard_verify_right .tour2023_timer {
   margin-right: 10px;
 }
 

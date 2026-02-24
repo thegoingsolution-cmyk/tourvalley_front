@@ -22,6 +22,7 @@ export default function PCContractPage() {
   const [inYear, setInYear] = useState<number>(1);
   const [cashInYear, setCashInYear] = useState<number>(1); // 무사고캐시 내역 조회용
   const [mileageInYear, setMileageInYear] = useState<number>(1); // 마일리지 내역 조회용
+  const memberContractPageSize = 3;
   
   // 계약 목록 데이터 (JSON)
   interface Contract {
@@ -44,7 +45,7 @@ export default function PCContractPage() {
     totalPages: number;
     totalCount: number;
     pageSize: number;
-  }>({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 3 });
+  }>({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: memberContractPageSize });
   
   // 행사보험 계약 목록 데이터
   interface EventContract {
@@ -155,15 +156,29 @@ export default function PCContractPage() {
   const [showServiceModal, setShowServiceModal] = useState(false);
   const [isVerified, setIsVerified] = useState(false); // 인증 완료 여부
   const [nonMemberContracts, setNonMemberContracts] = useState<Contract[]>([]); // 비회원 계약 목록
+  const nonMemberPageSize = 3;
   const [nonMemberContractPagination, setNonMemberContractPagination] = useState<{
     currentPage: number;
     totalPages: number;
     totalCount: number;
     pageSize: number;
-  }>({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
+  }>({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: nonMemberPageSize });
   
   // 계약 리스트 영역 스크롤용 ref
   const contractListRef = useRef<HTMLDivElement>(null);
+  const memberContractListRef = useRef<HTMLDivElement>(null);
+
+  const scrollToNonMemberContractList = () => {
+    if (contractListRef.current) {
+      contractListRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const scrollToMemberContractList = () => {
+    if (memberContractListRef.current) {
+      memberContractListRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   // 타이머 효과
   useEffect(() => {
@@ -425,12 +440,12 @@ export default function PCContractPage() {
           fullBirthDate = `${fullYear}${birthDate.substring(2, 6)}`;
         }
         
-        url = `${API_BASE_URL}/api/contracts/non-member/list?name=${encodeURIComponent(insuredName)}&birth_date=${fullBirthDate}&gender=${gender}&phone=${cleanedPhone}&inyear=${inYear}&block_type=C&str_cur_page=${page}`;
+        url = `${API_BASE_URL}/api/contracts/non-member/list?name=${encodeURIComponent(insuredName)}&birth_date=${fullBirthDate}&gender=${gender}&phone=${cleanedPhone}&inyear=${inYear}&block_type=C&str_cur_page=${page}&str_page_size=${nonMemberPageSize}`;
       } else {
         // 단체: 사업자번호, 회사명, 담당자 휴대폰 번호로 조회
         const businessNumber = `${businessNumber1}-${businessNumber2}-${businessNumber3}`;
         const cleanedPhone = companyPhoneNumber.replace(/-/g, '');
-        url = `${API_BASE_URL}/api/contracts/non-member/list?company_name=${encodeURIComponent(companyName)}&business_number=${encodeURIComponent(businessNumber)}&phone=${cleanedPhone}&inyear=${inYear}&block_type=C&str_cur_page=${page}`;
+        url = `${API_BASE_URL}/api/contracts/non-member/list?company_name=${encodeURIComponent(companyName)}&business_number=${encodeURIComponent(businessNumber)}&phone=${cleanedPhone}&inyear=${inYear}&block_type=C&str_cur_page=${page}&str_page_size=${nonMemberPageSize}`;
       }
 
       const response = await fetch(url, {
@@ -453,7 +468,7 @@ export default function PCContractPage() {
           currentPage: data.pagination?.currentPage || page,
           totalPages: data.pagination?.totalPages || 0,
           totalCount: data.pagination?.totalCount || 0,
-          pageSize: data.pagination?.pageSize || 10
+          pageSize: data.pagination?.pageSize || nonMemberPageSize
         });
         
         // 계약 리스트가 있으면 해당 영역으로 스크롤 이동
@@ -464,12 +479,12 @@ export default function PCContractPage() {
         }
       } else {
         setNonMemberContracts([]);
-        setNonMemberContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
+        setNonMemberContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: nonMemberPageSize });
       }
     } catch (error) {
       console.error('계약 목록 조회 오류:', error);
       setNonMemberContracts([]);
-      setNonMemberContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 10 });
+      setNonMemberContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: nonMemberPageSize });
     }
   };
 
@@ -531,7 +546,7 @@ export default function PCContractPage() {
 
     try {
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-      const response = await fetch(`${API_BASE_URL}/api/contracts/list?member_id=${member.id}&inyear=${inYear}&block_type=C&str_cur_page=${page}&str_page_size=3`, {
+      const response = await fetch(`${API_BASE_URL}/api/contracts/list?member_id=${member.id}&inyear=${inYear}&block_type=C&str_cur_page=${page}&str_page_size=${memberContractPageSize}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -550,16 +565,16 @@ export default function PCContractPage() {
           currentPage: data.pagination?.currentPage || page,
           totalPages: data.pagination?.totalPages || 0,
           totalCount: data.pagination?.totalCount || 0,
-          pageSize: data.pagination?.pageSize || 3
+          pageSize: data.pagination?.pageSize || memberContractPageSize
         });
       } else {
         setContracts([]);
-        setContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 3 });
+        setContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: memberContractPageSize });
       }
     } catch (error) {
       console.error('계약 목록 조회 오류:', error);
       setContracts([]);
-      setContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: 3 });
+      setContractPagination({ currentPage: 1, totalPages: 0, totalCount: 0, pageSize: memberContractPageSize });
     }
   };
 
@@ -1017,18 +1032,20 @@ export default function PCContractPage() {
                             }
                           }}
                         />
-                        <div className="tour2023_event_file">
-                          <button
-                            type="button"
-                            onClick={handleVerifyCode}
-                            className="tour2023_btn_b01 tour2023_btn11"
-                          >
-                            확인
-                          </button>
+                        <div className="tourGuard_verify_right">
+                          <div className="tour2023_timer">
+                            <span className="tour2023_timeLimit">{formatTime(remainingTime)}</span>
+                          </div>
+                          <div className="tour2023_event_file">
+                            <button
+                              type="button"
+                              onClick={handleVerifyCode}
+                              className="tour2023_btn_b01 tour2023_btn11"
+                            >
+                              확인
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                      <div className="tour2023_timer">
-                        <span className="tour2023_timeLimit">{formatTime(remainingTime)}</span>
                       </div>
                     </div>
                   )}
@@ -1137,18 +1154,20 @@ export default function PCContractPage() {
                             }
                           }}
                         />
-                        <div className="tour2023_event_file">
-                          <button
-                            type="button"
-                            onClick={handleVerifyCompanyCode}
-                            className="tour2023_btn_b01 tour2023_btn11"
-                          >
-                            확인
-                          </button>
+                        <div className="tourGuard_verify_right">
+                          <div className="tour2023_timer">
+                            <span className="tour2023_timeLimit">{formatTime(companyRemainingTime)}</span>
+                          </div>
+                          <div className="tour2023_event_file">
+                            <button
+                              type="button"
+                              onClick={handleVerifyCompanyCode}
+                              className="tour2023_btn_b01 tour2023_btn11"
+                            >
+                              확인
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                      <div className="tour2023_timer">
-                        <span className="tour2023_timeLimit">{formatTime(companyRemainingTime)}</span>
                       </div>
                     </div>
                   )}
@@ -1338,11 +1357,11 @@ export default function PCContractPage() {
                               href="#" 
                               onClick={(e) => {
                                 e.preventDefault();
-                                // 팝업창으로 상세보기 열기
+                                // 팝업창으로 상세보기 열기 (현재 창 가운데)
                                 const popupWidth = 500;
                                 const popupHeight = 700;
-                                const left = (window.screen.width - popupWidth) / 2;
-                                const top = (window.screen.height - popupHeight) / 2;
+                                const left = window.screenX + (window.outerWidth - popupWidth) / 2;
+                                const top = window.screenY + (window.outerHeight - popupHeight) / 2;
                                 
                                 window.open(
                                   `/contracts/detail/${contract.id}`,
@@ -1370,6 +1389,7 @@ export default function PCContractPage() {
                                 href="#" 
                                 onClick={(e) => {
                                   e.preventDefault();
+                                  scrollToNonMemberContractList();
                                   getNonMemberContractList(1);
                                 }}
                                 className="paging-nav-first"
@@ -1390,6 +1410,7 @@ export default function PCContractPage() {
                                 href="#" 
                                 onClick={(e) => {
                                   e.preventDefault();
+                                  scrollToNonMemberContractList();
                                   getNonMemberContractList(nonMemberContractPagination.currentPage - 1);
                                 }}
                                 className="paging-nav-prev"
@@ -1423,6 +1444,7 @@ export default function PCContractPage() {
                                   onClick={(e) => {
                                     e.preventDefault();
                                     if (page !== currentPage) {
+                                    scrollToNonMemberContractList();
                                       getNonMemberContractList(page);
                                     }
                                   }}
@@ -1440,6 +1462,7 @@ export default function PCContractPage() {
                                 href="#" 
                                 onClick={(e) => {
                                   e.preventDefault();
+                                  scrollToNonMemberContractList();
                                   getNonMemberContractList(nonMemberContractPagination.currentPage + 1);
                                 }}
                                 className="paging-nav-next"
@@ -1457,6 +1480,7 @@ export default function PCContractPage() {
                                 href="#" 
                                 onClick={(e) => {
                                   e.preventDefault();
+                                  scrollToNonMemberContractList();
                                   getNonMemberContractList(nonMemberContractPagination.totalPages);
                                 }}
                                 className="paging-nav-last"
@@ -1579,7 +1603,12 @@ export default function PCContractPage() {
               </div>
 
               {/* 계약 리스트 */}
-              <div id="contractList" className="tourG_mat10" style={{ marginTop: 0, paddingTop: 40 }}>
+              <div
+                id="contractList"
+                ref={memberContractListRef}
+                className="tourG_mat10"
+                style={{ marginTop: 0, paddingTop: 40 }}
+              >
                 {searchType === 'contract' ? (
                   // 여행자보험 목록
                   contracts.length === 0 ? (
@@ -1699,11 +1728,11 @@ export default function PCContractPage() {
                               href="#" 
                               onClick={(e) => {
                                 e.preventDefault();
-                                // 팝업창으로 상세보기 열기
+                                // 팝업창으로 상세보기 열기 (현재 창 가운데)
                                 const popupWidth = 500;
                                 const popupHeight = 700;
-                                const left = (window.screen.width - popupWidth) / 2;
-                                const top = (window.screen.height - popupHeight) / 2;
+                                const left = window.screenX + (window.outerWidth - popupWidth) / 2;
+                                const top = window.screenY + (window.outerHeight - popupHeight) / 2;
                                 
                                 window.open(
                                   `/contracts/detail/${contract.id}`,
@@ -1730,6 +1759,7 @@ export default function PCContractPage() {
                                   href="#" 
                                   onClick={(e) => {
                                     e.preventDefault();
+                                    scrollToMemberContractList();
                                     getContractList(1);
                                   }}
                                   className="paging-nav-first"
@@ -1750,6 +1780,7 @@ export default function PCContractPage() {
                                   href="#" 
                                   onClick={(e) => {
                                     e.preventDefault();
+                                    scrollToMemberContractList();
                                     getContractList(contractPagination.currentPage - 1);
                                   }}
                                   className="paging-nav-prev"
@@ -1783,6 +1814,7 @@ export default function PCContractPage() {
                                     onClick={(e) => {
                                       e.preventDefault();
                                       if (page !== currentPage) {
+                                      scrollToMemberContractList();
                                         getContractList(page);
                                       }
                                     }}
@@ -1800,6 +1832,7 @@ export default function PCContractPage() {
                                   href="#" 
                                   onClick={(e) => {
                                     e.preventDefault();
+                                    scrollToMemberContractList();
                                     getContractList(contractPagination.currentPage + 1);
                                   }}
                                   className="paging-nav-next"
@@ -1817,6 +1850,7 @@ export default function PCContractPage() {
                                   href="#" 
                                   onClick={(e) => {
                                     e.preventDefault();
+                                    scrollToMemberContractList();
                                     getContractList(contractPagination.totalPages);
                                   }}
                                   className="paging-nav-last"
@@ -2130,15 +2164,23 @@ export default function PCContractPage() {
                             const date = new Date(dateStr);
                             return date.toLocaleDateString('ko-KR');
                           };
+                          const formatPremium = (value?: number) => {
+                            if (value === null || value === undefined) return '-';
+                            const numericValue = Number(value);
+                            if (Number.isNaN(numericValue)) return '-';
+                            return `${numericValue.toLocaleString('ko-KR', {
+                              maximumFractionDigits: 0,
+                            })}원`;
+                          };
 
                           return (
                             <tr key={contract.id}>
                               <td>{contract.contract_number}</td>
                               <td>{contract.insurance_type}</td>
-                              <td>
+                              <td style={{ fontSize: '11px' }}>
                                 {formatDate(contract.departure_date)} ~ {formatDate(contract.arrival_date)}
                               </td>
-                              <td>{contract.total_premium ? contract.total_premium.toLocaleString() + '원' : '-'}</td>
+                              <td>{formatPremium(contract.total_premium)}</td>
                               <td style={{ color: '#1b37e1', fontWeight: '600' }}>
                                 {contract.eligibleCashAmount.toLocaleString()}원
                               </td>

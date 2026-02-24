@@ -1,0 +1,278 @@
+/* 여행자보험 가입신청내역서 (B2C 공통) */
+.b2c-cf-wrapper {
+  padding: 20px 0;
+  background: #fff;
+}
+
+.b2c-cf-container.cf-overseas-wrapper {
+  max-width: 800px !important;
+  margin: 0 auto;
+}
+
+.cf-overseas-wrapper {
+  max-width: 800px !important;
+}
+
+.cf-overseas {
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+  font-size: 13px;
+  color: #333;
+}
+
+.cf-overseas-header {
+  background: #1e4ea1;
+  color: #fff;
+  padding: 14px 20px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 0;
+}
+
+.cf-overseas-section {
+  margin-bottom: 0;
+}
+
+.cf-overseas-section-title {
+  background: #f0f0f0;
+  border: 1px solid #333;
+  border-bottom: none;
+  padding: 8px 12px;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.cf-overseas-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #333;
+  font-size: 12px;
+}
+
+.cf-overseas-table th,
+.cf-overseas-table td {
+  border: 1px solid #333;
+  padding: 8px 10px;
+  vertical-align: middle;
+}
+
+.cf-overseas-table th {
+  background: #f9f9f9;
+  font-weight: 700;
+  width: 120px;
+}
+
+.cf-overseas-table td {
+  min-height: 32px;
+}
+
+.cf-overseas-table .cf-dotted {
+  border-bottom: 1px dotted #999;
+  min-height: 20px;
+}
+
+/* 2열 레이아웃(기본정보, 계약자정보, 결제정보) */
+.cf-overseas-table--two-col th {
+  width: 140px;
+}
+
+.cf-overseas-table--two-col th:empty,
+.cf-overseas-table--two-col th.cf-empty {
+  background: #fff;
+  border-color: #333;
+}
+
+.cf-overseas-table--insured th {
+  width: auto;
+  white-space: nowrap;
+}
+
+.cf-overseas-table--insured .cf-sub {
+  font-size: 11px;
+  font-weight: 500;
+  color: #555;
+}
+
+.cf-overseas-table--coverage th {
+  width: auto;
+  text-align: left;
+}
+
+.cf-overseas-table--coverage .cf-amount {
+  width: 100px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.cf-overseas-table--coverage .cf-cat {
+  background: #e8e8e8;
+  font-weight: 700;
+}
+
+/* 플랜별 보장내용 테이블 */
+.cf-overseas-table--plans .cf-coverage-name {
+  width: 50%;
+  min-width: 200px;
+  text-align: left;
+  background: #f9f9f9;
+}
+
+.cf-overseas-table--plans .cf-coverage-amount-header {
+  text-align: center;
+  background: #f0f0f0;
+}
+
+.cf-overseas-table--plans .cf-plan-age {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: #555;
+}
+
+.cf-overseas-table--plans .cf-coverage-label {
+  padding-left: 12px;
+  text-align: left;
+}
+
+.cf-overseas-table--plans .cf-cat {
+  padding-left: 8px;
+  text-align: left;
+}
+
+.cf-overseas-notice {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  background: #fafafa;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #333;
+}
+
+.cf-overseas-notice h4 {
+  font-size: 13px;
+  font-weight: 700;
+  margin: 16px 0 8px;
+  color: #1e4ea1;
+}
+
+.cf-overseas-notice h4:first-child {
+  margin-top: 0;
+}
+
+.cf-overseas-notice ul {
+  margin: 4px 0;
+  padding-left: 18px;
+}
+
+.cf-overseas-notice li {
+  margin-bottom: 4px;
+}
+
+.cf-overseas-notice p {
+  margin: 6px 0;
+}
+
+.cf-overseas-notice .cf-note {
+  margin-top: 12px;
+  font-size: 11px;
+  color: #666;
+}
+
+.cf-overseas-footer {
+  margin-top: 24px;
+  font-size: 12px;
+  color: #333;
+}
+
+.cf-overseas-footer-intro {
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+
+.cf-overseas-footer-date {
+  margin: 0 0 12px;
+  line-height: 1.5;
+}
+
+.cf-overseas-footer-contact {
+  border-top: 1px solid #333;
+  border-bottom: 1px dotted #333;
+  background: #f0f0f0;
+  padding: 12px 14px;
+}
+
+.cf-overseas-footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.cf-overseas-footer-row:last-child {
+  margin-bottom: 0;
+}
+
+.cf-overseas-footer-left {
+  flex-shrink: 0;
+}
+
+.cf-overseas-footer-right {
+  text-align: right;
+}
+
+.cf-overseas--print-only {
+  padding: 0;
+  background: #fff;
+}
+
+.cf-overseas-loading,
+.cf-overseas-error {
+  padding: 40px 20px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.cf-overseas-error {
+  color: #c00;
+}
+
+@media print {
+  @page {
+    margin: 10mm;
+  }
+
+  html,
+  body {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .cf-overseas--print-only .b2c-cf-wrapper {
+    padding: 0;
+    background: #fff;
+  }
+  .cf-overseas-wrapper {
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  .cf-overseas {
+    padding: 0;
+    max-width: 100%;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  .cf-overseas-notice {
+    break-inside: avoid;
+  }
+}

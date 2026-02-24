@@ -189,7 +189,7 @@ function CustomerCenterContent() {
               <p className="customer-hero-highlight">투어밸리의 함께 하세요!</p>
             </div>
             <div className="customer-hero-buttons">
-              <button className="customer-hero-button" onClick={() => window.location.href = '/customer-center?view=main'}>가입/신청내역 조회</button>
+              <button className="customer-hero-button" onClick={() => window.location.href = '/contracts'}>가입/신청내역 조회</button>
               <button className="customer-hero-button" onClick={() => window.location.href = '/customer-center?view=qna'}>Q&A게시판</button>
             </div>
           </div>          

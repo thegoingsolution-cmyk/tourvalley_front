@@ -118,9 +118,9 @@ function MobileLongTermStayContent() {
   // 무통장입금 관련 상태
   const [depositBank, setDepositBank] = useState<string>('');
   const [depositorName, setDepositorName] = useState<string>('');
-  const [expectedDepositYear, setExpectedDepositYear] = useState<number>(0);
-  const [expectedDepositMonth, setExpectedDepositMonth] = useState<number>(0);
-  const [expectedDepositDay, setExpectedDepositDay] = useState<number>(0);
+  const [expectedDepositYear, setExpectedDepositYear] = useState<number>(new Date().getFullYear());
+  const [expectedDepositMonth, setExpectedDepositMonth] = useState<number>(new Date().getMonth() + 1);
+  const [expectedDepositDay, setExpectedDepositDay] = useState<number>(new Date().getDate());
   
   // 수기카드 관련 상태
   const [cardType, setCardType] = useState<'본인카드' | '기타카드'>('본인카드');

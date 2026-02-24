@@ -43,7 +43,12 @@ export default function ContractDetailPage() {
   };
 
   const handlePrint = () => {
-    window.print();
+    // B2C는 국내/해외/장기 구분 없이 모두 가입신청내역서(출력하기) 페이지로 열기
+    window.open(
+      `/confirmation?contractId=${contractId}`,
+      '_blank',
+      'noopener,noreferrer'
+    );
   };
 
   const handleClose = () => {
@@ -218,7 +223,10 @@ export default function ContractDetailPage() {
             계약정보
             <a 
               href="#" 
-              onClick={(e) => { e.preventDefault(); handlePrint(); }}
+              onClick={(e) => {
+                e.preventDefault();
+                handlePrint();
+              }}
               className="tour2023_btn_b02 tour2023_btn08" 
               style={{ float: 'right', fontWeight: 400, fontFamily: "'Noto Sans KR', sans-serif, 'Malgun Gothic', '맑은 고딕'" }}
             >
