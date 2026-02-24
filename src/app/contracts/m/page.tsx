@@ -1330,7 +1330,7 @@ export default function MobileContractPage() {
                             </li>
                             <li className="tour2023_conList">
                               <span className="tour2023_txt09">진행단계</span>
-                              <span className="tour2023_txt10">{contract.status}</span>
+                              <span className="tour2023_txt10">{contract.status === '등록' ? '가입신청' : contract.status}</span>
                             </li>
                           </ul>
                           <div className="tourG_line05 tourG_mat09 tourG_mab04"></div>
@@ -1686,7 +1686,7 @@ export default function MobileContractPage() {
                             </li>
                             <li className="tour2023_conList">
                               <span className="tour2023_txt09">진행단계</span>
-                              <span className="tour2023_txt10">{contract.status}</span>
+                              <span className="tour2023_txt10">{contract.status === '등록' ? '가입신청' : contract.status}</span>
                             </li>
                           </ul>
                           <div className="tourG_line05 tourG_mat09 tourG_mab04"></div>
@@ -1851,10 +1851,11 @@ export default function MobileContractPage() {
                       };
 
                       const getStatusDisplay = (status: string) => {
+                        const displayText = status === '등록' ? '가입신청' : status;
                         if (status === '등록' || status === '견적신청') {
-                          return <em className="tourGuard_red">{status}</em>;
+                          return <em className="tourGuard_red">{displayText}</em>;
                         }
-                        return status;
+                        return displayText;
                       };
 
                       return eventContracts.map((contract, index) => (
