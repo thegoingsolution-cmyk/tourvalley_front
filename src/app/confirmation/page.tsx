@@ -119,21 +119,68 @@ const formatNumber = (value?: number | null) => {
   return Math.floor(normalized).toLocaleString('ko-KR');
 };
 
+const B2C_CONFIRMATION_DRAFT_KEY = 'b2c_confirmation_draft';
+
 function ConfirmationContent() {
   const searchParams = useSearchParams();
   const contractIdParam = searchParams.get('contractId');
   const contractId = contractIdParam ?? null;
+  const isDraft = searchParams.get('draft') === '1';
 
   const [detail, setDetail] = useState<ContractDetail | null>(null);
   const [participants, setParticipants] = useState<Participant[]>([]);
-  const [loading, setLoading] = useState(!!contractId);
+  const [loading, setLoading] = useState(!!contractId || isDraft);
   const [error, setError] = useState<string | null>(null);
   const [plansCoverage, setPlansCoverage] = useState<(PlanCoverage | null)[]>([]);
   const [coverageLoading, setCoverageLoading] = useState(false);
   const [coverageError, setCoverageError] = useState<string | null>(null);
   const printTriggered = useRef(false);
+  const draftLoadedRef = useRef(false);
 
   useEffect(() => {
+    if (isDraft) {
+      if (draftLoadedRef.current) {
+        setLoading(false);
+        return;
+      }
+      try {
+        let raw: string | null = null;
+        let fromOpener = false;
+        if (typeof window !== 'undefined') {
+          const openerStorage = window.opener?.sessionStorage;
+          raw = openerStorage?.getItem(B2C_CONFIRMATION_DRAFT_KEY) ?? null;
+          if (raw) {
+            fromOpener = true;
+          } else {
+            raw = localStorage.getItem(B2C_CONFIRMATION_DRAFT_KEY);
+          }
+        }
+        if (!raw) {
+          setError('인쇄용 데이터가 없습니다. 계약정보 화면에서 다시 인쇄를 눌러주세요.');
+          setLoading(false);
+          return;
+        }
+        const parsed = JSON.parse(raw) as { detail?: ContractDetail; participants?: Participant[] };
+        if (parsed?.detail && Array.isArray(parsed.participants)) {
+          draftLoadedRef.current = true;
+          setDetail(parsed.detail);
+          setParticipants(parsed.participants);
+          if (typeof window !== 'undefined') {
+            if (fromOpener) {
+              window.opener?.sessionStorage?.removeItem(B2C_CONFIRMATION_DRAFT_KEY);
+            } else {
+              localStorage.removeItem(B2C_CONFIRMATION_DRAFT_KEY);
+            }
+          }
+        } else {
+          setError('인쇄용 데이터 형식이 올바르지 않습니다.');
+        }
+      } catch (e) {
+        setError('인쇄용 데이터를 불러올 수 없습니다.');
+      }
+      setLoading(false);
+      return;
+    }
     if (!contractId) {
       setError('계약 정보가 없습니다.');
       setLoading(false);
@@ -167,6 +214,7 @@ function ConfirmationContent() {
 
   useEffect(() => {
     if (!contractId || !detail) return;
+    if (isDraft) return;
     const fetchParticipants = async () => {
       try {
         const response = await fetch(`${API_BASE_URL}/api/contracts/${contractId}/participants`, {
@@ -204,7 +252,13 @@ function ConfirmationContent() {
     }
     setCoverageLoading(true);
     setCoverageError(null);
-    const insuranceType = detail.insuranceType === '해외여행' ? '해외여행보험' : detail.insuranceType;
+    const insuranceTypeRaw = detail.insuranceType ?? '';
+    const insuranceType =
+      insuranceTypeRaw === '해외여행' || insuranceTypeRaw === '해외여행자보험'
+        ? '해외여행보험'
+        : insuranceTypeRaw === '국내여행자보험'
+          ? '국내여행보험'
+          : insuranceTypeRaw;
     Promise.all(
       plans.map((p) =>
         fetch(`${API_BASE_URL}/api/travel/coverage-details`, {

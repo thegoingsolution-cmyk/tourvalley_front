@@ -1103,7 +1103,68 @@ export default function LongStayInsuranceStep5Page() {
           
           <div className="bgcolor_white">
             <p className="sub_title_02 ag_left pt10">5단계 : 보험료 결제</p>
-            <h2 className="sub_title pt30 ag_left">여행자보험 계약정보</h2>
+            <div className="pt30" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '16px' }}>
+              <h2 className="sub_title ag_left" style={{ margin: 0 }}>여행자보험 계약정보</h2>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!step1Data || !step2Data || !step3Data) {
+                    alert('계약 정보를 불러올 수 없습니다.');
+                    return;
+                  }
+                  const detailData = buildPremiumDetailData();
+                  if (!detailData) {
+                    alert('계약 정보를 불러올 수 없습니다.');
+                    return;
+                  }
+                  const { participants } = detailData;
+                  const departureDate = (step1Data.startDate || '').replace(/\./g, '-');
+                  const arrivalDate = (step1Data.endDate || '').replace(/\./g, '-');
+                  const draft = {
+                    detail: {
+                      id: 0,
+                      insuranceType: step2Data.travel_purpose || '해외장기체류보험',
+                      departureDate: departureDate || new Date().toISOString().slice(0, 10),
+                      arrivalDate: arrivalDate || new Date().toISOString().slice(0, 10),
+                      travelCountry: getTourPlaceLabel(step1Data.tourContinent, step1Data.tourPlace) || null,
+                      travelRegion: null,
+                      travelParticipants: step1Data.tourNum || participants.length,
+                      totalPremium: step3Data?.total_premium ?? 0,
+                      createdAt: new Date().toISOString(),
+                      contractorType: '법인',
+                      contractorCompanyName: step2Data.contractor_name || null,
+                      memberName: step2Data.contractor_name ?? '',
+                      memberBirthDate: '',
+                      memberPhone: step2Data.contractor_phone ?? '',
+                      memberEmail: step2Data.contractor_email ?? '',
+                      paymentMethod: null,
+                      paymentSubMethod: null,
+                      paymentStatus: '미결제',
+                      status: '가입신청',
+                      businessNumber: step2Data.contractor_business_number ?? null,
+                    },
+                    participants: participants.map((p: { id?: number; name: string; gender?: string; birthDate?: string; planType?: string; premium?: number }, i: number) => ({
+                      id: p.id ?? i + 1,
+                      name: p.name,
+                      gender: p.gender ?? '',
+                      birthDate: p.birthDate ?? '',
+                      planType: p.planType ?? '',
+                      premium: p.premium ?? 0,
+                    })),
+                  };
+                  try {
+                    sessionStorage.setItem('b2c_confirmation_draft', JSON.stringify(draft));
+                    window.open('/confirmation?draft=1', '_blank');
+                  } catch {
+                    alert('인쇄 화면을 열 수 없습니다.');
+                  }
+                }}
+                className="tour2023_btn_b02 tour2023_btn08"
+                style={{ font: 'unset', flexShrink: 0, backgroundColor: '#fff', padding: '6px 14px', border: '1px solid #000', color: '#000', fontSize: '13px' }}
+              >
+                <span style={{ color: '#000' }}>인쇄</span>
+              </button>
+            </div>
             <div className="detailView01 bgcolor_white">
               <table className="specialB" border={1} cellSpacing={0}>
                 <caption></caption>

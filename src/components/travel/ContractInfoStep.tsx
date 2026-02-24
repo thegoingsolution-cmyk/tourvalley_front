@@ -28,6 +28,8 @@ interface ContractInfoStepProps {
   companyName?: string; // 법인단체명 (단체 보험인 경우)
   /** 상단 form-header(타이틀+StepIndicator) 숨김 (페이지에서 이미 헤더를 렌더할 때 사용, 예: long-term-stay/m) */
   hideFormHeader?: boolean;
+  /** 계약 ID. 있으면 인쇄 시 가입신청내역서(confirmation) 페이지로 이동 */
+  contractId?: string | null;
 }
 
 export default function ContractInfoStep({
@@ -52,6 +54,7 @@ export default function ContractInfoStep({
   onShowPayment,
   companyName,
   hideFormHeader = false,
+  contractId,
 }: ContractInfoStepProps) {
   const [isAccidentFreeCashModalOpen, setIsAccidentFreeCashModalOpen] = useState(false);
 
@@ -122,73 +125,62 @@ export default function ContractInfoStep({
                 type="button"
                 className="print-btn"
                 onClick={() => {
-                  const printContent = document.querySelector('.contract-info-grid')?.parentElement;
-                  if (!printContent) return;
-                  
-                  const printWindow = window.open('', '_blank');
-                  if (!printWindow) return;
-                  
-                  printWindow.document.write(`
-                    <html>
-                      <head>
-                        <title>계약정보</title>
-                        <style>
-                          body {
-                            padding: 20px;
-                            margin: 0;
-                          }
-                          .contract-info-grid {
-                            display: grid;
-                            grid-template-columns: 1fr 1fr;
-                            gap: 16px;
-                          }
-                          .contract-info-item {
-                            padding: 12px;
-                            border-bottom: 1px solid #e0e0e0;
-                          }
-                          .contract-info-item label {
-                            display: block;
-                            font-weight: 600;
-                            margin-bottom: 8px;
-                            color: #333;
-                          }
-                          .contract-info-item div {
-                            color: #666;
-                          }
-                          .contract-info-item-divider {
-                            border-top: 2px solid #333;
-                            padding-top: 16px;
-                            margin-top: 8px;
-                          }
-                          .contract-info-item-divider label {
-                            font-size: 18px;
-                          }
-                          .contract-info-item-divider div {
-                            font-size: 18px;
-                            font-weight: 700;
-                            color: #333;
-                          }
-                          .participant-info-details div {
-                            margin-bottom: 4px;
-                          }
-                          .participant-detail-link {
-                            display: none;
-                          }
-                          @media print {
-                            body { margin: 0; padding: 10px; }
-                          }
-                        </style>
-                      </head>
-                      <body>
-                        <h2 style="margin-bottom: 20px; font-size: 24px; font-weight: 700;">계약정보</h2>
+                  if (contractId) {
+                    window.open(`/confirmation?contractId=${encodeURIComponent(contractId)}`, '_blank');
+                    return;
+                  }
+                  const first = participants[0];
+                  const memberEmail = first?.email1 && first?.email2
+                    ? `${first.email1}@${first.email2}`
+                    : (first as { customEmail?: string })?.customEmail ?? '';
+                  const draft = {
+                    detail: {
+                      id: 0,
+                      insuranceType: insuranceType ?? '국내여행자보험',
+                      departureDate,
+                      arrivalDate,
+                      travelCountry: travelCountry && travelCountry.trim() ? travelCountry : null,
+                      travelRegion: travelCountry && travelCountry.trim() ? null : '국내일원',
+                      travelParticipants: participants.length,
+                      totalPremium: calculatedPremiums?.totalPremium ?? 0,
+                      createdAt: new Date().toISOString(),
+                      contractorType: companyName ? '법인' : '개인',
+                      contractorCompanyName: companyName ?? null,
+                      memberName: first?.name ?? '',
+                      memberBirthDate: first?.birthDate ?? '',
+                      memberPhone: first?.phone ?? '',
+                      memberEmail,
+                      paymentMethod: null,
+                      paymentSubMethod: null,
+                      paymentStatus: '미결제',
+                      status: '가입신청',
+                      businessNumber: null,
+                    },
+                    participants: participants.map((p, i) => ({
+                      id: p.id ?? i + 1,
+                      name: p.name,
+                      gender: p.gender ?? '',
+                      birthDate: p.birthDate ?? '',
+                      planType: p.planType ?? calculatedPremiums?.participants?.[i]?.planType ?? '',
+                      premium: calculatedPremiums?.participants?.[i]?.premium ?? p.premium ?? 0,
+                    })),
+                  };
+                  try {
+                    sessionStorage.setItem('b2c_confirmation_draft', JSON.stringify(draft));
+                    window.open('/confirmation?draft=1', '_blank');
+                  } catch (err) {
+                    const printContent = document.querySelector('.contract-info-grid')?.parentElement;
+                    if (!printContent) return;
+                    const printWindow = window.open('', '_blank');
+                    if (!printWindow) return;
+                    printWindow.document.write(`
+                      <html><head><title>계약정보</title></head><body>
+                        <h2>계약정보</h2>
                         ${printContent.querySelector('.contract-info-grid')?.outerHTML || ''}
-                      </body>
-                    </html>
-                  `);
-                  printWindow.document.close();
-                  setTimeout(() => {
-                    printWindow.print();
-                  }, 250);
+                      </body></html>`);
+                    printWindow.document.close();
+                    setTimeout(() => { printWindow.print(); }, 250);
+                  }
                 }}
               >
                 <span className="Print_ico"></span>
