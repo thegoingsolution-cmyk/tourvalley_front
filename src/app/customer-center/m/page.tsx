@@ -45,7 +45,7 @@ function MobileCustomerCenterContent() {
     title: '',
     content: '',
     author_name: '',
-    is_secret: false,
+    is_secret: true,
     secret_password: '',
   });
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -122,7 +122,7 @@ function MobileCustomerCenterContent() {
       if (data.success) {
         alert('질문이 등록되었습니다.');
         setShowQnaWriteModal(false);
-        setQnaWriteForm({ title: '', content: '', author_name: '', is_secret: false, secret_password: '' });
+        setQnaWriteForm({ title: '', content: '', author_name: '', is_secret: true, secret_password: '' });
         fetchQnaList(1);
       } else {
         alert(data.message || '질문 등록에 실패했습니다.');
@@ -174,31 +174,59 @@ function MobileCustomerCenterContent() {
         </div>
       </section>
 
-      {/* 보험금 청구안내 */}
+      {/* 약관 다운로드 & 보험금 청구안내 - PC와 동일 디자인 */}
       <section className="bgcolor_white ptb20 prow_01 mb_base">
-        <div className="B02_tourG_pab30">
-          <div className="B02_tourG_pab15 B02_tourG_pat10">
-            <span className="tour2023_title02">보험금 청구안내</span>
+        <div className="customer-info-m">
+          <div className="customer-info-block-m">
+            <h3 className="customer-info-title-m">약관 다운로드</h3>
+            <div className="customer-info-table-m">
+              <div className="customer-info-cell-m">
+                해외여행보험(
+                <a href="/pdf/해외여행보험_라이나손보_%202026.01.pdf" download target="_blank" rel="noopener noreferrer" className="customer-info-link-m">라이나손보</a>
+                , <a href="/pdf/해외여행보험_현대해상_2026.01.pdf" download target="_blank" rel="noopener noreferrer" className="customer-info-link-m">현대해상</a>
+                )
+              </div>
+              <div className="customer-info-cell-m">
+                국내여행보험(
+                <a href="/pdf/국내여행보험_라이나손보_2026.01.pdf" download target="_blank" rel="noopener noreferrer" className="customer-info-link-m">라이나손보</a>
+                )
+              </div>
+              <div className="customer-info-cell-m">
+                해외장기체류보험
+                <br />
+                (<a href="/pdf/해외장기체류보험_메리츠화재_20260101.pdf" download target="_blank" rel="noopener noreferrer" className="customer-info-link-m">메리츠화재</a>
+                , <a href="/pdf/해외장기체류보험_현대해상_20260101.pdf" download target="_blank" rel="noopener noreferrer" className="customer-info-link-m">현대해상</a>
+                )
+              </div>
+              <div className="customer-info-cell-m">
+                행사보험
+                <br />
+                (<a href="/pdf/행사보험_라이나손보_2026.pdf" download target="_blank" rel="noopener noreferrer" className="customer-info-link-m">라이나손보</a>
+                , <a href="/pdf/행사보험_메리츠화재_20260101.pdf" download target="_blank" rel="noopener noreferrer" className="customer-info-link-m">메리츠화재</a>
+                )
+              </div>
+            </div>
           </div>
-          <a href="/customer-center/m?view=chubb">
-            <div className="B02_insu_List01">
-              <span className="B02_insu_Logo l77"></span>
-              <span className="B02_insu_Rcompany">CHUBB에이스손해보험</span>
-              <span className="B02_insu_Ricon">
-                <img src={getImagePath('/images/g_more.png')} alt="더보기" />
-              </span>
+          <div className="customer-info-block-m">
+            <h3 className="customer-info-title-m">보험금 청구안내(양식포함)</h3>
+            <div className="customer-info-table-m customer-info-table-m--three">
+              <div className="customer-info-cell-m">
+                <a href="/pdf/라이나손보_보험금청구서.pdf" download target="_blank" rel="noopener noreferrer" className="customer-info-link-m">라이나손보</a>
+              </div>
+              <div className="customer-info-cell-m">
+                <a href="/pdf/메리츠화재_보험금청구서(2024).pdf" download target="_blank" rel="noopener noreferrer" className="customer-info-link-m">메리츠화재</a>
+              </div>
+              <div className="customer-info-cell-m">
+                <a href="/pdf/현대해상_보험금청구서(2022.09).pdf" download target="_blank" rel="noopener noreferrer" className="customer-info-link-m">현대해상(안내서, 양식)</a>
+              </div>
             </div>
-          </a>
-          
-          <a href="/customer-center/m?view=hyundai">
-            <div className="B02_insu_List03">
-              <span className="B02_insu_Logo n09"></span>
-              <span className="B02_insu_Rcompany">현대해상</span>
-              <span className="B02_insu_Ricon">
-                <img src={getImagePath('/images/g_more.png')} alt="더보기" />
-              </span>
+          </div>
+          <div className="customer-info-block-m">
+            <h3 className="customer-info-title-m customer-info-title-m--blue">보험료 입금계좌</h3>
+            <div className="customer-info-account-m">
+              우리은행 1005-604-481542 (주)빨주노초파남보
             </div>
-          </a>
+          </div>
         </div>
       </section>
 
@@ -284,7 +312,7 @@ function MobileCustomerCenterContent() {
             title: '',
             content: '',
             author_name: isLoggedIn && member ? member.name : '',
-            is_secret: false,
+            is_secret: true,
             secret_password: '',
           });
           setShowQnaWriteModal(true);
@@ -795,28 +823,15 @@ function MobileCustomerCenterContent() {
                 />
               </div>
               <div className="form-group-mobile">
-                <label className="checkbox-label-mobile">
-                  <input
-                    type="checkbox"
-                    checked={qnaWriteForm.is_secret}
-                    onChange={(e) => setQnaWriteForm({ ...qnaWriteForm, is_secret: e.target.checked })}
-                    className="form-checkbox-mobile"
-                  />
-                  <span>비밀글로 작성</span>
-                </label>
+                <label>비밀번호 <span className="required-mobile">*</span></label>
+                <input
+                  type="password"
+                  value={qnaWriteForm.secret_password}
+                  onChange={(e) => setQnaWriteForm({ ...qnaWriteForm, secret_password: e.target.value })}
+                  className="form-input-mobile"
+                  placeholder="비밀번호를 입력하세요"
+                />
               </div>
-              {qnaWriteForm.is_secret && (
-                <div className="form-group-mobile">
-                  <label>비밀번호 <span className="required-mobile">*</span></label>
-                  <input
-                    type="password"
-                    value={qnaWriteForm.secret_password}
-                    onChange={(e) => setQnaWriteForm({ ...qnaWriteForm, secret_password: e.target.value })}
-                    className="form-input-mobile"
-                    placeholder="비밀번호를 입력하세요"
-                  />
-                </div>
-              )}
             </div>
             <div className="modal-footer-mobile">
               <button className="save-btn-mobile" onClick={handleQnaSubmit}>등록</button>

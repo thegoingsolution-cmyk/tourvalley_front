@@ -503,7 +503,7 @@ export default function MobileMyPage() {
                     </div>
 
                     {/* 이메일 주소 */}
-                    <div className="tourGuard_form_tt mag5 tourG_mab03">
+                    <div className="tourGuard_form_tt mag5 tourG_mab03 tourGuard_email_row">
                       <label>이메일 주소</label>
                       <input
                         type="text"
@@ -695,7 +695,7 @@ export default function MobileMyPage() {
             <form name="memberForm" id="memberForm" method="post" onSubmit={handlePersonalSubmit}>
               <section className="tourGuard_Info">
                 {/* 아이디 (수정불가) */}
-                <div className="tourGuard_form_tt mag5 tourG_mab03">
+                <div className="tourGuard_form_tt mag5 tourG_mab03 tourGuard_email_row">
                   <label>아이디</label>
                   <input
                     type="text"
@@ -784,7 +784,7 @@ export default function MobileMyPage() {
                 </div>
 
                 {/* 이메일 주소 */}
-                <div className="tourGuard_form_tt mag5 tourG_mab03">
+                <div className="tourGuard_form_tt mag5 tourG_mab03 tourGuard_email_row">
                   <label>이메일 주소</label>
                   <input
                     type="text"

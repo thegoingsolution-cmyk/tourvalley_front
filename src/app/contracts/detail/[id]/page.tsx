@@ -206,6 +206,14 @@ export default function ContractDetailPage() {
     return paidStatuses.has(normalized) || paidStatuses.has(String(rawStatus).trim());
   })();
 
+  const displayStatus = (() => {
+    const raw = String(contractDetail?.status ?? '').trim();
+    if (!raw) return '가입신청';
+    if (raw === '등록') return '가입신청';
+    const allowed = new Set(['가입신청', '가입완료', '취소신청', '취소']);
+    return allowed.has(raw) ? raw : '가입신청';
+  })();
+
   const termsPdfPath = getTermsPdfPath(contractDetail?.insuranceType);
 
   return (
@@ -331,11 +339,11 @@ export default function ContractDetailPage() {
             </li>
             <li className="tour2023_conList">
               <span className="tour2023_txt09">결제여부</span>
-              <span className="tour2023_txt10">{contractDetail.paymentStatus || '미결제'}</span>
+              <span className="tour2023_txt10">{isPaymentCompleted ? '결제완료' : '미결제'}</span>
             </li>
             <li className="tour2023_conList">
               <span className="tour2023_txt09">진행단계</span>
-              <span className="tour2023_txt10">{contractDetail.status}</span>
+              <span className="tour2023_txt10">{displayStatus}</span>
             </li>
           </ul>
           <div className="tourG_line05 tourG_mat09 tourG_mab01"></div>

@@ -53,7 +53,7 @@ function CustomerCenterContent() {
     title: '',
     content: '',
     author_name: '',
-    is_secret: false,
+    is_secret: true,
     secret_password: '',
   });
 
@@ -149,7 +149,7 @@ function CustomerCenterContent() {
       if (data.success) {
         alert('질문이 등록되었습니다.');
         setShowQnaWriteModal(false);
-        setQnaWriteForm({ title: '', content: '', author_name: '', is_secret: false, secret_password: '' });
+        setQnaWriteForm({ title: '', content: '', author_name: '', is_secret: true, secret_password: '' });
         fetchQnaList(1);
       } else {
         alert(data.message || '질문 등록에 실패했습니다.');
@@ -184,7 +184,7 @@ function CustomerCenterContent() {
               <img src={getImagePath('/images/customer_c_main.png')} alt="고객센터 메인" />
             </div>
             <div className="customer-hero-description">
-              <p>출국교안하신 여행은?</p>
+              <p>즐겁고 안전한 여행</p>
               <p>20년 노하우의 여행자보험 전문</p>
               <p className="customer-hero-highlight">투어밸리의 함께 하세요!</p>
             </div>
@@ -195,24 +195,62 @@ function CustomerCenterContent() {
           </div>          
         </div>
 
-        {/* Insurance Section */}
-        <div className="customer-insurance-section">
-          <h2 className="customer-section-title">보험금 청구안내</h2>
-          <div className="customer-insurance-cards">
-            <a href="?view=chubb" className="customer-insurance-card">
-              <img src={getImagePath('/images/logo_L77.png')} alt="CHUBB" className="customer-insurance-logo" />
-              <div className="customer-insurance-text-wrapper">
-                <span className="customer-insurance-text">CHUBB에이스손해보험</span>
-                <img src={getImagePath('/images/g_more.png')} alt="더보기" className="customer-insurance-arrow" />
+        {/* 약관 다운로드 & 보험금 청구안내 - B2B 동일 디자인 */}
+        <div className="customer-info">
+          <div className="customer-info-block">
+            <h3 className="customer-info-title">약관 다운로드</h3>
+            <div className="customer-info-table">
+              <div className="customer-info-cell">
+                해외여행보험(
+                <a href="/pdf/해외여행보험_라이나손보_%202026.01.pdf" download target="_blank" rel="noopener noreferrer" className="customer-info-link">라이나손보</a>
+                ,{' '}
+                <a href="/pdf/해외여행보험_현대해상_2026.01.pdf" download target="_blank" rel="noopener noreferrer" className="customer-info-link">현대해상</a>
+                )
               </div>
-            </a>
-            <a href="?view=hyundai" className="customer-insurance-card customer-insurance-card-highlight">
-              <img src={getImagePath('/images/logo_N09.png')} alt="현대해상" className="customer-insurance-logo" />
-              <div className="customer-insurance-text-wrapper">
-                <span className="customer-insurance-text">현대해상</span>
-                <img src={getImagePath('/images/g_more.png')} alt="더보기" className="customer-insurance-arrow" />
+              <div className="customer-info-cell">
+                국내여행보험(
+                <a href="/pdf/국내여행보험_라이나손보_2026.01.pdf" download target="_blank" rel="noopener noreferrer" className="customer-info-link">라이나손보</a>
+                )
               </div>
-            </a>
+              <div className="customer-info-cell">
+                해외장기체류보험
+                <br />
+                (
+                <a href="/pdf/해외장기체류보험_메리츠화재_20260101.pdf" download target="_blank" rel="noopener noreferrer" className="customer-info-link">메리츠화재</a>
+                ,{' '}
+                <a href="/pdf/해외장기체류보험_현대해상_20260101.pdf" download target="_blank" rel="noopener noreferrer" className="customer-info-link">현대해상</a>
+                )
+              </div>
+              <div className="customer-info-cell">
+                행사보험
+                <br />
+                (
+                <a href="/pdf/행사보험_라이나손보_2026.pdf" download target="_blank" rel="noopener noreferrer" className="customer-info-link">라이나손보</a>
+                ,{' '}
+                <a href="/pdf/행사보험_메리츠화재_20260101.pdf" download target="_blank" rel="noopener noreferrer" className="customer-info-link">메리츠화재</a>
+                )
+              </div>
+            </div>
+          </div>
+          <div className="customer-info-block">
+            <h3 className="customer-info-title">보험금 청구안내(양식포함)</h3>
+            <div className="customer-info-table customer-info-table--three">
+              <div className="customer-info-cell">
+                <a href="/pdf/라이나손보_보험금청구서.pdf" download target="_blank" rel="noopener noreferrer" className="customer-info-link">라이나손보</a>
+              </div>
+              <div className="customer-info-cell">
+                <a href="/pdf/메리츠화재_보험금청구서(2024).pdf" download target="_blank" rel="noopener noreferrer" className="customer-info-link">메리츠화재</a>
+              </div>
+              <div className="customer-info-cell">
+                <a href="/pdf/현대해상_보험금청구서(2022.09).pdf" download target="_blank" rel="noopener noreferrer" className="customer-info-link">현대해상(안내서, 양식)</a>
+              </div>
+            </div>
+          </div>
+          <div className="customer-info-block">
+            <h3 className="customer-info-title customer-info-title--blue">보험료 입금계좌</h3>
+            <div className="customer-info-account">
+              우리은행 1005-604-481542 (주)빨주노초파남보
+            </div>
           </div>
         </div>
 
@@ -810,7 +848,7 @@ function CustomerCenterContent() {
                 title: '',
                 content: '',
                 author_name: isLoggedIn && member ? member.name : '',
-                is_secret: false,
+                is_secret: true,
                 secret_password: '',
               });
               setShowQnaWriteModal(true);
@@ -907,28 +945,15 @@ function CustomerCenterContent() {
                 />
               </div>
               <div className="form-group">
-                <label className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={qnaWriteForm.is_secret}
-                    onChange={(e) => setQnaWriteForm({ ...qnaWriteForm, is_secret: e.target.checked })}
-                    className="form-checkbox"
-                  />
-                  <span>비밀글로 작성</span>
-                </label>
+                <label>비밀번호 <span className="required">*</span></label>
+                <input
+                  type="password"
+                  value={qnaWriteForm.secret_password}
+                  onChange={(e) => setQnaWriteForm({ ...qnaWriteForm, secret_password: e.target.value })}
+                  className="form-input"
+                  placeholder="비밀번호를 입력하세요"
+                />
               </div>
-              {qnaWriteForm.is_secret && (
-                <div className="form-group">
-                  <label>비밀번호 <span className="required">*</span></label>
-                  <input
-                    type="password"
-                    value={qnaWriteForm.secret_password}
-                    onChange={(e) => setQnaWriteForm({ ...qnaWriteForm, secret_password: e.target.value })}
-                    className="form-input"
-                    placeholder="비밀번호를 입력하세요"
-                  />
-                </div>
-              )}
             </div>
             <div className="modal-footer">
               <button className="save-btn" onClick={handleQnaSubmit}>등록</button>

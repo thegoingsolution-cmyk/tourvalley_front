@@ -612,6 +612,28 @@
   flex: 0 0 38%;
 }
 
+.mypage-mobile .tourGuard_email_row {
+  flex-wrap: nowrap;
+  align-items: center;
+  column-gap: 4px;
+}
+
+.mypage-mobile .tourGuard_email_row .tourGuard_input_w01 {
+  width: auto !important;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.mypage-mobile .tourGuard_email_row .tourGuard_input_cell08 {
+  width: auto !important;
+  flex: 1 1 0;
+  min-width: 90px;
+}
+
+.mypage-mobile .tourGuard_email_row .tourGuard_txt03 {
+  margin: 23px 4px 0 4px;
+}
+
 .tourGuard_form_tt .tourGuard_input_w02 {
   width: 90% !important;
   flex: 0 0 90%;

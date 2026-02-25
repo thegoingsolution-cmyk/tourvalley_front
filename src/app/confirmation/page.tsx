@@ -134,7 +134,9 @@ function ConfirmationContent() {
   const [plansCoverage, setPlansCoverage] = useState<(PlanCoverage | null)[]>([]);
   const [coverageLoading, setCoverageLoading] = useState(false);
   const [coverageError, setCoverageError] = useState<string | null>(null);
+  const [coverageReady, setCoverageReady] = useState(false);
   const printTriggered = useRef(false);
+  const printTimeoutRef = useRef<number | null>(null);
   const draftLoadedRef = useRef(false);
 
   useEffect(() => {
@@ -248,10 +250,12 @@ function ConfirmationContent() {
     const plans = getPlanListFromParticipants(participants);
     if (!detail?.insuranceType || plans.length === 0) {
       setPlansCoverage([]);
+      setCoverageReady(true);
       return;
     }
     setCoverageLoading(true);
     setCoverageError(null);
+    setCoverageReady(false);
     const insuranceTypeRaw = detail.insuranceType ?? '';
     const insuranceType =
       insuranceTypeRaw === '해외여행' || insuranceTypeRaw === '해외여행자보험'
@@ -282,20 +286,37 @@ function ConfirmationContent() {
         setCoverageLoading(false);
         const hasAny = results.some(Boolean);
         if (!hasAny) setCoverageError('보장내용을 불러올 수 없습니다.');
+        setCoverageReady(true);
       })
       .catch(() => {
         setCoverageLoading(false);
         setCoverageError('보장내용을 불러올 수 없습니다.');
+        setCoverageReady(true);
       });
   }, [detail?.insuranceType, participants]);
 
   useEffect(() => {
     if (loading || error || !detail || printTriggered.current) return;
     if (coverageLoading) return;
-    if (coverageError && plansCoverage.length === 0) return;
-    printTriggered.current = true;
-    window.print();
-  }, [loading, error, detail, contractId, plansCoverage.length, coverageLoading, coverageError]);
+    if (!coverageReady) return;
+    if (printTimeoutRef.current !== null) return;
+    // Give React time to flush table rows before opening the print dialog.
+    printTimeoutRef.current = window.setTimeout(() => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          printTriggered.current = true;
+          window.print();
+          printTimeoutRef.current = null;
+        });
+      });
+    }, 600);
+    return () => {
+      if (printTimeoutRef.current !== null) {
+        window.clearTimeout(printTimeoutRef.current);
+        printTimeoutRef.current = null;
+      }
+    };
+  }, [loading, error, detail, contractId, plansCoverage.length, coverageLoading, coverageReady]);
 
   if (loading) {
     return (
@@ -503,6 +524,7 @@ function ConfirmationContent() {
             })()}
           </section>
 
+          {/*
           <div className="cf-overseas-notice">
             <h4>1. 주요 보상하지 아니하는 손해</h4>
             <p>
@@ -564,6 +586,22 @@ function ConfirmationContent() {
                 </span>
               </div>
             </div>
+          </div>
+          */}
+          <p className="cf-overseas-footer-date cf-overseas-footer-date--secondary">
+            발행일 : {formatDate(new Date().toISOString())}
+          </p>
+          <div className="cf-overseas-footer-secondary">
+            <div className="cf-overseas-footer-secondary-logo">
+              <img src="/images/logo.png" alt="투어밸리" />
+            </div>
+            <div className="cf-overseas-footer-secondary-divider"></div>
+            <p className="cf-overseas-footer-secondary-text">
+              (주)빨주노초파남보 (04543) 서울시 중구 을지로 11길 15 동화빌딩 603호 고객센터 : 1599-2541
+              <br />
+              대표 : 한상윤 사업자등록번호 : 256-81-03026 통신판매업신고번호 : 제2023-서울중구-0084호
+              보험대리점등록번호 : 제2022120036호
+            </p>
           </div>
         </article>
       </div>

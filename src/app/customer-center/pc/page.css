@@ -231,7 +231,88 @@
   font-size: 12px;
 }
 
-/* Insurance Section */
+/* 약관 다운로드 & 보험금 청구안내 (B2B 동일 디자인) */
+.customer-info {
+  margin-top: 24px;
+  border: 1px solid #d9d9d9;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.customer-info-block {
+  padding: 14px 12px;
+  border-bottom: 1px solid #d9d9d9;
+}
+
+.customer-info-block:last-child {
+  border-bottom: none;
+}
+
+.customer-info-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.customer-info-title--blue {
+  color: #1e4ea1;
+}
+
+.customer-info-account {
+  border: 1px solid #333;
+  padding: 8px;
+  font-size: 13px;
+  color: #1e4ea1;
+  font-weight: 700;
+  text-align: center;
+}
+
+.customer-info-table {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid #333;
+  font-size: 12px;
+}
+
+.customer-info-table--three {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.customer-info-cell {
+  padding: 8px 6px;
+  border-right: 1px solid #333;
+  border-bottom: 1px solid #333;
+  text-align: center;
+}
+
+.customer-info-link {
+  color: #1e4ea1;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.customer-info-link:hover {
+  text-decoration: none;
+}
+
+.customer-info-table:not(.customer-info-table--three) .customer-info-cell:nth-child(2n) {
+  border-right: none;
+}
+
+.customer-info-table--three .customer-info-cell:nth-child(3n) {
+  border-right: none;
+}
+
+.customer-info-table .customer-info-cell:nth-last-child(-n + 2) {
+  border-bottom: none;
+}
+
+.customer-info-table--three .customer-info-cell:nth-last-child(-n + 3) {
+  border-bottom: none;
+}
+
+/* Insurance Section (legacy - chubb/hyundai view links) */
 .customer-insurance-section {
   padding: 40px 0;
   border-bottom: 1px solid #eee;

@@ -197,6 +197,11 @@
   line-height: 1.5;
 }
 
+.cf-overseas-footer-date--secondary {
+  margin-top: 18px;
+  margin-bottom: 16px;
+}
+
 .cf-overseas-footer-contact {
   border-top: 1px solid #333;
   border-bottom: 1px dotted #333;
@@ -223,6 +228,30 @@
 
 .cf-overseas-footer-right {
   text-align: right;
+}
+
+.cf-overseas-footer-secondary {
+  margin-top: 100px;
+  font-size: 11px;
+  color: #111;
+}
+
+.cf-overseas-footer-secondary-logo img {
+  display: block;
+  max-width: 130px;
+  height: auto;
+  margin-bottom: 6px;
+}
+
+.cf-overseas-footer-secondary-divider {
+  margin: 12px 0 12px;
+  border-top: 2px solid #111;
+}
+
+.cf-overseas-footer-secondary-text {
+  margin: 0;
+  line-height: 1.6;
+  word-break: keep-all;
 }
 
 .cf-overseas--print-only {
