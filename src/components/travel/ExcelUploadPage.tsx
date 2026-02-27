@@ -15,11 +15,16 @@ export default function ExcelUploadPage({
   onClose,
   excelTemplatePath,
 }: ExcelUploadPageProps) {
+  const handleUpload = (participants: Participant[], startId: number) => {
+    // startId는 무시하고 participants만 전달
+    onUpload(participants);
+  };
+
   return (
     <ExcelUploadModal
       isOpen={true}
       onClose={onClose}
-      onUpload={onUpload}
+      onUpload={handleUpload}
       currentParticipants={[]}
       excelTemplatePath={excelTemplatePath}
       variant="page"

@@ -126,13 +126,16 @@ export default function LongStayInsuranceStep3Page() {
         const data1 = JSON.parse(step1Data);
         const data2 = JSON.parse(step2Data);
         
-        setTourNum(data1.tourNum || 1);
+        // 실제 입력된 인원 수 사용 (step2에서 업데이트된 값 또는 actual_insured_count)
+        const actualCount = data2.actual_insured_count || data1.tourNum || 1;
+        setTourNum(actualCount);
         setStartDate(`${data1.startDate} ${data1.startHour}:00:00`);
         setEndDate(`${data1.endDate} ${data1.endHour}:00:00`);
         setTravelPurpose(data2.travel_purpose || '유학/어학연수');
         
         const insuredPersons = [];
-        for (let i = 1; i <= data1.tourNum; i++) {
+        // 입력 완료된 인원만 표시 (인덱스는 1부터 순차적으로 저장되어 있음)
+        for (let i = 1; i <= actualCount; i++) {
           const name = data2[`insured_name_${i}`] || `피보험자${i}`;
           const countryType = data2[`insured_country_type_${i}`] || 'D';
           

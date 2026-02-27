@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCorporateMemberInfo } from '@/services/authService';
+import { getTrackingInfo } from '@/utils/tracking';
 import { requestNicepayPayment, openNicepayWindow, processNaverPayPayment, processKakaoPayPayment } from '@/services/paymentService';
 import '../../popup/page.css';
 
@@ -452,8 +453,14 @@ export default function OverseasInsuranceStep5Page() {
         let residentNumber = ''; // 주민번호 또는 외국인등록번호
         
         if (countryType === 'F') {
-          // 외국인인 경우: 외국인등록번호 사용
-          if (ssn1 && ssn2) {
+          // 외국인인 경우: 외국인등록번호 사용 (앞 6자리 YYMMDD를 YYYYMMDD로 변환)
+          if (ssn1 && ssn2 && ssn1.length === 6 && ssn2.length === 7) {
+            const yy = parseInt(ssn1.substring(0, 2));
+            const mm = ssn1.substring(2, 4);
+            const dd = ssn1.substring(4, 6);
+            const year = yy >= 50 ? 1900 + yy : 2000 + yy;
+            residentNumber = `${year}${mm}${dd}-${ssn2}`;
+          } else if (ssn1 && ssn2) {
             residentNumber = `${ssn1}-${ssn2}`;
           }
           // 외국인인 경우 나이 계산은 생년월일로
@@ -488,8 +495,8 @@ export default function OverseasInsuranceStep5Page() {
               genderCode = gender === '남자' ? '1' : '2';
             }
             
-            // 주민번호 생성 (생년월일 + 성별코드 + ******)
-            residentNumber = `${birthDate}-${genderCode}******`;
+            // 주민번호 생성 (생년월일 + 성별코드 + 000000)
+            residentNumber = `${birthDate}-${genderCode}000000`;
           }
         }
 
@@ -716,6 +723,7 @@ export default function OverseasInsuranceStep5Page() {
       }
 
       // 계약 데이터 구성
+      const trackingInfo = getTrackingInfo('PC');
       const contractData = {
         contract: {
           member_id: isLoggedIn && member ? member.id : null,
@@ -730,7 +738,8 @@ export default function OverseasInsuranceStep5Page() {
           travel_participants: step1Data.tourNum,
           total_premium: step3Data?.total_premium || 0,
           device: 'PC',
-          access_path: '투어밸리 사이트',
+          access_path: trackingInfo.access_path,
+          affiliate: trackingInfo.affiliate,
         },
         contractor: {
           contractor_type: '법인',

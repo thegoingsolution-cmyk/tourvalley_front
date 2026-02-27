@@ -7,6 +7,7 @@ import { format, parse } from 'date-fns';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCorporateMemberInfo } from '@/services/authService';
+import { Participant } from '@/components/travel/types';
 import '../../popup/page.css';
 
 // 한국어 locale 등록
@@ -43,6 +44,8 @@ export default function OverseasInsuranceStep2Page() {
   const [email2, setEmail2] = useState('');
   // 외국인 선택 상태 관리 (각 피보험자별)
   const [countryTypes, setCountryTypes] = useState<{ [key: number]: string }>({});
+  // 엑셀 업로드된 참가자 데이터 (입력 필드 채우기용)
+  const [excelParticipants, setExcelParticipants] = useState<Participant[] | null>(null);
   // 대륙별 국가 목록 (각 피보험자별)
   const [countryLists, setCountryLists] = useState<{ [key: number]: any[] }>({});
   const resno1Ref = useRef<HTMLInputElement>(null);
@@ -248,6 +251,99 @@ export default function OverseasInsuranceStep2Page() {
     loadCorporateInfo();
   }, [isLoggedIn, member]);
 
+  // 팝업창에서 엑셀 업로드 완료 메시지 수신
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      
+      if (event.data && event.data.type === 'EXCEL_UPLOAD') {
+        const newParticipants = event.data.participants as Participant[];
+        
+        // 엑셀 데이터로 피보험자 정보 입력 필드에 채우기
+        const participantCount = newParticipants.length;
+        
+        // tourNum 업데이트 (엑셀 데이터 개수만큼)
+        setTourNum(participantCount);
+        
+        // 국적 타입 초기화
+        const updatedCountryTypes: { [key: number]: string } = {};
+        newParticipants.forEach((participant, index) => {
+          const fieldIndex = index + 1;
+          updatedCountryTypes[fieldIndex] = participant.nationality === '외국인' ? 'F' : 'D';
+        });
+        setCountryTypes(updatedCountryTypes);
+        
+        // 엑셀 데이터를 상태에 저장 (useEffect에서 처리)
+        setExcelParticipants(newParticipants);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, []);
+
+  // 엑셀 업로드 후 입력 필드 채우기
+  useEffect(() => {
+    if (excelParticipants && excelParticipants.length > 0) {
+      // DOM이 업데이트된 후 입력 필드에 값을 채우기 위해 약간의 지연
+      setTimeout(() => {
+        excelParticipants.forEach((participant, index) => {
+          const fieldIndex = index + 1;
+          
+          // 이름 입력
+          const nameInput = document.querySelector(`input[name="insured_name_${fieldIndex}"]`) as HTMLInputElement;
+          if (nameInput) {
+            nameInput.value = participant.name || '';
+          }
+          
+          // 생년월일 입력 (내국인인 경우)
+          if (participant.nationality === '내국인' && participant.birthDate) {
+            const birthInput = document.querySelector(`input[name="birth_${fieldIndex}"]`) as HTMLInputElement;
+            if (birthInput) {
+              birthInput.value = participant.birthDate;
+            }
+            
+            // 성별 라디오 버튼 선택
+            const genderValue = participant.gender === '남자' ? '1' : '2';
+            const genderRadio = document.querySelector(`input[name="gender_${fieldIndex}"][value="${genderValue}"]`) as HTMLInputElement;
+            if (genderRadio) {
+              genderRadio.checked = true;
+            }
+            
+            // 국적을 내국인으로 설정
+            const countryTypeSelect = document.querySelector(`select[name="country_type_${fieldIndex}"]`) as HTMLSelectElement;
+            if (countryTypeSelect) {
+              countryTypeSelect.value = 'D';
+              handleCountryTypeChange(fieldIndex, 'D');
+            }
+          } else if (participant.nationality === '외국인' && participant.residentNumber) {
+            // 외국인 등록번호 입력
+            const ssn1Input = document.querySelector(`input[name="insured_ssn1_${fieldIndex}"]`) as HTMLInputElement;
+            const ssn2Input = document.querySelector(`input[name="insured_ssn2_${fieldIndex}"]`) as HTMLInputElement;
+            
+            if (ssn1Input && ssn2Input) {
+              const residentNumber = participant.residentNumber;
+              ssn1Input.value = residentNumber.substring(0, 6);
+              ssn2Input.value = residentNumber.substring(6, 13);
+            }
+            
+            // 국적을 외국인으로 설정
+            const countryTypeSelect = document.querySelector(`select[name="country_type_${fieldIndex}"]`) as HTMLSelectElement;
+            if (countryTypeSelect) {
+              countryTypeSelect.value = 'F';
+              handleCountryTypeChange(fieldIndex, 'F');
+            }
+          }
+        });
+        
+        // 처리 완료 후 초기화
+        setExcelParticipants(null);
+      }, 100);
+    }
+  }, [excelParticipants, tourNum]);
+
   useEffect(() => {
     if (isLoggedIn && member?.member_type === '법인') {
       getCorporateMemberInfo(member.id)
@@ -276,37 +372,194 @@ export default function OverseasInsuranceStep2Page() {
     const ctelNo3Input = document.querySelector('input[name="contract_ctel_no3"]') as HTMLInputElement;
     const email2SelSelect = document.querySelector('select[name="email2_sel"]') as HTMLSelectElement;
     
-    // 사업자번호 합치기 (3-2-5 형식)
-    const businessNumber = [resno1Input?.value || '', resno2Input?.value || '', resno3Input?.value || '']
-      .filter(v => v).join('-');
+    // ===== 계약자 정보 유효성 검사 =====
+    // 법인(단체)명 검증
+    if (!contractCompanyInput?.value || contractCompanyInput.value.trim() === '') {
+      alert('법인(단체)명을 입력해주세요.');
+      contractCompanyInput?.focus();
+      return;
+    }
     
-    // 전화번호 합치기
-    const phone = [telno1Input?.value || '', telno2Input?.value || '', telno3Input?.value || '']
-      .filter(v => v).join('-');
+    // 사업자번호 검증 (3-2-5 형식, 총 10자리)
+    const resno1 = resno1Input?.value || '';
+    const resno2 = resno2Input?.value || '';
+    const resno3 = resno3Input?.value || '';
+    if (resno1.length !== 3 || resno2.length !== 2 || resno3.length !== 5) {
+      alert('사업자번호를 올바르게 입력해주세요. (3-2-5 형식)');
+      if (resno1.length !== 3) {
+        resno1Input?.focus();
+      } else if (resno2.length !== 2) {
+        resno2Input?.focus();
+      } else {
+        resno3Input?.focus();
+      }
+      return;
+    }
     
-    // 핸드폰번호 합치기
-    const mobilePhone = [
-      ctelNo1Select?.value || '', 
-      ctelNo2Input?.value || '', 
-      ctelNo3Input?.value || ''
-    ].filter(v => v).join('-');
+    // 담당자명 검증
+    if (!chargeInput?.value || chargeInput.value.trim() === '') {
+      alert('담당자명을 입력해주세요.');
+      chargeInput?.focus();
+      return;
+    }
     
-    // 이메일 합치기
+    // 핸드폰번호 필수 검증
+    const ctelNo1 = ctelNo1Select?.value || '';
+    const ctelNo2 = ctelNo2Input?.value || '';
+    const ctelNo3 = ctelNo3Input?.value || '';
+    
+    const hasMobile = ctelNo1 && ctelNo2 && ctelNo3;
+    
+    if (!hasMobile) {
+      alert('핸드폰번호를 입력해주세요.');
+      if (!ctelNo2) {
+        ctelNo2Input?.focus();
+      } else if (!ctelNo3) {
+        ctelNo3Input?.focus();
+      } else {
+        ctelNo2Input?.focus();
+      }
+      return;
+    }
+    
+    // 전화번호는 선택사항 (핸드폰번호가 있으면 통과)
+    const telno1 = telno1Input?.value || '';
+    const telno2 = telno2Input?.value || '';
+    const telno3 = telno3Input?.value || '';
+    
+    // 이메일 검증
     const emailDomain = email2SelSelect?.value || email2;
     const email = [email1, emailDomain].filter(v => v).join('@');
+    if (!email1 || !emailDomain) {
+      alert('이메일을 올바르게 입력해주세요.');
+      if (!email1) {
+        (document.querySelector('input[name="email1"]') as HTMLInputElement)?.focus();
+      } else {
+        (document.querySelector('input[name="email2"]') as HTMLInputElement)?.focus();
+      }
+      return;
+    }
     
-    // 피보험자 정보 수집
+    // 이메일 형식 검증
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert('올바른 이메일 형식을 입력해주세요.');
+      (document.querySelector('input[name="email1"]') as HTMLInputElement)?.focus();
+      return;
+    }
+    
+    // ===== 피보험자 정보 유효성 검사 =====
+    const validatedInsuredList: number[] = []; // 입력 완료된 인원 목록
+    const incompleteInsuredList: number[] = []; // 입력 미완료 인원 목록
+    
+    for (let i = 1; i <= tourNum; i++) {
+      const nameInput = document.querySelector(`input[name="insured_name_${i}"]`) as HTMLInputElement;
+      const birthInput = document.querySelector(`input[name="birth_${i}"]`) as HTMLInputElement;
+      const genderInput = document.querySelector(`input[name="gender_${i}"]:checked`) as HTMLInputElement;
+      const countryTypeSelect = document.querySelector(`select[name="country_type_${i}"]`) as HTMLSelectElement;
+      const ssn1Input = document.querySelector(`input[name="insured_ssn1_${i}"]`) as HTMLInputElement;
+      const ssn2Input = document.querySelector(`input[name="insured_ssn2_${i}"]`) as HTMLInputElement;
+      const country1Select = document.querySelector(`select[name="insured_country1_${i}"]`) as HTMLSelectElement;
+      const country2Select = document.querySelector(`select[name="insured_country2_${i}"]`) as HTMLSelectElement;
+      
+      // 성명이 입력되지 않으면 해당 인원은 미입력으로 처리
+      if (!nameInput?.value || nameInput.value.trim() === '') {
+        incompleteInsuredList.push(i);
+        continue;
+      }
+      
+      const countryType = countryTypeSelect?.value || 'D';
+      let isValid = true;
+      
+      if (countryType === 'D') {
+        // 내국인: 생년월일 검증 (8자리)
+        if (!birthInput?.value || birthInput.value.length !== 8) {
+          incompleteInsuredList.push(i);
+          continue;
+        }
+        
+        // 생년월일 형식 검증 (YYYYMMDD)
+        const birthRegex = /^(19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])$/;
+        if (!birthRegex.test(birthInput.value)) {
+          incompleteInsuredList.push(i);
+          continue;
+        }
+        
+        // 성별 검증
+        if (!genderInput) {
+          incompleteInsuredList.push(i);
+          continue;
+        }
+      } else {
+        // 외국인: 외국인등록번호 검증 (앞 6자리 + 뒤 7자리)
+        if (!ssn1Input?.value || ssn1Input.value.length !== 6) {
+          incompleteInsuredList.push(i);
+          continue;
+        }
+        
+        if (!ssn2Input?.value || ssn2Input.value.length !== 7) {
+          incompleteInsuredList.push(i);
+          continue;
+        }
+        
+        // 외국인 국적 검증
+        if (!country1Select?.value || country1Select.value === '') {
+          incompleteInsuredList.push(i);
+          continue;
+        }
+        
+        if (!country2Select?.value || country2Select.value === '') {
+          incompleteInsuredList.push(i);
+          continue;
+        }
+      }
+      
+      // 모든 필수 필드가 입력된 경우
+      validatedInsuredList.push(i);
+    }
+    
+    // 일부만 입력된 경우 확인 메시지 표시
+    if (incompleteInsuredList.length > 0 && validatedInsuredList.length > 0) {
+      const validatedCount = validatedInsuredList.length;
+      const incompleteCount = incompleteInsuredList.length;
+      const totalCount = tourNum;
+      
+      const confirmMessage = `${totalCount}명 중 ${validatedCount}명의 정보만 입력했고, ${incompleteCount}명은 입력을 안했습니다. 다음 단계 넘어갈까요?`;
+      
+      if (!confirm(confirmMessage)) {
+        return; // 취소하면 진행하지 않음
+      }
+    } else if (validatedInsuredList.length === 0) {
+      // 아무도 입력하지 않은 경우
+      alert('최소 1명 이상의 가입자 정보를 입력해주세요.');
+      const firstNameInput = document.querySelector('input[name="insured_name_1"]') as HTMLInputElement;
+      firstNameInput?.focus();
+      return;
+    }
+    
+    // 사업자번호 합치기 (3-2-5 형식)
+    const businessNumber = [resno1, resno2, resno3].join('-');
+    
+    // 전화번호 합치기
+    const phone = [telno1, telno2, telno3].filter(v => v).join('-');
+    
+    // 핸드폰번호 합치기
+    const mobilePhone = [ctelNo1, ctelNo2, ctelNo3].filter(v => v).join('-');
+    
+    // 피보험자 정보 수집 (입력 완료된 인원만 저장)
     const step2Data: any = {
-      contractor_name: contractCompanyInput?.value || '',
-      contractor_business_number: businessNumber || '',
-      contractor_contact_person: chargeInput?.value || '',
+      contractor_name: contractCompanyInput.value,
+      contractor_business_number: businessNumber,
+      contractor_contact_person: chargeInput.value,
       contractor_position: positionInput?.value || '',
       contractor_phone: phone || '',
       contractor_mobile_phone: mobilePhone || '',
-      contractor_email: email || '',
+      contractor_email: email,
     };
     
-    for (let i = 1; i <= tourNum; i++) {
+    // 입력 완료된 인원만 저장
+    let savedIndex = 1; // 저장 시 사용할 인덱스 (1부터 시작)
+    for (const i of validatedInsuredList) {
       const nameInput = document.querySelector(`input[name="insured_name_${i}"]`) as HTMLInputElement;
       const engNameInput = document.querySelector(`input[name="insured_engname_${i}"]`) as HTMLInputElement;
       const birthInput = document.querySelector(`input[name="birth_${i}"]`) as HTMLInputElement;
@@ -317,67 +570,70 @@ export default function OverseasInsuranceStep2Page() {
       const country1Select = document.querySelector(`select[name="insured_country1_${i}"]`) as HTMLSelectElement;
       const country2Select = document.querySelector(`select[name="insured_country2_${i}"]`) as HTMLSelectElement;
       
-      if (nameInput) {
-        step2Data[`insured_name_${i}`] = nameInput.value;
-      }
+      step2Data[`insured_name_${savedIndex}`] = nameInput.value;
       
       // 영문 이름 저장
       if (engNameInput) {
-        step2Data[`insured_engname_${i}`] = engNameInput.value;
+        step2Data[`insured_engname_${savedIndex}`] = engNameInput.value;
       }
       
       const countryType = countryTypeSelect?.value || 'D';
-      step2Data[`insured_country_type_${i}`] = countryType;
+      step2Data[`insured_country_type_${savedIndex}`] = countryType;
       
       if (countryType === 'D') {
         // 내국인: 생년월일 저장
-        if (birthInput && birthInput.value) {
-          step2Data[`insured_birth_${i}`] = birthInput.value;
-        }
+        step2Data[`insured_birth_${savedIndex}`] = birthInput.value;
         
         // 성별 저장 (1 -> '남자', 2 -> '여자')
-        if (genderInput) {
-          const genderValue = genderInput.value === '1' ? '남자' : '여자';
-          step2Data[`insured_gender_${i}`] = genderValue;
-        }
+        const genderValue = genderInput.value === '1' ? '남자' : '여자';
+        step2Data[`insured_gender_${savedIndex}`] = genderValue;
         
         // 생년월일(8자리)과 성별(1,2,3,4)을 조합하여 주민번호 앞 7자리 생성
-        if (birthInput && genderInput && birthInput.value.length === 8) {
-          const birth = birthInput.value; // 예: 19880818
-          const genderCode = genderInput.value; // 1: 남자, 2: 여자
-          
-          // 생년월일 뒤 6자리 (YYMMDD)
-          const birthSuffix = birth.substring(2, 8);
-          
-          // 생년에 따라 성별코드 결정
-          const birthYear = parseInt(birth.substring(0, 4));
-          let finalGenderCode = genderCode;
-          
-          if (birthYear >= 2000) {
-            // 2000년대생
-            finalGenderCode = genderCode === '1' ? '3' : '4';
-          } else {
-            // 1900년대생
-            finalGenderCode = genderCode === '1' ? '1' : '2';
-          }
-          
-          // 주민번호 앞 7자리 (YYMMDD + 성별코드)
-          step2Data[`insured_ssn_${i}`] = birthSuffix + finalGenderCode;
-        }
-      } else {
-        // 외국인: 주민등록번호 저장
-        if (ssn1Input && ssn2Input) {
-          step2Data[`insured_ssn1_${i}`] = ssn1Input.value;
-          step2Data[`insured_ssn2_${i}`] = ssn2Input.value;
+        const birth = birthInput.value; // 예: 19880818
+        const genderCode = genderInput.value; // 1: 남자, 2: 여자
+        
+        // 생년월일 뒤 6자리 (YYMMDD)
+        const birthSuffix = birth.substring(2, 8);
+        
+        // 생년에 따라 성별코드 결정
+        const birthYear = parseInt(birth.substring(0, 4));
+        let finalGenderCode = genderCode;
+        
+        if (birthYear >= 2000) {
+          // 2000년대생
+          finalGenderCode = genderCode === '1' ? '3' : '4';
+        } else {
+          // 1900년대생
+          finalGenderCode = genderCode === '1' ? '1' : '2';
         }
         
+        // 주민번호 앞 7자리 (YYMMDD + 성별코드)
+        step2Data[`insured_ssn_${savedIndex}`] = birthSuffix + finalGenderCode;
+      } else {
+        // 외국인: 주민등록번호 저장
+        step2Data[`insured_ssn1_${savedIndex}`] = ssn1Input.value;
+        step2Data[`insured_ssn2_${savedIndex}`] = ssn2Input.value;
+        
         // 외국인 국적 저장
-        if (country1Select) {
-          step2Data[`insured_country1_${i}`] = country1Select.value;
-        }
-        if (country2Select) {
-          step2Data[`insured_country2_${i}`] = country2Select.value;
-        }
+        step2Data[`insured_country1_${savedIndex}`] = country1Select.value;
+        step2Data[`insured_country2_${savedIndex}`] = country2Select.value;
+      }
+      
+      savedIndex++;
+    }
+    
+    // 실제 저장된 인원 수 저장
+    step2Data.actual_insured_count = validatedInsuredList.length;
+    
+    // step1의 tourNum을 실제 입력된 인원 수로 업데이트 (입력 안된 인원 데이터 강제 삭제)
+    const step1Data = localStorage.getItem('overseasInsuranceStep1');
+    if (step1Data) {
+      try {
+        const step1Parsed = JSON.parse(step1Data);
+        step1Parsed.tourNum = validatedInsuredList.length; // 실제 입력된 인원 수로 업데이트
+        localStorage.setItem('overseasInsuranceStep1', JSON.stringify(step1Parsed));
+      } catch (error) {
+        console.error('Failed to update step1 data:', error);
       }
     }
     
@@ -925,7 +1181,40 @@ export default function OverseasInsuranceStep2Page() {
               </div>
 
               <div id="insured_people_area_2">
-                <h2 className="sub_title pt30 ag_left">가입자(피보험자) 정보 입력</h2>
+                <h2 className="sub_title pt30 ag_left" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>가입자(피보험자) 정보 입력</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const width = 650;
+                      const height = 700;
+                      const left = (window.screen.width - width) / 2;
+                      const top = (window.screen.height - height) / 2;
+                      window.open(
+                        '/group-insurance/overseas/step2/excel-upload',
+                        'excelUpload',
+                        `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
+                      );
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '0',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      fontSize: '14px',
+                      color: '#4d60d6',
+                    }}
+                  >
+                    <img 
+                      src="/images/excel-icon.png" 
+                      alt="엑셀 아이콘" 
+                      style={{ width: '20px', height: '20px' }}
+                    />
+                  </button>
+                </h2>
                 <div className="detailView01 bgcolor_white">
                   <table className="specialB" border={1} cellSpacing="0">
                     <caption>동반자(피보험자) 정보</caption>

@@ -76,13 +76,15 @@ export default function DomesticInsuranceStep3Page() {
         const data1 = JSON.parse(step1Data);
         const data2 = JSON.parse(step2Data);
         
-        setTourNum(data1.tourNum || 1);
+        // 실제 입력된 인원 수 사용 (step2에서 업데이트된 값 또는 actual_insured_count)
+        const actualCount = data2.actual_insured_count || data1.tourNum || 1;
+        setTourNum(actualCount);
         setStartDate(`${data1.startDate} ${data1.startHour}:00:00`);
         setEndDate(`${data1.endDate} ${data1.endHour}:00:00`);
         
-        // 피보험자 리스트 생성
+        // 피보험자 리스트 생성 (입력 완료된 인원만 표시)
         const insuredPersons = [];
-        for (let i = 1; i <= data1.tourNum; i++) {
+        for (let i = 1; i <= actualCount; i++) {
           const name = data2[`insured_name_${i}`] || `피보험자${i}`;
           const countryType = data2[`insured_country_type_${i}`] || 'D';
           

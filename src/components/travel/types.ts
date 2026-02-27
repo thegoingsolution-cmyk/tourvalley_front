@@ -29,6 +29,7 @@ export interface Participant {
   nationality: '내국인' | '외국인';
   birthDate: string;
   gender: '남자' | '여자';
+  residentNumber?: string; // 주민번호 또는 외국인등록번호
   email1: string;
   email2: string;
   customEmail?: string; // 직접입력 이메일 도메인

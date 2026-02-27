@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCorporateMemberInfo } from '@/services/authService';
+import { getTrackingInfo } from '@/utils/tracking';
 import { requestNicepayPayment, openNicepayWindow, processNaverPayPayment, processKakaoPayPayment } from '@/services/paymentService';
 import '../../popup/page.css';
 
@@ -545,7 +546,7 @@ export default function LongStayInsuranceStep5Page() {
           sequence_number: i,
           name: name,
           english_name: engName || null,
-          resident_number: birthDate ? `${birthDate}-${genderCode}******` : '',
+          resident_number: birthDate ? `${birthDate}-${genderCode}000000` : '',
           gender: gender,
           age: age,
           plan_type: getPlanType(planCode),
@@ -661,6 +662,7 @@ export default function LongStayInsuranceStep5Page() {
       }
 
       // 계약 데이터 구성
+      const trackingInfo = getTrackingInfo('PC');
       const contractData = {
         contract: {
           member_id: isLoggedIn && member ? member.id : null,
@@ -675,7 +677,8 @@ export default function LongStayInsuranceStep5Page() {
           travel_participants: step1Data.tourNum,
           total_premium: step3Data?.total_premium || 0,
           device: 'PC',
-          access_path: '투어밸리 사이트',
+          access_path: trackingInfo.access_path,
+          affiliate: trackingInfo.affiliate,
         },
         contractor: {
           contractor_type: '법인',

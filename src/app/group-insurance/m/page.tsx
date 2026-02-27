@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { requestNicepayPayment, openNicepayWindow, processNaverPayPayment, processKakaoPayPayment } from '@/services/paymentService';
+import { getTrackingInfo } from '@/utils/tracking';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCorporateMemberInfo, CorporateInfo, ContactInfo } from '@/services/authService';
 import Header from '@/components/Header';
@@ -1722,10 +1723,25 @@ function MobileGroupInsuranceContent() {
       return;
     }
 
+    // 필수 정보 검증 (내국인/외국인별)
     for (const participant of participants) {
-      if (!participant.name || !participant.birthDate || participant.birthDate.length !== 8) {
-        alert('모든 가입자의 이름과 생년월일을 입력해주세요.');
+      if (!participant.name) {
+        alert('모든 가입자의 이름을 입력해주세요.');
         return;
+      }
+      
+      if (participant.nationality === '내국인') {
+        // 내국인: 생년월일 8자리 필수
+        if (!participant.birthDate || participant.birthDate.length !== 8) {
+          alert('내국인 가입자의 생년월일 8자리를 입력해주세요.');
+          return;
+        }
+      } else if (participant.nationality === '외국인') {
+        // 외국인: 외국인등록번호 13자리 필수
+        if (!participant.residentNumber || participant.residentNumber.length !== 13) {
+          alert('외국인 가입자의 외국인등록번호 13자리를 입력해주세요.');
+          return;
+        }
       }
     }
 
@@ -1917,6 +1933,7 @@ function MobileGroupInsuranceContent() {
       // 나이스페이먼츠, 네이버페이, 카카오페이는 먼저 계약 등록 후 결제
       if (paymentMethod === '나이스페이먼츠' || paymentMethod === '네이버페이' || paymentMethod === '카카오페이') {
         // 1. 계약 등록 (결제 대기 상태)
+        const trackingInfo = getTrackingInfo('모바일');
         const contractData = {
           contract: {
             member_id: isLoggedIn && member ? member.id : null,
@@ -1931,7 +1948,8 @@ function MobileGroupInsuranceContent() {
             travel_participants: currentParticipants.length,
             total_premium: currentCalculatedPremiums.totalPremium,
             device: '모바일',
-            access_path: '투어밸리 모바일 사이트',
+            access_path: trackingInfo.access_path,
+            affiliate: trackingInfo.affiliate,
           },
           contractor: hasGroupParticipants && groupInfo ? {
             // 그룹 보험인 경우 - 회원 타입에 따라 결정
@@ -1948,22 +1966,26 @@ function MobileGroupInsuranceContent() {
             // 개인 보험인 경우 기존 로직
             contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: currentParticipants[0]?.name || '',
-            resident_number: currentParticipants[0]?.birthDate ? `${currentParticipants[0].birthDate}-${getResidentGenderCode(currentParticipants[0].birthDate, currentParticipants[0].gender)}******` : '',
+            resident_number: currentParticipants[0]?.birthDate ? `${currentParticipants[0].birthDate}-${getResidentGenderCode(currentParticipants[0].birthDate, currentParticipants[0].gender)}000000` : '',
             mobile_phone: currentParticipants[0]?.phone || '',
             email: getFullEmail(currentParticipants[0]),
           },
           insured_persons: currentParticipants.map((p, idx) => {
             const age = calculateAgeFromBirthDate(p.birthDate);
             const participantPremium = currentCalculatedPremiums.participants.find(cp => cp.id === p.id || cp.name === p.name);
+            const nationalityType = p.nationality === '외국인' ? '외국인' : '내국인';
             return {
               sequence_number: idx + 1,
               name: p.name,
-              resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}******`,
+              resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}000000`,
               gender: p.gender,
               age: age || 0,
               plan_type: participantPremium?.planType || selectedPlan || '실속플랜',
               premium: participantPremium?.premium || 0,
               has_medical_expense: hasMedicalExpense ? 1 : 0,
+              nationality_type: nationalityType,
+              nationality_continent: null,
+              nationality_country: null,
             };
           }),
           companions: [],
@@ -2092,6 +2114,7 @@ function MobileGroupInsuranceContent() {
         }
       } else if (paymentMethod === '기타결제' && paymentSubMethod === '가상계좌') {
         // 가상계좌: 계약 등록 후 나이스페이 결제창 호출
+        const trackingInfo = getTrackingInfo('모바일');
         const contractData = {
           contract: {
             member_id: isLoggedIn && member ? member.id : null,
@@ -2106,7 +2129,8 @@ function MobileGroupInsuranceContent() {
             travel_participants: currentParticipants.length,
             total_premium: currentCalculatedPremiums.totalPremium,
             device: '모바일',
-            access_path: '투어밸리 모바일 사이트',
+            access_path: trackingInfo.access_path,
+            affiliate: trackingInfo.affiliate,
           },
           contractor: hasGroupParticipants && groupInfo ? {
             contractor_type: (isLoggedIn && member && member.member_type !== '개인') ? '법인' : '개인',
@@ -2121,22 +2145,26 @@ function MobileGroupInsuranceContent() {
           } : {
             contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: currentParticipants[0]?.name || '',
-            resident_number: currentParticipants[0]?.birthDate ? `${currentParticipants[0].birthDate}-${getResidentGenderCode(currentParticipants[0].birthDate, currentParticipants[0].gender)}******` : '',
+            resident_number: currentParticipants[0]?.birthDate ? `${currentParticipants[0].birthDate}-${getResidentGenderCode(currentParticipants[0].birthDate, currentParticipants[0].gender)}000000` : '',
             mobile_phone: currentParticipants[0]?.phone || '',
             email: getFullEmail(currentParticipants[0]),
           },
           insured_persons: currentParticipants.map((p, idx) => {
             const age = calculateAgeFromBirthDate(p.birthDate);
             const participantPremium = currentCalculatedPremiums.participants.find(cp => cp.id === p.id || cp.name === p.name);
+            const nationalityType = p.nationality === '외국인' ? '외국인' : '내국인';
             return {
               sequence_number: idx + 1,
               name: p.name,
-              resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}******`,
+              resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}000000`,
               gender: p.gender,
               age: age || 0,
               plan_type: participantPremium?.planType || selectedPlan || '실속플랜',
               premium: participantPremium?.premium || 0,
               has_medical_expense: hasMedicalExpense ? 1 : 0,
+              nationality_type: nationalityType,
+              nationality_continent: null,
+              nationality_country: null,
             };
           }),
           companions: [],
@@ -2213,6 +2241,7 @@ function MobileGroupInsuranceContent() {
         }
       } else {
         // 기타결제 (무통장입금, 수기카드)는 바로 계약 등록
+        const trackingInfo = getTrackingInfo('모바일');
         const contractData = {
           contract: {
             member_id: isLoggedIn && member ? member.id : null,
@@ -2227,7 +2256,8 @@ function MobileGroupInsuranceContent() {
             travel_participants: currentParticipants.length,
             total_premium: currentCalculatedPremiums.totalPremium,
             device: '모바일',
-            access_path: '투어밸리 모바일 사이트',
+            access_path: trackingInfo.access_path,
+            affiliate: trackingInfo.affiliate,
           },
           contractor: hasGroupParticipants && groupInfo ? {
             // 그룹 보험인 경우 - 회원 타입에 따라 결정
@@ -2244,22 +2274,26 @@ function MobileGroupInsuranceContent() {
             // 개인 보험인 경우 기존 로직
             contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: currentParticipants[0]?.name || '',
-            resident_number: currentParticipants[0]?.birthDate ? `${currentParticipants[0].birthDate}-${getResidentGenderCode(currentParticipants[0].birthDate, currentParticipants[0].gender)}******` : '',
+            resident_number: currentParticipants[0]?.birthDate ? `${currentParticipants[0].birthDate}-${getResidentGenderCode(currentParticipants[0].birthDate, currentParticipants[0].gender)}000000` : '',
             mobile_phone: currentParticipants[0]?.phone || '',
             email: getFullEmail(currentParticipants[0]),
           },
           insured_persons: currentParticipants.map((p, idx) => {
             const age = calculateAgeFromBirthDate(p.birthDate);
             const participantPremium = currentCalculatedPremiums.participants.find(cp => cp.id === p.id || cp.name === p.name);
+            const nationalityType = p.nationality === '외국인' ? '외국인' : '내국인';
             return {
               sequence_number: idx + 1,
               name: p.name,
-              resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}******`,
+              resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}000000`,
               gender: p.gender,
               age: age || 0,
               plan_type: selectedPlan || '실속플랜',
               premium: participantPremium?.premium || 0,
               has_medical_expense: hasMedicalExpense ? 1 : 0,
+              nationality_type: nationalityType,
+              nationality_continent: null,
+              nationality_country: null,
             };
           }),
           companions: [],
@@ -2865,13 +2899,13 @@ function MobileGroupInsuranceContent() {
         isOpen={showExcelModal}
         onClose={() => setShowExcelModal(false)}
         onUpload={(newParticipants, startId) => {
-          const updatedParticipants = [...participants];
+          // 엑셀 데이터로 기존 참가자 목록을 완전히 교체
           const participantsWithCorrectIds = newParticipants.map((p, index) => ({
             ...p,
-            id: startId + index,
+            id: index + 1, // ID를 1부터 시작하도록 설정
           }));
-          updatedParticipants.push(...participantsWithCorrectIds);
-          setParticipants(updatedParticipants);
+          
+          setParticipants(participantsWithCorrectIds);
           setShowExcelModal(false);
         }}
         currentParticipants={participants}

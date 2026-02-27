@@ -256,8 +256,8 @@ export default function ExcelUploadModal({
                       </tr>
                     </tbody>
                   </table>
-                  <p className="tour2023_pcBox_txt07">- 반드시 피보험자 전체리스트를 업로드 해주셔야 합니다.</p>
-                  <p className="tour2023_pcBox_txt07">- 외국인은 외국인 등록번호가 있는 경우 보험가입이 가능합니다(외국인 등록번호가 없는 경우 가입불가)</p>
+                  <p className="tour2023_pcBox_txt07">- 대표가입자(가입자1)를 포함한 가입자(피보험자) 전체리스트를 업로드해주셔야 합니다.</p>
+                  <p className="tour2023_pcBox_txt07">- 외국인은 외국인 등록번호가 있는 사람만 가입이 가능합니다.</p>
                   <p className="tour2023_pcBox_txt11">파일 업로드</p>
                   <div className="tour2023_pc_insu">
                     <a
@@ -356,9 +356,8 @@ export default function ExcelUploadModal({
 
         <div className="excel-notes">
           <ul>
-            <li>- 반드시 피보험자 전체리스트를 업로드 해주셔야 합니다.(개인)</li>
-            <li>- 대표가입자(피보험자)를 제외한 동반가입자(피보험자) 리스트를 업로드해야 합니다.(단체)</li>
-            <li>- 외국인은 외국인 등록번호가 있는 사람만 가입이 가능합니다.</li>
+            <li>대표가입자(가입자1)를 포함한 가입자(피보험자) 전체리스트를 업로드해주셔야 합니다.</li>
+            <li>외국인은 외국인 등록번호가 있는 사람만 가입이 가능합니다.</li>
           </ul>
         </div>
 

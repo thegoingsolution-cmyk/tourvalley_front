@@ -173,6 +173,7 @@ export default function ParticipantInfoStep({
         nationality: '내국인',
         birthDate: '',
         gender: '남자',
+        residentNumber: '',
         email1: '',
         email2: '',
         phone: '',
@@ -227,8 +228,24 @@ export default function ParticipantInfoStep({
   };
 
   return (
-    <section className="form-section">
-      <div className="form-container">
+    <>
+      <style>{`
+        .resident-number-horizontal.tourG_line::after {
+          content: '';
+          position: absolute;
+          display: inline-block;
+          width: 20px;
+          height: 1px;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          border-bottom: 1px solid #d5d7dd;
+          vertical-align: middle;
+          z-index: 1;
+        }
+      `}</style>
+      <section className="form-section">
+        <div className="form-container">
         <div className="form-card">
           {!hideFormHeader && (
             <div className="form-header">
@@ -396,6 +413,71 @@ export default function ParticipantInfoStep({
                     </div>
                   </div>
                 )}
+
+                {/* 외국인등록번호 */}
+                {participant.nationality === '외국인' && (() => {
+                  const residentNumber = participant.residentNumber || '';
+                  const frontPart = residentNumber.substring(0, 6);
+                  const backPart = residentNumber.substring(6, 13);
+                  
+                  return (
+                    <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line resident-number-horizontal" id={`resident_number_area_${index + 1}`}>
+                      <label>외국인등록번호</label>
+                      <input
+                        type="tel"
+                        id={`resident_number_front_${index + 1}`}
+                        name="resident_number_front"
+                        value={frontPart}
+                        maxLength={6}
+                        placeholder="881212"
+                        className="tourGuard_input_w01"
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9]/g, '');
+                          if (value.length <= 6) {
+                            const newResidentNumber = value + backPart;
+                            handleParticipantChange(index, 'residentNumber', newResidentNumber);
+                          }
+                        }}
+                        style={{
+                          height: '32px',
+                          paddingLeft: '10px',
+                          color: '#000',
+                          fontSize: '18px',
+                          letterSpacing: '0px',
+                          marginTop: '23px',
+                          marginLeft: '10px',
+                          paddingTop: '0px',
+                        }}
+                      />
+                      <input
+                        type="tel"
+                        id={`resident_number_back_${index + 1}`}
+                        name="resident_number_back"
+                        value={backPart}
+                        maxLength={7}
+                        placeholder="1234567"
+                        className="tourGuard_input_w01"
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9]/g, '');
+                          if (value.length <= 7) {
+                            const newResidentNumber = frontPart + value;
+                            handleParticipantChange(index, 'residentNumber', newResidentNumber);
+                          }
+                        }}
+                        style={{
+                          height: '32px',
+                          paddingLeft: '10px',
+                          color: '#000',
+                          fontSize: '18px',
+                          letterSpacing: '0px',
+                          marginTop: '23px',
+                          marginLeft: '0px',
+                          paddingTop: '0px',
+                        }}
+                      />
+                    </div>
+                  );
+                })()}
 
                 {/* 이메일 주소 - 가입자 1(대표)만 */}
                 {index === 0 && (
@@ -736,6 +818,7 @@ export default function ParticipantInfoStep({
         </div>
       </div>
     </section>
+    </>
   );
 }
 

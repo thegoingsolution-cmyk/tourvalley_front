@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getImagePath } from '@/utils/path';
+import { getTrackingInfo } from '@/utils/tracking';
 import { requestNicepayPayment, openNicepayWindow, processNaverPayPayment, processKakaoPayPayment } from '@/services/paymentService';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
@@ -473,11 +474,25 @@ export default function PCLongTermStayPage() {
       return;
     }
 
-    // 필수 정보 검증
+    // 필수 정보 검증 (내국인/외국인별)
     for (const participant of participants) {
-      if (!participant.name || !participant.birthDate || participant.birthDate.length !== 8) {
-        alert('모든 가입자의 이름과 생년월일을 입력해주세요.');
+      if (!participant.name) {
+        alert('모든 가입자의 이름을 입력해주세요.');
         return;
+      }
+      
+      if (participant.nationality === '내국인') {
+        // 내국인: 생년월일 8자리 필수
+        if (!participant.birthDate || participant.birthDate.length !== 8) {
+          alert('내국인 가입자의 생년월일 8자리를 입력해주세요.');
+          return;
+        }
+      } else if (participant.nationality === '외국인') {
+        // 외국인: 외국인등록번호 13자리 필수
+        if (!participant.residentNumber || participant.residentNumber.length !== 13) {
+          alert('외국인 가입자의 외국인등록번호 13자리를 입력해주세요.');
+          return;
+        }
       }
     }
 
@@ -494,10 +509,27 @@ export default function PCLongTermStayPage() {
       let totalPremium = 0;
 
       for (const participant of participants) {
-        // 나이 계산
-        const age = calculateAgeFromBirthDate(participant.birthDate);
+        // 나이 계산 (내국인: 생년월일, 외국인: 외국인등록번호에서 추출)
+        let birthDateForAge = participant.birthDate;
+        if (participant.nationality === '외국인' && participant.residentNumber) {
+          // 외국인등록번호 앞 6자리(YYMMDD)에서 생년월일 추출
+          const residentNum = participant.residentNumber;
+          if (residentNum.length >= 6) {
+            const yy = parseInt(residentNum.substring(0, 2));
+            const mm = residentNum.substring(2, 4);
+            const dd = residentNum.substring(4, 6);
+            // 50 이상이면 1900년대, 미만이면 2000년대
+            const year = yy >= 50 ? 1900 + yy : 2000 + yy;
+            birthDateForAge = `${year}${mm}${dd}`;
+          }
+        }
+        
+        const age = calculateAgeFromBirthDate(birthDateForAge);
         if (age === null) {
-          alert(`${participant.name}의 생년월일을 올바르게 입력해주세요.`);
+          const errorMsg = participant.nationality === '외국인' 
+            ? `${participant.name}의 외국인등록번호를 올바르게 입력해주세요.`
+            : `${participant.name}의 생년월일을 올바르게 입력해주세요.`;
+          alert(errorMsg);
           setIsCalculating(false);
           return;
         }
@@ -555,6 +587,19 @@ export default function PCLongTermStayPage() {
         const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
         const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
 
+        // 외국인일 경우 외국인등록번호에서 생년월일 추출
+        let birthDateForApi = participant.birthDate;
+        if (participant.nationality === '외국인' && participant.residentNumber) {
+          const residentNum = participant.residentNumber;
+          if (residentNum.length >= 6) {
+            const yy = parseInt(residentNum.substring(0, 2));
+            const mm = residentNum.substring(2, 4);
+            const dd = residentNum.substring(4, 6);
+            const year = yy >= 50 ? 1900 + yy : 2000 + yy;
+            birthDateForApi = `${year}${mm}${dd}`;
+          }
+        }
+        
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/travel/calculate-premium`, {
           method: 'POST',
           headers: {
@@ -563,7 +608,7 @@ export default function PCLongTermStayPage() {
           body: JSON.stringify({
             insurance_type: travelPurpose || '유학/어학연수',
             age: age,
-            birth_date: participant.birthDate,
+            birth_date: birthDateForApi,
             gender: participant.gender,
             plan_type: dbPlanType, // DB에 저장된 플랜명 사용
             plan_variant: 'B',
@@ -907,6 +952,7 @@ export default function PCLongTermStayPage() {
       // 나이스페이먼츠, 네이버페이, 카카오페이는 먼저 계약 등록 후 결제 처리
       if (paymentMethod === '나이스페이먼츠' || paymentMethod === '네이버페이' || paymentMethod === '카카오페이') {
         // 1. 계약 등록 (결제 대기 상태)
+        const trackingInfo = getTrackingInfo('PC');
         const contractData = {
           contract: {
             member_id: isLoggedIn && member ? member.id : null,
@@ -921,25 +967,58 @@ export default function PCLongTermStayPage() {
             travel_participants: participants.length,
             total_premium: calculatedPremiums?.totalPremium || 0,
             device: 'PC',
-            access_path: '투어밸리 사이트',
+            access_path: trackingInfo.access_path,
+            affiliate: trackingInfo.affiliate,
           },
           contractor: {
             contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: participants[0]?.name || '',
-            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${getResidentGenderCode(participants[0].birthDate, participants[0].gender)}******` : '',
+            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${getResidentGenderCode(participants[0].birthDate, participants[0].gender)}000000` : '',
             mobile_phone: participants[0]?.phone || '',
             email: participants[0]?.email1 && participants[0]?.email2 ? `${participants[0].email1}@${participants[0].email2}` : '',
           },
           insured_persons: participants.map((p, idx) => {
-            const age = calculateAgeFromBirthDate(p.birthDate);
+            // 외국인일 경우 외국인등록번호에서 생년월일 추출
+            let birthDateForAge = p.birthDate;
+            if (p.nationality === '외국인' && p.residentNumber) {
+              const residentNum = p.residentNumber;
+              if (residentNum.length >= 6) {
+                const yy = parseInt(residentNum.substring(0, 2));
+                const mm = residentNum.substring(2, 4);
+                const dd = residentNum.substring(4, 6);
+                const year = yy >= 50 ? 1900 + yy : 2000 + yy;
+                birthDateForAge = `${year}${mm}${dd}`;
+              }
+            }
+            
+            const age = calculateAgeFromBirthDate(birthDateForAge);
             // 국적 정보 변환
             const nationalityType = p.nationality === '외국인' ? '외국인' : '내국인';
             const calculatedParticipant = calculatedPremiums?.participants.find(cp => cp.id === p.id);
+            
+            // resident_number 설정 (내국인: 주민번호, 외국인: 외국인등록번호)
+            let residentNumber = '';
+            if (p.nationality === '외국인') {
+              // 외국인등록번호: 앞 6자리(YYMMDD)를 YYYYMMDD로 변환하고 하이픈 포함
+              if (p.residentNumber && p.residentNumber.length === 13) {
+                const yy = parseInt(p.residentNumber.substring(0, 2));
+                const mm = p.residentNumber.substring(2, 4);
+                const dd = p.residentNumber.substring(4, 6);
+                const year = yy >= 50 ? 1900 + yy : 2000 + yy;
+                const backPart = p.residentNumber.substring(6, 13);
+                residentNumber = `${year}${mm}${dd}-${backPart}`;
+              } else {
+                residentNumber = p.residentNumber || '';
+              }
+            } else {
+              residentNumber = p.birthDate ? `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}000000` : '';
+            }
+            
             return {
               sequence_number: idx + 1,
               name: p.name,
               english_name: p.englishName || null,
-              resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}******`,
+              resident_number: residentNumber,
               gender: p.gender,
               age: age || 0,
               plan_type: calculatedParticipant?.planType || selectedPlan || '실속플랜',
@@ -1041,6 +1120,7 @@ export default function PCLongTermStayPage() {
         }
       } else if (paymentMethod === '기타결제' && paymentSubMethod !== '가상계좌') {
         // 기타결제 (무통장입금, 수기카드)는 바로 계약 등록 (가상계좌는 아래 별도 블록에서 처리)
+        const trackingInfo = getTrackingInfo('PC');
         const contractData = {
           contract: {
             member_id: isLoggedIn && member ? member.id : null,
@@ -1055,25 +1135,58 @@ export default function PCLongTermStayPage() {
             travel_participants: participants.length,
             total_premium: calculatedPremiums?.totalPremium || 0,
             device: 'PC',
-            access_path: '투어밸리 사이트',
+            access_path: trackingInfo.access_path,
+            affiliate: trackingInfo.affiliate,
           },
           contractor: {
             contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: participants[0]?.name || '',
-            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${getResidentGenderCode(participants[0].birthDate, participants[0].gender)}******` : '',
+            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${getResidentGenderCode(participants[0].birthDate, participants[0].gender)}000000` : '',
             mobile_phone: participants[0]?.phone || '',
             email: participants[0]?.email1 && participants[0]?.email2 ? `${participants[0].email1}@${participants[0].email2}` : '',
           },
           insured_persons: participants.map((p, idx) => {
-            const age = calculateAgeFromBirthDate(p.birthDate);
+            // 외국인일 경우 외국인등록번호에서 생년월일 추출
+            let birthDateForAge = p.birthDate;
+            if (p.nationality === '외국인' && p.residentNumber) {
+              const residentNum = p.residentNumber;
+              if (residentNum.length >= 6) {
+                const yy = parseInt(residentNum.substring(0, 2));
+                const mm = residentNum.substring(2, 4);
+                const dd = residentNum.substring(4, 6);
+                const year = yy >= 50 ? 1900 + yy : 2000 + yy;
+                birthDateForAge = `${year}${mm}${dd}`;
+              }
+            }
+            
+            const age = calculateAgeFromBirthDate(birthDateForAge);
             // 국적 정보 변환
             const nationalityType = p.nationality === '외국인' ? '외국인' : '내국인';
             const calculatedParticipant = calculatedPremiums?.participants.find(cp => cp.id === p.id);
+            
+            // resident_number 설정 (내국인: 주민번호, 외국인: 외국인등록번호)
+            let residentNumber = '';
+            if (p.nationality === '외국인') {
+              // 외국인등록번호: 앞 6자리(YYMMDD)를 YYYYMMDD로 변환하고 하이픈 포함
+              if (p.residentNumber && p.residentNumber.length === 13) {
+                const yy = parseInt(p.residentNumber.substring(0, 2));
+                const mm = p.residentNumber.substring(2, 4);
+                const dd = p.residentNumber.substring(4, 6);
+                const year = yy >= 50 ? 1900 + yy : 2000 + yy;
+                const backPart = p.residentNumber.substring(6, 13);
+                residentNumber = `${year}${mm}${dd}-${backPart}`;
+              } else {
+                residentNumber = p.residentNumber || '';
+              }
+            } else {
+              residentNumber = p.birthDate ? `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}000000` : '';
+            }
+            
             return {
               sequence_number: idx + 1,
               name: p.name,
               english_name: p.englishName || null,
-              resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}******`,
+              resident_number: residentNumber,
               gender: p.gender,
               age: age || 0,
               plan_type: calculatedParticipant?.planType || selectedPlan || '실속플랜',
@@ -1131,6 +1244,7 @@ export default function PCLongTermStayPage() {
       // 가상계좌 결제 처리 (결제창 Server 승인 모델)
       if (paymentMethod === '기타결제' && paymentSubMethod === '가상계좌') {
         // 1. 계약 등록 (결제 대기 상태)
+        const trackingInfo = getTrackingInfo('PC');
         const contractData = {
           contract: {
             member_id: isLoggedIn && member ? member.id : null,
@@ -1145,12 +1259,13 @@ export default function PCLongTermStayPage() {
             travel_participants: participants.length,
             total_premium: calculatedPremiums?.totalPremium || 0,
             device: 'PC',
-            access_path: '투어밸리 사이트',
+            access_path: trackingInfo.access_path,
+            affiliate: trackingInfo.affiliate,
           },
           contractor: {
             contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: participants[0]?.name || '',
-            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${getResidentGenderCode(participants[0].birthDate, participants[0].gender)}******` : '',
+            resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${getResidentGenderCode(participants[0].birthDate, participants[0].gender)}000000` : '',
             mobile_phone: participants[0]?.phone || '',
             email: participants[0]?.email1 && participants[0]?.email2 
               ? `${participants[0].email1}@${participants[0].email2 === '직접입력' ? participants[0].customEmail : participants[0].email2}`
@@ -1163,7 +1278,7 @@ export default function PCLongTermStayPage() {
               sequence_number: idx + 1,
               name: p.name,
               english_name: p.englishName || null,
-              resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}******`,
+              resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}000000`,
               gender: p.gender,
               age: age || 0,
               plan_type: selectedPlan || '실속플랜',
@@ -1598,20 +1713,13 @@ export default function PCLongTermStayPage() {
           isOpen={showExcelModal}
           onClose={() => setShowExcelModal(false)}
           onUpload={(newParticipants, startId) => {
-            // 기존 참가자 목록에 새로 파싱된 참가자들 추가
-            // 대표 가입자(첫 번째)는 제외하고 추가
-            const updatedParticipants = [...participants];
-            
-            // 새 참가자들의 ID를 올바르게 설정
+            // 엑셀 데이터로 기존 참가자 목록을 완전히 교체
             const participantsWithCorrectIds = newParticipants.map((p, index) => ({
               ...p,
-              id: startId + index,
+              id: index + 1, // ID를 1부터 시작하도록 설정
             }));
             
-            // 기존 참가자 목록에 추가 (대표 가입자는 유지)
-            updatedParticipants.push(...participantsWithCorrectIds);
-            
-            setParticipants(updatedParticipants);
+            setParticipants(participantsWithCorrectIds);
             setShowExcelModal(false);
           }}
           currentParticipants={participants}

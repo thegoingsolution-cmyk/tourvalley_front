@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCorporateMemberInfo } from '@/services/authService';
+import { getTrackingInfo } from '@/utils/tracking';
 import { requestNicepayPayment, openNicepayWindow, processNaverPayPayment, processKakaoPayPayment } from '@/services/paymentService';
 import '../../popup/page.css';
 
@@ -346,14 +347,32 @@ export default function DomesticInsuranceStep5Page() {
         const gender = step2Data[`insured_gender_${i}`] || '남자';
         const planCode = step3Data.selected_plans?.[i] || 'BAW';
         const premium = step3Data.premiums?.[i] || 0;
+        const countryType = step2Data[`insured_country_type_${i}`] || 'D'; // 'D' = 내국인, 'F' = 외국인
+        const nationalityType = countryType === 'F' ? '외국인' : '내국인';
 
         // 생년월일에서 나이 계산
         let age = 0;
         let genderCode = '1'; // 기본값
-        if (birthDate && birthDate.length >= 8) {
-          const year = parseInt(birthDate.substring(0, 4));
-          const month = parseInt(birthDate.substring(4, 6));
-          const day = parseInt(birthDate.substring(6, 8));
+        
+        // 외국인일 경우 외국인등록번호에서 생년월일 추출
+        let actualBirthDate = birthDate;
+        if (countryType === 'F') {
+          const ssn1 = step2Data[`insured_ssn1_${i}`] || '';
+          // 외국인등록번호 앞 6자리가 생년월일 (YYMMDD)
+          if (ssn1 && ssn1.length >= 6) {
+            const yy = parseInt(ssn1.substring(0, 2));
+            const mm = ssn1.substring(2, 4);
+            const dd = ssn1.substring(4, 6);
+            // 1900년대 또는 2000년대 판단 (일반적으로 50 이상이면 1900년대, 미만이면 2000년대)
+            const year = yy >= 50 ? 1900 + yy : 2000 + yy;
+            actualBirthDate = `${year}${mm}${dd}`;
+          }
+        }
+        
+        if (actualBirthDate && actualBirthDate.length >= 8) {
+          const year = parseInt(actualBirthDate.substring(0, 4));
+          const month = parseInt(actualBirthDate.substring(4, 6));
+          const day = parseInt(actualBirthDate.substring(6, 8));
           const today = new Date();
           age = today.getFullYear() - year;
           if (today.getMonth() < month - 1 || (today.getMonth() === month - 1 && today.getDate() < day)) {
@@ -370,16 +389,38 @@ export default function DomesticInsuranceStep5Page() {
           }
         }
 
+        // 외국인일 경우 외국인등록번호 가져오기
+        let residentNumber = '';
+        if (countryType === 'F') {
+          const ssn1 = step2Data[`insured_ssn1_${i}`] || '';
+          const ssn2 = step2Data[`insured_ssn2_${i}`] || '';
+          if (ssn1 && ssn2 && ssn1.length === 6 && ssn2.length === 7) {
+            // 외국인등록번호: 앞 6자리(YYMMDD)를 YYYYMMDD로 변환하고 하이픈 포함
+            const yy = parseInt(ssn1.substring(0, 2));
+            const mm = ssn1.substring(2, 4);
+            const dd = ssn1.substring(4, 6);
+            const year = yy >= 50 ? 1900 + yy : 2000 + yy;
+            residentNumber = `${year}${mm}${dd}-${ssn2}`;
+          } else {
+            residentNumber = ssn1 && ssn2 ? `${ssn1}${ssn2}` : '';
+          }
+        } else {
+          residentNumber = birthDate ? `${birthDate}-${genderCode}000000` : '';
+        }
+
         insuredPersons.push({
           sequence_number: i,
           name: name,
-          resident_number: birthDate ? `${birthDate}-${genderCode}******` : '',
+          resident_number: residentNumber,
           gender: gender,
           age: age,
           plan_type: getPlanType(planCode),
           plan_variant: 'B',
           premium: premium,
           has_medical_expense: 1,
+          nationality_type: nationalityType,
+          nationality_continent: null,
+          nationality_country: null,
         });
       }
 
@@ -395,6 +436,7 @@ export default function DomesticInsuranceStep5Page() {
       const paymentMethodName = paymentMethodMap[payMethod] || '나이스페이먼츠';
 
       // 계약 데이터 구성
+      const trackingInfo = getTrackingInfo('PC');
       const contractData = {
         contract: {
           member_id: isLoggedIn && member ? member.id : null,
@@ -409,7 +451,8 @@ export default function DomesticInsuranceStep5Page() {
           travel_participants: step1Data.tourNum,
           total_premium: step3Data?.total_premium || 0,
           device: 'PC',
-          access_path: '투어밸리 사이트',
+          access_path: trackingInfo.access_path,
+          affiliate: trackingInfo.affiliate,
         },
         contractor: {
           contractor_type: '법인',

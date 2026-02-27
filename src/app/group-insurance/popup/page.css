@@ -2119,3 +2119,206 @@ select::-ms-expand {
   letter-spacing: -0.7px;
 }
 
+/* ========================================
+   Excel Upload Modal Styles
+   ======================================== */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 480px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.modal-title {
+  font-size: 22px;
+  color: #3e3e3e;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  text-align: center;
+  box-sizing: border-box;
+  margin: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 32px;
+  color: #999;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.modal-close-btn:hover {
+  color: #333;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-description {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+/* Excel Upload Modal */
+.excel-download-btn {
+  width: 100%;
+  padding: 12px;
+  background: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 24px;
+  transition: background 0.2s;
+}
+
+.excel-download-btn:hover {
+  background: #218838;
+}
+
+.excel-example-table {
+  margin: 24px 0;
+  overflow-x: auto;
+}
+
+.excel-example-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.excel-example-table th,
+.excel-example-table td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: center;
+  font-size: 14px;
+}
+
+.excel-example-table th {
+  background: #f9f9f9;
+  font-weight: 600;
+  color: #333;
+}
+
+.excel-notes {
+  margin: 24px 0;
+  padding: 16px;
+  background: #fff3cd;
+  border-radius: 8px;
+}
+
+.excel-notes ul {
+  margin: 0;
+  padding-left: 20px;
+  line-height: 1.8;
+  color: #856404;
+  font-size: 14px;
+}
+
+.file-upload-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #eee;
+}
+
+.file-upload-section h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.file-upload-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.file-select-btn {
+  padding: 10px 20px;
+  background: #fff;
+  border: 2px solid #2843e5;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #2843e5;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.file-select-btn:hover {
+  background: #f0f4ff;
+}
+
+.file-selected-info {
+  flex: 1;
+  padding: 10px 12px;
+  background: #f9f9f9;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #666;
+}
+
+.file-upload-submit-btn {
+  width: 100%;
+  padding: 12px;
+  background: #2843e5;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.file-upload-submit-btn:hover {
+  background: #1e33c4;
+}
+
+.file-upload-submit-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
