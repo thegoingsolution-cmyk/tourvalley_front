@@ -265,7 +265,7 @@ export default function PCMainPage() {
               />
               <span className="nav-icon-label">여행자보험<br />견적신청</span>
             </div>
-            <div className="nav-icon-item" onClick={() => window.open('https://b2b.bzvalley.net/', '_blank')}>
+            <div className="nav-icon-item" onClick={() => window.open('https://b2b.tourvalley.net/', '_blank')}>
               <img
                 src={getImagePath('/bottom-menu/b_menu07.png')}
                 alt="여행사전용 여행보험센터"

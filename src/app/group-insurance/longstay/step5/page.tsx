@@ -357,8 +357,15 @@ export default function LongStayInsuranceStep5Page() {
           setIsProcessing(false);
           return;
         }
-        if (!cardholderResidentNumber || cardholderResidentNumber.length < 6) {
-          alert('카드소유자 생년월일 또는 사업자번호를 입력해주세요.');
+        // 생년월일 6자리 또는 사업자번호(10자리) 또는 13자리 허용
+        if (!cardholderResidentNumber) {
+          alert('소유자 생년월일 또는 사업자번호를 입력해주세요.');
+          setIsProcessing(false);
+          return;
+        }
+        const residentNumberWithoutHyphen = cardholderResidentNumber.replace(/-/g, '');
+        if (residentNumberWithoutHyphen.length !== 6 && residentNumberWithoutHyphen.length !== 10 && residentNumberWithoutHyphen.length !== 13) {
+          alert('소유자 생년월일 6자리 또는 사업자번호(10자리) 또는 13자리를 입력해주세요.');
           setIsProcessing(false);
           return;
         }
@@ -389,6 +396,36 @@ export default function LongStayInsuranceStep5Page() {
           alert('입금예정자명과 입금예정일을 입력해주세요.');
           setIsProcessing(false);
           return;
+        }
+
+        // 입금예정일이 출발일보다 이전인지 검증
+        if (step1Data && step1Data.startDate) {
+          let departureDateFormatted = step1Data.startDate;
+          let departureHour = parseInt(step1Data.startHour);
+          if (departureHour === 24) {
+            const date = new Date(step1Data.startDate);
+            date.setDate(date.getDate() + 1);
+            departureDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            departureHour = 0;
+          }
+          
+          const departureDateOnly = new Date(departureDateFormatted);
+          const departureYear = departureDateOnly.getFullYear();
+          const departureMonth = departureDateOnly.getMonth() + 1;
+          const departureDay = departureDateOnly.getDate();
+
+          const expectedYearNum = parseInt(expectedYear);
+          const expectedMonthNum = parseInt(expectedMonth);
+          const expectedDayNum = parseInt(expectedDay);
+
+          if (expectedYearNum < departureYear || 
+              (expectedYearNum === departureYear && expectedMonthNum < departureMonth) ||
+              (expectedYearNum === departureYear && expectedMonthNum === departureMonth && expectedDayNum < departureDay)) {
+            const formattedDepartureDate = `${departureYear}-${String(departureMonth).padStart(2, '0')}-${String(departureDay).padStart(2, '0')}`;
+            alert(`입금예정일은 보험 이용 기간 중 출발일(${formattedDepartureDate}) 이후로 설정해야 합니다.`);
+            setIsProcessing(false);
+            return;
+          }
         }
       }
 
@@ -792,6 +829,8 @@ export default function LongStayInsuranceStep5Page() {
               customerEmail: step2Data.contractor_email || '',
               customerPhone: step2Data.contractor_phone || '',
               checkOutDate: step1Data.endDate,
+              purchaserName: step2Data.contractor_contact_person || step2Data.contractor_name || '',
+              purchaserBirthday: step2Data?.insured_birth_1 ? String(step2Data.insured_birth_1).replace(/-/g, '').slice(0, 8) : undefined,
             });
           } catch (error) {
             console.error('네이버 페이 결제 오류:', error);
@@ -1357,6 +1396,7 @@ export default function LongStayInsuranceStep5Page() {
                   <dd className="font_blue01">※ 네이버페이 안내</dd>
                   <dl style={{ border: '1px solid #d2d2d2', paddingLeft: '4px' }}>
                     <dd>네이버페이는 네이버ID로 신용카드 또는 은행계좌 정보를 등록하여 결제할 수 있는 간편결제 서비스입니다.</dd>
+                    <dd><strong>계약자(또는 결제 담당자) 본인 명의의 네이버 계정으로 로그인한 후 결제해 주세요.</strong> 타인 명의 계정으로는 결제가 제한됩니다.</dd>
                     <dd>주문 변경 시 카드사 혜택 및 할부 적용 여부는 해당 카드사 정책에 따라 변경될 수 있습니다.</dd>
                     <dd>지원 가능 결제수단 : 네이버페이 결제창 내 노출되는 모든 카드/계좌</dd>
                   </dl>
@@ -1543,46 +1583,42 @@ export default function LongStayInsuranceStep5Page() {
                         </div>
                       </td>
                     </tr>
-                    {cardType === '기타카드' && (
-                      <>
-                        <tr>
-                          <td className="sName01">소유자 이름</td>
-                          <td className="dd ag_left">
-                            <div className="in_wrap01">
-                              <div className="bg_join input_cell_01 wd_30" style={{ width: '55%' }}>
-                                <input 
-                                  type="text" 
-                                  className="tf_g" 
-                                  name="card_owner_name" 
-                                  size={15} 
-                                  maxLength={15}
-                                  value={cardholderName}
-                                  onChange={(e) => setCardholderName(e.target.value)}
-                                />
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="sName01">소유자 생년월일 / 사업자번호</td>
-                          <td className="dd ag_left">
-                            <div className="in_wrap01">
-                              <div className="bg_join input_cell_01 wd_30" style={{ width: '55%' }}>
-                                <input 
-                                  type="text" 
-                                  className="tf_g" 
-                                  name="card_owner_ssn" 
-                                  size={15} 
-                                  maxLength={13}
-                                  value={cardholderResidentNumber}
-                                  onChange={(e) => setCardholderResidentNumber(e.target.value.replace(/[^0-9-]/g, ''))}
-                                />
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      </>
-                    )}
+                    <tr>
+                      <td className="sName01">소유자 이름</td>
+                      <td className="dd ag_left">
+                        <div className="in_wrap01">
+                          <div className="bg_join input_cell_01 wd_30" style={{ width: '55%' }}>
+                            <input 
+                              type="text" 
+                              className="tf_g" 
+                              name="card_owner_name" 
+                              size={15} 
+                              maxLength={15}
+                              value={cardholderName}
+                              onChange={(e) => setCardholderName(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="sName01">소유자 생년월일 / 사업자번호</td>
+                      <td className="dd ag_left">
+                        <div className="in_wrap01">
+                          <div className="bg_join input_cell_01 wd_30" style={{ width: '55%' }}>
+                            <input 
+                              type="text" 
+                              className="tf_g" 
+                              name="card_owner_ssn" 
+                              size={15} 
+                              maxLength={15}
+                              value={cardholderResidentNumber}
+                              onChange={(e) => setCardholderResidentNumber(e.target.value.replace(/[^0-9-]/g, ''))}
+                            />
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
               </div>

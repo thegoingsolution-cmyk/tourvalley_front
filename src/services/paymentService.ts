@@ -345,6 +345,10 @@ export const processNaverPayPayment = async (data: {
   customerEmail: string;
   customerPhone: string;
   checkOutDate: string;
+  /** 보험사 가맹점: 네이버 로그인 계정과 일치해야 함. 법인 시 결제 담당자명 권장 */
+  purchaserName?: string;
+  /** 보험사 가맹점 시 purchaserName 또는 purchaserBirthday 권장 (YYYYMMDD 또는 YYYY-MM-DD) */
+  purchaserBirthday?: string;
 }) => {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
@@ -367,6 +371,9 @@ export const processNaverPayPayment = async (data: {
         customerEmail: data.customerEmail,
         customerPhone: data.customerPhone,
         checkOutDate: data.checkOutDate,
+        // 보험사 가맹점: 계약자/결제 담당자와 동일한 네이버 계정으로만 결제 가능 (담당자명 권장)
+        purchaserName: (data.purchaserName || data.customerName)?.trim() || undefined,
+        purchaserBirthday: data.purchaserBirthday ? String(data.purchaserBirthday).replace(/-/g, '').slice(0, 8) : undefined,
       }),
     });
     
@@ -386,7 +393,7 @@ export const processNaverPayPayment = async (data: {
     // 3. 네이버 페이 객체 생성
     const naverPayClientId = process.env.NEXT_PUBLIC_NAVER_PAY_CLIENT_ID;
     // chainId는 필수입니다 (샘플 코드 참고)
-    const naverPayChainId = process.env.NAVER_PAY_CHAIN_ID || "Y1dub1pDaDgyM0w"; // chainId가 없으면 clientId 사용
+    const naverPayChainId = process.env.NAVER_PAY_CHAIN_ID || "UXdGbWVsZDRDcTR"; // chainId가 없으면 clientId 사용
     const isDev = process.env.NEXT_PUBLIC_NAVER_PAY_ENV === 'dev' || process.env.NEXT_PUBLIC_NAVER_PAY_ENV === 'development';
     
     if (!naverPayClientId) {
@@ -446,6 +453,20 @@ export const processNaverPayPayment = async (data: {
       taxExScopeAmount: String(0), // 면세 금액
       returnUrl: String(returnUrl),
     };
+
+    // 보험사 가맹점: 계약자/결제 담당자 본인 네이버 계정으로만 결제 가능 (purchaserName 우선)
+    const purchaserNameValue = (data.purchaserName || data.customerName)?.trim();
+    if (purchaserNameValue) {
+      paymentParams.purchaserName = String(purchaserNameValue);
+      paymentParams.purchaser_name = String(purchaserNameValue);
+    }
+    if (data.purchaserBirthday) {
+      const bday = String(data.purchaserBirthday).replace(/-/g, '').slice(0, 8);
+      if (bday.length === 8) {
+        paymentParams.purchaserBirthday = bday;
+        paymentParams.purchaser_birthday = bday;
+      }
+    }
     
     // 이용완료일이 있는 경우에만 추가
     // 개발 환경에서는 지원되지 않으므로 production 환경에서만 사용 (상용에서는 필수)

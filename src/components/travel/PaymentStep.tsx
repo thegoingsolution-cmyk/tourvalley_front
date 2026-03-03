@@ -27,6 +27,10 @@ interface PaymentStepProps {
   normalPremium: number;
   receiptPremium: number;
   isSamePremium: boolean;
+  departureDate?: string; // 출발일 (YYYY-MM-DD 형식)
+  departureTime?: string; // 출발시간 (HH 형식)
+  arrivalDate?: string; // 도착일 (YYYY-MM-DD 형식)
+  arrivalTime?: string; // 도착시간 (HH 형식)
   onPaymentMethodChange: (method: PaymentMethod | null) => void;
   onPaymentSubMethodChange: (method: PaymentSubMethod | null) => void;
   onDepositBankChange: (bank: string) => void;
@@ -70,6 +74,10 @@ export default function PaymentStep({
   normalPremium,
   receiptPremium,
   isSamePremium,
+  departureDate,
+  departureTime,
+  arrivalDate,
+  arrivalTime,
   onPaymentMethodChange,
   onPaymentSubMethodChange,
   onDepositBankChange,
@@ -95,6 +103,61 @@ export default function PaymentStep({
     if (subMethod === '가상계좌') {
       onDepositBankChange('');
     }
+  };
+
+  // 입금예정일이 출발일보다 이전인지 검증하는 함수
+  const validateExpectedDepositDate = (year: number, month: number, day: number): boolean => {
+    // 출발일 정보가 없으면 검증하지 않음
+    if (!departureDate || !departureTime) {
+      return true;
+    }
+
+    // 입금예정일이 완전히 입력되지 않았으면 검증하지 않음
+    if (year === 0 || month === 0 || day === 0) {
+      return true;
+    }
+
+    // 출발일 계산 (24시인 경우 다음 날 0시로 처리)
+    let departureHour = parseInt(departureTime);
+    let departureDateFormatted = departureDate;
+    if (departureHour === 24) {
+      const date = new Date(departureDate);
+      date.setDate(date.getDate() + 1);
+      departureDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+      departureHour = 0;
+    }
+    
+    // 출발일 날짜만 추출 (YYYY-MM-DD)
+    const departureDateOnly = new Date(departureDateFormatted);
+    const departureYear = departureDateOnly.getFullYear();
+    const departureMonth = departureDateOnly.getMonth() + 1;
+    const departureDay = departureDateOnly.getDate();
+
+    // 입금예정일 날짜
+    const expectedDepositDateOnly = new Date(year, month - 1, day);
+    const expectedYear = expectedDepositDateOnly.getFullYear();
+    const expectedMonth = expectedDepositDateOnly.getMonth() + 1;
+    const expectedDay = expectedDepositDateOnly.getDate();
+
+    // 날짜 비교 (입금예정일이 출발일보다 이전이면 false 반환)
+    if (year < departureYear || 
+        (year === departureYear && month < departureMonth) ||
+        (year === departureYear && month === departureMonth && day < departureDay)) {
+      const formattedDepartureDate = `${departureYear}-${String(departureMonth).padStart(2, '0')}-${String(departureDay).padStart(2, '0')}`;
+      alert(`입금예정일은 보험 이용 기간 중 출발일(${formattedDepartureDate}) 이후로 설정해야 합니다.`);
+      return false;
+    }
+
+    return true;
+  };
+
+  // 입금예정일 변경 핸들러
+  const handleExpectedDepositDateChange = (year: number, month: number, day: number) => {
+    // 검증 실패 시 변경하지 않음
+    if (!validateExpectedDepositDate(year, month, day)) {
+      return;
+    }
+    onExpectedDepositDateChange(year, month, day);
   };
 
   const paymentLabelStyle: React.CSSProperties = {
@@ -303,7 +366,7 @@ export default function PaymentStep({
                     <div className="date-inputs">
                       <select
                         value={expectedDepositYear}
-                        onChange={(e) => onExpectedDepositDateChange(Number(e.target.value), expectedDepositMonth, expectedDepositDay)}
+                        onChange={(e) => handleExpectedDepositDateChange(Number(e.target.value), expectedDepositMonth, expectedDepositDay)}
                       >
                       <option value={0}>연도 선택</option>
                         {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() + i).map(year => (
@@ -312,7 +375,7 @@ export default function PaymentStep({
                       </select>
                       <select
                         value={expectedDepositMonth}
-                        onChange={(e) => onExpectedDepositDateChange(expectedDepositYear, Number(e.target.value), expectedDepositDay)}
+                        onChange={(e) => handleExpectedDepositDateChange(expectedDepositYear, Number(e.target.value), expectedDepositDay)}
                       >
                       <option value={0}>월 선택</option>
                         {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
@@ -321,7 +384,7 @@ export default function PaymentStep({
                       </select>
                       <select
                         value={expectedDepositDay}
-                        onChange={(e) => onExpectedDepositDateChange(expectedDepositYear, expectedDepositMonth, Number(e.target.value))}
+                        onChange={(e) => handleExpectedDepositDateChange(expectedDepositYear, expectedDepositMonth, Number(e.target.value))}
                       >
                       <option value={0}>일 선택</option>
                         {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
@@ -503,6 +566,7 @@ export default function PaymentStep({
               <h3>※ 네이버페이 안내</h3>
               <ul>
                 <li>네이버페이는 네이버ID로 신용카드 또는 은행계좌 정보를 등록하여 결제할 수 있는 간편결제 서비스입니다.</li>
+                <li><strong>계약자(또는 결제 담당자) 본인 명의의 네이버 계정으로 로그인한 후 결제해 주세요.</strong> 타인 명의 계정으로는 결제가 제한됩니다.</li>
                 <li>주문 변경 시 카드사 혜택 및 할부 적용 여부는 해당 카드사 정책에 따라 변경될 수 있습니다.</li>
                 <li>지원 가능 결제수단 : 네이버페이 결제창 내 노출되는 모든 카드/계좌</li>
                 <li>네이버페이 결제 시 네이버 로그인 후 결제가 진행됩니다.</li>
@@ -541,7 +605,15 @@ export default function PaymentStep({
           <button
             type="button"
             className="payment-submit-btn"
-            onClick={onSubmit}
+            onClick={() => {
+              // 무통장입금 선택 시 입금예정일 검증
+              if (paymentMethod === '기타결제' && paymentSubMethod === '무통장입금') {
+                if (!validateExpectedDepositDate(expectedDepositYear, expectedDepositMonth, expectedDepositDay)) {
+                  return;
+                }
+              }
+              onSubmit();
+            }}
           >
             결제하기
           </button>

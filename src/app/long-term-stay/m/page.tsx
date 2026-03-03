@@ -941,8 +941,14 @@ function MobileLongTermStayContent() {
         alert('카드소유자명을 입력해주세요.');
         return;
       }
-      if (!cardholderResidentNumber || cardholderResidentNumber.length < 14) {
-        alert('카드소유자 주민번호를 입력해주세요.');
+      // 생년월일 6자리 또는 사업자번호(10자리) 또는 13자리 허용
+      if (!cardholderResidentNumber) {
+        alert('소유자 생년월일 또는 사업자번호를 입력해주세요.');
+        return;
+      }
+      const residentNumberWithoutHyphen = cardholderResidentNumber.replace(/-/g, '');
+      if (residentNumberWithoutHyphen.length !== 6 && residentNumberWithoutHyphen.length !== 10 && residentNumberWithoutHyphen.length !== 13) {
+        alert('소유자 생년월일 6자리 또는 사업자번호(10자리) 또는 13자리를 입력해주세요.');
         return;
       }
     }
@@ -1119,6 +1125,8 @@ function MobileLongTermStayContent() {
               customerEmail: getFullEmail(participants[0]),
               customerPhone: participants[0]?.phone || '',
               checkOutDate: arrivalDate,
+              purchaserName: participants[0]?.name || '',
+              purchaserBirthday: participants[0]?.birthDate ? String(participants[0].birthDate).replace(/-/g, '').slice(0, 8) : undefined,
             });
             // 네이버 페이 결제창이 열리면, 콜백으로 결과가 처리됩니다
           } catch (error) {
@@ -1793,6 +1801,10 @@ function MobileLongTermStayContent() {
               onNormalPremiumChange={setNormalPremium}
               onReceiptPremiumChange={setReceiptPremium}
               onIsSamePremiumChange={setIsSamePremium}
+              departureDate={departureDate}
+              departureTime={departureTime}
+              arrivalDate={arrivalDate}
+              arrivalTime={arrivalTime}
               onSubmit={handlePaymentSubmit}
             />
           )}

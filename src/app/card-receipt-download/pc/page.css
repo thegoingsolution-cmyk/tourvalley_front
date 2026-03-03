@@ -1,0 +1,235 @@
+/* Certificate Download PC Version */
+.certificate-download-pc {
+  background-color: #fff;
+  min-height: 100vh;
+  padding: 40px 0;
+}
+
+.cd-wrapper {
+  width: 45%;
+  margin: 0 auto;
+  min-width: 600px;
+}
+
+.cd-container {
+  padding: 0 20px;
+}
+
+.cd-content {
+  margin-top: 40px;
+}
+
+.cd-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #2c2c2c;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.cd-form-section {
+  margin: 0;
+}
+
+/* 개인/법인단체 선택 */
+.cd-member-type {
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+}
+
+.cd-radio-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.cd-radio-item {
+  display: inline-block;
+  margin-right: 32px;
+}
+
+.cd-radio-item:last-child {
+  margin-right: 0;
+}
+
+.cd-radio-item input[type="radio"] {
+  display: none;
+}
+
+.cd-radio-item input[type="radio"] + label {
+  position: relative;
+  display: inline-block;
+  padding-left: 35px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #2c2c2c;
+  line-height: 24px;
+}
+
+.cd-radio-item input[type="radio"] + label::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  background: url('/icons/icon_rdo.png') no-repeat center;
+  background-size: contain;
+}
+
+.cd-radio-item input[type="radio"]:checked + label::after {
+  background: url('/icons/icon_rdo_ov.png') no-repeat center;
+  background-size: contain;
+}
+
+.cd-radio-text {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2c2c2c;
+}
+
+/* 입력 폼 */
+.cd-input-area {
+  margin-bottom: 0;
+}
+
+.cd-form-group {
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.cd-form-group label {
+  font-size: 15px;
+  font-weight: 700;
+  color: #2c2c2c;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.cd-input {
+  width: 100%;
+  height: 50px;
+  padding: 0 15px;
+  border: 1px solid #d8d8d8;
+  border-radius: 4px;
+  font-size: 15px;
+  color: #2c2c2c;
+  background-color: #fff;
+  box-sizing: border-box;
+}
+
+.cd-input::placeholder {
+  color: #b5b5b5;
+}
+
+.cd-input:focus {
+  outline: none;
+  border-color: #2843e5;
+}
+
+/* 사업자번호 입력 */
+.cd-business-number {
+  position: relative;
+}
+
+.cd-business-number label {
+  width: 100%;
+  flex-basis: 100%;
+}
+
+.cd-business-inputs {
+  display: flex;
+  gap: 0;
+  position: relative;
+  width: 100%;
+}
+
+.cd-business-number .cd-input-small {
+  flex: 1;
+  margin-right: 2%;
+}
+
+.cd-business-number .cd-input-small:last-child {
+  margin-right: 0;
+}
+
+.cd-business-inputs::before {
+  content: '';
+  position: absolute;
+  left: 33.33%;
+  top: 50%;
+  width: 8px;
+  height: 2px;
+  background-color: #d8d8d8;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.cd-business-inputs::after {
+  content: '';
+  position: absolute;
+  left: 66.66%;
+  top: 50%;
+  width: 8px;
+  height: 2px;
+  background-color: #d8d8d8;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* 버튼 */
+.cd-button-wrapper {
+  margin-top: 10px;
+}
+
+.cd-button {
+  width: 100%;
+  height: 50px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.cd-button-primary {
+  background-color: #2843e5;
+  color: #fff;
+}
+
+.cd-button-primary:hover {
+  background-color: #1b37e1;
+}
+
+.cd-button-primary:active {
+  background-color: #1530d5;
+}
+
+/* 인증번호 입력 영역 */
+.cd-sign-area {
+  display: block;
+}
+
+/* 반응형 */
+@media (max-width: 1200px) {
+  .cd-wrapper {
+    width: 60%;
+  }
+}
+
+@media (max-width: 768px) {
+  .cd-wrapper {
+    width: 90%;
+    min-width: auto;
+  }
+  
+  .cd-title {
+    font-size: 24px;
+  }
+}
+
