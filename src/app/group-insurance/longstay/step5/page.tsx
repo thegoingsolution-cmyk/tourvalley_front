@@ -1575,7 +1575,7 @@ export default function LongStayInsuranceStep5Page() {
                               >
                                 <option value="">년</option>
                                 {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i).map(year => (
-                                  <option key={year} value={String(year)}>{String(year).slice(-2)}</option>
+                                  <option key={year} value={String(year).slice(-2)}>{String(year).slice(-2)}</option>
                                 ))}
                               </select>
                             </span>

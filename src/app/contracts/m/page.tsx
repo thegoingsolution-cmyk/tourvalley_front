@@ -11,6 +11,7 @@ import AccidentFreeCashModal from '@/components/travel/AccidentFreeCashModal';
 import ServiceModal from '@/components/ServiceModal';
 import GiftCardExchangeModal from '@/components/mileage/GiftCardExchangeModal';
 import { getImagePath } from '@/utils/path';
+import { formatInsurancePeriod } from '@/utils/dateTime';
 import './page.css';
 
 export default function MobileContractPage() {
@@ -1230,17 +1231,6 @@ export default function MobileContractPage() {
                 ) : (
                   <>
                     {(() => {
-                      // 헬퍼 함수들
-                      const formatDate = (dateStr: string) => {
-                        if (!dateStr) return '-';
-                        const date = new Date(dateStr);
-                        const year = date.getFullYear();
-                        const month = String(date.getMonth() + 1).padStart(2, '0');
-                        const day = String(date.getDate()).padStart(2, '0');
-                        const hour = date.getHours();
-                        return `${year}.${month}.${day} ${hour}시`;
-                      };
-
                       const calculateDuration = (start: string, end: string) => {
                         if (!start || !end) return '';
                         const startDate = new Date(start);
@@ -1306,7 +1296,7 @@ export default function MobileContractPage() {
                             <li className="tour2023_conList">
                               <span className="tour2023_txt09">보험기간</span>
                               <span className="tour2023_txt10">
-                                {formatDate(contract.departureDate)} ~ {formatDate(contract.arrivalDate)}<br />
+                                {formatInsurancePeriod(contract.departureDate, contract.arrivalDate)}<br />
                                 {calculateDuration(contract.departureDate, contract.arrivalDate)}
                               </span>
                             </li>
@@ -1586,17 +1576,6 @@ export default function MobileContractPage() {
                 ) : (
                   <>
                     {(() => {
-                      // 헬퍼 함수들
-                      const formatDate = (dateStr: string) => {
-                        if (!dateStr) return '-';
-                        const date = new Date(dateStr);
-                        const year = date.getFullYear();
-                        const month = String(date.getMonth() + 1).padStart(2, '0');
-                        const day = String(date.getDate()).padStart(2, '0');
-                        const hour = date.getHours();
-                        return `${year}.${month}.${day} ${hour}시`;
-                      };
-
                       const calculateDuration = (start: string, end: string) => {
                         if (!start || !end) return '';
                         const startDate = new Date(start);
@@ -1662,7 +1641,7 @@ export default function MobileContractPage() {
                             <li className="tour2023_conList">
                               <span className="tour2023_txt09">보험기간</span>
                               <span className="tour2023_txt10">
-                                {formatDate(contract.departureDate)} ~ {formatDate(contract.arrivalDate)}<br />
+                                {formatInsurancePeriod(contract.departureDate, contract.arrivalDate)}<br />
                                 {calculateDuration(contract.departureDate, contract.arrivalDate)}
                               </span>
                             </li>
@@ -1831,16 +1810,6 @@ export default function MobileContractPage() {
                   <>
                     <div ref={eventContractListRef}></div>
                     {(() => {
-                      const formatEventDate = (dateStr: string) => {
-                        if (!dateStr) return '-';
-                        const date = new Date(dateStr);
-                        const year = date.getFullYear();
-                        const month = String(date.getMonth() + 1).padStart(2, '0');
-                        const day = String(date.getDate()).padStart(2, '0');
-                        const hour = String(date.getHours()).padStart(2, '0');
-                        return `${year}.${month}.${day} ${hour}시`;
-                      };
-
                       const calculateEventDuration = (start: string, end: string) => {
                         if (!start || !end) return '';
                         const startDate = new Date(start);
@@ -1894,7 +1863,7 @@ export default function MobileContractPage() {
                             <li className="tour2023_conList">
                               <span className="tour2023_txt09">보험기간</span>
                               <span className="tour2023_txt10">
-                                {formatEventDate(contract.startDate)} ~ {formatEventDate(contract.endDate)}<br />
+                                {formatInsurancePeriod(contract.startDate, contract.endDate)}<br />
                                 {calculateEventDuration(contract.startDate, contract.endDate)}
                               </span>
                             </li>

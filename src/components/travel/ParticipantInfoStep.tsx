@@ -783,6 +783,7 @@ export default function ParticipantInfoStep({
                       participants: calculatedPremiums.participants,
                       totalPremium: calculatedPremiums.totalPremium,
                       hasMedicalExpense: hasMedicalExpense,
+                      insuranceType,
                     };
                     localStorage.setItem('premiumDetailData', JSON.stringify(data));
                     const width = 650;

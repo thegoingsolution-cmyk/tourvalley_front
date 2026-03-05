@@ -537,17 +537,13 @@ export default function OverseasInsuranceStep5Page() {
           }
         }
 
-        // 플랜 타입 변환 (단체 해외 전용 스키마: 기준/실속/고보장)
+        // 플랜 타입: 화면 선택값 그대로 DB에 저장 (표준플랜/실속플랜/고보장플랜)
         let planTypeName = '';
         const normalizedPlanType = normalizePlanType(planCode);
-        if (normalizedPlanType === '표준플랜') {
-          planTypeName = '기준플랜';
-        } else if (normalizedPlanType === '실속플랜') {
-          planTypeName = '실속플랜';
-        } else if (normalizedPlanType === '고급플랜') {
-          planTypeName = '고보장플랜';
+        if (normalizedPlanType === '고급플랜') {
+          planTypeName = '고보장플랜'; // 화면 표시명과 동일하게 저장
         } else {
-          planTypeName = normalizedPlanType;
+          planTypeName = normalizedPlanType; // 표준플랜, 실속플랜 그대로 저장
         }
 
         // 국적 정보 변환
@@ -1638,7 +1634,7 @@ export default function OverseasInsuranceStep5Page() {
                               >
                                 <option value="">년</option>
                                 {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i).map(year => (
-                                  <option key={year} value={String(year)}>{String(year).slice(-2)}</option>
+                                  <option key={year} value={String(year).slice(-2)}>{String(year).slice(-2)}</option>
                                 ))}
                               </select>
                             </span>

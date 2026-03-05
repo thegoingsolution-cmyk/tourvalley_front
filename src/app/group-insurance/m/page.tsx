@@ -490,21 +490,29 @@ function MobileGroupInsuranceContent() {
   const [isSamePremium, setIsSamePremium] = useState<boolean>(false);
   
   const planSelectionRef = useRef<HTMLDivElement>(null);
-  const fetchAvailablePlans = async (age: number, genderValue: string) => {
+  const fetchAvailablePlans = async (
+    age: number,
+    genderValue: string,
+    options?: { birth_date?: string; departure_date?: string }
+  ) => {
     try {
+      const body: Record<string, unknown> = {
+        insurance_type: getInsuranceType(),
+        age,
+        gender: genderValue,
+        plan_variant: 'B',
+        has_medical_expense: hasMedicalExpense ? 1 : 0,
+        include_foreign_currency: activeTab === 'FL',
+      };
+      if (options?.birth_date) body.birth_date = options.birth_date;
+      if (options?.departure_date) body.departure_date = options.departure_date;
+
       const response = await fetch('/api/travel/available-plans', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          insurance_type: getInsuranceType(),
-          age,
-          gender: genderValue,
-          plan_variant: 'B',
-          has_medical_expense: hasMedicalExpense ? 1 : 0,
-          include_foreign_currency: activeTab === 'FL',
-        }),
+        body: JSON.stringify(body),
       });
       const data = await response.json();
       if (data?.success && Array.isArray(data.plan_types)) {
@@ -1753,6 +1761,26 @@ function MobileGroupInsuranceContent() {
     setIsCalculating(true);
 
     try {
+      // 24시는 다음날 00시로 변환 (가입자 공통)
+      let departureDateFormatted = departureDate;
+      let departureHour = parseInt(departureTime, 10) || 0;
+      if (departureHour === 24) {
+        const date = new Date(departureDate);
+        date.setDate(date.getDate() + 1);
+        departureDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        departureHour = 0;
+      }
+      let arrivalDateFormatted = arrivalDate;
+      let arrivalHour = parseInt(arrivalTime, 10) || 0;
+      if (arrivalHour === 24) {
+        const date = new Date(arrivalDate);
+        date.setDate(date.getDate() + 1);
+        arrivalDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        arrivalHour = 0;
+      }
+      const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
+      const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
+
       const calculatedParticipants: CalculatedPremiums['participants'] = [];
       let totalPremium = 0;
       const isWorkingHoliday = activeTab === 'FL' && travelPurposeLong === 'N010003';
@@ -1766,30 +1794,39 @@ function MobileGroupInsuranceContent() {
       };
 
       for (const participant of participants) {
-        const age = calculateAgeFromBirthDate(participant.birthDate);
+        // 외국인일 경우 외국인등록번호에서 생년월일 추출
+        let birthDateForApi = participant.birthDate;
+        if (participant.nationality === '외국인' && participant.residentNumber) {
+          const residentNum = participant.residentNumber;
+          if (residentNum.length >= 6) {
+            const yy = parseInt(residentNum.substring(0, 2), 10);
+            const mm = residentNum.substring(2, 4);
+            const dd = residentNum.substring(4, 6);
+            const year = yy >= 50 ? 1900 + yy : 2000 + yy;
+            birthDateForApi = `${year}${mm}${dd}`;
+          }
+        }
+
+        const age = calculateAgeFromBirthDate(birthDateForApi);
         if (age === null) {
           alert(`${participant.name}의 생년월일을 올바르게 입력해주세요.`);
           setIsCalculating(false);
           return;
         }
 
-        let planType: string = selectedPlan || '실속플랜';
-        if (!isWorkingHoliday) {
-          if (age <= 14) {
-            planType = '어린이플랜';
-          } else if (age >= 71) {
-            planType = selectedPlan === '어르신플랜2' ? '어르신플랜2' : '어르신플랜1';
-          } else {
-            const basePlan =
-              selectedPlan && !['어린이플랜', '어르신플랜1', '어르신플랜2'].includes(selectedPlan)
-                ? selectedPlan
-                : '실속플랜';
-            planType = basePlan;
-          }
+        // 가능 플랜 API로 해당 가입자 허용 플랜 조회 (보험나이 15세 시 만 나이 기준 적용)
+        const availablePlans = await fetchAvailablePlans(age, participant.gender, {
+          birth_date: birthDateForApi,
+          departure_date: departureDateTime,
+        });
+        if (availablePlans.length === 0) {
+          alert(`${participant.name}에 대해 가입 가능한 플랜이 없습니다.`);
+          setIsCalculating(false);
+          return;
         }
+        const planType =
+          selectedPlan && availablePlans.includes(selectedPlan) ? selectedPlan : availablePlans[0];
         const { dbPlanType, requestCurrencyPlan } = getPlanRequestInfo(planType);
-        const departureDateTime = `${departureDate} ${String(departureTime).padStart(2, '0')}:00:00`;
-        const arrivalDateTime = `${arrivalDate} ${String(arrivalTime).padStart(2, '0')}:00:00`;
 
         const response = await fetch('/api/travel/calculate-premium', {
           method: 'POST',
@@ -1799,7 +1836,7 @@ function MobileGroupInsuranceContent() {
           body: JSON.stringify({
             insurance_type: getInsuranceType(),
             age: age,
-            birth_date: participant.birthDate,
+            birth_date: birthDateForApi,
             gender: participant.gender,
             plan_type: dbPlanType,
             plan_variant: 'B',

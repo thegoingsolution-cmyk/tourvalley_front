@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import '../../popup/page.css';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCorporateMemberInfo } from '@/services/authService';
-import { calculateAgeAndGenderFromResidentNumber } from '@/utils/age';
+import { calculateAgeAndGenderFromResidentNumber, getBirthDateStringFromResidentNumber } from '@/utils/age';
 
 const normalizePlanType = (planCd: string): string => {
   const planMap: { [key: string]: string } = {
@@ -124,21 +124,30 @@ export default function OverseasInsuranceStep3Page() {
     }
   }, []);
 
-  const fetchAvailablePlans = async (age: number, gender: string, hasMedicalExpense: boolean) => {
+  const fetchAvailablePlans = async (
+    age: number,
+    gender: string,
+    hasMedicalExpense: boolean,
+    options?: { birth_date?: string; departure_date?: string }
+  ) => {
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const body: Record<string, unknown> = {
+        insurance_type: '해외여행보험',
+        age,
+        gender,
+        plan_variant: 'B',
+        has_medical_expense: hasMedicalExpense ? 1 : 0,
+      };
+      if (options?.birth_date) body.birth_date = options.birth_date;
+      if (options?.departure_date) body.departure_date = options.departure_date;
+
       const response = await fetch(`${apiBase}/api/travel/available-plans`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          insurance_type: '해외여행보험',
-          age,
-          gender,
-          plan_variant: 'B',
-          has_medical_expense: hasMedicalExpense ? 1 : 0,
-        }),
+        body: JSON.stringify(body),
       });
       const data = await response.json();
       if (data?.success && Array.isArray(data.plan_types)) {
@@ -157,11 +166,16 @@ export default function OverseasInsuranceStep3Page() {
     });
     if (missing.length === 0) return false;
 
+    const departureDate = startDate || undefined;
     const entries = await Promise.all(
       missing.map(async (person) => {
         const planType = types[person.index] || 'V';
         const hasMedicalExpense = planType === 'V';
-        const plans = await fetchAvailablePlans(person.age, person.gender, hasMedicalExpense);
+        const birthDate = getBirthDateStringFromResidentNumber(person.residentNumber || '') || undefined;
+        const plans = await fetchAvailablePlans(person.age, person.gender, hasMedicalExpense, {
+          birth_date: birthDate,
+          departure_date: departureDate,
+        });
         return [person.index, plans] as const;
       })
     );
@@ -181,11 +195,16 @@ export default function OverseasInsuranceStep3Page() {
     let isActive = true;
 
     const loadPlans = async () => {
+      const departureDate = startDate || undefined;
       const entries = await Promise.all(
         insuredList.map(async (person) => {
           const planType = planTypes[person.index] || 'V';
           const hasMedicalExpense = planType === 'V';
-          const plans = await fetchAvailablePlans(person.age, person.gender, hasMedicalExpense);
+          const birthDate = getBirthDateStringFromResidentNumber(person.residentNumber || '') || undefined;
+          const plans = await fetchAvailablePlans(person.age, person.gender, hasMedicalExpense, {
+            birth_date: birthDate,
+            departure_date: departureDate,
+          });
           return [person.index, plans] as const;
         })
       );
@@ -201,7 +220,7 @@ export default function OverseasInsuranceStep3Page() {
     return () => {
       isActive = false;
     };
-  }, [insuredList, planTypes]);
+  }, [insuredList, planTypes, startDate]);
 
   useEffect(() => {
     if (insuredList.length === 0) return;

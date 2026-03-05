@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 // 동적 페이지로 설정
@@ -30,12 +30,32 @@ interface EstimateData {
   created_at: string;
 }
 
+interface CoverageItem {
+  label: string;
+  amount: string;
+  note?: string;
+}
+
+interface CoverageSection {
+  title: string;
+  items: CoverageItem[];
+}
+
+interface PlanCoverage {
+  planName: string;
+  sections: CoverageSection[];
+}
+
 function EstimatePrintContent() {
   const searchParams = useSearchParams();
   const requestNumber = searchParams.get('request');
   const [estimateData, setEstimateData] = useState<EstimateData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [planCoverages, setPlanCoverages] = useState<PlanCoverage[]>([]);
+  const [planCoverageLoading, setPlanCoverageLoading] = useState(false);
+  const [planCoverageError, setPlanCoverageError] = useState<string | null>(null);
+  const printTriggeredRef = useRef(false);
 
   useEffect(() => {
     if (!requestNumber) {
@@ -68,11 +88,81 @@ function EstimatePrintContent() {
   }, [requestNumber]);
 
   useEffect(() => {
-    if (!loading && estimateData) {
-      // 페이지 로드 후 자동으로 인쇄 다이얼로그 실행
-      window.print();
-    }
-  }, [loading, estimateData]);
+    if (printTriggeredRef.current) return;
+    if (loading || !estimateData) return;
+
+    // 플랜별 보장내용 로딩이 끝난 뒤 인쇄 (가능하면 보장내용까지 포함해서 인쇄)
+    if (planCoverageLoading) return;
+
+    printTriggeredRef.current = true;
+    window.print();
+  }, [loading, estimateData, planCoverageLoading]);
+
+  // 플랜별 보장내용 조회 (견적에 포함된 모든 플랜)
+  useEffect(() => {
+    if (!estimateData) return;
+    if (planCoverageLoading) return;
+    if (planCoverages.length > 0 || planCoverageError) return;
+
+    const uniquePlanTypes = Array.from(
+      new Set(
+        estimateData.participants
+          .map((p) => p.planType)
+          .filter((p): p is string => Boolean(p))
+      )
+    );
+    if (uniquePlanTypes.length === 0) return;
+
+    const fetchCoverages = async () => {
+      try {
+        setPlanCoverageLoading(true);
+        setPlanCoverageError(null);
+
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        const results = await Promise.all(
+          uniquePlanTypes.map(async (planType) => {
+            try {
+              const planVariant =
+                estimateData.insurance_type === '국내여행보험' ? 'B' : null;
+
+              const res = await fetch(`${apiUrl}/api/travel/coverage-details`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  insurance_type: estimateData.insurance_type,
+                  plan_type: planType,
+                  is_medical_expense: true,
+                  currency_plan: null,
+                  plan_variant: planVariant,
+                }),
+              });
+              const json = await res.json();
+              if (res.ok && json.success && Array.isArray(json.sections)) {
+                return {
+                  planName: json.planName || planType,
+                  sections: json.sections as CoverageSection[],
+                } as PlanCoverage;
+              }
+            } catch (e) {
+              console.error('모바일 플랜 보장내용 조회 오류:', planType, e);
+            }
+            return null;
+          })
+        );
+
+        const valid = results.filter((c): c is PlanCoverage => c !== null);
+        if (valid.length === 0) {
+          setPlanCoverageError('보장내용을 불러올 수 없습니다.');
+        } else {
+          setPlanCoverages(valid);
+        }
+      } finally {
+        setPlanCoverageLoading(false);
+      }
+    };
+
+    fetchCoverages();
+  }, [estimateData, planCoverageLoading, planCoverages.length, planCoverageError]);
 
   if (loading) {
     return (
@@ -129,7 +219,61 @@ function EstimatePrintContent() {
         <p>보험기간: {insurancePeriod}</p>
         <p>인원: {estimateData.tour_num}명</p>
         <p>합계보험료: {formatPremium(estimateData.total_premium)}</p>
-        <p>피보험자 리스트 및 상세 정보는 PC 버전과 동일한 구조로 추가 구현 필요</p>
+
+        {/* 플랜별 보장내용 (모바일용 간단 버전) */}
+        <div style={{ marginTop: '32px' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '12px' }}>플랜별 보장내용</h2>
+
+          {planCoverageLoading && (
+            <p style={{ fontSize: '14px', color: '#666' }}>보장내용을 불러오는 중입니다...</p>
+          )}
+
+          {planCoverageError && !planCoverageLoading && (
+            <p style={{ fontSize: '14px', color: '#c00' }}>{planCoverageError}</p>
+          )}
+
+          {!planCoverageLoading &&
+            !planCoverageError &&
+            planCoverages.map((cov, idx) => (
+              <div key={cov.planName} style={{ marginTop: idx > 0 ? '32px' : 0 }}>
+                <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px' }}>
+                  가입플랜: {cov.planName}
+                </h3>
+                {cov.sections.map((section) => (
+                  <div key={`${cov.planName}-${section.title}`} style={{ marginBottom: '10px' }}>
+                    <div
+                      style={{
+                        fontSize: '14px',
+                        fontWeight: 600,
+                        padding: '6px 0',
+                        borderBottom: '1px solid #ddd',
+                      }}
+                    >
+                      {section.title}
+                    </div>
+                    {section.items.map((item) => (
+                      <div
+                        key={`${cov.planName}-${section.title}-${item.label}`}
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          padding: '6px 0',
+                          borderBottom: '1px solid #f1f1f1',
+                          fontSize: '13px',
+                        }}
+                      >
+                        <div style={{ flex: 1, paddingRight: '8px', textAlign: 'left' }}>
+                          {item.label}
+                          {item.note ? ` ${item.note}` : ''}
+                        </div>
+                        <div style={{ minWidth: '90px', textAlign: 'right' }}>{item.amount}</div>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            ))}
+        </div>
       </div>
     </div>
   );

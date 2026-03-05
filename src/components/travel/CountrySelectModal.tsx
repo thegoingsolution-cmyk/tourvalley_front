@@ -103,7 +103,7 @@ const allCountries: Country[] = [
   { code: 'MM', name: '미얀마(가입불가)' },
   { code: 'PM', name: '미클롱 섬' },
   { code: 'VU', name: '바누아투' },
-  { code: 'BH', name: '바레인' },
+  { code: 'BH', name: '바레인(가입불가)' },
   { code: 'BB', name: '바베이도스' },
   { code: 'BS', name: '바하마' },
   { code: 'BD', name: '방글라데시' },
@@ -127,7 +127,7 @@ const allCountries: Country[] = [
   { code: 'BR', name: '브라질' },
   { code: 'BN', name: '브루나이' },
   { code: 'VA', name: '비티칸' },
-  { code: 'SA', name: '사우디아라비아' },
+  { code: 'SA', name: '사우디아라비아(가입불가)' },
   { code: 'SP', name: '사이판' },
   { code: 'CY', name: '사이프러스' },
   { code: 'SM', name: '산마리노' },
@@ -155,7 +155,7 @@ const allCountries: Country[] = [
   { code: 'SY', name: '시리아(가입불가)' },
   { code: 'SL', name: '시에라리온' },
   { code: 'SG', name: '싱가포르' },
-  { code: 'AE', name: '아랍에미리트' },
+  { code: 'AE', name: '아랍에미리트공화국(가입불가)' },
   { code: 'AW', name: '아루바' },
   { code: 'AM', name: '아르메니아' },
   { code: 'AR', name: '아르헨티나' },
@@ -181,7 +181,7 @@ const allCountries: Country[] = [
   { code: 'OM', name: '오만' },
   { code: 'AT', name: '오스트리아' },
   { code: 'HN', name: '온두라스' },
-  { code: 'JO', name: '요르단' },
+  { code: 'JO', name: '요르단(가입불가)' },
   { code: 'UG', name: '우간다' },
   { code: 'UY', name: '우르과이' },
   { code: 'UZ', name: '우즈베키스탄' },
@@ -210,7 +210,7 @@ const allCountries: Country[] = [
   { code: 'CL', name: '칠레' },
   { code: 'CM', name: '카메룬' },
   { code: 'KZ', name: '카자흐스탄' },
-  { code: 'QA', name: '카타르' },
+  { code: 'QA', name: '카타르(가입불가)' },
   { code: 'KH', name: '캄보디아' },
   { code: 'CA', name: '캐나다' },
   { code: 'KE', name: '케냐' },
@@ -223,7 +223,7 @@ const allCountries: Country[] = [
   { code: 'CG', name: '콩고(가입불가)' },
   { code: 'CD', name: '콩고(자이레)(가입불가)' },
   { code: 'CU', name: '쿠바(가입불가)' },
-  { code: 'KW', name: '쿠웨이트' },
+  { code: 'KW', name: '쿠웨이트(가입불가)' },
   { code: 'CK', name: '쿡아일랜드' },
   { code: 'HR', name: '크로아티아' },
   { code: 'CX', name: '크리스마스섬' },
@@ -288,6 +288,10 @@ export default function CountrySelectModal({
   if (!isOpen) return null;
 
   const handleCountryClick = (countryCode: string, countryName: string) => {
+    if (countryName.includes('(가입불가)')) {
+      alert('해외여행 보험 가입 불가 지역입니다.');
+      return;
+    }
     onSelect(countryCode, countryName);
     onClose();
   };

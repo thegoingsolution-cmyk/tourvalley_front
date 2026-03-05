@@ -10,6 +10,13 @@ import { getImagePath } from '@/utils/path';
 import { useAuth } from '@/contexts/AuthContext';
 import './page.css';
 
+interface QnaResponse {
+  id: number;
+  content: string;
+  responder_name: string;
+  created_at: string;
+}
+
 interface QnaDetail {
   id: number;
   title: string;
@@ -21,6 +28,7 @@ interface QnaDetail {
   view_count: number;
   created_at: string;
   updated_at: string;
+  response?: QnaResponse;
 }
 
 export default function QnaDetailPCPage() {
@@ -205,6 +213,24 @@ export default function QnaDetailPCPage() {
                         </div>
                       )}
                     </div>
+                    {/* 관리자 답변 영역 */}
+                    {qna.response && (
+                      <div className="B02_Notice_ContBox bgcolor_white mb_base qna-response-box">
+                        <div className="B02_Notice_Head qna-response-head">
+                          <span className="B02_Notice_HeadTxt">관리자 답변</span>
+                          <div className="B02_Notice_date">
+                            <span>담당자: {qna.response.responder_name}</span>
+                            <span>{formatDate(qna.response.created_at)}</span>
+                          </div>
+                        </div>
+                        <div className="B02_Notice_contBox">
+                          <div
+                            className="notice-content qna-response-content"
+                            dangerouslySetInnerHTML={{ __html: qna.response.content }}
+                          />
+                        </div>
+                      </div>
+                    )}
                     <div className="B02_Back_ListBtn">
                       <a href="#" onClick={(e) => { e.preventDefault(); handleGoBack(); }}>
                         목록

@@ -291,6 +291,36 @@
 }
 
 /* ========================================
+   관리자 답변 영역
+   ======================================== */
+
+.qna-detail-pc .qna-response-box {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid #e8eaed;
+  border-radius: 12px;
+  background: #f8f9fc;
+}
+
+.qna-detail-pc .qna-response-head {
+  border-bottom-color: #2843e5;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.qna-detail-pc .qna-response-head .B02_Notice_date {
+  display: flex;
+  gap: 16px;
+  margin-top: 6px;
+  font-size: 13px;
+  color: #666;
+}
+
+.qna-detail-pc .qna-response-content {
+  margin-bottom: 0;
+}
+
+/* ========================================
    Password Modal
    ======================================== */
 

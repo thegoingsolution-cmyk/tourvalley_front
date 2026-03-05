@@ -464,20 +464,32 @@ export default function LongStayInsuranceStep2Page() {
     };
 
     const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-    const fetchAvailablePlans = async (insuranceType: string, age: number, gender: string) => {
+    const departureDateTime = startDate && startHour
+      ? `${startDate} ${String(parseInt(startHour, 10) || 0).padStart(2, '0')}:00:00`
+      : undefined;
+    const fetchAvailablePlans = async (
+      insuranceType: string,
+      age: number,
+      gender: string,
+      options?: { birth_date?: string; departure_date?: string }
+    ) => {
+      const body: Record<string, unknown> = {
+        insurance_type: insuranceType,
+        age,
+        gender,
+        plan_variant: 'B',
+        has_medical_expense: 1,
+        include_foreign_currency: true,
+      };
+      if (options?.birth_date) body.birth_date = options.birth_date;
+      if (options?.departure_date) body.departure_date = options.departure_date;
+
       const response = await fetch(`${apiBase}/api/travel/available-plans`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          insurance_type: insuranceType,
-          age,
-          gender,
-          plan_variant: 'B',
-          has_medical_expense: 1,
-          include_foreign_currency: true,
-        }),
+        body: JSON.stringify(body),
       });
       const data = await response.json();
       if (data?.success && Array.isArray(data.plan_types)) {
@@ -660,7 +672,10 @@ export default function LongStayInsuranceStep2Page() {
         }
 
         try {
-          const planTypes = await fetchAvailablePlans(getTravelPurpose(tourGoal), age, genderValue);
+          const planTypes = await fetchAvailablePlans(getTravelPurpose(tourGoal), age, genderValue, {
+            birth_date: birthValue,
+            departure_date: departureDateTime,
+          });
           if (!planTypes.length) {
             alert(`${i}번 피보험자는 가입 가능한 보험상품이 없습니다.`);
             return;

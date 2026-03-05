@@ -29,8 +29,16 @@ function PCCoverageDetailContent() {
   const searchParams = useSearchParams();
   const planType = searchParams.get('planType') || '표준플랜';
   const hasMedicalExpense = searchParams.get('hasMedicalExpense') !== 'false';
-  const insuranceType = (searchParams.get('insuranceType') as InsuranceType) || '국내여행보험';
+  const insuranceTypeParam = searchParams.get('insuranceType');
+  const insuranceType: InsuranceType = (() => {
+    const raw = insuranceTypeParam || '국내여행보험';
+    return raw === '해외여행자보험' ? '해외여행보험' : (raw as InsuranceType);
+  })();
   const currencyPlan = searchParams.get('currencyPlan') as '원화플랜' | '외화플랜' | undefined;
+  const planVariantParam = searchParams.get('planVariant');
+  const planVariant = planVariantParam === 'null' || planVariantParam === ''
+    ? null
+    : (planVariantParam || 'B');
 
   const [data, setData] = useState<CoverageDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,16 +51,19 @@ function PCCoverageDetailContent() {
       setLoading(true);
       setError(false);
       try {
+        const body: Record<string, unknown> = {
+          insurance_type: insuranceType,
+          plan_type: planType,
+          is_medical_expense: hasMedicalExpense,
+          currency_plan: currencyPlan || undefined,
+        };
+        if (planVariant !== null) body.plan_variant = planVariant;
+        else body.plan_variant = null;
+
         const res = await fetch('/api/travel/coverage-details', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            insurance_type: insuranceType,
-            plan_type: planType,
-            is_medical_expense: hasMedicalExpense,
-            currency_plan: currencyPlan || undefined,
-            plan_variant: 'B',
-          }),
+          body: JSON.stringify(body),
         });
 
         const json = await res.json();
@@ -80,7 +91,7 @@ function PCCoverageDetailContent() {
     return () => {
       isMounted = false;
     };
-  }, [planType, hasMedicalExpense, insuranceType, currencyPlan]);
+  }, [planType, hasMedicalExpense, insuranceType, currencyPlan, planVariant]);
 
   const handleClose = () => {
     if (typeof window !== 'undefined' && window.opener) {

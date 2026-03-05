@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 // 동적 페이지로 설정
@@ -30,12 +30,32 @@ interface EstimateData {
   created_at: string;
 }
 
+interface CoverageItem {
+  label: string;
+  amount: string;
+  note?: string;
+}
+
+interface CoverageSection {
+  title: string;
+  items: CoverageItem[];
+}
+
+interface PlanCoverage {
+  planName: string;
+  sections: CoverageSection[];
+}
+
 function EstimatePrintContent() {
   const searchParams = useSearchParams();
   const requestNumber = searchParams.get('request');
   const [estimateData, setEstimateData] = useState<EstimateData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [planCoverages, setPlanCoverages] = useState<PlanCoverage[]>([]);
+  const [planCoverageLoading, setPlanCoverageLoading] = useState(false);
+  const [planCoverageError, setPlanCoverageError] = useState<string | null>(null);
+  const printTriggeredRef = useRef(false);
 
   useEffect(() => {
     if (!requestNumber) {
@@ -68,11 +88,83 @@ function EstimatePrintContent() {
   }, [requestNumber]);
 
   useEffect(() => {
-    if (!loading && estimateData) {
-      // 페이지 로드 후 자동으로 인쇄 다이얼로그 실행
-      window.print();
-    }
-  }, [loading, estimateData]);
+    if (printTriggeredRef.current) return;
+    if (loading || !estimateData) return;
+
+    // 보장내용(플랜별) 로딩이 끝난 뒤 인쇄 (빈 화면 인쇄 방지)
+    if (planCoverageLoading) return;
+
+    printTriggeredRef.current = true;
+    window.print();
+  }, [loading, estimateData, planCoverageLoading]);
+
+  // 플랜별 보장내용 조회 (견적에 포함된 모든 플랜)
+  useEffect(() => {
+    if (!estimateData) return;
+    if (planCoverageLoading) return;
+    // 이미 조회를 끝냈거나(성공) 에러가 난 경우에는 다시 호출하지 않음
+    if (planCoverages.length > 0 || planCoverageError) return;
+
+    const uniquePlanTypes = Array.from(
+      new Set(
+        estimateData.participants
+          .map((p) => p.planType)
+          .filter((p): p is string => Boolean(p))
+      )
+    );
+    if (uniquePlanTypes.length === 0) return;
+
+    const fetchCoverages = async () => {
+      try {
+        setPlanCoverageLoading(true);
+        setPlanCoverageError(null);
+
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        const results = await Promise.all(
+          uniquePlanTypes.map(async (planType) => {
+            try {
+              // 국내여행보험: plan_variant 기본값을 'B'로 사용, 그 외는 null
+              const planVariant =
+                estimateData.insurance_type === '국내여행보험' ? 'B' : null;
+
+              const res = await fetch(`${apiUrl}/api/travel/coverage-details`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  insurance_type: estimateData.insurance_type,
+                  plan_type: planType,
+                  is_medical_expense: true,
+                  currency_plan: null,
+                  plan_variant: planVariant,
+                }),
+              });
+              const json = await res.json();
+              if (res.ok && json.success && Array.isArray(json.sections)) {
+                return {
+                  planName: json.planName || planType,
+                  sections: json.sections as CoverageSection[],
+                } as PlanCoverage;
+              }
+            } catch (e) {
+              console.error('플랜 보장내용 조회 오류:', planType, e);
+            }
+            return null;
+          })
+        );
+
+        const valid = results.filter((c): c is PlanCoverage => c !== null);
+        if (valid.length === 0) {
+          setPlanCoverageError('보장내용을 불러올 수 없습니다.');
+        } else {
+          setPlanCoverages(valid);
+        }
+      } finally {
+        setPlanCoverageLoading(false);
+      }
+    };
+
+    fetchCoverages();
+  }, [estimateData, planCoverageLoading, planCoverages.length, planCoverageError]);
 
   if (loading) {
     return (
@@ -273,6 +365,66 @@ function EstimatePrintContent() {
                 </tr>
                 <tr>
                   <td>
+                    {planCoverageLoading && (
+                      <div style={{ padding: '16px 0', textAlign: 'center', fontSize: '14px', color: '#666' }}>
+                        보장내용을 불러오는 중입니다...
+                      </div>
+                    )}
+                    {planCoverageError && !planCoverageLoading && (
+                      <div style={{ padding: '16px 0', textAlign: 'center', fontSize: '14px', color: '#c00' }}>
+                        {planCoverageError}
+                      </div>
+                    )}
+                    {!planCoverageLoading && !planCoverageError && planCoverages.length > 0 ? (
+                      <>
+                        {planCoverages.map((cov, idx) => (
+                          <table
+                            key={cov.planName}
+                            style={{
+                              width: '100%',
+                              border: 0,
+                              borderCollapse: 'collapse',
+                              tableLayout: 'fixed',
+                              marginTop: idx > 0 ? 50 : 0,
+                            }}
+                            border={1}
+                            cellSpacing={0}
+                          >
+                            <caption></caption>
+                            <colgroup>
+                              <col width="60%" />
+                              <col width="40%" />
+                            </colgroup>
+                            <tbody>
+                              <tr>
+                                <td colSpan={2} style={{ position: 'relative', padding: '14px 17px 13px 18px', border: 0, borderBottom: 'solid 1px #d8d8d8', fontSize: '14px', textAlign: 'left', verticalAlign: 'middle', fontFamily: "'Noto Sans KR', sans-serif,'Malgun Gothic','맑은 고딕'", lineHeight: '125%', boxSizing: 'border-box', borderTop: '2px solid #000!important', background: '#eff7fe' }}>
+                                  가입플랜: {cov.planName}
+                                </td>
+                              </tr>
+                              {cov.sections.map((section) => (
+                                <React.Fragment key={`${cov.planName}-${section.title}`}>
+                                  <tr>
+                                    <th colSpan={2} style={{ position: 'relative', padding: '12px 17px 11px 18px', border: 0, borderBottom: 'solid 1px #d8d8d8', fontSize: '14px', textAlign: 'left', verticalAlign: 'middle', fontFamily: "'Noto Sans KR', sans-serif,'Malgun Gothic','맑은 고딕'", lineHeight: '125%', boxSizing: 'border-box', background: '#f5f5f5' }}>
+                                      {section.title}
+                                    </th>
+                                  </tr>
+                                  {section.items.map((item) => (
+                                    <tr key={`${cov.planName}-${section.title}-${item.label}`}>
+                                      <td style={{ position: 'relative', padding: '12px 17px 11px 18px', border: 0, borderBottom: 'solid 1px #d8d8d8', fontSize: '14px', verticalAlign: 'middle', fontFamily: "'Noto Sans KR', sans-serif,'Malgun Gothic','맑은 고딕'", lineHeight: '125%', boxSizing: 'border-box', textAlign: 'left' }}>
+                                        {item.label}{item.note ? ` ${item.note}` : ''}
+                                      </td>
+                                      <td style={{ position: 'relative', padding: '12px 17px 11px 18px', border: 0, borderBottom: 'solid 1px #d8d8d8', fontSize: '14px', textAlign: 'center', verticalAlign: 'middle', fontFamily: "'Noto Sans KR', sans-serif,'Malgun Gothic','맑은 고딕'", lineHeight: '125%', boxSizing: 'border-box' }}>
+                                        {item.amount}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </React.Fragment>
+                              ))}
+                            </tbody>
+                          </table>
+                        ))}
+                      </>
+                    ) : (
                     <table style={{ width: '100%', border: 0, borderCollapse: 'collapse', tableLayout: 'fixed' }} border={1} cellSpacing={0}>
                       <caption></caption>
                       <colgroup>
@@ -468,6 +620,7 @@ function EstimatePrintContent() {
                         </tr>
                       </tbody>
                     </table>
+                    )}
                   </td>
                 </tr>
               </tbody>
@@ -550,7 +703,7 @@ function EstimatePrintContent() {
             </table>
 
             {/* 하단 이미지 및 푸터 */}
-            <table cellPadding="0" cellSpacing="0" border={0} align="center" width="700">
+            {/* <table cellPadding="0" cellSpacing="0" border={0} align="center" width="700">
               <tbody>
                 <tr>
                   <td width="100%" colSpan={2} style={{ padding: '45px 0 0 0' }}>
@@ -558,7 +711,7 @@ function EstimatePrintContent() {
                   </td>
                 </tr>
               </tbody>
-            </table>
+            </table> */}
             <table cellPadding="0" cellSpacing="0" border={0} align="center" width="700" style={{ position: 'relative', display: 'inline-block', boxSizing: 'border-box', background: '#eee', padding: '28px 10px 28px 15px', margin: '5px 0 35px 0', fontFamily: "Noto Sans KR, sans-serif,'Malgun Gothic','맑은 고딕'" }}>
               <tbody>
                 <tr>

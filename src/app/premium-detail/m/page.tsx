@@ -19,6 +19,7 @@ function MobilePremiumDetailContent() {
   }>>([]);
   const [totalPremium, setTotalPremium] = useState(0);
   const [hasMedicalExpense, setHasMedicalExpense] = useState(true);
+  const [insuranceType, setInsuranceType] = useState<string | null>(null);
 
   // 데이터 정규화 함수 (다양한 데이터 소스에서 일관된 형식으로 변환)
   const normalizeParticipants = (participants: any[]): Array<{
@@ -43,7 +44,9 @@ function MobilePremiumDetailContent() {
 
   useEffect(() => {
     const contractId = searchParams.get('contractId');
-    
+    const insuranceTypeParam = searchParams.get('insuranceType');
+    if (insuranceTypeParam) setInsuranceType(insuranceTypeParam);
+
     if (contractId) {
       // 계약 ID로 피보험자 정보 조회
       fetchParticipants(contractId);
@@ -57,6 +60,7 @@ function MobilePremiumDetailContent() {
           setParticipants(normalizedParticipants);
           setTotalPremium(parsed.totalPremium || parsed.total_premium || 0);
           setHasMedicalExpense(parsed.hasMedicalExpense ?? parsed.has_medical_expense ?? true);
+          if (parsed.insuranceType) setInsuranceType(parsed.insuranceType);
         } catch (error) {
           console.error('데이터 파싱 오류:', error);
         }
@@ -69,6 +73,7 @@ function MobilePremiumDetailContent() {
             setParticipants(normalizedParticipants);
             setTotalPremium(parsed.totalPremium || parsed.total_premium || 0);
             setHasMedicalExpense(parsed.hasMedicalExpense ?? parsed.has_medical_expense ?? true);
+            if (parsed.insuranceType) setInsuranceType(parsed.insuranceType);
           } catch (error) {
             console.error('데이터 파싱 오류:', error);
           }
@@ -94,6 +99,7 @@ function MobilePremiumDetailContent() {
           setParticipants(data.participants || []);
           setTotalPremium(data.totalPremium || 0);
           setHasMedicalExpense(data.hasMedicalExpense ?? true);
+          if (data.insuranceType) setInsuranceType(data.insuranceType);
         }
       } else {
         console.error('피보험자 정보 조회 실패');
@@ -157,7 +163,16 @@ function MobilePremiumDetailContent() {
                             <button 
                               className="plan-badge-btn"
                               onClick={() => {
-                                window.open(`/coverage-detail?planType=${participant.planType}&hasMedicalExpense=${hasMedicalExpense}`, '_blank');
+                                const params = new URLSearchParams({
+                                  planType: participant.planType,
+                                  hasMedicalExpense: String(hasMedicalExpense),
+                                });
+                                if (insuranceType) {
+                                  const apiInsuranceType = insuranceType === '해외여행자보험' ? '해외여행보험' : insuranceType;
+                                  params.set('insuranceType', apiInsuranceType);
+                                  if (apiInsuranceType === '해외여행보험') params.set('planVariant', 'null');
+                                }
+                                window.open(`/coverage-detail?${params.toString()}`, '_blank');
                               }}
                             >
                               {participant.planType || '-'}

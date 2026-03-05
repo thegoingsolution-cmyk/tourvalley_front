@@ -75,3 +75,21 @@ export const calculateAgeAndGenderFromResidentNumber = (
 
   return { age, gender };
 };
+
+/**
+ * 주민등록번호에서 생년월일 문자열(YYYYMMDD) 반환
+ * available-plans API의 만 나이 기준 15세 판별용
+ */
+export const getBirthDateStringFromResidentNumber = (residentNumber: string): string | null => {
+  if (!residentNumber || residentNumber.length < 7) return null;
+  const birthYear = parseInt(residentNumber.substring(0, 2), 10);
+  const birthMonth = residentNumber.substring(2, 4);
+  const birthDay = residentNumber.substring(4, 6);
+  const genderCode = parseInt(residentNumber.substring(6, 7), 10);
+  let centuryPrefix = 1900;
+  if (genderCode === 3 || genderCode === 4 || genderCode === 7 || genderCode === 8) {
+    centuryPrefix = 2000;
+  }
+  const fullYear = centuryPrefix + birthYear;
+  return `${fullYear}${birthMonth}${birthDay}`;
+};

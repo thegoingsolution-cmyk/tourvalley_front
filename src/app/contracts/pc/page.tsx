@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { getImagePath } from '@/utils/path';
+import { formatInsurancePeriod } from '@/utils/dateTime';
 import AccidentFreeCashModal from '@/components/travel/AccidentFreeCashModal';
 import ServiceModal from '@/components/ServiceModal';
 import GiftCardExchangeModal from '@/components/mileage/GiftCardExchangeModal';
@@ -1246,17 +1247,6 @@ export default function PCContractPage() {
                 ) : (
                   <>
                     {(() => {
-                      // 헬퍼 함수들
-                      const formatDate = (dateStr: string) => {
-                        if (!dateStr) return '-';
-                        const date = new Date(dateStr);
-                        const year = date.getFullYear();
-                        const month = String(date.getMonth() + 1).padStart(2, '0');
-                        const day = String(date.getDate()).padStart(2, '0');
-                        const hour = date.getHours();
-                        return `${year}.${month}.${day} ${hour}시`;
-                      };
-
                       const calculateDuration = (start: string, end: string) => {
                         if (!start || !end) return '';
                         const startDate = new Date(start);
@@ -1325,7 +1315,7 @@ export default function PCContractPage() {
                               <li className="tour2023_conList">
                                 <span className="tour2023_txt09">보험기간</span>
                                 <span className="tour2023_txt10">
-                                  {formatDate(contract.departureDate)} ~ {formatDate(contract.arrivalDate)}<br />
+                                  {formatInsurancePeriod(contract.departureDate, contract.arrivalDate)}<br />
                                   {calculateDuration(contract.departureDate, contract.arrivalDate)}
                                 </span>
                               </li>
@@ -1616,17 +1606,6 @@ export default function PCContractPage() {
                   ) : (
                     <>
                       {(() => {
-                        // 헬퍼 함수들
-                        const formatDate = (dateStr: string) => {
-                          if (!dateStr) return '-';
-                          const date = new Date(dateStr);
-                          const year = date.getFullYear();
-                          const month = String(date.getMonth() + 1).padStart(2, '0');
-                          const day = String(date.getDate()).padStart(2, '0');
-                          const hour = date.getHours();
-                          return `${year}.${month}.${day} ${hour}시`;
-                        };
-
                         const calculateDuration = (start: string, end: string) => {
                           if (!start || !end) return '';
                           const startDate = new Date(start);
@@ -1696,7 +1675,7 @@ export default function PCContractPage() {
                               <li className="tour2023_conList">
                                 <span className="tour2023_txt09">보험기간</span>
                                 <span className="tour2023_txt10">
-                                  {formatDate(contract.departureDate)} ~ {formatDate(contract.arrivalDate)}<br />
+                                  {formatInsurancePeriod(contract.departureDate, contract.arrivalDate)}<br />
                                   {calculateDuration(contract.departureDate, contract.arrivalDate)}
                                 </span>
                               </li>
@@ -1884,17 +1863,6 @@ export default function PCContractPage() {
                   ) : (
                     <>
                       {(() => {
-                        // 헬퍼 함수들
-                        const formatEventDate = (dateStr: string) => {
-                          if (!dateStr) return '-';
-                          const date = new Date(dateStr);
-                          const year = date.getFullYear();
-                          const month = String(date.getMonth() + 1).padStart(2, '0');
-                          const day = String(date.getDate()).padStart(2, '0');
-                          const hour = String(date.getHours()).padStart(2, '0');
-                          return `${year}.${month}.${day} ${hour}시`;
-                        };
-
                         const calculateEventDuration = (start: string, end: string) => {
                           if (!start || !end) return '';
                           const startDate = new Date(start);
@@ -1945,7 +1913,7 @@ export default function PCContractPage() {
                                 <li className="tour2023_conList">
                                   <span className="tour2023_txt09">보험기간</span>
                                   <span className="tour2023_txt10">
-                                    {formatEventDate(contract.startDate)}~{formatEventDate(contract.endDate)}<br />
+                                    {formatInsurancePeriod(contract.startDate, contract.endDate)}<br />
                                     {calculateEventDuration(contract.startDate, contract.endDate)}
                                   </span>
                                 </li>
@@ -2160,11 +2128,6 @@ export default function PCContractPage() {
                           <td className="sName tour2023_ListB_bg">적립</td>
                         </tr>
                         {eligibleContracts.map((contract) => {
-                          const formatDate = (dateStr: string) => {
-                            if (!dateStr) return '-';
-                            const date = new Date(dateStr);
-                            return date.toLocaleDateString('ko-KR');
-                          };
                           const formatPremium = (value?: number) => {
                             if (value === null || value === undefined) return '-';
                             const numericValue = Number(value);
@@ -2179,7 +2142,7 @@ export default function PCContractPage() {
                               <td>{contract.contract_number}</td>
                               <td>{contract.insurance_type}</td>
                               <td style={{ fontSize: '11px' }}>
-                                {formatDate(contract.departure_date)} ~ {formatDate(contract.arrival_date)}
+                                {formatInsurancePeriod(contract.departure_date, contract.arrival_date)}
                               </td>
                               <td>{formatPremium(contract.total_premium)}</td>
                               <td style={{ color: '#1b37e1', fontWeight: '600' }}>

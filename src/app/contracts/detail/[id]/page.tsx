@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { formatInsurancePeriod } from '@/utils/dateTime';
 import './page.css';
 
 export default function ContractDetailPage() {
@@ -138,16 +139,6 @@ export default function ContractDetailPage() {
     );
   }
 
-  const formatDate = (dateStr: string) => {
-    if (!dateStr) return '-';
-    const date = new Date(dateStr);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hour = date.getHours();
-    return `${year}.${month}.${day} ${hour}시`;
-  };
-
   const calculateDuration = (start: string, end: string) => {
     if (!start || !end) return '';
     const startDate = new Date(start);
@@ -254,7 +245,7 @@ export default function ContractDetailPage() {
             <li className="tour2023_conList">
               <span className="tour2023_txt09">보험기간</span>
               <span className="tour2023_txt10">
-                {formatDate(contractDetail.departureDate)} ~ {formatDate(contractDetail.arrivalDate)}<br />
+                {formatInsurancePeriod(contractDetail.departureDate, contractDetail.arrivalDate)}<br />
                 {calculateDuration(contractDetail.departureDate, contractDetail.arrivalDate)}
               </span>
             </li>

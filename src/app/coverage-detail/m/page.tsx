@@ -34,9 +34,11 @@ function MobileCoverageDetailContent() {
   const returnUrl = returnUrlParam ? decodeURIComponent(returnUrlParam) : '/domestic/m';
   const isMedicalExpenseParam = searchParams.get('isMedicalExpense');
   const currencyPlanParam = searchParams.get('currencyPlan') as '원화플랜' | '외화플랜' | null;
+  const planVariantParam = searchParams.get('planVariant');
 
-  const insuranceType = insuranceTypeParam as InsuranceType;
+  const insuranceType: InsuranceType = insuranceTypeParam === '해외여행자보험' ? '해외여행보험' : (insuranceTypeParam as InsuranceType);
   const planType = planTypeParam as PlanType;
+  const planVariant = planVariantParam === 'null' || planVariantParam === '' ? null : (planVariantParam || 'B');
   const needsMedicalExpenseDistinction = insuranceType === '국내여행보험' || insuranceType === '해외여행보험';
   const openGuidePopup = (url: string) => {
     const w = 650;
@@ -67,16 +69,19 @@ function MobileCoverageDetailContent() {
       setLoading(true);
       setError(false);
       try {
+        const body: Record<string, unknown> = {
+          insurance_type: insuranceType,
+          plan_type: planType,
+          is_medical_expense: isMedicalExpense,
+          currency_plan: currencyPlan,
+        };
+        if (planVariant !== null) body.plan_variant = planVariant;
+        else body.plan_variant = null;
+
         const res = await fetch('/api/travel/coverage-details', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            insurance_type: insuranceType,
-            plan_type: planType,
-            is_medical_expense: isMedicalExpense,
-            currency_plan: currencyPlan,
-            plan_variant: 'B',
-          }),
+          body: JSON.stringify(body),
         });
         const json = await res.json();
         if (isMounted && res.ok && json.success) {
@@ -95,7 +100,7 @@ function MobileCoverageDetailContent() {
     };
     fetchDetail();
     return () => { isMounted = false; };
-  }, [insuranceType, planType, needsMedicalExpenseDistinction, needsCurrencyPlanDistinction, isMedicalExpenseParam, currencyPlanParam]);
+  }, [insuranceType, planType, planVariant, needsMedicalExpenseDistinction, needsCurrencyPlanDistinction, isMedicalExpenseParam, currencyPlanParam]);
 
   const handleConfirm = (e?: React.MouseEvent<HTMLAnchorElement>) => {
     if (e) {

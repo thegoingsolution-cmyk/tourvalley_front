@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import '../../popup/page.css';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCorporateMemberInfo } from '@/services/authService';
-import { calculateAgeAndGenderFromResidentNumber } from '@/utils/age';
+import { calculateAgeAndGenderFromResidentNumber, getBirthDateStringFromResidentNumber } from '@/utils/age';
 
 // 플랜 코드 또는 플랜명을 DB plan_type으로 정규화
 const normalizePlanType = (planCd: string): string => {
@@ -123,21 +123,29 @@ export default function DomesticInsuranceStep3Page() {
     }
   }, []);
 
-  const fetchAvailablePlans = async (age: number, gender: string) => {
+  const fetchAvailablePlans = async (
+    age: number,
+    gender: string,
+    options?: { birth_date?: string; departure_date?: string }
+  ) => {
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const body: Record<string, unknown> = {
+        insurance_type: '국내여행보험',
+        age,
+        gender,
+        plan_variant: 'B',
+        has_medical_expense: 1,
+      };
+      if (options?.birth_date) body.birth_date = options.birth_date;
+      if (options?.departure_date) body.departure_date = options.departure_date;
+
       const response = await fetch(`${apiBase}/api/travel/available-plans`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          insurance_type: '국내여행보험',
-          age,
-          gender,
-          plan_variant: 'B',
-          has_medical_expense: 1,
-        }),
+        body: JSON.stringify(body),
       });
       const data = await response.json();
       if (data?.success && Array.isArray(data.plan_types)) {
@@ -156,9 +164,14 @@ export default function DomesticInsuranceStep3Page() {
     });
     if (missing.length === 0) return false;
 
+    const departureDate = startDate || undefined;
     const entries = await Promise.all(
       missing.map(async (person) => {
-        const plans = await fetchAvailablePlans(person.age, person.gender);
+        const birthDate = getBirthDateStringFromResidentNumber(person.residentNumber || '') || undefined;
+        const plans = await fetchAvailablePlans(person.age, person.gender, {
+          birth_date: birthDate,
+          departure_date: departureDate,
+        });
         return [person.index, plans] as const;
       })
     );
@@ -178,9 +191,14 @@ export default function DomesticInsuranceStep3Page() {
     let isActive = true;
 
     const loadPlans = async () => {
+      const departureDate = startDate || undefined;
       const entries = await Promise.all(
         insuredList.map(async (person) => {
-          const plans = await fetchAvailablePlans(person.age, person.gender);
+          const birthDate = getBirthDateStringFromResidentNumber(person.residentNumber || '') || undefined;
+          const plans = await fetchAvailablePlans(person.age, person.gender, {
+            birth_date: birthDate,
+            departure_date: departureDate,
+          });
           return [person.index, plans] as const;
         })
       );
@@ -196,7 +214,7 @@ export default function DomesticInsuranceStep3Page() {
     return () => {
       isActive = false;
     };
-  }, [insuredList]);
+  }, [insuredList, startDate]);
 
   useEffect(() => {
     if (insuredList.length === 0) return;

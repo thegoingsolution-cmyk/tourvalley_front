@@ -11,7 +11,7 @@ interface CoverageDetailModalProps {
   insuranceType?: string; // 기본값: '국내여행보험'
   isMedicalExpense?: boolean; // 실손의료비 포함 여부 (기본값: true, 국내/해외여행보험용)
   currencyPlan?: '원화플랜' | '외화플랜'; // 원화플랜/외화플랜 구분 (유학/어학연수, 해외출장/주재원/교환교수용)
-  planVariant?: 'A' | 'B'; // 플랜 변형 (기본값: 'B')
+  planVariant?: 'A' | 'B' | null; // 플랜 변형. null이면 백엔드에서 plan_variant IS NULL 매칭
 }
 
 // 보장 상세 데이터 타입 정의

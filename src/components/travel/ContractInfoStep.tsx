@@ -231,6 +231,7 @@ export default function ContractInfoStep({
                         participants: calculatedPremiums?.participants || [],
                         totalPremium: calculatedPremiums?.totalPremium || 0,
                         hasMedicalExpense: hasMedicalExpense,
+                        insuranceType,
                       };
                       localStorage.setItem('premiumDetailData', JSON.stringify(data));
                       const width = 650;

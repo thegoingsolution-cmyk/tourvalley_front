@@ -110,7 +110,7 @@ export default function ServiceModal({ isOpen, onClose, onOpenAccidentFreeCashMo
               {/* 3줄 */}
               <div className="service-modal-row">
                 <div className="service-category">
-                  <h3 className="service-category-title" style={{ cursor: 'pointer' }} onClick={() => handleExternalLink('https://b2b.bzvalley.net/')}>여행사전용 여행보험센터</h3>
+                  <h3 className="service-category-title" style={{ cursor: 'pointer' }} onClick={() => handleExternalLink('https://b2b.tourvalley.net/')}>여행사전용 여행보험센터</h3>
                   {/* <ul className="service-list">
                     <li><a href="#" className="service-link">- 여행사전용 여행보험센터</a></li>
                   </ul> */}

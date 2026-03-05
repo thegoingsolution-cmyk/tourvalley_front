@@ -92,19 +92,30 @@ export default function PCStep1Page() {
       return;
     }
 
-    // 날짜 유효성 검사
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    
-    if (end < start) {
-      alert('도착일은 출발일보다 이전일 수 없습니다.');
+    // 출발·도착 일시로 비교 (시간 포함, 24시 = 해당일 자정 끝 = 다음날 00:00)
+    const toDateTime = (dateStr: string, hourStr: string) => {
+      const d = new Date(dateStr + 'T00:00:00');
+      const h = parseInt(hourStr, 10) || 0;
+      if (h === 24) {
+        d.setDate(d.getDate() + 1);
+        d.setHours(0, 0, 0, 0);
+      } else {
+        d.setHours(h, 0, 0, 0);
+      }
+      return d;
+    };
+    const startDt = toDateTime(startDate, startHour);
+    const endDt = toDateTime(endDate, endHour);
+
+    if (endDt.getTime() <= startDt.getTime()) {
+      alert('도착일시는 출발일시보다 이후여야 합니다.');
       return;
     }
 
-    // 여행 기간 계산
-    const diffTime = end.getTime() - start.getTime();
+    // 여행 기간(일) 계산 (시간 포함, 올림)
+    const diffTime = endDt.getTime() - startDt.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays < 1) {
       alert('여행 기간을 확인해 주세요.');
       return;

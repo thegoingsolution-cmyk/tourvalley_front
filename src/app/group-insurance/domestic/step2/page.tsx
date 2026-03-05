@@ -454,24 +454,13 @@ export default function DomesticInsuranceStep2Page() {
           continue;
         }
       } else {
-        // 외국인: 외국인등록번호 검증 (앞 6자리 + 뒤 7자리)
+        // 외국인: 외국인등록번호만 검증 (국내 보험은 국적 선택 UI 없음, 등록번호만 수집)
         if (!ssn1Input?.value || ssn1Input.value.length !== 6) {
           incompleteInsuredList.push(i);
           continue;
         }
         
         if (!ssn2Input?.value || ssn2Input.value.length !== 7) {
-          incompleteInsuredList.push(i);
-          continue;
-        }
-        
-        // 외국인 국적 검증
-        if (!country1Select?.value || country1Select.value === '') {
-          incompleteInsuredList.push(i);
-          continue;
-        }
-        
-        if (!country2Select?.value || country2Select.value === '') {
           incompleteInsuredList.push(i);
           continue;
         }
@@ -567,13 +556,11 @@ export default function DomesticInsuranceStep2Page() {
         // 주민번호 앞 7자리 (YYMMDD + 성별코드)
         step2Data[`insured_ssn_${savedIndex}`] = birthSuffix + finalGenderCode;
       } else {
-        // 외국인: 주민등록번호 저장
+        // 외국인: 주민등록번호 저장 (국내 보험은 국적 선택 UI 없음)
         step2Data[`insured_ssn1_${savedIndex}`] = ssn1Input.value;
         step2Data[`insured_ssn2_${savedIndex}`] = ssn2Input.value;
-        
-        // 외국인 국적 저장
-        step2Data[`insured_country1_${savedIndex}`] = country1Select.value;
-        step2Data[`insured_country2_${savedIndex}`] = country2Select.value;
+        step2Data[`insured_country1_${savedIndex}`] = '';
+        step2Data[`insured_country2_${savedIndex}`] = '';
       }
       
       savedIndex++;

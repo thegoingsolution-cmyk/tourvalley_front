@@ -222,21 +222,30 @@ function MobileDomesticStep1Content() {
     return { valid: true };
   };
 
-  const fetchAvailablePlans = async (age: number, genderValue: '남자' | '여자', medicalExpenseValue: boolean = hasMedicalExpense) => {
+  const fetchAvailablePlans = async (
+    age: number,
+    genderValue: '남자' | '여자',
+    medicalExpenseValue: boolean = hasMedicalExpense,
+    options?: { birth_date?: string; departure_date?: string }
+  ) => {
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const body: Record<string, unknown> = {
+        insurance_type: '국내여행보험',
+        age,
+        gender: genderValue,
+        plan_variant: 'B',
+        has_medical_expense: medicalExpenseValue ? 1 : 0,
+      };
+      if (options?.birth_date) body.birth_date = options.birth_date;
+      if (options?.departure_date) body.departure_date = options.departure_date;
+
       const response = await fetch(`${apiBase}/api/travel/available-plans`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          insurance_type: '국내여행보험',
-          age,
-          gender: genderValue,
-          plan_variant: 'B',
-          has_medical_expense: medicalExpenseValue ? 1 : 0,
-        }),
+        body: JSON.stringify(body),
       });
       const data = await response.json();
       if (data?.success && Array.isArray(data.plan_types)) {
@@ -294,15 +303,18 @@ function MobileDomesticStep1Content() {
       const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
       const genderValue = getGenderFromBirthDate(birthDate, gender);
 
+      const planOptions = birthDate && birthDate.length === 8
+        ? { birth_date: birthDate, departure_date: departureDateTime }
+        : undefined;
       if (medicalExpenseValue !== undefined) {
-        const refreshedPlans = await fetchAvailablePlans(age, genderValue, medicalExpense);
+        const refreshedPlans = await fetchAvailablePlans(age, genderValue, medicalExpense, planOptions);
         if (refreshedPlans.length === 0) {
           setPlanInfo({});
           return;
         }
         availablePlans = refreshedPlans;
       } else if (availablePlans.length === 0) {
-        const refreshedPlans = await fetchAvailablePlans(age, genderValue, medicalExpense);
+        const refreshedPlans = await fetchAvailablePlans(age, genderValue, medicalExpense, planOptions);
         if (refreshedPlans.length === 0) {
           setPlanInfo({});
           return;
@@ -426,7 +438,21 @@ function MobileDomesticStep1Content() {
     }
 
     const genderValue = getGenderFromBirthDate(birthDate, gender);
-    const availablePlans = await fetchAvailablePlans(age, genderValue);
+
+    let depDateFormatted = departureDate;
+    let depHour = parseInt(departureTime, 10) || 0;
+    if (depHour === 24) {
+      const d = new Date(departureDate);
+      d.setDate(d.getDate() + 1);
+      depDateFormatted = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      depHour = 0;
+    }
+    const departureDateTimeForPlans = `${depDateFormatted} ${String(depHour).padStart(2, '0')}:00:00`;
+
+    const availablePlans = await fetchAvailablePlans(age, genderValue, undefined, {
+      birth_date: birthDate,
+      departure_date: departureDateTimeForPlans,
+    });
     if (availablePlans.length === 0) {
       alert('가입 가능한 플랜이 없습니다.');
       return;
@@ -630,6 +656,26 @@ function MobileDomesticStep1Content() {
     setIsCalculating(true);
 
     try {
+      // 24시는 다음날 00시로 변환 (가입자 공통)
+      let departureDateFormatted = departureDate;
+      let departureHour = parseInt(departureTime, 10) || 0;
+      if (departureHour === 24) {
+        const date = new Date(departureDate);
+        date.setDate(date.getDate() + 1);
+        departureDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        departureHour = 0;
+      }
+      let arrivalDateFormatted = arrivalDate;
+      let arrivalHour = parseInt(arrivalTime, 10) || 0;
+      if (arrivalHour === 24) {
+        const date = new Date(arrivalDate);
+        date.setDate(date.getDate() + 1);
+        arrivalDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        arrivalHour = 0;
+      }
+      const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
+      const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
+
       const calculatedParticipants: CalculatedPremiums['participants'] = [];
       let totalPremium = 0;
 
@@ -637,21 +683,19 @@ function MobileDomesticStep1Content() {
         // 나이 계산 (내국인: 생년월일, 외국인: 외국인등록번호에서 추출)
         let birthDateForAge = participant.birthDate;
         if (participant.nationality === '외국인' && participant.residentNumber) {
-          // 외국인등록번호 앞 6자리(YYMMDD)에서 생년월일 추출
           const residentNum = participant.residentNumber;
           if (residentNum.length >= 6) {
-            const yy = parseInt(residentNum.substring(0, 2));
+            const yy = parseInt(residentNum.substring(0, 2), 10);
             const mm = residentNum.substring(2, 4);
             const dd = residentNum.substring(4, 6);
-            // 50 이상이면 1900년대, 미만이면 2000년대
             const year = yy >= 50 ? 1900 + yy : 2000 + yy;
             birthDateForAge = `${year}${mm}${dd}`;
           }
         }
-        
+
         const age = calculateAgeFromBirthDate(birthDateForAge);
         if (age === null) {
-          const errorMsg = participant.nationality === '외국인' 
+          const errorMsg = participant.nationality === '외국인'
             ? `${participant.name}의 외국인등록번호를 올바르게 입력해주세요.`
             : `${participant.name}의 생년월일을 올바르게 입력해주세요.`;
           alert(errorMsg);
@@ -659,56 +703,33 @@ function MobileDomesticStep1Content() {
           return;
         }
 
-        // 플랜 타입: 나이에 따라 백엔드에 보내는 플랜명 사용 (STEP1 선택 플랜 또는 나이별 자동)
-        let planType: string;
-        if (age <= 14) {
-          planType = '어린이플랜';
-        } else if (age >= 71) {
-          planType = selectedPlan === '어르신플랜2' ? '어르신플랜2' : '어르신플랜1';
-        } else {
-          const basePlan =
-            selectedPlan && !['어린이플랜', '어르신플랜1', '어르신플랜2'].includes(selectedPlan)
-              ? selectedPlan
-              : '실속플랜';
-          planType = basePlan;
-        }
-
-        // 보험료 계산 API 호출
-        // 24시는 다음날 00시로 변환
-        let departureDateFormatted = departureDate;
-        let departureHour = parseInt(departureTime);
-        if (departureHour === 24) {
-          const date = new Date(departureDate);
-          date.setDate(date.getDate() + 1);
-          departureDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-          departureHour = 0;
-        }
-        
-        let arrivalDateFormatted = arrivalDate;
-        let arrivalHour = parseInt(arrivalTime);
-        if (arrivalHour === 24) {
-          const date = new Date(arrivalDate);
-          date.setDate(date.getDate() + 1);
-          arrivalDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-          arrivalHour = 0;
-        }
-        
-        const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
-        const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
-
         // 외국인일 경우 외국인등록번호에서 생년월일 추출
         let birthDateForApi = participant.birthDate;
         if (participant.nationality === '외국인' && participant.residentNumber) {
           const residentNum = participant.residentNumber;
           if (residentNum.length >= 6) {
-            const yy = parseInt(residentNum.substring(0, 2));
+            const yy = parseInt(residentNum.substring(0, 2), 10);
             const mm = residentNum.substring(2, 4);
             const dd = residentNum.substring(4, 6);
             const year = yy >= 50 ? 1900 + yy : 2000 + yy;
             birthDateForApi = `${year}${mm}${dd}`;
           }
         }
-        
+
+        // 가능 플랜 API로 해당 가입자 허용 플랜 조회 (보험나이 15세 시 만 나이 기준 적용)
+        const availablePlans = await fetchAvailablePlans(age, participant.gender, undefined, {
+          birth_date: birthDateForApi,
+          departure_date: departureDateTime,
+        });
+        if (availablePlans.length === 0) {
+          alert(`${participant.name}에 대해 가입 가능한 플랜이 없습니다.`);
+          setIsCalculating(false);
+          return;
+        }
+        // STEP1에서 선택한 플랜이 허용 목록에 있으면 사용, 없으면 첫 번째 플랜
+        const planType =
+          selectedPlan && availablePlans.includes(selectedPlan) ? selectedPlan : availablePlans[0];
+
         const response = await fetch('/api/travel/calculate-premium', {
           method: 'POST',
           headers: {
