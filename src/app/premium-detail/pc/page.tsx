@@ -167,11 +167,15 @@ function PCPremiumDetailContent() {
                                   planType: participant.planType,
                                   hasMedicalExpense: String(hasMedicalExpense),
                                 });
-                                if (insuranceType) {
-                                  const apiInsuranceType = insuranceType === '해외여행자보험' ? '해외여행보험' : insuranceType;
-                                  params.set('insuranceType', apiInsuranceType);
-                                  if (apiInsuranceType === '해외여행보험') params.set('planVariant', 'null');
-                                }
+                                const apiInsuranceType = !insuranceType
+                                  ? '국내여행보험'
+                                  : insuranceType === '해외여행자보험'
+                                    ? '해외여행보험'
+                                    : insuranceType === '국내여행자보험'
+                                      ? '국내여행보험'
+                                      : insuranceType;
+                                params.set('insuranceType', apiInsuranceType);
+                                if (apiInsuranceType === '해외여행보험') params.set('planVariant', 'null');
                                 const url = `/coverage-detail?${params.toString()}`;
                                 const w = 650;
                                 const h = 700;

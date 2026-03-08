@@ -180,6 +180,8 @@ export default function ParticipantInfoStep({
         isVerified: false,
       },
     ]);
+    // 인원 추가 시 기존 보험료 계산 결과 초기화 → 보험료 계산하기 버튼 다시 활성화
+    onCalculatedPremiumsChange(null);
   };
 
   const handleSendVerification = async (phone: string) => {

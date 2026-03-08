@@ -378,7 +378,7 @@ function MobileDomesticStep1Content() {
 
   // 페이지 마운트 시 저장된 상태 복원 (coverage-detail에서 돌아올 때)
   useEffect(() => {
-    const restoreState = () => {
+    const restoreState = (): boolean => {
       try {
         const savedState = localStorage.getItem('domestic_m_state');
         if (savedState) {
@@ -397,6 +397,7 @@ function MobileDomesticStep1Content() {
             if (state.arrivalTime) setArrivalTime(state.arrivalTime);
             if (state.birthDate) setBirthDate(state.birthDate);
             if (state.gender) setGender(state.gender);
+            return true;
           }
           // 상태 복원 여부와 관계없이 localStorage는 유지 (다음 coverage-detail 방문 시에도 사용)
         }
@@ -404,13 +405,24 @@ function MobileDomesticStep1Content() {
         console.error('상태 복원 오류:', error);
         localStorage.removeItem('domestic_m_state');
       }
+      return false;
     };
 
     // URL에 returnUrl 파라미터가 있을 때만 복원 (coverage-detail에서 돌아온 경우)
     // 그 외 진입에서는 오래된 저장값을 제거해 초기 상태로 유지
     const returnUrl = searchParams.get('returnUrl');
     if (returnUrl === '/domestic/m') {
-      restoreState();
+      const didRestore = restoreState();
+      if (didRestore) {
+        // 복원 후 리렌더로 인해 effect가 다시 실행되면 cleanup이 타이머를 지워버리므로, cleanup 없이 실행
+        setTimeout(() => {
+          if (planSelectionRef.current) {
+            const elementPosition = planSelectionRef.current.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.scrollY - 80;
+            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+          }
+        }, 250);
+      }
     } else {
       localStorage.removeItem('domestic_m_state');
     }
@@ -753,11 +765,14 @@ function MobileDomesticStep1Content() {
         const data = await response.json();
 
         if (data.success) {
+          // premium-detail 표시: 내국인/외국인 모두 생년월일 8자리(YYYYMMDD) 형식으로 통일
+          const displayBirthDate =
+            participant.nationality === '외국인' ? birthDateForApi : (participant.birthDate || birthDateForApi);
           calculatedParticipants.push({
             id: participant.id,
             name: participant.name,
             gender: participant.gender,
-            birthDate: participant.birthDate,
+            birthDate: displayBirthDate,
             planType: planType,
             premium: data.premium,
           });
@@ -1743,10 +1758,17 @@ function MobileDomesticStep1Content() {
       <ExcelUploadModal
         isOpen={showExcelModal}
         onClose={() => setShowExcelModal(false)}
-        onUpload={(data) => {
-          console.log('Excel data:', data);
+        onUpload={(newParticipants) => {
+          const representative = participants[0];
+          const restFromExcel = newParticipants.map((p, index) => ({ ...p, id: index + 2 }));
+          const merged = representative
+            ? [{ ...representative, id: 1 }, ...restFromExcel]
+            : restFromExcel.map((p, i) => ({ ...p, id: i + 1 }));
+          setParticipants(merged);
+          setCalculatedPremiums(null);
           setShowExcelModal(false);
         }}
+        currentParticipants={participants}
       />
 
       {/* 하단 고정버튼 (STEP 2-1, STEP 3, 완료 화면에서는 숨김) */}
@@ -1763,7 +1785,7 @@ function MobileDomesticStep1Content() {
         <span className="tour2023_txt02 tour2023_grey">
           <span>
             ※ 본 광고는 광고심의기준을 준수하였으며, 유효기간은 심의일로부터 1년입니다.<br />
-            준법감시필 제2025-광고T-002(2025.04.07-2026-04.06)
+            준법감시필 제2026-광고T-002(2026.03.04-2027-03.03)
           </span>
         </span>
       </div>

@@ -27,6 +27,12 @@ const parseDate = (dateString: string): Date | null => {
   }
 };
 
+// 여행목적 코드 → DB 저장용 한글 라벨 (팝업 option value와 동일)
+const TRAVEL_PURPOSE_LABELS: Record<string, string> = {
+  '001': '일반관광',
+  '002': '출장/연수/교육(체험학습)',
+};
+
 export default function OverseasInsuranceStep2Page() {
   const { isLoggedIn, member, isLoading } = useAuth();
   const [corporateName, setCorporateName] = useState<string | null>(null);
@@ -555,6 +561,7 @@ export default function OverseasInsuranceStep2Page() {
       contractor_phone: phone || '',
       contractor_mobile_phone: mobilePhone || '',
       contractor_email: email,
+      travel_purpose: (tourGoal && TRAVEL_PURPOSE_LABELS[tourGoal]) || '', // 여행목적 한글 라벨 (DB 저장용)
     };
     
     // 입력 완료된 인원만 저장
@@ -1373,7 +1380,7 @@ export default function OverseasInsuranceStep2Page() {
         <section className="ss_number_w">
           <div className="ss_number">
             ※ 본 광고는 광고심의기준을 준수하였으며, 유효기간은 심의일로부터 1년입니다.<br />
-            준법감시필 제2025-광고T-001(2025.01.30-2026-01.29)
+            준법감시필 제2026-광고T-002(2026.03.04-2027-03.03)
           </div>
         </section>
       </div>

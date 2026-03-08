@@ -36,7 +36,12 @@ function MobileCoverageDetailContent() {
   const currencyPlanParam = searchParams.get('currencyPlan') as '원화플랜' | '외화플랜' | null;
   const planVariantParam = searchParams.get('planVariant');
 
-  const insuranceType: InsuranceType = insuranceTypeParam === '해외여행자보험' ? '해외여행보험' : (insuranceTypeParam as InsuranceType);
+  const insuranceType: InsuranceType = (() => {
+    const raw = insuranceTypeParam || '국내여행보험';
+    if (raw === '해외여행자보험') return '해외여행보험';
+    if (raw === '국내여행자보험') return '국내여행보험';
+    return raw as InsuranceType;
+  })();
   const planType = planTypeParam as PlanType;
   const planVariant = planVariantParam === 'null' || planVariantParam === '' ? null : (planVariantParam || 'B');
   const needsMedicalExpenseDistinction = insuranceType === '국내여행보험' || insuranceType === '해외여행보험';
@@ -121,7 +126,15 @@ function MobileCoverageDetailContent() {
           console.error('복귀 플래그 저장 오류:', error);
         }
       }
-      router.push(returnUrl);
+      // domestic/m, overseas/m, long-term-stay/m 등 상태 복원이 필요한 페이지로 돌아갈 때는
+      // returnUrl 쿼리를 붙여서 해당 페이지가 localStorage 상태를 복원하도록 함
+      const stateRestorePaths = ['/domestic/m', '/overseas/m', '/long-term-stay/m'] as const;
+      const baseReturnUrl = stateRestorePaths.find((p) => returnUrl === p || returnUrl.startsWith(`${p}?`));
+      const targetUrl =
+        baseReturnUrl != null
+          ? (returnUrl.includes('?') ? `${returnUrl}&returnUrl=${encodeURIComponent(baseReturnUrl)}` : `${returnUrl}?returnUrl=${encodeURIComponent(baseReturnUrl)}`)
+          : returnUrl;
+      router.push(targetUrl);
     } else {
       router.back();
     }

@@ -98,6 +98,17 @@ export const openNicepayWindow = (params: any) => {
     // 결제 방법 (card 또는 vbank)
     // 나이스페이는 소문자 vbank를 요구함
     const paymentMethod = params.method || 'card';
+
+    const applyTaxFreeParams = (requestParams: any) => {
+      const amountValue =
+        typeof requestParams.amount === 'string'
+          ? parseInt(requestParams.amount, 10)
+          : requestParams.amount;
+      requestParams.amount = amountValue;
+      requestParams.taxFreeAmt = amountValue;
+      requestParams.supplyAmt = 0;
+      requestParams.vat = 0;
+    };
     
     const buildMallReserved = () => {
       if (typeof params.mallReserved === 'string' && params.mallReserved.trim()) {
@@ -132,6 +143,8 @@ export const openNicepayWindow = (params: any) => {
             reject(new Error(result.msg || '결제 중 오류가 발생했습니다.'));
           }
         };
+
+        applyTaxFreeParams(requestParams);
         
         // 가상계좌인 경우 은행 코드/예금주명/만료일 추가
         if (paymentMethod === 'vbank') {
@@ -180,6 +193,8 @@ export const openNicepayWindow = (params: any) => {
                 reject(new Error(result.msg || '결제 중 오류가 발생했습니다.'));
               }
             };
+
+            applyTaxFreeParams(requestParams);
             
             // 가상계좌인 경우 은행 코드/예금주명/만료일 추가
             if (paymentMethod === 'vbank') {
@@ -244,6 +259,8 @@ export const openNicepayWindow = (params: any) => {
                 reject(new Error(result.msg || '결제 중 오류가 발생했습니다.'));
               }
             };
+
+            applyTaxFreeParams(requestParams);
             
             // 가상계좌인 경우 은행 코드/예금주명/만료일 추가
             if (paymentMethod === 'vbank') {

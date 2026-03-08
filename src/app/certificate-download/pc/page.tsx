@@ -1,12 +1,15 @@
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import './page.css';
 
 function CertificateDownloadContent() {
+  const searchParams = useSearchParams();
   const [memberType, setMemberType] = useState<'I' | 'C'>('I');
+  const [urlContractId, setUrlContractId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     birth_date: '',
@@ -41,6 +44,18 @@ function CertificateDownloadContent() {
       setIsIOS(true);
     }
   }, []);
+
+  // URL 쿼리: contract_id 있으면 해당 계약 가입증서, 없으면 최신 계약
+  useEffect(() => {
+    const contractId = searchParams.get('contract_id');
+    const fileType = searchParams.get('file_type');
+    if (contractId?.trim()) {
+      setUrlContractId(contractId.trim());
+    }
+    if (fileType?.trim()) {
+      setFormData((prev) => ({ ...prev, file_type: fileType.trim() as 'policy' }));
+    }
+  }, [searchParams]);
 
   const handleMemberTypeChange = (type: 'I' | 'C') => {
     setMemberType(type);
@@ -161,7 +176,7 @@ function CertificateDownloadContent() {
     }
 
     try {
-      // 1단계: 입력 정보로 계약 검색
+      // 1단계: 입력 정보로 계약 검색 (URL에 contract_id 있으면 해당 건, 없으면 최신 건)
       const findRequestBody: any = {
         member_type: memberType,
         phone_number: newCtelNo
@@ -173,6 +188,10 @@ function CertificateDownloadContent() {
       } else {
         findRequestBody.company_name = contract_name;
         findRequestBody.business_number = birth_ssn;
+      }
+
+      if (urlContractId) {
+        findRequestBody.contract_number = urlContractId;
       }
 
       const findResponse = await fetch('/api/certificate/find-contract', {

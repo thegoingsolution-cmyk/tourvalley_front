@@ -1479,7 +1479,7 @@ export default function PCEventInsurancePage() {
           <div className="ss_number">
             ※ 본 광고는 광고심의기준을 준수하였으며, 유효기간은 심의일로부터 1년입니다.
             <br />
-            준법감시필 제2025-광고T-001(2025.01.30-2026-01.29)
+            준법감시필 제2026-광고T-002(2026.03.04-2027-03.03)
           </div>
         </section>
 

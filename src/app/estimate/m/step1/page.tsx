@@ -400,7 +400,7 @@ export default function MobileStep1Page() {
         <span className="tour2023_txt02 tour2023_grey">
           <span>
             ※ 본 광고는 광고심의기준을 준수하였으며, 유효기간은 심의일로부터 1년입니다.<br />
-            준법감시필 제2025-광고T-002(2025.04.07-2026-04.06)
+            준법감시필 제2026-광고T-002(2026.03.04-2027-03.03)
           </span>
         </span>
       </div>

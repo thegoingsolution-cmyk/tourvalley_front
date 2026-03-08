@@ -398,34 +398,23 @@ export default function LongStayInsuranceStep5Page() {
           return;
         }
 
-        // 입금예정일이 출발일보다 이전인지 검증
-        if (step1Data && step1Data.startDate) {
-          let departureDateFormatted = step1Data.startDate;
-          let departureHour = parseInt(step1Data.startHour);
-          if (departureHour === 24) {
-            const date = new Date(step1Data.startDate);
-            date.setDate(date.getDate() + 1);
-            departureDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-            departureHour = 0;
-          }
-          
-          const departureDateOnly = new Date(departureDateFormatted);
-          const departureYear = departureDateOnly.getFullYear();
-          const departureMonth = departureDateOnly.getMonth() + 1;
-          const departureDay = departureDateOnly.getDate();
+        // 입금예정일이 오늘 이전인지 검증 (오늘 이후로만 설정 가능)
+        const now = new Date();
+        const todayYear = now.getFullYear();
+        const todayMonth = now.getMonth() + 1;
+        const todayDay = now.getDate();
 
-          const expectedYearNum = parseInt(expectedYear);
-          const expectedMonthNum = parseInt(expectedMonth);
-          const expectedDayNum = parseInt(expectedDay);
+        const expectedYearNum = parseInt(expectedYear);
+        const expectedMonthNum = parseInt(expectedMonth);
+        const expectedDayNum = parseInt(expectedDay);
 
-          if (expectedYearNum < departureYear || 
-              (expectedYearNum === departureYear && expectedMonthNum < departureMonth) ||
-              (expectedYearNum === departureYear && expectedMonthNum === departureMonth && expectedDayNum < departureDay)) {
-            const formattedDepartureDate = `${departureYear}-${String(departureMonth).padStart(2, '0')}-${String(departureDay).padStart(2, '0')}`;
-            alert(`입금예정일은 보험 이용 기간 중 출발일(${formattedDepartureDate}) 이후로 설정해야 합니다.`);
-            setIsProcessing(false);
-            return;
-          }
+        if (expectedYearNum < todayYear ||
+            (expectedYearNum === todayYear && expectedMonthNum < todayMonth) ||
+            (expectedYearNum === todayYear && expectedMonthNum === todayMonth && expectedDayNum < todayDay)) {
+          const formattedToday = `${todayYear}-${String(todayMonth).padStart(2, '0')}-${String(todayDay).padStart(2, '0')}`;
+          alert(`입금예정일은 오늘(${formattedToday}) 이후로 설정해야 합니다.`);
+          setIsProcessing(false);
+          return;
         }
       }
 
@@ -1100,7 +1089,7 @@ export default function LongStayInsuranceStep5Page() {
             <div className="ss_number">
               ※ 본 광고는 광고심의기준을 준수하였으며, 유효기간은 심의일로부터 1년입니다.
               <br />
-              준법감시필 제2025-광고T-001(2025.01.30-2026-01.29)
+              준법감시필 제2026-광고T-002(2026.03.04-2027-03.03)
             </div>
           </section>
         </div>
@@ -1789,7 +1778,7 @@ export default function LongStayInsuranceStep5Page() {
           <div className="ss_number">
             ※ 본 광고는 광고심의기준을 준수하였으며, 유효기간은 심의일로부터 1년입니다.
             <br />
-            준법감시필 제2025-광고T-001(2025.01.30-2026-01.29)
+            준법감시필 제2026-광고T-002(2026.03.04-2027-03.03)
           </div>
         </section>
       </div>

@@ -626,11 +626,13 @@ export default function PCLongTermStayPage() {
         const data = await response.json();
 
         if (data.success) {
+          const displayBirthDate =
+            participant.nationality === '외국인' ? birthDateForApi : (participant.birthDate || birthDateForApi);
           calculatedParticipants.push({
             id: participant.id,
             name: participant.name,
             gender: participant.gender,
-            birthDate: participant.birthDate,
+            birthDate: displayBirthDate,
             planType: dbPlanType, // DB plan_type 그대로 표시
             premium: data.premium,
           });
@@ -1730,14 +1732,14 @@ export default function PCLongTermStayPage() {
         <ExcelUploadModal
           isOpen={showExcelModal}
           onClose={() => setShowExcelModal(false)}
-          onUpload={(newParticipants, startId) => {
-            // 엑셀 데이터로 기존 참가자 목록을 완전히 교체
-            const participantsWithCorrectIds = newParticipants.map((p, index) => ({
-              ...p,
-              id: index + 1, // ID를 1부터 시작하도록 설정
-            }));
-            
-            setParticipants(participantsWithCorrectIds);
+          onUpload={(newParticipants) => {
+            const representative = participants[0];
+            const restFromExcel = newParticipants.map((p, index) => ({ ...p, id: index + 2 }));
+            const merged = representative
+              ? [{ ...representative, id: 1 }, ...restFromExcel]
+              : restFromExcel.map((p, i) => ({ ...p, id: i + 1 }));
+            setParticipants(merged);
+            setCalculatedPremiums(null);
             setShowExcelModal(false);
           }}
           currentParticipants={participants}

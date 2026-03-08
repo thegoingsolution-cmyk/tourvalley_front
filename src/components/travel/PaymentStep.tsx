@@ -105,46 +105,24 @@ export default function PaymentStep({
     }
   };
 
-  // 입금예정일이 출발일보다 이전인지 검증하는 함수
+  // 입금예정일이 오늘 이전인지 검증 (오늘 이후로만 설정 가능)
   const validateExpectedDepositDate = (year: number, month: number, day: number): boolean => {
-    // 출발일 정보가 없으면 검증하지 않음
-    if (!departureDate || !departureTime) {
-      return true;
-    }
-
     // 입금예정일이 완전히 입력되지 않았으면 검증하지 않음
     if (year === 0 || month === 0 || day === 0) {
       return true;
     }
 
-    // 출발일 계산 (24시인 경우 다음 날 0시로 처리)
-    let departureHour = parseInt(departureTime);
-    let departureDateFormatted = departureDate;
-    if (departureHour === 24) {
-      const date = new Date(departureDate);
-      date.setDate(date.getDate() + 1);
-      departureDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-      departureHour = 0;
-    }
-    
-    // 출발일 날짜만 추출 (YYYY-MM-DD)
-    const departureDateOnly = new Date(departureDateFormatted);
-    const departureYear = departureDateOnly.getFullYear();
-    const departureMonth = departureDateOnly.getMonth() + 1;
-    const departureDay = departureDateOnly.getDate();
+    const now = new Date();
+    const todayYear = now.getFullYear();
+    const todayMonth = now.getMonth() + 1;
+    const todayDay = now.getDate();
 
-    // 입금예정일 날짜
-    const expectedDepositDateOnly = new Date(year, month - 1, day);
-    const expectedYear = expectedDepositDateOnly.getFullYear();
-    const expectedMonth = expectedDepositDateOnly.getMonth() + 1;
-    const expectedDay = expectedDepositDateOnly.getDate();
-
-    // 날짜 비교 (입금예정일이 출발일보다 이전이면 false 반환)
-    if (year < departureYear || 
-        (year === departureYear && month < departureMonth) ||
-        (year === departureYear && month === departureMonth && day < departureDay)) {
-      const formattedDepartureDate = `${departureYear}-${String(departureMonth).padStart(2, '0')}-${String(departureDay).padStart(2, '0')}`;
-      alert(`입금예정일은 보험 이용 기간 중 출발일(${formattedDepartureDate}) 이후로 설정해야 합니다.`);
+    // 날짜 비교 (입금예정일이 오늘보다 이전이면 false 반환)
+    if (year < todayYear ||
+        (year === todayYear && month < todayMonth) ||
+        (year === todayYear && month === todayMonth && day < todayDay)) {
+      const formattedToday = `${todayYear}-${String(todayMonth).padStart(2, '0')}-${String(todayDay).padStart(2, '0')}`;
+      alert(`입금예정일은 오늘(${formattedToday}) 이후로 설정해야 합니다.`);
       return false;
     }
 
@@ -524,12 +502,12 @@ export default function PaymentStep({
                         ))}
                       </select>
                       <select
-                        value={cardExpiryYear}
+                        value={cardExpiryYear.length === 4 ? cardExpiryYear.slice(-2) : cardExpiryYear}
                         onChange={(e) => onCardExpiryChange(cardExpiryMonth, e.target.value)}
                       >
                         <option value="">선택</option>
                         {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i).map(y => (
-                          <option key={y} value={y}>{y}년</option>
+                          <option key={y} value={String(y).slice(-2)}>{y}년</option>
                         ))}
                       </select>
                     </div>

@@ -616,11 +616,14 @@ export default function PCDomesticPage() {
         const data = await response.json();
 
         if (data.success) {
+          // premium-detail 표시: 내국인/외국인 모두 생년월일 8자리(YYYYMMDD) 형식으로 통일
+          const displayBirthDate =
+            participant.nationality === '외국인' ? birthDateForApi : (participant.birthDate || birthDateForApi);
           calculatedParticipants.push({
             id: participant.id,
             name: participant.name,
             gender: participant.gender,
-            birthDate: participant.birthDate,
+            birthDate: displayBirthDate,
             planType: planType,
             premium: data.premium,
           });
@@ -1588,14 +1591,15 @@ export default function PCDomesticPage() {
         <ExcelUploadModal
           isOpen={showExcelModal}
           onClose={() => setShowExcelModal(false)}
-          onUpload={(newParticipants, startId) => {
-            // 엑셀 데이터로 기존 참가자 목록을 완전히 교체
-            const participantsWithCorrectIds = newParticipants.map((p, index) => ({
-              ...p,
-              id: index + 1, // ID를 1부터 시작하도록 설정
-            }));
-            
-            setParticipants(participantsWithCorrectIds);
+          onUpload={(newParticipants) => {
+            // 가입자1(대표)은 유지하고, 엑셀 데이터를 2번째부터 추가 (대표 인증/입력 유지)
+            const representative = participants[0];
+            const restFromExcel = newParticipants.map((p, index) => ({ ...p, id: index + 2 }));
+            const merged = representative
+              ? [{ ...representative, id: 1 }, ...restFromExcel]
+              : restFromExcel.map((p, i) => ({ ...p, id: i + 1 }));
+            setParticipants(merged);
+            setCalculatedPremiums(null);
             setShowExcelModal(false);
           }}
           currentParticipants={participants}

@@ -32,7 +32,9 @@ function PCCoverageDetailContent() {
   const insuranceTypeParam = searchParams.get('insuranceType');
   const insuranceType: InsuranceType = (() => {
     const raw = insuranceTypeParam || '국내여행보험';
-    return raw === '해외여행자보험' ? '해외여행보험' : (raw as InsuranceType);
+    if (raw === '해외여행자보험') return '해외여행보험';
+    if (raw === '국내여행자보험') return '국내여행보험';
+    return raw as InsuranceType;
   })();
   const currencyPlan = searchParams.get('currencyPlan') as '원화플랜' | '외화플랜' | undefined;
   const planVariantParam = searchParams.get('planVariant');
