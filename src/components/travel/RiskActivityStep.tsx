@@ -88,7 +88,7 @@ export default function RiskActivityStep({
               </div>
               <p
                 className="font_blue"
-                style={{ marginTop: '10px' }}
+                style={{ marginTop: '10px', color : "red" }}
               >
                 ※ 현재 출국하였거나 해외에 체류 중인 경우 해외여행보험에 가입하실 수 없습니다.
               </p>
@@ -130,9 +130,9 @@ export default function RiskActivityStep({
             </div>
             <p
               className="font_blue"
-              style={{ marginTop: '10px' }}
+              style={{ marginTop: '10px', color : "red" }}
             >
-              ※ 위험한 활동이 포함된 여행인 경우 해외여행보험에 가입하실 수 없습니다.
+              ※ 위험한 활동이 포함된 여행인 경우 여행보험에 가입하실 수 없습니다.
             </p>
           </div>
 

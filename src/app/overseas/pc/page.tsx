@@ -99,12 +99,27 @@ export default function PCOverseasPage() {
   const [accidentFreeCash, setAccidentFreeCash] = useState(0);
   const [useAccidentFreeCash, setUseAccidentFreeCash] = useState(0);
 
-  // 로그인 회원의 무사고캐시 보유액 반영 (계약정보 단계에서 표시)
+  // STEP3 진입 시 /api/cash/info로 최신 무사고캐시 조회 (비로그인 시 0)
   useEffect(() => {
-    if (member && typeof member.accident_free_cash === 'number') {
-      setAccidentFreeCash(member.accident_free_cash);
+    if (!showStep3) return;
+    if (!member?.id) {
+      setAccidentFreeCash(0);
+      return;
     }
-  }, [member]);
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+    fetch(`${apiBase}/api/cash/info?member_id=${member.id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && typeof data.totalCash === 'number') {
+          setAccidentFreeCash(data.totalCash);
+        } else {
+          setAccidentFreeCash(typeof member.accident_free_cash === 'number' ? member.accident_free_cash : 0);
+        }
+      })
+      .catch(() => {
+        setAccidentFreeCash(typeof member.accident_free_cash === 'number' ? member.accident_free_cash : 0);
+      });
+  }, [showStep3, member?.id, member?.accident_free_cash]);
 
   // 무통장입금 관련 상태
   const [depositBank, setDepositBank] = useState<string>('');
@@ -932,6 +947,7 @@ export default function PCOverseasPage() {
             payment_sub_method: null,
             amount: receiptPremium,
             status: '대기',
+            use_accident_free_cash: useAccidentFreeCash,
           },
         };
 
@@ -1119,6 +1135,7 @@ export default function PCOverseasPage() {
             approval_date: paymentSubMethod === '수기카드' ? `${approvalYear}-${String(approvalMonth).padStart(2, '0')}-${String(approvalDay).padStart(2, '0')}` : null,
             normal_premium: normalPremium,
             receipt_premium: receiptPremium,
+            use_accident_free_cash: useAccidentFreeCash,
           },
         };
 
@@ -1193,6 +1210,7 @@ export default function PCOverseasPage() {
             payment_sub_method: '가상계좌',
             amount: receiptPremium,
             status: '대기',
+            use_accident_free_cash: useAccidentFreeCash,
           },
         };
 

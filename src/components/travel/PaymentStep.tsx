@@ -105,7 +105,7 @@ export default function PaymentStep({
     }
   };
 
-  // 입금예정일이 오늘 이전인지 검증 (오늘 이후로만 설정 가능)
+  // 입금예정일 검증: 오늘 이전 불가, 보험 시작일(출발일) 당일·이후 불가 → 오늘 이상, 보험 시작일 미만만 허용
   const validateExpectedDepositDate = (year: number, month: number, day: number): boolean => {
     // 입금예정일이 완전히 입력되지 않았으면 검증하지 않음
     if (year === 0 || month === 0 || day === 0) {
@@ -117,13 +117,25 @@ export default function PaymentStep({
     const todayMonth = now.getMonth() + 1;
     const todayDay = now.getDate();
 
-    // 날짜 비교 (입금예정일이 오늘보다 이전이면 false 반환)
+    // 1) 오늘 이전이면 불가
     if (year < todayYear ||
         (year === todayYear && month < todayMonth) ||
         (year === todayYear && month === todayMonth && day < todayDay)) {
       const formattedToday = `${todayYear}-${String(todayMonth).padStart(2, '0')}-${String(todayDay).padStart(2, '0')}`;
       alert(`입금예정일은 오늘(${formattedToday}) 이후로 설정해야 합니다.`);
       return false;
+    }
+
+    // 2) 보험 시작일(출발일) 당일 또는 이후면 불가 — 출발일이 있을 때만 검사
+    if (departureDate && /^\d{4}-\d{2}-\d{2}$/.test(departureDate.trim())) {
+      const [startY, startM, startD] = departureDate.trim().split('-').map(Number);
+      if (year > startY ||
+          (year === startY && month > startM) ||
+          (year === startY && month === startM && day >= startD)) {
+        const formattedStart = `${startY}-${String(startM).padStart(2, '0')}-${String(startD).padStart(2, '0')}`;
+        alert(`입금예정일은 보험 시작일(${formattedStart}) 전으로만 설정 가능합니다.`);
+        return false;
+      }
     }
 
     return true;
