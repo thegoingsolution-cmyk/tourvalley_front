@@ -29,6 +29,10 @@ interface ParticipantInfoStepProps {
   gender?: 'male' | 'female';
   /** 모바일 등 상단에서 이미 단계 인디케이터를 보여줄 때 true → form-header(타이틀+단계) 생략 */
   hideFormHeader?: boolean;
+  /** 로그인한 회원이면 true. 회원일 때는 휴대폰 입력·인증 미노출, memberPhone 사용 */
+  isLoggedIn?: boolean;
+  /** 회원 가입 시 저장된 휴대폰 번호. isLoggedIn일 때 대표 가입자 휴대폰으로 사용 */
+  memberPhone?: string;
 }
 
 export default function ParticipantInfoStep({
@@ -52,6 +56,8 @@ export default function ParticipantInfoStep({
   birthDate,
   gender,
   hideFormHeader = false,
+  isLoggedIn = false,
+  memberPhone,
 }: ParticipantInfoStepProps) {
   const openEmailSelect = (index: number) => {
     const selectEl = document.getElementById(`select_email_${index}`) as HTMLSelectElement | null;
@@ -125,6 +131,18 @@ export default function ParticipantInfoStep({
       setIsInitialized(true);
     }
   }, [birthDate, gender, participants, onParticipantsChange, isInitialized]);
+
+  // 로그인 회원: 가입 시 저장된 휴대폰 번호를 대표 가입자 번호로 반영(입력란 미노출)
+  useEffect(() => {
+    if (!isLoggedIn || !memberPhone || participants.length === 0) return;
+    const normalized = memberPhone.replace(/\D/g, '');
+    if (!normalized) return;
+    const current = (participants[0].phone || '').replace(/\D/g, '');
+    if (current === normalized) return;
+    const updated = [...participants];
+    updated[0] = { ...updated[0], phone: normalized, isVerified: true };
+    onParticipantsChange(updated);
+  }, [isLoggedIn, memberPhone, participants, onParticipantsChange]);
 
   // 보험료 계산 결과가 표시되면 해당 위치로 스크롤
   useEffect(() => {
@@ -605,8 +623,8 @@ export default function ParticipantInfoStep({
                   </div>
                 )}
 
-                {/* 휴대폰 번호 - 가입자 1(대표)만 */}
-                {index === 0 && (
+                {/* 휴대폰 번호 - 가입자 1(대표)만. 비회원만 입력·인증, 회원은 가입 시 저장된 번호 사용 */}
+                {index === 0 && !isLoggedIn && (
                   <div className="tourGuard_form_tt mag5 tourG_mab03" style={{ paddingRight: '20px', position: 'relative' }}>
                     <label htmlFor={`phone_${index}`}>휴대폰 번호</label>
                     <input
@@ -661,8 +679,8 @@ export default function ParticipantInfoStep({
                   </div>
                 )}
 
-                {/* 인증번호 입력 필드 */}
-                {index === 0 && verificationSent && !participant.isVerified && (
+                {/* 인증번호 입력 필드 - 비회원일 때만 */}
+                {index === 0 && !isLoggedIn && verificationSent && !participant.isVerified && (
                   <div className="tourGuard_form_tt mag5 tourG_mab03" style={{ paddingRight: '20px', position: 'relative' }}>
                     <label htmlFor={`verification_code_${index}`}>인증번호</label>
                     <input

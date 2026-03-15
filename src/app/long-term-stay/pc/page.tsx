@@ -525,7 +525,7 @@ export default function PCLongTermStayPage() {
     }
 
     // 대표 가입자 인증 확인
-    if (!participants[0].isVerified) {
+    if (!isLoggedIn && !participants[0].isVerified) {
       alert('대표 가입자의 휴대폰 인증을 완료해주세요.');
       return;
     }
@@ -1090,7 +1090,7 @@ export default function PCLongTermStayPage() {
           const paymentRequest = await requestNicepayPayment({
             contract_id,
             amount: receiptPremium,
-            orderId: contractData_result.contract_number,
+            orderId: String(contractData_result.contract_id),
             goodsName: `해외장기체류보험(${travelPurpose || '유학/어학연수'})`,
             buyerName: participants[0]?.name || '',
             buyerEmail: participants[0] ? getFullEmail(participants[0]) : '',
@@ -1353,7 +1353,7 @@ export default function PCLongTermStayPage() {
         const paymentRequest = await requestNicepayPayment({
           contract_id,
           amount: receiptPremium,
-          orderId: contractData_result.contract_number,
+          orderId: String(contractData_result.contract_id),
           goodsName: travelPurpose || '유학/어학연수',
           buyerName: participants[0]?.name || '',
           buyerEmail: participants[0] ? getFullEmail(participants[0]) : '',
@@ -1534,6 +1534,8 @@ export default function PCLongTermStayPage() {
             calculateAgeFromBirthDate={calculateAgeFromBirthDate}
             birthDate={birthDate}
             gender={gender}
+            isLoggedIn={isLoggedIn}
+            memberPhone={member?.mobile_phone || ''}
           />
         )}
 

@@ -504,7 +504,7 @@ export default function PCOverseasPage() {
     }
 
     // 대표 가입자 인증 확인
-    if (!participants[0].isVerified) {
+    if (!isLoggedIn && !participants[0].isVerified) {
       alert('대표 가입자의 휴대폰 인증을 완료해주세요.');
       return;
     }
@@ -974,7 +974,7 @@ export default function PCOverseasPage() {
           const paymentRequest = await requestNicepayPayment({
             contract_id,
             amount: receiptPremium,
-            orderId: contractData_result.contract_number,
+            orderId: String(contractData_result.contract_id),
             goodsName: '해외여행보험',
             buyerName: participants[0]?.name || '',
             buyerEmail: getFullEmail(participants[0]),
@@ -1236,7 +1236,7 @@ export default function PCOverseasPage() {
         const paymentRequest = await requestNicepayPayment({
           contract_id,
           amount: receiptPremium,
-          orderId: contractData_result.contract_number,
+          orderId: String(contractData_result.contract_id),
           goodsName: '해외여행보험',
           buyerName: participants[0]?.name || '',
           buyerEmail: getFullEmail(participants[0]) || '',
@@ -1404,6 +1404,8 @@ export default function PCOverseasPage() {
             calculateAgeFromBirthDate={calculateAgeFromBirthDate}
             birthDate={birthDate}
             gender={gender}
+            isLoggedIn={isLoggedIn}
+            memberPhone={member?.mobile_phone || ''}
           />
         )}
 

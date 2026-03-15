@@ -2086,7 +2086,7 @@ function MobileGroupInsuranceContent() {
           const paymentRequest = await requestNicepayPayment({
             contract_id,
             amount: receiptPremium,
-            orderId: contractData_result.contract_number,
+            orderId: String(contractData_result.contract_id),
             goodsName: insuranceTypeName,
             buyerName,
             buyerEmail,
@@ -2262,7 +2262,7 @@ function MobileGroupInsuranceContent() {
         const paymentRequest = await requestNicepayPayment({
           contract_id,
           amount: receiptPremium,
-          orderId: contractData_result.contract_number,
+          orderId: String(contractData_result.contract_id),
           goodsName: insuranceTypeName,
           buyerName,
           buyerEmail,

@@ -1090,7 +1090,7 @@ export default function OverseasInsuranceStep5Page() {
           const paymentRequest = await requestNicepayPayment({
             contract_id,
             amount: step3Data?.total_premium || 0,
-            orderId: contractResult.contract_number,
+            orderId: String(contractResult.contract_id ?? contractResult.id),
             goodsName: '해외여행보험',
             buyerName: step2Data.contractor_name || '',
             buyerEmail: step2Data.contractor_email || '',
@@ -1179,7 +1179,7 @@ export default function OverseasInsuranceStep5Page() {
           const paymentRequest = await requestNicepayPayment({
             contract_id,
             amount: step3Data?.total_premium || 0,
-            orderId: contractResult.contract_number,
+            orderId: String(contractResult.contract_id ?? contractResult.id),
             goodsName: '해외여행보험',
             buyerName: step2Data.contractor_name || '',
             buyerEmail: step2Data.contractor_email || '',

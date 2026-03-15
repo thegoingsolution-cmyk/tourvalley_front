@@ -676,7 +676,7 @@ function MobileDomesticStep1Content() {
     }
 
     // 대표 가입자 인증 확인
-    if (!participants[0].isVerified) {
+    if (!isLoggedIn && !participants[0].isVerified) {
       alert('대표 가입자의 휴대폰 인증을 완료해주세요.');
       return;
     }
@@ -1075,7 +1075,7 @@ function MobileDomesticStep1Content() {
           const paymentRequest = await requestNicepayPayment({
             contract_id,
             amount: receiptPremium,
-            orderId: contractData_result.contract_number,
+            orderId: String(contractData_result.contract_id),
             goodsName: '국내여행자보험',
             buyerName: participants[0]?.name || '',
             buyerEmail: getFullEmail(participants[0]),
@@ -1363,7 +1363,7 @@ function MobileDomesticStep1Content() {
         const paymentRequest = await requestNicepayPayment({
           contract_id,
           amount: receiptPremium,
-          orderId: contractData_result.contract_number,
+          orderId: String(contractData_result.contract_id),
           goodsName: '국내여행보험',
           buyerName: participants[0]?.name || '',
           buyerEmail: getFullEmail(participants[0]) || '',
@@ -1589,6 +1589,8 @@ function MobileDomesticStep1Content() {
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             onExcelUpload={() => {}}
+            isLoggedIn={isLoggedIn}
+            memberPhone={member?.mobile_phone || ''}
           />
 
         </div>

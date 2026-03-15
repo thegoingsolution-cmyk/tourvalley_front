@@ -525,8 +525,8 @@ export default function PCDomesticPage() {
       }
     }
 
-    // 대표 가입자 인증 확인
-    if (!participants[0].isVerified) {
+    // 대표 가입자 휴대폰 인증 확인 (비회원만 필수)
+    if (!isLoggedIn && !participants[0].isVerified) {
       alert('대표 가입자의 휴대폰 인증을 완료해주세요.');
       return;
     }
@@ -985,7 +985,7 @@ export default function PCDomesticPage() {
           const paymentRequest = await requestNicepayPayment({
             contract_id,
             amount: receiptPremium,
-            orderId: contractData_result.contract_number,
+            orderId: String(contractData_result.contract_id),
             goodsName: '국내여행보험',
             buyerName: participants[0]?.name || '',
             buyerEmail: participants[0]?.email1 && participants[0]?.email2 ? `${participants[0].email1}@${participants[0].email2}` : '',
@@ -1260,7 +1260,7 @@ export default function PCDomesticPage() {
         const paymentRequest = await requestNicepayPayment({
           contract_id,
           amount: receiptPremium,
-          orderId: contractData_result.contract_number,
+          orderId: String(contractData_result.contract_id),
           goodsName: '국내여행보험',
           buyerName: participants[0]?.name || '',
           buyerEmail: participants[0]?.email1 && participants[0]?.email2 
@@ -1424,6 +1424,8 @@ export default function PCDomesticPage() {
             calculateAgeFromBirthDate={calculateAgeFromBirthDate}
             birthDate={birthDate}
             gender={gender}
+            isLoggedIn={isLoggedIn}
+            memberPhone={member?.mobile_phone || ''}
           />
         )}
 
