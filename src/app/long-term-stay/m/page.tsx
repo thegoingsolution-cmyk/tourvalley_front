@@ -1325,9 +1325,7 @@ function MobileLongTermStayContent() {
             contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: participants[0]?.name || '',
             phone: participants[0]?.phone || '',
-            email: participants[0]?.email1 && participants[0]?.email2 
-              ? `${participants[0].email1}@${participants[0].email2 === '직접입력' ? participants[0].customEmail : participants[0].email2}`
-              : null,
+            email: participants[0] ? getFullEmail(participants[0]) : null,
           },
           insured_persons: participants.map((p, idx) => {
             const age = calculateAgeFromBirthDate(p.birthDate);
@@ -1383,9 +1381,7 @@ function MobileLongTermStayContent() {
           orderId: contractData_result.contract_number,
           goodsName: travelPurpose || '유학/어학연수',
           buyerName: participants[0]?.name || '',
-          buyerEmail: participants[0]?.email1 && participants[0]?.email2 
-            ? `${participants[0].email1}@${participants[0].email2 === '직접입력' ? participants[0].customEmail : participants[0].email2}`
-            : '',
+          buyerEmail: participants[0] ? getFullEmail(participants[0]) : '',
           buyerTel: participants[0]?.phone || '',
           returnUrl: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/payments/nicepay/callback`,
           closeUrl: `${window.location.origin}/payment/close`,

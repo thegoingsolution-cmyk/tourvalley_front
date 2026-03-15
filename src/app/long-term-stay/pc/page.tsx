@@ -1004,7 +1004,7 @@ export default function PCLongTermStayPage() {
             name: participants[0]?.name || '',
             resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${getResidentGenderCode(participants[0].birthDate, participants[0].gender)}000000` : '',
             mobile_phone: participants[0]?.phone || '',
-            email: participants[0]?.email1 && participants[0]?.email2 ? `${participants[0].email1}@${participants[0].email2}` : '',
+            email: participants[0] ? getFullEmail(participants[0]) : '',
           },
           insured_persons: participants.map((p, idx) => {
             // 외국인일 경우 외국인등록번호에서 생년월일 추출
@@ -1093,7 +1093,7 @@ export default function PCLongTermStayPage() {
             orderId: contractData_result.contract_number,
             goodsName: `해외장기체류보험(${travelPurpose || '유학/어학연수'})`,
             buyerName: participants[0]?.name || '',
-            buyerEmail: participants[0]?.email1 && participants[0]?.email2 ? `${participants[0].email1}@${participants[0].email2}` : '',
+            buyerEmail: participants[0] ? getFullEmail(participants[0]) : '',
             buyerTel: participants[0]?.phone || '',
             returnUrl: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/payments/nicepay/callback`,
             closeUrl: `${window.location.origin}/payment/close`,
@@ -1356,9 +1356,7 @@ export default function PCLongTermStayPage() {
           orderId: contractData_result.contract_number,
           goodsName: travelPurpose || '유학/어학연수',
           buyerName: participants[0]?.name || '',
-          buyerEmail: participants[0]?.email1 && participants[0]?.email2 
-            ? `${participants[0].email1}@${participants[0].email2 === '직접입력' ? participants[0].customEmail : participants[0].email2}`
-            : '',
+          buyerEmail: participants[0] ? getFullEmail(participants[0]) : '',
           buyerTel: participants[0]?.phone || '',
           returnUrl: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/payments/nicepay/callback`,
           closeUrl: `${window.location.origin}/payment/close`,

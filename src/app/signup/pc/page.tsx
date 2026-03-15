@@ -852,7 +852,7 @@ export default function PCSignupPage() {
                           value={businessNumber1}
                           onChange={(e) => setBusinessNumber1(e.target.value)}
                           maxLength={3}
-                          className="form-input business-input"
+                          className="form-input business-input business-input-1"
                         />
                         <span className="number-divider">—</span>
                         <input
@@ -860,7 +860,7 @@ export default function PCSignupPage() {
                           value={businessNumber2}
                           onChange={(e) => setBusinessNumber2(e.target.value)}
                           maxLength={2}
-                          className="form-input business-input"
+                          className="form-input business-input business-input-2"
                         />
                         <span className="number-divider">—</span>
                         <input
@@ -868,7 +868,7 @@ export default function PCSignupPage() {
                           value={businessNumber3}
                           onChange={(e) => setBusinessNumber3(e.target.value)}
                           maxLength={5}
-                          className="form-input business-input"
+                          className="form-input business-input business-input-3"
                         />
                       </div>
                     </div>

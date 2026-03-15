@@ -1,11 +1,16 @@
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import './page.css';
 
 function CardReceiptDownloadContent() {
+  const searchParams = useSearchParams();
+  const contractIdFromUrl = searchParams.get('contract_id') || '';
+  const isEmailEntry = !!contractIdFromUrl.trim();
+
   const [memberType, setMemberType] = useState<'I' | 'C'>('I');
   const [formData, setFormData] = useState({
     name: '',
@@ -123,10 +128,12 @@ function CardReceiptDownloadContent() {
       birth_ssn = formData.resno1 + formData.resno2 + formData.resno3;
     }
 
-    if (!formData.ctel_no || formData.ctel_no.length < 10 || formData.ctel_no.length > 11) {
+    if (!isEmailEntry && (!formData.ctel_no || formData.ctel_no.length < 10 || formData.ctel_no.length > 11)) {
       alert('휴대폰 번호를 정확히 입력해주세요.');
       return;
     }
+
+    if (isEmailEntry) return; // 이메일 진입은 checkInput 대신 verifyByIdentity 사용
 
     const ctel_no1 = formData.ctel_no.substring(0, 3);
     const ctel_rest = formData.ctel_no.substring(3);
@@ -219,6 +226,56 @@ function CardReceiptDownloadContent() {
     } catch (error) {
       console.error(error);
       alert('처리 중 오류가 발생했습니다.\n새로고침 후 다시 시도해주세요.');
+    }
+  };
+
+  // 이메일 링크 진입(contract_id 있음): 생년월일/사업자번호로 바로 영수증 조회
+  const verifyByIdentity = async () => {
+    if (!contractIdFromUrl.trim()) return;
+
+    if (memberType === 'I') {
+      if (!formData.birth_date || formData.birth_date.length !== 8) {
+        alert('생년월일 8자리를 입력해주세요.');
+        return;
+      }
+      if (!isYYYYMMDD(formData.birth_date)) {
+        alert('생년월일을 정확히 입력해주세요.');
+        return;
+      }
+    } else {
+      if (formData.resno1.length < 3 || formData.resno2.length < 2 || formData.resno3.length < 5) {
+        alert('사업자번호를 정확히 입력해주세요.');
+        return;
+      }
+    }
+
+    try {
+      const body: Record<string, string> = {
+        contract_number: contractIdFromUrl.trim(),
+        member_type: memberType,
+      };
+      if (memberType === 'I') {
+        body.birth_date = formData.birth_date;
+      } else {
+        body.business_number = formData.resno1 + formData.resno2 + formData.resno3;
+      }
+
+      const response = await fetch('/api/certificate/verify-receipt-by-identity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await response.json();
+
+      if (!data.success || !data.receiptUrl) {
+        alert(data.message || '영수증 정보를 찾을 수 없습니다.');
+        return;
+      }
+
+      window.open(data.receiptUrl, '_blank', 'noopener,noreferrer');
+    } catch (error) {
+      console.error(error);
+      alert('처리 중 오류가 발생했습니다.');
     }
   };
 
@@ -335,17 +392,6 @@ function CardReceiptDownloadContent() {
                   {memberType === 'I' && (
                     <div className="cd-input-area">
                       <div className="cd-form-group">
-                        <label>이름</label>
-                        <input
-                          type="text"
-                          value={formData.name}
-                          onChange={(e) => handleInputChange('name', e.target.value)}
-                          maxLength={25}
-                          placeholder="이름 입력"
-                          className="cd-input"
-                        />
-                      </div>
-                      <div className="cd-form-group">
                         <label>생년월일</label>
                         <input
                           type="tel"
@@ -362,17 +408,6 @@ function CardReceiptDownloadContent() {
                   {/* 법인단체 입력 폼 */}
                   {memberType === 'C' && (
                     <div className="cd-input-area">
-                      <div className="cd-form-group">
-                        <label>법인(단체)명</label>
-                        <input
-                          type="text"
-                          value={formData.company_name}
-                          onChange={(e) => handleInputChange('company_name', e.target.value)}
-                          maxLength={20}
-                          placeholder="법인(단체)명"
-                          className="cd-input"
-                        />
-                      </div>
                       <div className="cd-form-group cd-business-number">
                         <label>사업자번호</label>
                         <div className="cd-business-inputs">
@@ -402,30 +437,47 @@ function CardReceiptDownloadContent() {
                     </div>
                   )}
 
-                  {/* 휴대폰 번호 */}
-                  <div className="cd-form-group">
-                    <label>휴대폰 번호</label>
-                    <input
-                      type="tel"
-                      value={formData.ctel_no}
-                      onChange={(e) => handleInputChange('ctel_no', e.target.value)}
-                      maxLength={11}
-                      placeholder="(-없이) 숫자만 입력"
-                      className="cd-input"
-                    />
-                    <div className="cd-button-wrapper">
-                      <button
-                        type="button"
-                        onClick={checkInput}
-                        className="cd-button cd-button-primary"
-                      >
-                        인증번호받기
-                      </button>
+                  {/* 이메일 링크 진입: 확인 버튼만 (휴대폰/인증번호 없음) */}
+                  {isEmailEntry && (
+                    <div className="cd-form-group">
+                      <div className="cd-button-wrapper">
+                        <button
+                          type="button"
+                          onClick={verifyByIdentity}
+                          className="cd-button cd-button-primary"
+                        >
+                          확인
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  {/* 인증번호 입력 */}
-                  {showSignArea && (
+                  {/* 휴대폰 번호 (일반 진입만) */}
+                  {!isEmailEntry && (
+                    <div className="cd-form-group">
+                      <label>휴대폰 번호</label>
+                      <input
+                        type="tel"
+                        value={formData.ctel_no}
+                        onChange={(e) => handleInputChange('ctel_no', e.target.value)}
+                        maxLength={11}
+                        placeholder="(-없이) 숫자만 입력"
+                        className="cd-input"
+                      />
+                      <div className="cd-button-wrapper">
+                        <button
+                          type="button"
+                          onClick={checkInput}
+                          className="cd-button cd-button-primary"
+                        >
+                          인증번호받기
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 인증번호 입력 (일반 진입만) */}
+                  {!isEmailEntry && showSignArea && (
                     <div className="cd-form-group cd-sign-area">
                       <label>인증번호</label>
                       <input

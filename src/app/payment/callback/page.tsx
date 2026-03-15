@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useRef, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { approveNicepayPayment } from '@/services/paymentService';
 
@@ -9,9 +9,15 @@ function PaymentCallbackContent() {
   const router = useRouter();
   const [status, setStatus] = useState<'processing' | 'success' | 'error'>('processing');
   const [message, setMessage] = useState('결제를 처리하고 있습니다...');
+  const processStartedRef = useRef(false);
 
   useEffect(() => {
     const processPayment = async () => {
+      if (processStartedRef.current) {
+        return;
+      }
+      processStartedRef.current = true;
+
       try {
         // 나이스페이먼츠 결제 결과 파라미터
         const resultCode = searchParams.get('resultCode');

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useRef, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { approveNicepayPayment } from '@/services/paymentService';
 
@@ -10,9 +10,17 @@ function PaymentCompleteContent() {
   const [status, setStatus] = useState<'processing' | 'success' | 'error'>('processing');
   const [message, setMessage] = useState('결제를 처리하고 있습니다...');
   const [paymentInfo, setPaymentInfo] = useState<any>(null);
+  /** 모바일 등에서 useEffect 이중 실행 시 동일 orderId로 approve 두 번 호출되는 것 방지 */
+  const processStartedRef = useRef(false);
 
   useEffect(() => {
     const processPayment = async () => {
+      if (processStartedRef.current) {
+        console.log('결제 완료 처리 이미 진행됨, 중복 실행 스킵 (orderId:', searchParams.get('orderId'), ')');
+        return;
+      }
+      processStartedRef.current = true;
+
       try {
         console.log('===== 결제 완료 페이지 시작 =====');
         console.log('전체 URL:', window.location.href);

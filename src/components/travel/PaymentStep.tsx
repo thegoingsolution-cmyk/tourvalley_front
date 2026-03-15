@@ -112,10 +112,21 @@ export default function PaymentStep({
       return true;
     }
 
-    const now = new Date();
-    const todayYear = now.getFullYear();
-    const todayMonth = now.getMonth() + 1;
-    const todayDay = now.getDate();
+    // "오늘" 기준은 KST(Asia/Seoul)로 고정 (클라이언트 타임존 차이 방지)
+    const kstNow = new Date(
+      new Intl.DateTimeFormat('sv-SE', {
+        timeZone: 'Asia/Seoul',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      }).format(new Date()).replace(' ', 'T')
+    );
+    const todayYear = kstNow.getFullYear();
+    const todayMonth = kstNow.getMonth() + 1;
+    const todayDay = kstNow.getDate();
 
     // 1) 오늘 이전이면 불가
     if (year < todayYear ||
@@ -126,15 +137,43 @@ export default function PaymentStep({
       return false;
     }
 
-    // 2) 보험 시작일(출발일) 당일 또는 이후면 불가 — 출발일이 있을 때만 검사
+    // 2) 보험 시작일(출발일) "날짜+시간" 기준 검증
+    // - 출발시간이 00이면: 입금예정일은 전날까지만 허용
+    // - 출발시간이 00이 아니면: 같은 날짜도 허용
+    // - 출발시간이 24이면: 다음날 00으로 간주
     if (departureDate && /^\d{4}-\d{2}-\d{2}$/.test(departureDate.trim())) {
-      const [startY, startM, startD] = departureDate.trim().split('-').map(Number);
-      if (year > startY ||
+      const base = new Date(`${departureDate.trim()}T00:00:00`);
+      if (!Number.isNaN(base.getTime())) {
+        const effectiveStart = new Date(base);
+        const rawHour = departureTime;
+        const hasDepartureTime =
+          rawHour !== undefined &&
+          rawHour !== null &&
+          String(rawHour).trim() !== '';
+        const parsedHour = hasDepartureTime ? parseInt(String(rawHour), 10) : NaN;
+        let effectiveHour = Number.isFinite(parsedHour) ? parsedHour : 0;
+        if (effectiveHour === 24) {
+          effectiveStart.setDate(effectiveStart.getDate() + 1);
+          effectiveHour = 0;
+        }
+
+        const startY = effectiveStart.getFullYear();
+        const startM = effectiveStart.getMonth() + 1;
+        const startD = effectiveStart.getDate();
+
+        const isAfterStartDate =
+          year > startY ||
           (year === startY && month > startM) ||
-          (year === startY && month === startM && day >= startD)) {
-        const formattedStart = `${startY}-${String(startM).padStart(2, '0')}-${String(startD).padStart(2, '0')}`;
-        alert(`입금예정일은 보험 시작일(${formattedStart}) 전으로만 설정 가능합니다.`);
-        return false;
+          (year === startY && month === startM && day > startD);
+        const isSameStartDate = year === startY && month === startM && day === startD;
+        // 출발시간 정보가 없으면(=전달 누락/파싱 실패) 같은 날짜 제한은 걸지 않음
+        const isNotAllowedSameDay = isSameStartDate && effectiveHour === 0 && hasDepartureTime;
+
+        if (isAfterStartDate || isNotAllowedSameDay) {
+          const formattedStart = `${startY}-${String(startM).padStart(2, '0')}-${String(startD).padStart(2, '0')}`;
+          alert(`입금예정일은 보험 시작일(${formattedStart}) 전으로만 설정 가능합니다.`);
+          return false;
+        }
       }
     }
 

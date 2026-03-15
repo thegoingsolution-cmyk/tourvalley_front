@@ -25,6 +25,12 @@ type ContractDetail = {
   paymentMethod?: string | null;
   paymentSubMethod?: string | null;
   paymentStatus?: string | null;
+  bankName?: string | null;
+  bank_name?: string | null;
+  accountNumber?: string | null;
+  account_number?: string | null;
+  accountHolder?: string | null;
+  account_holder?: string | null;
   status?: string | null;
   businessNumber?: string | null;
 };
@@ -346,7 +352,7 @@ function ConfirmationContent() {
       <div className="b2c-cf-container cf-overseas-wrapper">
         <article className="cf-overseas">
           <h1 className="cf-overseas-header">
-            여행자보험 가입신청내역서
+            여행자보험 견적서 및 가입신청내역서
           </h1>
 
           {/* 기본정보: 이미지 형식 - 좌(신청일자,보험상품,보험기간,가입인원) | 우(보험회사,여행지,보험료) */}
@@ -393,12 +399,14 @@ function ConfirmationContent() {
                   <th>주민번호(사업자번호)</th>
                   <td className="cf-dotted">{detail?.contractorType === '법인' && detail?.businessNumber ? detail.businessNumber : (detail?.memberBirthDate ? `${detail.memberBirthDate.substring(0, 6)}-*******` : '')}</td>
                 </tr>
+                {/* 휴대폰번호, E-MAIL
                 <tr>
                   <th>휴대폰번호</th>
                   <td className="cf-dotted">{detail?.memberPhone ?? ''}</td>
                   <th>E-MAIL</th>
                   <td className="cf-dotted">{detail?.memberEmail ?? ''}</td>
                 </tr>
+                */}
               </tbody>
             </table>
           </section>
@@ -450,7 +458,14 @@ function ConfirmationContent() {
               <tbody>
                 <tr>
                   <th>결제방법</th>
-                  <td className="cf-dotted">{detail?.paymentMethod === '기타결제' ? (detail?.paymentSubMethod ?? '기타결제') : (detail?.paymentMethod ?? '')}</td>
+                  <td className="cf-dotted">
+                    {detail?.paymentMethod === '기타결제' ? (detail?.paymentSubMethod ?? '기타결제') : (detail?.paymentMethod ?? '')}
+                    {detail?.paymentMethod === '무통장입금' && (
+                      <div className="cf-bank-info" style={{ marginTop: 8 }}>
+                        은행명: {detail?.bankName ?? detail?.bank_name ?? '-'} / 계좌번호: {detail?.accountNumber ?? detail?.account_number ?? '-'} / 예금주: (주)빨주노초파남보
+                      </div>
+                    )}
+                  </td>
                   <th>결제여부</th>
                   <td className="cf-dotted">{detail?.paymentStatus ?? ''}</td>
                 </tr>

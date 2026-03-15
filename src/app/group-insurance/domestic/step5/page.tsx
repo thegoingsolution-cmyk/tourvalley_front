@@ -44,6 +44,11 @@ export default function DomesticInsuranceStep5Page() {
   const currentYear = today.getFullYear();
   const currentMonth = String(today.getMonth() + 1).padStart(2, '0');
   const currentDay = String(today.getDate()).padStart(2, '0');
+
+  // 무통장입금 입금예정일 (즉시 검증용 controlled state)
+  const [expectedYearSelect, setExpectedYearSelect] = useState<string>(String(currentYear));
+  const [expectedMonthSelect, setExpectedMonthSelect] = useState<string>(currentMonth);
+  const [expectedDaySelect, setExpectedDaySelect] = useState<string>(currentDay);
   
   // 년도 옵션 생성 (현재 년도 + 5년)
   const yearOptions = Array.from({ length: 6 }, (_, i) => currentYear + i);
@@ -54,6 +59,76 @@ export default function DomesticInsuranceStep5Page() {
     return map[planCode] || planCode || '실속플랜';
   };
   const getPlanDisplayName = (planCode: string) => getPlanType(planCode);
+
+  // 입금예정일 즉시 검증: 오늘 이전 불가, 보험 시작일(출발일) 당일·이후 불가
+  const validateExpectedDepositDate = (year: number, month: number, day: number): boolean => {
+    if (!year || !month || !day) return true;
+
+    const now = new Date();
+    const todayYear = now.getFullYear();
+    const todayMonth = now.getMonth() + 1;
+    const todayDay = now.getDate();
+
+    if (
+      year < todayYear ||
+      (year === todayYear && month < todayMonth) ||
+      (year === todayYear && month === todayMonth && day < todayDay)
+    ) {
+      const formattedToday = `${todayYear}-${String(todayMonth).padStart(2, '0')}-${String(todayDay).padStart(2, '0')}`;
+      alert(`입금예정일은 오늘(${formattedToday}) 이후로 설정해야 합니다.`);
+      return false;
+    }
+
+    // 보험 시작일(출발일) "날짜+시간" 기준으로 검증
+    // - 시작 시간이 0시(00)면: 입금예정일은 전날까지만 허용
+    // - 시작 시간이 0시가 아니면: 같은 날짜도 허용 (당일 입금 가능)
+    // - 시작 시간이 24시면 다음날 00시로 간주
+    const startDateStr = (step1Data?.startDate || '').replace(/\./g, '-');
+    const rawStartHour = step1Data?.startHour;
+    const startHourNum = typeof rawStartHour === 'string' || typeof rawStartHour === 'number' ? parseInt(String(rawStartHour), 10) : 0;
+    if (startDateStr && /^\d{4}-\d{2}-\d{2}$/.test(startDateStr.trim())) {
+      const base = new Date(`${startDateStr.trim()}T00:00:00`);
+      if (!Number.isNaN(base.getTime())) {
+        const effectiveStart = new Date(base);
+        let effectiveStartHour = Number.isFinite(startHourNum) ? startHourNum : 0;
+        if (effectiveStartHour === 24) {
+          effectiveStart.setDate(effectiveStart.getDate() + 1);
+          effectiveStartHour = 0;
+        }
+
+        const startY = effectiveStart.getFullYear();
+        const startM = effectiveStart.getMonth() + 1;
+        const startD = effectiveStart.getDate();
+
+        const isAfterStartDate =
+          year > startY ||
+          (year === startY && month > startM) ||
+          (year === startY && month === startM && day > startD);
+        const isSameStartDate = year === startY && month === startM && day === startD;
+        const isNotAllowedSameDay = isSameStartDate && effectiveStartHour === 0;
+
+        if (isAfterStartDate || isNotAllowedSameDay) {
+          const formattedStart = `${startY}-${String(startM).padStart(2, '0')}-${String(startD).padStart(2, '0')}`;
+          alert(`입금예정일은 보험 시작일(${formattedStart}) 전으로만 설정 가능합니다.`);
+          return false;
+        }
+      }
+    }
+
+    return true;
+  };
+
+  const handleExpectedDepositSelectChange = (nextYear: string, nextMonth: string, nextDay: string) => {
+    const y = parseInt(nextYear, 10);
+    const m = parseInt(nextMonth, 10);
+    const d = parseInt(nextDay, 10);
+    if (!validateExpectedDepositDate(y, m, d)) {
+      return;
+    }
+    setExpectedYearSelect(nextYear);
+    setExpectedMonthSelect(nextMonth);
+    setExpectedDaySelect(nextDay);
+  };
 
   useEffect(() => {
     if (isLoggedIn && member?.member_type === '법인') {
@@ -329,11 +404,8 @@ export default function DomesticInsuranceStep5Page() {
         const expectedMonthNum = parseInt(expectedMonth);
         const expectedDayNum = parseInt(expectedDay);
 
-        if (expectedYearNum < todayYear ||
-            (expectedYearNum === todayYear && expectedMonthNum < todayMonth) ||
-            (expectedYearNum === todayYear && expectedMonthNum === todayMonth && expectedDayNum < todayDay)) {
-          const formattedToday = `${todayYear}-${String(todayMonth).padStart(2, '0')}-${String(todayDay).padStart(2, '0')}`;
-          alert(`입금예정일은 오늘(${formattedToday}) 이후로 설정해야 합니다.`);
+        // 입금예정일 검증 (오늘 이전 불가 + 보험 시작일(출발일) 날짜/시간 기준)
+        if (!validateExpectedDepositDate(expectedYearNum, expectedMonthNum, expectedDayNum)) {
           setIsProcessing(false);
           return;
         }
@@ -500,6 +572,9 @@ export default function DomesticInsuranceStep5Page() {
           depositor_name: payMethod === 'B' ? (document.querySelector('input[name="payment_name"]') as HTMLInputElement)?.value : null,
           bank_name: payMethod === 'B' ? ((document.querySelector('input[name="accountB"]:checked') as HTMLInputElement)?.value === 'B1' ? '우리은행' : '농협') : null,
           account_number: payMethod === 'B' ? ((document.querySelector('input[name="accountB"]:checked') as HTMLInputElement)?.value === 'B1' ? '1005-604-481542' : '301-0337-8596-01') : null,
+          expected_deposit_date: payMethod === 'B'
+            ? `${(document.querySelector('select[name="expected_year"]') as HTMLSelectElement)?.value || ''}-${(document.querySelector('select[name="expected_month"]') as HTMLSelectElement)?.value || ''}-${(document.querySelector('select[name="expected_day"]') as HTMLSelectElement)?.value || ''}`.trim()
+            : null,
           card_type: payMethod === 'W' ? cardType : null,
           card_category: payMethod === 'W' ? cardCategory : null,
           card_number: payMethod === 'W' ? `${cardNumber1}-${cardNumber2}-${cardNumber3}-${cardNumber4}` : null,
@@ -1483,7 +1558,14 @@ export default function DomesticInsuranceStep5Page() {
                     <div className="in_wrap01">
                       <div className="bg_join input_cell_01 wd_30">
                         <span className="ps_box02 wd_100">
-                          <select className="sel01" title="" id="expected_year" name="expected_year" defaultValue={String(currentYear)}>
+                          <select
+                            className="sel01"
+                            title=""
+                            id="expected_year"
+                            name="expected_year"
+                            value={expectedYearSelect}
+                            onChange={(e) => handleExpectedDepositSelectChange(e.target.value, expectedMonthSelect, expectedDaySelect)}
+                          >
                             {yearOptions.map((year) => (
                               <option key={year} value={String(year)}>
                                 {year}년
@@ -1494,7 +1576,14 @@ export default function DomesticInsuranceStep5Page() {
                       </div>
                       <div className="bg_join input_cell_01 wd_30">
                         <span className="ps_box02 wd_100">
-                          <select className="sel01" title="" id="expected_month" name="expected_month" defaultValue={currentMonth}>
+                          <select
+                            className="sel01"
+                            title=""
+                            id="expected_month"
+                            name="expected_month"
+                            value={expectedMonthSelect}
+                            onChange={(e) => handleExpectedDepositSelectChange(expectedYearSelect, e.target.value, expectedDaySelect)}
+                          >
                             {Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0')).map((month) => (
                               <option key={month} value={month}>
                                 {parseInt(month)}월
@@ -1505,7 +1594,14 @@ export default function DomesticInsuranceStep5Page() {
                       </div>
                       <div className="bg_join input_cell_01 wd_30">
                         <span className="ps_box02 wd_100">
-                          <select className="sel01" title="" id="expected_day" name="expected_day" defaultValue={currentDay}>
+                          <select
+                            className="sel01"
+                            title=""
+                            id="expected_day"
+                            name="expected_day"
+                            value={expectedDaySelect}
+                            onChange={(e) => handleExpectedDepositSelectChange(expectedYearSelect, expectedMonthSelect, e.target.value)}
+                          >
                             {Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0')).map((day) => (
                               <option key={day} value={day}>
                                 {parseInt(day)}일

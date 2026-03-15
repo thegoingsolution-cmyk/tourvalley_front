@@ -411,10 +411,11 @@ export default function PCEventInsurancePage() {
         formData.append('overview', overviewFile);
       }
 
-      // API 호출
+      // API 호출 (credentials: 'include'로 쿠키/세션 전송)
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/event-insurance/estimate`, {
         method: 'POST',
         body: formData,
+        credentials: 'include',
       });
 
       const data = await response.json();

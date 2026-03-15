@@ -99,6 +99,8 @@ function CertificateDownloadContent() {
     return true;
   };
 
+  const isEmailEntry = !!urlContractId;
+
   const checkMobilePhone = (first: string, rest: string): boolean => {
     const fullNumber = first + rest;
     if (fullNumber.length < 10 || fullNumber.length > 11) return false;
@@ -158,8 +160,13 @@ function CertificateDownloadContent() {
       birth_ssn = formData.resno1 + formData.resno2 + formData.resno3;
     }
 
-    if (!formData.ctel_no || formData.ctel_no.length < 10 || formData.ctel_no.length > 11) {
+    if (!isEmailEntry && (!formData.ctel_no || formData.ctel_no.length < 10 || formData.ctel_no.length > 11)) {
       alert('휴대폰 번호를 정확히 입력해주세요.');
+      return;
+    }
+
+    if (isEmailEntry) {
+      // 이메일 링크 진입인 경우에는 휴대폰 인증 플로우를 사용하지 않음
       return;
     }
 
@@ -259,6 +266,59 @@ function CertificateDownloadContent() {
     } catch (error) {
       console.error(error);
       alert('처리 중 오류가 발생했습니다.\n새로고침 후 다시 시도해주세요.');
+    }
+  };
+
+  // 이메일 링크 진입: contract_id + 생년월일 또는 사업자번호만으로 가입증명서 다운로드
+  const verifyByIdentity = async () => {
+    if (!urlContractId) return;
+
+    if (memberType === 'I') {
+      if (!formData.birth_date || formData.birth_date.length !== 8) {
+        alert('생년월일 8자리를 입력해주세요.');
+        return;
+      }
+
+      if (!isYYYYMMDD(formData.birth_date)) {
+        alert('생년월일을 정확히 입력해주세요.');
+        return;
+      }
+    } else {
+      if (formData.resno1.length < 3 || formData.resno2.length < 2 || formData.resno3.length < 5) {
+        alert('사업자번호를 정확히 입력해주세요.');
+        return;
+      }
+    }
+
+    try {
+      const body: any = {
+        contract_number: urlContractId,
+        member_type: memberType,
+      };
+
+      if (memberType === 'I') {
+        body.birth_date = formData.birth_date;
+      } else {
+        body.business_number = formData.resno1 + formData.resno2 + formData.resno3;
+      }
+
+      const response = await fetch('/api/certificate/verify-by-identity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const data = await response.json();
+
+      if (!data.success || !data.contractId) {
+        alert(data.message || '가입증명서를 찾을 수 없습니다.');
+        return;
+      }
+
+      window.open(`/api/certificate/download/${data.contractId}`, '_blank', 'noopener,noreferrer');
+    } catch (error) {
+      console.error(error);
+      alert('처리 중 오류가 발생했습니다.');
     }
   };
 
@@ -373,17 +433,6 @@ function CertificateDownloadContent() {
                   {memberType === 'I' && (
                     <div className="cd-input-area">
                       <div className="cd-form-group">
-                        <label>이름</label>
-                        <input
-                          type="text"
-                          value={formData.name}
-                          onChange={(e) => handleInputChange('name', e.target.value)}
-                          maxLength={25}
-                          placeholder="이름 입력"
-                          className="cd-input"
-                        />
-                      </div>
-                      <div className="cd-form-group">
                         <label>생년월일</label>
                         <input
                           type="tel"
@@ -400,17 +449,6 @@ function CertificateDownloadContent() {
                   {/* 법인단체 입력 폼 */}
                   {memberType === 'C' && (
                     <div className="cd-input-area">
-                      <div className="cd-form-group">
-                        <label>법인(단체)명</label>
-                        <input
-                          type="text"
-                          value={formData.company_name}
-                          onChange={(e) => handleInputChange('company_name', e.target.value)}
-                          maxLength={20}
-                          placeholder="법인(단체)명"
-                          className="cd-input"
-                        />
-                      </div>
                       <div className="cd-form-group cd-business-number">
                         <label>사업자번호</label>
                         <div className="cd-business-inputs">
@@ -443,50 +481,69 @@ function CertificateDownloadContent() {
                     </div>
                   )}
 
-                  {/* 휴대폰 번호 */}
-                  <div className="cd-form-group">
-                    <label>휴대폰 번호</label>
-                    <input
-                      type="tel"
-                      value={formData.ctel_no}
-                      onChange={(e) => handleInputChange('ctel_no', e.target.value)}
-                      maxLength={11}
-                      placeholder="(-없이) 숫자만 입력"
-                      className="cd-input"
-                    />
-                    <div className="cd-button-wrapper">
-                      <button
-                        type="button"
-                        onClick={checkInput}
-                        className="cd-button cd-button-primary"
-                      >
-                        인증번호받기
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* 인증번호 입력 */}
-                  {showSignArea && (
-                    <div className="cd-form-group cd-sign-area">
-                      <label>인증번호</label>
-                      <input
-                        type="tel"
-                        value={formData.signNo}
-                        onChange={(e) => handleInputChange('signNo', e.target.value)}
-                        maxLength={6}
-                        placeholder="인증번호 입력"
-                        className="cd-input"
-                      />
+                  {/* 이메일 링크 진입: 휴대폰 인증 없이 본인확인 후 다운로드 */}
+                  {isEmailEntry && (
+                    <div className="cd-form-group">
                       <div className="cd-button-wrapper">
                         <button
                           type="button"
-                          onClick={compareNo}
+                          onClick={verifyByIdentity}
                           className="cd-button cd-button-primary"
                         >
                           확인
                         </button>
                       </div>
                     </div>
+                  )}
+
+                  {/* 일반 진입: 휴대폰 인증 플로우 */}
+                  {!isEmailEntry && (
+                    <>
+                      <div className="cd-form-group">
+                        <label>휴대폰 번호</label>
+                        <input
+                          type="tel"
+                          value={formData.ctel_no}
+                          onChange={(e) => handleInputChange('ctel_no', e.target.value)}
+                          maxLength={11}
+                          placeholder="(-없이) 숫자만 입력"
+                          className="cd-input"
+                        />
+                        <div className="cd-button-wrapper">
+                          <button
+                            type="button"
+                            onClick={checkInput}
+                            className="cd-button cd-button-primary"
+                          >
+                            인증번호받기
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* 인증번호 입력 */}
+                      {showSignArea && (
+                        <div className="cd-form-group cd-sign-area">
+                          <label>인증번호</label>
+                          <input
+                            type="tel"
+                            value={formData.signNo}
+                            onChange={(e) => handleInputChange('signNo', e.target.value)}
+                            maxLength={6}
+                            placeholder="인증번호 입력"
+                            className="cd-input"
+                          />
+                          <div className="cd-button-wrapper">
+                            <button
+                              type="button"
+                              onClick={compareNo}
+                              className="cd-button cd-button-primary"
+                            >
+                              확인
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </>
                   )}
                 </section>
               </form>

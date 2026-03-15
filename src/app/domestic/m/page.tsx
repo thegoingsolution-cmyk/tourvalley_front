@@ -213,8 +213,9 @@ function MobileDomesticStep1Content() {
 
   // 이메일 전체 주소 가져오기
   const getFullEmail = (participant: Participant): string => {
-    if (!participant.email1 || !participant.email2) return '';
-    return `${participant.email1}@${participant.email2}`;
+    if (!participant.email1) return '';
+    const domain = participant.email2 === '직접입력' ? participant.customEmail : participant.email2;
+    return domain ? `${participant.email1}@${domain}` : '';
   };
 
   // 기간 검증 (국내여행보험 최대 1개월)

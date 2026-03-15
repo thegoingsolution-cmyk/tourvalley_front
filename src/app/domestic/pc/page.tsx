@@ -899,7 +899,7 @@ export default function PCDomesticPage() {
             name: participants[0]?.name || '',
             resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${getResidentGenderCode(participants[0].birthDate, participants[0].gender)}000000` : '',
             mobile_phone: participants[0]?.phone || '',
-            email: participants[0]?.email1 && participants[0]?.email2 ? `${participants[0].email1}@${participants[0].email2}` : '',
+            email: participants[0] ? getFullEmail(participants[0]) : '',
           },
           insured_persons: participants.map((p, idx) => {
             // 외국인일 경우 외국인등록번호에서 생년월일 추출

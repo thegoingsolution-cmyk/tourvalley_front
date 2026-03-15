@@ -698,6 +698,13 @@ export default function MobileContractPage() {
     }
   };
 
+  // 페이지 진입(또는 로그인/회원 정보 변경) 시 최신 마일리지 정보 조회
+  useEffect(() => {
+    if (isLoggedIn && member) {
+      getMileageInfo();
+    }
+  }, [isLoggedIn, member]);
+
   // 로그인한 유저용: 데이터 로딩 useEffect
   useEffect(() => {
     if (isLoggedIn && member) {

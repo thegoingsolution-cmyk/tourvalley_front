@@ -742,6 +742,13 @@ export default function PCContractPage() {
     setMileageInYear(value);
   };
 
+  // 페이지 진입(또는 로그인/회원 정보 변경) 시 최신 마일리지 정보 조회
+  useEffect(() => {
+    if (isLoggedIn && member) {
+      getMileageInfo();
+    }
+  }, [isLoggedIn, member]);
+
   useEffect(() => {
     if (isLoggedIn && member) {
       if (activeTab === 'contract') {

@@ -43,6 +43,11 @@ export default function LongStayInsuranceStep5Page() {
   const currentYear = today.getFullYear();
   const currentMonth = String(today.getMonth() + 1).padStart(2, '0');
   const currentDay = String(today.getDate()).padStart(2, '0');
+
+  // 무통장입금 입금예정일 (즉시 검증용 controlled state)
+  const [expectedYearSelect, setExpectedYearSelect] = useState<string>(String(currentYear));
+  const [expectedMonthSelect, setExpectedMonthSelect] = useState<string>(currentMonth);
+  const [expectedDaySelect, setExpectedDaySelect] = useState<string>(currentDay);
   
   // 년도 옵션 생성 (현재 년도 + 5년)
   const yearOptions = Array.from({ length: 6 }, (_, i) => currentYear + i);
@@ -60,69 +65,332 @@ export default function LongStayInsuranceStep5Page() {
   };
   const getPlanDisplayName = (planCode: string) => getPlanType(planCode);
 
+  // 입금예정일 즉시 검증: 오늘 이전 불가, 보험 시작일(출발일) 당일·이후 불가
+  const validateExpectedDepositDate = (year: number, month: number, day: number): boolean => {
+    if (!year || !month || !day) return true;
+
+    const now = new Date();
+    const todayYear = now.getFullYear();
+    const todayMonth = now.getMonth() + 1;
+    const todayDay = now.getDate();
+
+    if (
+      year < todayYear ||
+      (year === todayYear && month < todayMonth) ||
+      (year === todayYear && month === todayMonth && day < todayDay)
+    ) {
+      const formattedToday = `${todayYear}-${String(todayMonth).padStart(2, '0')}-${String(todayDay).padStart(2, '0')}`;
+      alert(`입금예정일은 오늘(${formattedToday}) 이후로 설정해야 합니다.`);
+      return false;
+    }
+
+    // 보험 시작일(출발일) "날짜+시간" 기준으로 검증
+    // - 시작 시간이 0시(00)면: 입금예정일은 전날까지만 허용
+    // - 시작 시간이 0시가 아니면: 같은 날짜도 허용 (당일 입금 가능)
+    // - 시작 시간이 24시면 다음날 00시로 간주
+    const startDateStr = (step1Data?.startDate || '').replace(/\./g, '-');
+    const rawStartHour = step1Data?.startHour;
+    const startHourNum = typeof rawStartHour === 'string' || typeof rawStartHour === 'number' ? parseInt(String(rawStartHour), 10) : 0;
+    if (startDateStr && /^\d{4}-\d{2}-\d{2}$/.test(startDateStr.trim())) {
+      const base = new Date(`${startDateStr.trim()}T00:00:00`);
+      if (!Number.isNaN(base.getTime())) {
+        const effectiveStart = new Date(base);
+        let effectiveStartHour = Number.isFinite(startHourNum) ? startHourNum : 0;
+        if (effectiveStartHour === 24) {
+          effectiveStart.setDate(effectiveStart.getDate() + 1);
+          effectiveStartHour = 0;
+        }
+
+        const startY = effectiveStart.getFullYear();
+        const startM = effectiveStart.getMonth() + 1;
+        const startD = effectiveStart.getDate();
+
+        const isAfterStartDate =
+          year > startY ||
+          (year === startY && month > startM) ||
+          (year === startY && month === startM && day > startD);
+        const isSameStartDate = year === startY && month === startM && day === startD;
+        const isNotAllowedSameDay = isSameStartDate && effectiveStartHour === 0;
+
+        if (isAfterStartDate || isNotAllowedSameDay) {
+          const formattedStart = `${startY}-${String(startM).padStart(2, '0')}-${String(startD).padStart(2, '0')}`;
+          alert(`입금예정일은 보험 시작일(${formattedStart}) 전으로만 설정 가능합니다.`);
+          return false;
+        }
+      }
+    }
+
+    return true;
+  };
+
+  const handleExpectedDepositSelectChange = (nextYear: string, nextMonth: string, nextDay: string) => {
+    const y = parseInt(nextYear, 10);
+    const m = parseInt(nextMonth, 10);
+    const d = parseInt(nextDay, 10);
+    if (!validateExpectedDepositDate(y, m, d)) {
+      return;
+    }
+    setExpectedYearSelect(nextYear);
+    setExpectedMonthSelect(nextMonth);
+    setExpectedDaySelect(nextDay);
+  };
+
   const continentPlaceLabels: { [key: string]: { value: string; label: string }[] } = {
-    EU: [
-      { value: 'GR', label: '그리스' },
-      { value: 'NL', label: '네덜란드' },
-      { value: 'NO', label: '노르웨이' },
-      { value: 'DK', label: '덴마크' },
-      { value: 'DE', label: '독일' },
-      { value: 'RU', label: '러시아' },
-      { value: 'BE', label: '벨기에' },
-      { value: 'SE', label: '스웨덴' },
-      { value: 'ES', label: '스페인' },
-      { value: 'CH', label: '스위스' },
-      { value: 'GB', label: '영국' },
-      { value: 'AT', label: '오스트리아' },
-      { value: 'IT', label: '이탈리아' },
-      { value: 'CZ', label: '체코' },
-      { value: 'PT', label: '포르투갈' },
-      { value: 'PL', label: '폴란드' },
-      { value: 'FI', label: '핀란드' },
-      { value: 'FR', label: '프랑스' },
-      { value: 'HU', label: '헝가리' },
+    SA: [
+      { value: 'GY', label: '가이아나' },
+      { value: 'GP', label: '과들루프' },
+      { value: 'GF', label: '기아나' },
+      { value: 'MQ', label: '마르티니크' },
+      { value: 'MS', label: '몬트세랫' },
+      { value: 'BS', label: '바하마' },
+      { value: 'VE', label: '베네수엘라(가입불가)' },
+      { value: 'BO', label: '볼리비아' },
+      { value: 'BR', label: '브라질' },
+      { value: 'SR', label: '수리남' },
+      { value: 'AR', label: '아르헨티나' },
+      { value: 'HT', label: '아이티(가입불가)' },
+      { value: 'EC', label: '에콰도르' },
+      { value: 'UY', label: '우루과이' },
+      { value: 'CO', label: '콜롬비아' },
+      { value: 'TC', label: '터크스 케이커스 제도' },
+      { value: 'PY', label: '파라과이' },
+      { value: 'PE', label: '페루' },
+      { value: 'PR', label: '푸에리토리코' },
+      { value: 'GS', label: 'SOUTH GEORGIA AND THE SOUTH SANDWICH ISLANDS' },
+    ],
+    NA: [
+      { value: 'GT', label: '과테말라' },
+      { value: 'GD', label: '그레나다' },
+      { value: 'NI', label: '니카라과' },
+      { value: 'DM', label: '도미니카' },
+      { value: 'DO', label: '도미니카공화국' },
+      { value: 'MX', label: '멕시코' },
+      { value: 'US', label: '미국' },
+      { value: 'VI', label: '버진 아일랜드(미국령)' },
+      { value: 'UM', label: '미국령 작은 섬' },
+      { value: 'MI', label: '미드웨이' },
+      { value: 'BB', label: '바베이도스' },
+      { value: 'VG', label: '버진 아일랜드(영국령)' },
+      { value: 'BZ', label: '벨리즈' },
+      { value: 'KN', label: '세인트 키츠 네비스' },
+      { value: 'LC', label: '세인트루시아' },
+      { value: 'VC', label: '세인트빈센트그레나딘' },
+      { value: 'AG', label: '안티구아 바부다' },
+      { value: 'AI', label: '앙갈라' },
+      { value: 'SV', label: '엘살바도르' },
+      { value: 'HN', label: '온두라스' },
+      { value: 'JM', label: '자메이카' },
+      { value: 'CL', label: '칠레' },
+      { value: 'CA', label: '캐나다' },
+      { value: 'CR', label: '코스타리카' },
+      { value: 'CU', label: '쿠바(가입불가)' },
+      { value: 'TT', label: '트리니다드 토바고' },
+      { value: 'PA', label: '파나마' },
+      { value: 'JT', label: 'JOHNSTON IS' },
+      { value: 'WK', label: 'WAKE ISLAND' },
     ],
     AS: [
-      { value: 'TW', label: '대만' },
+      { value: 'NP', label: '네팔' },
+      { value: 'TW', label: '대만(타이완)' },
+      { value: 'TL', label: '동티모르' },
+      { value: 'LA', label: '라오스' },
+      { value: 'LB', label: '레바논(가입불가)' },
+      { value: 'MO', label: '마카오' },
       { value: 'MY', label: '말레이시아' },
+      { value: 'MV', label: '몰디브' },
       { value: 'MN', label: '몽골' },
+      { value: 'MM', label: '미얀마(가입불가)' },
+      { value: 'BH', label: '바레인(가입불가)' },
+      { value: 'BD', label: '방글라데시' },
       { value: 'VN', label: '베트남' },
+      { value: 'BT', label: '부탄' },
+      { value: 'KP', label: '북한(가입불가)' },
+      { value: 'BN', label: '브루나이' },
+      { value: 'SA', label: '사우디아라비아(가입불가)' },
+      { value: 'CY', label: '사이프러스' },
+      { value: 'LK', label: '스리랑카' },
+      { value: 'SY', label: '시리아(가입불가)' },
       { value: 'SG', label: '싱가포르' },
+      { value: 'AE', label: '아랍에미리트공화국(가입불가)' },
+      { value: 'AM', label: '아르메니아' },
+      { value: 'AZ', label: '아제르바이젠' },
+      { value: 'AF', label: '아프가니스탄(가입불가)' },
+      { value: 'YE', label: '예멘(가입불가)' },
+      { value: 'OM', label: '오만' },
+      { value: 'JO', label: '요르단(가입불가)' },
+      { value: 'UZ', label: '우즈베키스탄' },
+      { value: 'IQ', label: '이라크(가입불가)' },
+      { value: 'IR', label: '이란(가입불가)' },
+      { value: 'IL', label: '이스라엘(가입불가)' },
       { value: 'IN', label: '인도' },
       { value: 'ID', label: '인도네시아' },
-      { value: 'UZ', label: '우즈베키스탄' },
       { value: 'JP', label: '일본' },
+      { value: 'GE', label: '조지아' },
       { value: 'CN', label: '중국' },
       { value: 'KZ', label: '카자흐스탄' },
-      { value: 'TH', label: '태국' },
+      { value: 'QA', label: '카타르(가입불가)' },
+      { value: 'KH', label: '캄보디아' },
+      { value: 'KW', label: '쿠웨이트(가입불가)' },
+      { value: 'KG', label: '키르키즈스탄' },
+      { value: 'TJ', label: '타지키스탄' },
+      { value: 'TH', label: '태국(타이)' },
+      { value: 'TM', label: '투르크메니스탄' },
+      { value: 'TR', label: '튀르키예(터키)' },
+      { value: 'TI', label: '티모르' },
+      { value: 'PK', label: '파키스탄(가입불가)' },
+      { value: 'PS', label: '팔레스타인 자치구(가입불가)' },
       { value: 'PH', label: '필리핀' },
       { value: 'HK', label: '홍콩' },
     ],
     AF: [
+      { value: 'GH', label: '가나' },
+      { value: 'GA', label: '가봉' },
+      { value: 'GM', label: '감비아' },
+      { value: 'GN', label: '기니(가입불가)' },
+      { value: 'GW', label: '기니비소' },
+      { value: 'CV', label: '까뽀베르데' },
+      { value: 'NA', label: '나미비아' },
+      { value: 'NG', label: '나이지리아(가입불가)' },
       { value: 'ZA', label: '남아프리카공화국' },
+      { value: 'NE', label: '니제르(가입불가)' },
+      { value: 'LS', label: '레소토' },
+      { value: 'RW', label: '르완다' },
+      { value: 'LR', label: '라이베리아' },
+      { value: 'LY', label: '리비아(가입불가)' },
+      { value: 'MG', label: '마다가스카르' },
+      { value: 'MW', label: '말라위' },
+      { value: 'ML', label: '말리(가입불가)' },
       { value: 'MA', label: '모로코' },
+      { value: 'MU', label: '모리셔스' },
+      { value: 'MR', label: '모리타니아' },
+      { value: 'MZ', label: '모잠비크' },
+      { value: 'BJ', label: '베넹' },
+      { value: 'BW', label: '보츠와나' },
+      { value: 'BI', label: '부룬디' },
+      { value: 'BF', label: '부르키나파소(가입불가)' },
+      { value: 'ST', label: '생 토메 프린시페' },
+      { value: 'EH', label: '서사하라' },
+      { value: 'SN', label: '세네갈' },
+      { value: 'SC', label: '세이쉘' },
+      { value: 'SO', label: '소말리아(가입불가)' },
+      { value: 'SD', label: '수단(가입불가)' },
+      { value: 'SZ', label: '스와질랜드' },
+      { value: 'SL', label: '시에라리온' },
+      { value: 'AC', label: '아센션 섬' },
+      { value: 'DZ', label: '알제리' },
+      { value: 'AO', label: '앙골라' },
+      { value: 'ER', label: '에리트리아' },
+      { value: 'UG', label: '우간다' },
+      { value: 'ET', label: '에티오피아' },
       { value: 'EG', label: '이집트' },
+      { value: 'ZR', label: '자이레(가입불가)' },
+      { value: 'ZM', label: '잠비아' },
+      { value: 'GQ', label: '적도기니' },
+      { value: 'CF', label: '중앙아프리카(가입불가)' },
+      { value: 'DJ', label: '지부티' },
+      { value: 'ZW', label: '짐바브웨' },
+      { value: 'TD', label: '챠드(가입불가)' },
+      { value: 'CM', label: '카메룬' },
       { value: 'KE', label: '케냐' },
+      { value: 'KY', label: '케이멘군도' },
+      { value: 'KM', label: '코모로' },
+      { value: 'CI', label: '코트디브와르(가입불가)' },
+      { value: 'CG', label: '콩고(가입불가)' },
+      { value: 'CD', label: '콩고(자이레)(가입불가)' },
       { value: 'TZ', label: '탄자니아' },
+      { value: 'TG', label: '토고' },
+      { value: 'TN', label: '튀니지' },
+      { value: 'TF', label: '프랑스령 남부지역' },
     ],
     AU: [
+      { value: 'GU', label: '괌' },
+      { value: 'NR', label: '나우루' },
+      { value: 'NF', label: '노퍽아일랜드' },
       { value: 'NZ', label: '뉴질랜드' },
+      { value: 'NC', label: '뉴칼레도니아' },
+      { value: 'NU', label: '니웨(니우에)' },
+      { value: 'MH', label: '마샬군도' },
+      { value: 'FM', label: '미크로네시아' },
+      { value: 'VU', label: '바누아투' },
+      { value: 'MP', label: '북마리아나제도(사이판섬,티니안섬,로타섬 등)' },
+      { value: 'WS', label: '서사모아' },
+      { value: 'SB', label: '솔로몬군도' },
+      { value: 'AW', label: '아루바' },
+      { value: 'CC', label: '코코스섬' },
+      { value: 'CK', label: '쿡아일랜드' },
+      { value: 'CX', label: '크리스마스섬' },
+      { value: 'KI', label: '키리바시' },
+      { value: 'TK', label: '토켈라우' },
+      { value: 'TO', label: '통가' },
+      { value: 'TV', label: '투발루' },
       { value: 'PG', label: '파푸아뉴기니' },
+      { value: 'PW', label: '팔라우' },
+      { value: 'PF', label: '폴리네시아(프랑스령)' },
       { value: 'FJ', label: '피지' },
       { value: 'AU', label: '호주' },
+      { value: 'CT', label: 'CANTON ENDERBURY' },
+      { value: 'PC', label: 'CAROLINE IS' },
+      { value: 'HM', label: 'HEARD AND MC DONALD ISLANDS' },
     ],
-    NA: [
-      { value: 'MX', label: '멕시코' },
-      { value: 'US', label: '미국' },
-      { value: 'CU', label: '쿠바' },
-      { value: 'CA', label: '캐나다' },
-    ],
-    SA: [
-      { value: 'BR', label: '브라질' },
-      { value: 'AR', label: '아르헨티나' },
-      { value: 'CL', label: '칠레' },
-      { value: 'CO', label: '콜롬비아' },
-      { value: 'PE', label: '페루' },
+    EU: [
+      { value: 'GR', label: '그리스' },
+      { value: 'GL', label: '그린란드' },
+      { value: 'NL', label: '네덜란드' },
+      { value: 'NO', label: '노르웨이' },
+      { value: 'DK', label: '덴마크' },
+      { value: 'DE', label: '독일' },
+      { value: 'LV', label: '라트비아' },
+      { value: 'RU', label: '러시아(가입불가)' },
+      { value: 'RE', label: '레위니옹' },
+      { value: 'RO', label: '루마니아' },
+      { value: 'LU', label: '룩셈부르크' },
+      { value: 'LT', label: '리투아니아' },
+      { value: 'LI', label: '리히텐슈타인' },
+      { value: 'MK', label: '마케도니아' },
+      { value: 'MC', label: '모나코' },
+      { value: 'MD', label: '몰도바(가입불가)' },
+      { value: 'MT', label: '몰타' },
+      { value: 'PM', label: '미클롱 섬' },
+      { value: 'VA', label: '바티칸' },
+      { value: 'BM', label: '버뮤다' },
+      { value: 'BE', label: '벨기에' },
+      { value: 'BY', label: '벨라루스(가입불가)' },
+      { value: 'BA', label: '보니스아 헤르체코비나' },
+      { value: 'BG', label: '불가리아' },
+      { value: 'SM', label: '산마리노' },
+      { value: 'RS', label: '세르비아' },
+      { value: 'SJ', label: '스발바르 얀마위엔섬' },
+      { value: 'SE', label: '스웨덴' },
+      { value: 'CH', label: '스위스' },
+      { value: 'ES', label: '스페인' },
+      { value: 'SK', label: '슬로바키아' },
+      { value: 'SI', label: '슬로베니아' },
+      { value: 'IS', label: '아이슬란드' },
+      { value: 'IE', label: '아일랜드' },
+      { value: 'AD', label: '안도라' },
+      { value: 'AL', label: '알바니아' },
+      { value: 'EE', label: '에스토니아' },
+      { value: 'GB', label: '영국' },
+      { value: 'AT', label: '오스트리아' },
+      { value: 'UA', label: '우크라이나(가입불가)' },
+      { value: 'WF', label: '월리스푸투나제도' },
+      { value: 'YU', label: '유고' },
+      { value: 'IT', label: '이탈리아' },
+      { value: 'GI', label: '지브롤터' },
+      { value: 'CZ', label: '체코' },
+      { value: 'HR', label: '크로아티아' },
+      { value: 'FO', label: '페로제도' },
+      { value: 'PT', label: '포르투갈' },
+      { value: 'FK', label: '포클랜드' },
+      { value: 'PL', label: '폴란드' },
+      { value: 'FR', label: '프랑스' },
+      { value: 'FI', label: '핀란드' },
+      { value: 'HU', label: '헝가리' },
+      { value: 'BV', label: 'BOUVET ISLAND' },
+      { value: 'IO', label: 'BRITISH INDIAN OCEAN TERRITORY' },
+      { value: 'FX', label: 'FRANCE METROPOLITAN' },
+      { value: 'YT', label: 'MAYOTTE' },
+      { value: 'PN', label: 'PITCAIRN' },
     ],
   };
 
@@ -408,11 +676,8 @@ export default function LongStayInsuranceStep5Page() {
         const expectedMonthNum = parseInt(expectedMonth);
         const expectedDayNum = parseInt(expectedDay);
 
-        if (expectedYearNum < todayYear ||
-            (expectedYearNum === todayYear && expectedMonthNum < todayMonth) ||
-            (expectedYearNum === todayYear && expectedMonthNum === todayMonth && expectedDayNum < todayDay)) {
-          const formattedToday = `${todayYear}-${String(todayMonth).padStart(2, '0')}-${String(todayDay).padStart(2, '0')}`;
-          alert(`입금예정일은 오늘(${formattedToday}) 이후로 설정해야 합니다.`);
+        // 입금예정일 검증 (오늘 이전 불가 + 보험 시작일(출발일) 날짜/시간 기준)
+        if (!validateExpectedDepositDate(expectedYearNum, expectedMonthNum, expectedDayNum)) {
           setIsProcessing(false);
           return;
         }
@@ -726,6 +991,9 @@ export default function LongStayInsuranceStep5Page() {
           depositor_name: payMethod === 'B' ? (document.querySelector('input[name="payment_name"]') as HTMLInputElement)?.value : null,
           bank_name: payMethod === 'B' ? ((document.querySelector('input[name="accountB"]:checked') as HTMLInputElement)?.value === 'B1' ? '우리은행' : '농협') : null,
           account_number: payMethod === 'B' ? ((document.querySelector('input[name="accountB"]:checked') as HTMLInputElement)?.value === 'B1' ? '1005-604-481542' : '301-0337-8596-01') : null,
+          expected_deposit_date: payMethod === 'B'
+            ? `${(document.querySelector('select[name="expected_year"]') as HTMLSelectElement)?.value || ''}-${(document.querySelector('select[name="expected_month"]') as HTMLSelectElement)?.value || ''}-${(document.querySelector('select[name="expected_day"]') as HTMLSelectElement)?.value || ''}`.trim()
+            : null,
           card_type: payMethod === 'W' ? cardType : null,
           card_category: payMethod === 'W' ? cardCategory : null,
           card_number: payMethod === 'W' ? `${cardNumber1}-${cardNumber2}-${cardNumber3}-${cardNumber4}` : null,
@@ -1700,7 +1968,14 @@ export default function LongStayInsuranceStep5Page() {
                     <div className="in_wrap01">
                       <div className="bg_join input_cell_01 wd_30">
                         <span className="ps_box02 wd_100">
-                          <select className="sel01" title="" id="expected_year" name="expected_year" defaultValue={String(currentYear)}>
+                          <select
+                            className="sel01"
+                            title=""
+                            id="expected_year"
+                            name="expected_year"
+                            value={expectedYearSelect}
+                            onChange={(e) => handleExpectedDepositSelectChange(e.target.value, expectedMonthSelect, expectedDaySelect)}
+                          >
                             {yearOptions.map((year) => (
                               <option key={year} value={String(year)}>
                                 {year}년
@@ -1711,7 +1986,14 @@ export default function LongStayInsuranceStep5Page() {
                       </div>
                       <div className="bg_join input_cell_01 wd_30">
                         <span className="ps_box02 wd_100">
-                          <select className="sel01" title="" id="expected_month" name="expected_month" defaultValue={currentMonth}>
+                          <select
+                            className="sel01"
+                            title=""
+                            id="expected_month"
+                            name="expected_month"
+                            value={expectedMonthSelect}
+                            onChange={(e) => handleExpectedDepositSelectChange(expectedYearSelect, e.target.value, expectedDaySelect)}
+                          >
                             {Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0')).map((month) => (
                               <option key={month} value={month}>
                                 {parseInt(month)}월
@@ -1722,7 +2004,14 @@ export default function LongStayInsuranceStep5Page() {
                       </div>
                       <div className="bg_join input_cell_01 wd_30">
                         <span className="ps_box02 wd_100">
-                          <select className="sel01" title="" id="expected_day" name="expected_day" defaultValue={currentDay}>
+                          <select
+                            className="sel01"
+                            title=""
+                            id="expected_day"
+                            name="expected_day"
+                            value={expectedDaySelect}
+                            onChange={(e) => handleExpectedDepositSelectChange(expectedYearSelect, expectedMonthSelect, e.target.value)}
+                          >
                             {Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0')).map((day) => (
                               <option key={day} value={day}>
                                 {parseInt(day)}일

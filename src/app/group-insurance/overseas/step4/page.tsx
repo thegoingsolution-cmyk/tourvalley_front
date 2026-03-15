@@ -261,32 +261,28 @@ export default function OverseasInsuranceStep4Page() {
                 </colgroup>
                 <tbody>
                   <tr>
-                    <td className="sName01">유럽</td>
-                    <td className="dd tb ag_left">우크라이나, 벨라루스, 크림반도, (러시아의 체첸), 몰도바, 알바니아</td>
-                  </tr>
-                  <tr>
                     <td className="sName01">아시아</td>
-                    <td className="dd ag_left">
-                      레바논, 북한, 시리아, 아르메니아, 아프가니스탄, 예멘, 오만, 이라크, 이란, 이스라엘,
-                      타지키스탄, 파키스탄, 팔레스타인 자치구, (인도의 잠무, 카슈미르), (필리핀의 민다나오),
-                      (태국의 파타니, 알라, 나라티왓, 송클라주), (중국의 후베이성(우한))
+                    <td className="dd tb ag_left">
+                      레바논, 미얀마, 북한, 시리아, 아프가니스탄, 예멘, 이라크, 이란, 이스라엘, 파키스탄, 팔레스타인 자치구, 바레인, 사우디아라비아, 아랍에미리트공화국, 요르단, 카타르, 쿠웨이트
                     </td>
-                  </tr>
-                  <tr>
-                    <td className="sName01">북아메리카</td>
-                    <td className="dd ag_left">니카라과, 쿠바</td>
-                  </tr>
-                  <tr>
-                    <td className="sName01">남아메리카</td>
-                    <td className="dd ag_left">베넬수엘라, 아이티</td>
                   </tr>
                   <tr>
                     <td className="sName01">아프리카</td>
                     <td className="dd ag_left">
-                      기니, 나이지리아, 니제르, 리비아, 말리, 모잠비크, 부룬디, 부르키나파소, 소말리아, 수단,
-                      시에라리온, 알제리, 이디오피아, 이집트, 자이레, 중앙아프리카, 챠드, 케냐, 코트디브와르,
-                      콩고, 콩고(자이레)
+                      기니, 나이지리아, 니제르, 리비아, 말리, 부르키나파소, 소말리아, 수단, 자이레, 중앙아프리카, 챠드, 코트디브와르, 콩고, 콩고(자이레)
                     </td>
+                  </tr>
+                  <tr>
+                    <td className="sName01">유럽</td>
+                    <td className="dd ag_left">러시아, 몰도바, 벨라루스, 우크라이나, 크림반도</td>
+                  </tr>
+                  <tr>
+                    <td className="sName01">북아메리카</td>
+                    <td className="dd ag_left">쿠바</td>
+                  </tr>
+                  <tr>
+                    <td className="sName01">남아메리카</td>
+                    <td className="dd ag_left">베네수엘라, 아이티</td>
                   </tr>
                   <tr>
                     <td className="sName01">기타</td>
