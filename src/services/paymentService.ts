@@ -405,7 +405,7 @@ export const processNaverPayPayment = async (data: {
       throw new Error(createResult.message || '결제 준비 실패');
     }
     
-    const { orderId, merchantPayKey } = createResult.data;
+    const { orderId, merchantPayKey, taxFreeAmount, productTaxType } = createResult.data;
     
     // 3. 네이버 페이 객체 생성
     const naverPayClientId = process.env.NEXT_PUBLIC_NAVER_PAY_CLIENT_ID;
@@ -460,14 +460,18 @@ export const processNaverPayPayment = async (data: {
     // 네이버 페이 SDK open() 메서드 파라미터 준비
     // 샘플 코드와 동일하게 모든 값을 문자열로 전달해야 합니다
     // totalPayAmount = taxScopeAmount + taxExScopeAmount 여야 합니다
+    // 면세점: 전액 비과세 (taxExScopeAmount = 결제금액, taxScopeAmount = 0)
     const totalAmount = Math.round(data.amount);
+    const isTaxFree = productTaxType === 'TAX_FREE' || (taxFreeAmount != null && Number(taxFreeAmount) > 0);
+    const scopeTaxFree = isTaxFree ? (Number(taxFreeAmount) || totalAmount) : 0;
+    const scopeTax = isTaxFree ? 0 : totalAmount;
     const paymentParams: any = {
       merchantPayKey: String(merchantPayKey || orderId),
       productName: String(data.productName),
       productCount: String(data.productCount),
       totalPayAmount: String(totalAmount),
-      taxScopeAmount: String(totalAmount), // 과세 금액 (전체 금액을 과세로 설정)
-      taxExScopeAmount: String(0), // 면세 금액
+      taxScopeAmount: String(scopeTax),   // 과세 금액 (면세점이면 0)
+      taxExScopeAmount: String(scopeTaxFree), // 면세 금액 (면세점이면 전액)
       returnUrl: String(returnUrl),
     };
 
