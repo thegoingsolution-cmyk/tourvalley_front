@@ -110,13 +110,20 @@ export default function ParticipantInfoStep({
   };
   const handleApplyClick = () => {
     if (!validateRepresentativeEmail()) return;
+    if (hasAnyForeigner && !foreignerNoticeAgreed) {
+      alert('외국인 가입 시 본국으로의 여행(경유포함)은 보험가입이 불가함을 확인하고 동의해 주세요.');
+      return;
+    }
     onApply();
   };
   const [verificationSent, setVerificationSent] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
   const [remainingTime, setRemainingTime] = useState(0);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [foreignerNoticeAgreed, setForeignerNoticeAgreed] = useState(false);
   const premiumSummaryRef = useRef<HTMLDivElement>(null);
+
+  const hasAnyForeigner = participants.some((p) => p.nationality === '외국인');
 
   // STEP1에서 입력한 생년월일과 성별을 가입자 1(대표)에 자동 세팅
   useEffect(() => {
@@ -823,6 +830,21 @@ export default function ParticipantInfoStep({
               <div className="premium-total">
                 합계보험료 <span className="premium-amount">{calculatedPremiums.totalPremium.toLocaleString()}원</span>
               </div>
+            </div>
+          )}
+
+          {/* 외국인 가입 시 동의 체크박스 - 외국인 가입자가 1명이라도 있을 때만 표시 */}
+          {calculatedPremiums && hasAnyForeigner && (
+            <div className="foreigner-notice-agree" style={{ marginTop: '20px', marginBottom: '16px' }}>
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer', fontSize: '14px', lineHeight: 1.5 }}>
+                <input
+                  type="checkbox"
+                  checked={foreignerNoticeAgreed}
+                  onChange={(e) => setForeignerNoticeAgreed(e.target.checked)}
+                  style={{ marginTop: '3px', flexShrink: 0 }}
+                />
+                <span>외국인 가입 시 본국으로의 여행(경유포함)은 보험가입이 불가 합니다.</span>
+              </label>
             </div>
           )}
 

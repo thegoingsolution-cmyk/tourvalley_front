@@ -50,7 +50,7 @@ export default function MobileStep1Page() {
   const [endDate, setEndDate] = useState(formattedDate);
   const [endHour, setEndHour] = useState(String(defaultHour).padStart(2, '0'));
   const [tourNum, setTourNum] = useState('1');
-  const [productCd, setProductCd] = useState('N521026'); // 국내여행보험 기본값
+  const [productCd, setProductCd] = useState('국내여행'); // 기본값: 국내여행 (PC와 동일)
   const [hasSelectedStartDate, setHasSelectedStartDate] = useState(true);
   const [hasSelectedEndDate, setHasSelectedEndDate] = useState(true);
 
@@ -170,34 +170,34 @@ export default function MobileStep1Page() {
           </div>
 
           <div className="menu_wrap_tab tourG_mat10 tourG_mab05">
-            <span className={`menu_tab ${productCd === 'N521026' ? 'on' : ''}`}>
+            <span className={`menu_tab ${productCd === '국내여행' ? 'on' : ''}`}>
               <a 
                 href="javascript:void(0);" 
                 onClick={(e) => { 
                   e.preventDefault(); 
-                  setProductCd('N521026'); 
+                  setProductCd('국내여행'); 
                 }}
               >
                 국내여행
               </a>
             </span>
-            <span className={`menu_tab ${productCd === 'N520045' ? 'on' : ''}`}>
+            <span className={`menu_tab ${productCd === '해외여행' ? 'on' : ''}`}>
               <a 
                 href="javascript:void(0);" 
                 onClick={(e) => { 
                   e.preventDefault(); 
-                  setProductCd('N520045'); 
+                  setProductCd('해외여행'); 
                 }}
               >
                 해외여행
               </a>
             </span>
-            <span className={`menu_tab ${productCd === 'N130035' ? 'on' : ''}`}>
+            <span className={`menu_tab ${productCd === '해외장기체류' ? 'on' : ''}`}>
               <a 
                 href="javascript:void(0);" 
                 onClick={(e) => { 
                   e.preventDefault(); 
-                  alert('준비중입니다.');
+                  setProductCd('해외장기체류'); 
                 }}
               >
                 해외장기체류

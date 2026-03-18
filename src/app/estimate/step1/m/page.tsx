@@ -45,7 +45,7 @@ export default function MobileStep1Page() {
   const [endDate, setEndDate] = useState(formattedDate);
   const [endHour, setEndHour] = useState(String(defaultHour).padStart(2, '0'));
   const [tourNum, setTourNum] = useState('1');
-  const [productCd, setProductCd] = useState('N521026'); // 국내여행보험 기본값
+  const [productCd, setProductCd] = useState('국내여행'); // 기본값: 국내여행 (PC와 동일)
   const [hasSelectedStartDate, setHasSelectedStartDate] = useState(true);
   const [hasSelectedEndDate, setHasSelectedEndDate] = useState(true);
 
@@ -165,20 +165,20 @@ export default function MobileStep1Page() {
 
                   <div className="menu_wrap_tab tourG_mat10 tourG_mab05">
                     <span 
-                      className={`menu_tab ${productCd === 'N521026' ? 'on' : ''}`}
-                      onClick={() => setProductCd('N521026')}
+                      className={`menu_tab ${productCd === '국내여행' ? 'on' : ''}`}
+                      onClick={() => setProductCd('국내여행')}
                     >
                       <a href="#" onClick={(e) => e.preventDefault()}>국내여행</a>
                     </span>
                     <span 
-                      className={`menu_tab ${productCd === 'N520045' ? 'on' : ''}`}
-                      onClick={() => setProductCd('N520045')}
+                      className={`menu_tab ${productCd === '해외여행' ? 'on' : ''}`}
+                      onClick={() => setProductCd('해외여행')}
                     >
                       <a href="#" onClick={(e) => e.preventDefault()}>해외여행</a>
                     </span>
                     <span 
-                      className={`menu_tab ${productCd === 'N130035' ? 'on' : ''}`}
-                      onClick={() => setProductCd('N130035')}
+                      className={`menu_tab ${productCd === '해외장기체류' ? 'on' : ''}`}
+                      onClick={() => setProductCd('해외장기체류')}
                     >
                       <a href="#" onClick={(e) => e.preventDefault()}>해외장기체류</a>
                     </span>

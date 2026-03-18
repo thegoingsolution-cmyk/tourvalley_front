@@ -50,6 +50,8 @@ export default function OverseasInsuranceStep2Page() {
   const [email2, setEmail2] = useState('');
   // 외국인 선택 상태 관리 (각 피보험자별)
   const [countryTypes, setCountryTypes] = useState<{ [key: number]: string }>({});
+  // 외국인 가입 시 본국 여행 불가 동의 (외국인 1명이라도 있으면 체크 필수)
+  const [foreignerNoticeAgreed, setForeignerNoticeAgreed] = useState(false);
   // 엑셀 업로드된 참가자 데이터 (입력 필드 채우기용)
   const [excelParticipants, setExcelParticipants] = useState<Participant[] | null>(null);
   // 대륙별 국가 목록 (각 피보험자별)
@@ -362,7 +364,13 @@ export default function OverseasInsuranceStep2Page() {
     }
   }, [isLoggedIn, member]);
 
+  const hasAnyForeigner = Array.from({ length: tourNum }, (_, i) => countryTypes[i + 1] || 'D').some((v) => v === 'F');
+
   const handleSubmit = () => {
+    if (hasAnyForeigner && !foreignerNoticeAgreed) {
+      alert('외국인 가입 시 본국으로의 여행(경유포함)은 보험가입이 불가함을 확인하고 동의해 주세요.');
+      return;
+    }
     // 계약자(법인/단체) 정보 수집
     const contractCompanyInput = document.querySelector('input[name="contract_company"]') as HTMLInputElement;
     const resno1Input = document.querySelector('input[name="resno1"]') as HTMLInputElement;
@@ -1368,6 +1376,20 @@ export default function OverseasInsuranceStep2Page() {
               </div>
             </div>
           </form>
+
+          {hasAnyForeigner && (
+            <div className="foreigner-notice-agree" style={{ marginTop: '20px', marginBottom: '16px' }}>
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer', fontSize: '14px', lineHeight: 1.5 }}>
+                <input
+                  type="checkbox"
+                  checked={foreignerNoticeAgreed}
+                  onChange={(e) => setForeignerNoticeAgreed(e.target.checked)}
+                  style={{ marginTop: '3px', flexShrink: 0 }}
+                />
+                <span>외국인 가입 시 본국으로의 여행(경유포함)은 보험가입이 불가 합니다.</span>
+              </label>
+            </div>
+          )}
 
           <div className="con_btnWrap mt30 mb10">
             <a href="#" onClick={(e) => { e.preventDefault(); handleSubmit(); }}>다음단계</a>
