@@ -9,6 +9,7 @@ import {
   updateMember, 
   getCorporateMemberInfo, 
   updateCorporateMember,
+  withdrawMember,
   CorporateInfo,
   ContactInfo
 } from '@/services/authService';
@@ -28,7 +29,7 @@ interface ContactFormData {
 
 export default function MobileMyPage() {
   const router = useRouter();
-  const { isLoggedIn, member, updateMember: updateMemberContext, isLoading } = useAuth();
+  const { isLoggedIn, member, updateMember: updateMemberContext, logout, isLoading } = useAuth();
 
   // 공통 폼 상태
   const [password, setPassword] = useState('');
@@ -356,9 +357,24 @@ export default function MobileMyPage() {
   };
 
   // 회원탈퇴
-  const handleWithdraw = () => {
-    if (confirm('정말 회원탈퇴를 진행하시겠습니까?\n탈퇴 시 모든 정보가 삭제됩니다.')) {
-      alert('회원탈퇴 기능은 준비 중입니다.');
+  const handleWithdraw = async () => {
+    if (!member) return;
+
+    const ok = confirm('정말 회원탈퇴를 진행하시겠습니까?\n탈퇴 시 모든 정보가 삭제됩니다.');
+    if (!ok) return;
+
+    try {
+      const result = await withdrawMember(member.id);
+      if (result.success) {
+        alert('회원탈퇴가 완료되었습니다.');
+        logout();
+        router.push('/main');
+        return;
+      }
+      alert(result.message);
+    } catch (error) {
+      console.error('회원탈퇴 오류:', error);
+      alert('회원탈퇴에 실패했습니다.');
     }
   };
 

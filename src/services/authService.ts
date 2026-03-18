@@ -431,6 +431,11 @@ interface UpdateCorporateMemberResponse {
   message: string;
 }
 
+interface WithdrawMemberResponse {
+  success: boolean;
+  message: string;
+}
+
 /**
  * 법인회원 정보 수정
  */
@@ -458,6 +463,28 @@ export const updateCorporateMember = async (
   }
 };
 
+/**
+ * 회원 탈퇴 (soft delete)
+ */
+export const withdrawMember = async (memberId: number): Promise<WithdrawMemberResponse> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/withdraw/${memberId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    return await response.json();
+  } catch (error) {
+    console.error('회원 탈퇴 오류:', error);
+    return {
+      success: false,
+      message: '회원 탈퇴에 실패했습니다. 잠시 후 다시 시도해주세요.',
+    };
+  }
+};
+
 export default {
   login,
   checkUsername,
@@ -466,5 +493,6 @@ export default {
   updateMember,
   getCorporateMemberInfo,
   updateCorporateMember,
+  withdrawMember,
 };
 

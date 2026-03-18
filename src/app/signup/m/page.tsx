@@ -742,7 +742,7 @@ export default function MobileSignupPage() {
                       포괄계약(open policy)을 체결하시면 청약서 작성, 보험료 정산 등 보험가입 프로세스가 보다 편리해 집니다. 포괄계약 신청시 <span className="highlight-red">사업자등록증(또는 고유번호증)은 필수서류</span>입니다.
                     </p>
                     <p>• 팩스번호 : 02-2261-0098</p>
-                    <p>• 메일주소 : tourvalley@insvalley.com</p>
+                    <p>• 메일주소 : admin@tourvalley.net</p>
                   </div>
 
                   <button className="agreement-link-mobile">

@@ -27,8 +27,8 @@ const frequentCountries: Country[] = [
   { code: 'MY', name: '말레이시아' },
 ];
 
-// 전체 국가 목록 (엑셀 B,D,F,H,J,L 열 순서와 동일)
-const allCountries: Country[] = [
+// 전체 국가 목록 (원본 데이터)
+const allCountriesSource: Country[] = [
   { code: 'GY', name: '가이아나' },
   { code: 'GP', name: '과들루프' },
   { code: 'GF', name: '기아나' },
@@ -274,6 +274,11 @@ const allCountries: Country[] = [
   { code: 'YT', name: 'MAYOTTE' },
   { code: 'PN', name: 'PITCAIRN' },
 ];
+
+// ㄱ,ㄴ,ㄷ... (가나다) 순 정렬
+const allCountries: Country[] = [...allCountriesSource].sort((a, b) =>
+  a.name.localeCompare(b.name, 'ko'),
+);
 
 export default function CountrySelectModal({
   isOpen,
