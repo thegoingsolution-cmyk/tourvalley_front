@@ -472,8 +472,14 @@ export default function OverseasInsuranceStep5Page() {
     const loadFallbackContractData = async (contractId: string) => {
       try {
         const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        if (!member?.id) return;
         const [contractResponse, companionsResponse] = await Promise.all([
-          fetch(`${apiBase}/api/contracts/detail/${contractId}`),
+          fetch(
+            `${apiBase}/api/contracts/detail/${contractId}?member_id=${encodeURIComponent(
+              String(member.id)
+            )}`,
+            { credentials: 'include' }
+          ),
           fetch(`${apiBase}/api/travel/group/contract/${contractId}/companions`),
         ]);
 

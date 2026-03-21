@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import './page.css';
 
 function MobilePremiumDetailContent() {
@@ -9,6 +10,7 @@ function MobilePremiumDetailContent() {
   const searchParams = useSearchParams();
   const returnUrl = searchParams.get('returnUrl');
   const decodedReturnUrl = returnUrl ? decodeURIComponent(returnUrl) : null;
+  const { isLoggedIn, member, isLoading: authLoading } = useAuth();
   const [participants, setParticipants] = useState<Array<{
     id: number;
     name: string;
@@ -84,14 +86,21 @@ function MobilePremiumDetailContent() {
 
   const fetchParticipants = async (contractId: string) => {
     try {
+      if (authLoading) return;
+      if (!isLoggedIn || !member?.id) return;
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-      const response = await fetch(`${API_BASE_URL}/api/contracts/${contractId}/participants`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/api/contracts/${contractId}/participants?member_id=${encodeURIComponent(
+          String(member.id)
+        )}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();

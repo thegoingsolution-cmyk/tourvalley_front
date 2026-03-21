@@ -2,6 +2,7 @@
 
 import React, { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 
 type ContractDetail = {
   insuranceType?: string;
@@ -40,6 +41,7 @@ const getInsuranceTypeDisplay = (insuranceType?: string) => {
 function BankTransferReceiptContent() {
   const searchParams = useSearchParams();
   const contractId = searchParams.get('contractId');
+  const { isLoggedIn, member, isLoading: authLoading } = useAuth();
   const [detail, setDetail] = useState<ContractDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [scale, setScale] = useState(1);
@@ -52,13 +54,20 @@ function BankTransferReceiptContent() {
       }
       try {
         const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-        const response = await fetch(`${API_BASE_URL}/api/contracts/detail/${contractId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-        });
+        if (authLoading) return;
+        if (!isLoggedIn || !member?.id) return;
+        const response = await fetch(
+          `${API_BASE_URL}/api/contracts/detail/${contractId}?member_id=${encodeURIComponent(
+            String(member.id)
+          )}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+          }
+        );
         if (!response.ok) {
           setLoading(false);
           return;

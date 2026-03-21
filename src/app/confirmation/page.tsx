@@ -2,6 +2,7 @@
 
 import React, { Suspense, useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import './page.css';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
@@ -133,6 +134,8 @@ function ConfirmationContent() {
   const contractId = contractIdParam ?? null;
   const isDraft = searchParams.get('draft') === '1';
 
+  const { isLoggedIn, member, isLoading: authLoading } = useAuth();
+
   const [detail, setDetail] = useState<ContractDetail | null>(null);
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(!!contractId || isDraft);
@@ -194,13 +197,26 @@ function ConfirmationContent() {
       setLoading(false);
       return;
     }
+
+    if (authLoading) return;
+    if (!isLoggedIn || !member?.id) {
+      setError('로그인이 필요합니다.');
+      setLoading(false);
+      return;
+    }
+
     const fetchDetail = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/contracts/detail/${contractId}`, {
+        const response = await fetch(
+          `${API_BASE_URL}/api/contracts/detail/${contractId}?member_id=${encodeURIComponent(
+            String(member.id)
+          )}`,
+          {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-        });
+          }
+        );
         if (response.ok) {
           const data = await response.json();
           if (data.success && data.contract) {
@@ -225,11 +241,17 @@ function ConfirmationContent() {
     if (isDraft) return;
     const fetchParticipants = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/contracts/${contractId}/participants`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-        });
+        if (!member?.id) return;
+        const response = await fetch(
+          `${API_BASE_URL}/api/contracts/${contractId}/participants?member_id=${encodeURIComponent(
+            String(member.id)
+          )}`,
+          {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+          }
+        );
         if (response.ok) {
           const data = await response.json();
           if (data.success && Array.isArray(data.participants)) {

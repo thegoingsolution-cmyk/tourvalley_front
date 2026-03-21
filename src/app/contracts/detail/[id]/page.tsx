@@ -3,12 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { formatInsurancePeriod } from '@/utils/dateTime';
+import { useAuth } from '@/contexts/AuthContext';
 import './page.css';
 
 export default function ContractDetailPage() {
   const params = useParams();
   const router = useRouter();
   const contractId = params.id as string;
+  const { isLoggedIn, member, isLoading: authLoading } = useAuth();
   const [contractDetail, setContractDetail] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [receiptLoading, setReceiptLoading] = useState(false);
@@ -20,15 +22,25 @@ export default function ContractDetailPage() {
   }, [contractId]);
 
   const fetchContractDetail = async (id: string) => {
+    if (authLoading) return;
+    if (!isLoggedIn || !member?.id) {
+      setLoading(false);
+      return;
+    }
     try {
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-      const response = await fetch(`${API_BASE_URL}/api/contracts/detail/${id}`, {
+      const response = await fetch(
+        `${API_BASE_URL}/api/contracts/detail/${id}?member_id=${encodeURIComponent(
+          String(member.id)
+        )}`,
+        {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-      });
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
