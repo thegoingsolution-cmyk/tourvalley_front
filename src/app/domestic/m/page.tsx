@@ -227,11 +227,10 @@ function MobileDomesticStep1Content() {
       return { valid: false, message: '도착일시는 출발일시보다 이후여야 합니다.' };
     }
     
-    const diffTime = arrival.getTime() - departure.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    // 국내여행보험은 최대 1개월(30일) 이하
-    if (diffDays > 30) {
+    // 국내여행보험은 출발 기준 최대 1개월 미만
+    const maxArrival = new Date(departure.getTime());
+    maxArrival.setMonth(maxArrival.getMonth() + 1);
+    if (arrival >= maxArrival) {
       return { valid: false, message: '국내여행보험은 최대 1개월(30일)까지 가능합니다.' };
     }
     

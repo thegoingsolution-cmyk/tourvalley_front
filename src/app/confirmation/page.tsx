@@ -3,6 +3,10 @@
 import React, { Suspense, useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  readNonMemberContractAuth,
+  buildFullBirthDateFromSixDigits,
+} from '@/utils/nonMemberContractAuth';
 import './page.css';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
@@ -144,6 +148,7 @@ function ConfirmationContent() {
   const [coverageLoading, setCoverageLoading] = useState(false);
   const [coverageError, setCoverageError] = useState<string | null>(null);
   const [coverageReady, setCoverageReady] = useState(false);
+  const [isNonMemberView, setIsNonMemberView] = useState(false);
   const printTriggered = useRef(false);
   const printTimeoutRef = useRef<number | null>(null);
   const draftLoadedRef = useRef(false);
@@ -199,24 +204,52 @@ function ConfirmationContent() {
     }
 
     if (authLoading) return;
-    if (!isLoggedIn || !member?.id) {
-      setError('로그인이 필요합니다.');
-      setLoading(false);
-      return;
-    }
 
     const fetchDetail = async () => {
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/api/contracts/detail/${contractId}?member_id=${encodeURIComponent(
-            String(member.id)
-          )}`,
-          {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
+        let response: Response;
+        if (isLoggedIn && member?.id) {
+          setIsNonMemberView(false);
+          response = await fetch(
+            `${API_BASE_URL}/api/contracts/detail/${contractId}?member_id=${encodeURIComponent(
+              String(member.id)
+            )}`,
+            {
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+            }
+          );
+        } else {
+          const auth = readNonMemberContractAuth();
+          if (!auth) {
+            setError('가입내역 조회에서 휴대폰 인증을 완료한 뒤 다시 시도해 주세요.');
+            setLoading(false);
+            return;
           }
-        );
+          setIsNonMemberView(true);
+          let url = `${API_BASE_URL}/api/contracts/non-member/detail/${encodeURIComponent(contractId)}?`;
+          if (auth.loginType === 'I') {
+            url += new URLSearchParams({
+              name: auth.insuredName,
+              birth_date: buildFullBirthDateFromSixDigits(auth.birthDate),
+              gender: auth.gender,
+              phone: auth.phone,
+            }).toString();
+          } else {
+            url += new URLSearchParams({
+              company_name: auth.companyName,
+              business_number: auth.businessNumber,
+              phone: auth.phone,
+            }).toString();
+          }
+          response = await fetch(url, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+          });
+        }
+
         if (response.ok) {
           const data = await response.json();
           if (data.success && data.contract) {
@@ -234,24 +267,51 @@ function ConfirmationContent() {
       }
     };
     fetchDetail();
-  }, [contractId]);
+  }, [contractId, authLoading, isLoggedIn, member?.id]);
 
   useEffect(() => {
     if (!contractId || !detail) return;
     if (isDraft) return;
     const fetchParticipants = async () => {
       try {
-        if (!member?.id) return;
-        const response = await fetch(
-          `${API_BASE_URL}/api/contracts/${contractId}/participants?member_id=${encodeURIComponent(
-            String(member.id)
-          )}`,
-          {
+        let response: Response;
+        if (isNonMemberView) {
+          const auth = readNonMemberContractAuth();
+          if (!auth) return;
+          let url = `${API_BASE_URL}/api/contracts/non-member/${encodeURIComponent(contractId)}/participants?`;
+          if (auth.loginType === 'I') {
+            url += new URLSearchParams({
+              name: auth.insuredName,
+              birth_date: buildFullBirthDateFromSixDigits(auth.birthDate),
+              gender: auth.gender,
+              phone: auth.phone,
+            }).toString();
+          } else {
+            url += new URLSearchParams({
+              company_name: auth.companyName,
+              business_number: auth.businessNumber,
+              phone: auth.phone,
+            }).toString();
+          }
+          response = await fetch(url, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
-          }
-        );
+          });
+        } else {
+          if (!member?.id) return;
+          response = await fetch(
+            `${API_BASE_URL}/api/contracts/${contractId}/participants?member_id=${encodeURIComponent(
+              String(member.id)
+            )}`,
+            {
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+            }
+          );
+        }
+
         if (response.ok) {
           const data = await response.json();
           if (data.success && Array.isArray(data.participants)) {
@@ -272,7 +332,7 @@ function ConfirmationContent() {
       }
     };
     fetchParticipants();
-  }, [contractId, detail]);
+  }, [contractId, detail, isNonMemberView, member?.id]);
 
   useEffect(() => {
     const plans = getPlanListFromParticipants(participants);
@@ -482,7 +542,10 @@ function ConfirmationContent() {
                   <th>결제방법</th>
                   <td className="cf-dotted">
                     {detail?.paymentMethod === '기타결제' ? (detail?.paymentSubMethod ?? '기타결제') : (detail?.paymentMethod ?? '')}
-                    {detail?.paymentMethod === '무통장입금' && (
+                    {(detail?.paymentMethod === '무통장입금' ||
+                      (detail?.paymentMethod === '기타결제' &&
+                        (detail?.paymentSubMethod === '무통장입금' ||
+                          detail?.paymentSubMethod === '가상계좌'))) && (
                       <div className="cf-bank-info" style={{ marginTop: 8 }}>
                         은행명: {detail?.bankName ?? detail?.bank_name ?? '-'} / 계좌번호: {detail?.accountNumber ?? detail?.account_number ?? '-'} / 예금주: (주)빨주노초파남보
                       </div>

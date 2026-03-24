@@ -12,6 +12,11 @@ import ServiceModal from '@/components/ServiceModal';
 import GiftCardExchangeModal from '@/components/mileage/GiftCardExchangeModal';
 import { getImagePath } from '@/utils/path';
 import { formatInsurancePeriod } from '@/utils/dateTime';
+import {
+  saveNonMemberContractAuth,
+  clearNonMemberContractAuth,
+  type NonMemberContractAuth,
+} from '@/utils/nonMemberContractAuth';
 import './page.css';
 
 export default function MobileContractPage() {
@@ -411,6 +416,23 @@ export default function MobileContractPage() {
 
       const data = await response.json();
       if (data.success) {
+        if (loginType === 'I') {
+          saveNonMemberContractAuth({
+            loginType: 'I',
+            insuredName,
+            birthDate,
+            gender,
+            phone: phoneNumber.replace(/-/g, ''),
+          } as Omit<NonMemberContractAuth, 'verifiedAt'>);
+        } else {
+          saveNonMemberContractAuth({
+            loginType: 'C',
+            companyName,
+            businessNumber: `${businessNumber1}-${businessNumber2}-${businessNumber3}`,
+            phone: companyPhoneNumber.replace(/-/g, ''),
+          } as Omit<NonMemberContractAuth, 'verifiedAt'>);
+        }
+
         const contractsData = data.contracts || [];
         setNonMemberContracts(contractsData);
         setNonMemberContractPagination({
@@ -949,6 +971,7 @@ export default function MobileContractPage() {
                     checked={loginType === 'I'}
                     onChange={(e) => {
                       setLoginType('I');
+                      clearNonMemberContractAuth();
                       setShowVerificationInput(false);
                       setShowCompanyVerificationInput(false);
                       setIsVerificationSent(false);
@@ -970,6 +993,7 @@ export default function MobileContractPage() {
                     checked={loginType === 'C'}
                     onChange={(e) => {
                       setLoginType('C');
+                      clearNonMemberContractAuth();
                       setShowVerificationInput(false);
                       setShowCompanyVerificationInput(false);
                       setIsVerificationSent(false);

@@ -395,7 +395,19 @@ function CertificateDownloadContent() {
             <div className="cd-content">
               <h1 className="cd-title">가입증서 다운로드</h1>
               
-              <form className="cd-form">
+              <form
+                className="cd-form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (isEmailEntry) {
+                    verifyByIdentity();
+                  } else if (showSignArea) {
+                    compareNo();
+                  } else {
+                    checkInput();
+                  }
+                }}
+              >
                 <section className="cd-form-section">
                   {/* 개인/법인단체 선택 */}
                   <div className="cd-member-type">

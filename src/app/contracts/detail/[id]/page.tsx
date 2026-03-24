@@ -4,6 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { formatInsurancePeriod } from '@/utils/dateTime';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  readNonMemberContractAuth,
+  buildFullBirthDateFromSixDigits,
+} from '@/utils/nonMemberContractAuth';
 import './page.css';
 
 export default function ContractDetailPage() {
@@ -14,42 +18,106 @@ export default function ContractDetailPage() {
   const [contractDetail, setContractDetail] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [receiptLoading, setReceiptLoading] = useState(false);
+  /** 비회원: 인증 정보 없음 vs 조회 실패 구분 */
+  const [emptyHint, setEmptyHint] = useState<'guest' | 'notfound' | null>(null);
 
   useEffect(() => {
-    if (contractId) {
-      fetchContractDetail(contractId);
-    }
+    setContractDetail(null);
+    setLoading(true);
+    setEmptyHint(null);
   }, [contractId]);
 
-  const fetchContractDetail = async (id: string) => {
+  useEffect(() => {
+    if (!contractId) return;
+    // 인증 컨텍스트가 준비되기 전에는 조회하지 않음 — 준비되면 이 effect가 다시 실행됨
     if (authLoading) return;
-    if (!isLoggedIn || !member?.id) {
+    fetchContractDetail(contractId);
+  }, [contractId, authLoading, isLoggedIn, member?.id]);
+
+  const fetchContractDetail = async (id: string) => {
+    setEmptyHint(null);
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+
+    if (isLoggedIn && member?.id) {
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/api/contracts/detail/${id}?member_id=${encodeURIComponent(
+            String(member.id)
+          )}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.contract) {
+            setContractDetail(data.contract);
+          } else {
+            setEmptyHint('notfound');
+          }
+        } else {
+          setEmptyHint('notfound');
+        }
+      } catch (error) {
+        console.error('계약 상세 조회 오류:', error);
+        setEmptyHint('notfound');
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    const auth = readNonMemberContractAuth();
+    if (!auth) {
+      setEmptyHint('guest');
       setLoading(false);
       return;
     }
+
     try {
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-      const response = await fetch(
-        `${API_BASE_URL}/api/contracts/detail/${id}?member_id=${encodeURIComponent(
-          String(member.id)
-        )}`,
-        {
+      let url = `${API_BASE_URL}/api/contracts/non-member/detail/${encodeURIComponent(id)}?`;
+      if (auth.loginType === 'I') {
+        const birth = buildFullBirthDateFromSixDigits(auth.birthDate);
+        url += new URLSearchParams({
+          name: auth.insuredName,
+          birth_date: birth,
+          gender: auth.gender,
+          phone: auth.phone,
+        }).toString();
+      } else {
+        url += new URLSearchParams({
+          company_name: auth.companyName,
+          business_number: auth.businessNumber,
+          phone: auth.phone,
+        }).toString();
+      }
+
+      const response = await fetch(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        }
-      );
+      });
 
       if (response.ok) {
         const data = await response.json();
-        if (data.success) {
+        if (data.success && data.contract) {
           setContractDetail(data.contract);
+        } else {
+          setEmptyHint('notfound');
         }
+      } else {
+        setEmptyHint('notfound');
       }
     } catch (error) {
-      console.error('계약 상세 조회 오류:', error);
+      console.error('비회원 계약 상세 조회 오류:', error);
+      setEmptyHint('notfound');
     } finally {
       setLoading(false);
     }
@@ -142,10 +210,14 @@ export default function ContractDetailPage() {
   }
 
   if (!contractDetail) {
+    const message =
+      emptyHint === 'guest'
+        ? '가입내역 조회에서 휴대폰 인증을 완료한 뒤 자세히보기를 이용해 주세요.'
+        : '계약 정보를 찾을 수 없습니다.';
     return (
       <div className="contract-detail-page">
         <div className="prow_01" style={{ textAlign: 'center', padding: '50px' }}>
-          계약 정보를 찾을 수 없습니다.
+          {message}
         </div>
       </div>
     );

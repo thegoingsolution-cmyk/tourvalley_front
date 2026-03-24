@@ -1196,30 +1196,53 @@ function MobileGroupInsuranceContent() {
 
   // 기간 검증
   const validateDuration = (): { valid: boolean; message?: string } => {
-    const departure = new Date(`${departureDate}T${departureTime}:00:00`);
-    const arrival = new Date(`${arrivalDate}T${arrivalTime}:00:00`);
+    const departure = new Date(`${departureDate}T00:00:00`);
+    departure.setHours(Number(departureTime) % 24, 0, 0, 0);
+    if (Number(departureTime) === 24) {
+      departure.setDate(departure.getDate() + 1);
+    }
+
+    const arrival = new Date(`${arrivalDate}T00:00:00`);
+    arrival.setHours(Number(arrivalTime) % 24, 0, 0, 0);
+    if (Number(arrivalTime) === 24) {
+      arrival.setDate(arrival.getDate() + 1);
+    }
     
     if (arrival <= departure) {
       return { valid: false, message: '도착일시는 출발일시보다 이후여야 합니다.' };
     }
     
-    const diffTime = arrival.getTime() - departure.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (activeTab === 'DS' && diffDays > 30) {
-      return { valid: false, message: '국내여행보험은 최대 1개월(30일)까지 가능합니다.' };
+    if (activeTab === 'DS') {
+      const maxArrival = new Date(departure.getTime());
+      maxArrival.setMonth(maxArrival.getMonth() + 1);
+      if (arrival >= maxArrival) {
+        return { valid: false, message: '국내여행보험은 최대 1개월까지 가능합니다.' };
+      }
     }
-    if (activeTab === 'FS' && diffDays > 90) {
-      return { valid: false, message: '해외여행보험은 최대 3개월(90일)까지 가능합니다.' };
+
+    if (activeTab === 'FS') {
+      const maxArrival = new Date(departure.getTime());
+      maxArrival.setMonth(maxArrival.getMonth() + 3);
+      if (arrival >= maxArrival) {
+        return { valid: false, message: '해외여행보험은 최대 3개월까지 가능합니다.' };
+      }
     }
-    // 해외장기체류보험: 최소 3개월 초과(91일 이상), 최대 1년(365일) 이하 (long-term-stay/pc, group-insurance/longstay/popup과 동일)
-    if (activeTab === 'FL' && diffDays <= 90) {
-      return { valid: false, message: '해외장기체류보험은 3개월 초과시 가능합니다.' };
+
+    // 해외장기체류보험: 최소 3개월 초과, 최대 1년 미만
+    if (activeTab === 'FL') {
+      const minArrival = new Date(departure.getTime());
+      minArrival.setMonth(minArrival.getMonth() + 3);
+      if (arrival <= minArrival) {
+        return { valid: false, message: '해외장기체류보험은 3개월 초과시 가능합니다.' };
+      }
+
+      const maxArrival = new Date(departure.getTime());
+      maxArrival.setFullYear(maxArrival.getFullYear() + 1);
+      if (arrival >= maxArrival) {
+        return { valid: false, message: '해외장기체류보험은 최대 1년까지 가능합니다.' };
+      }
     }
-    if (activeTab === 'FL' && diffDays > 365) {
-      return { valid: false, message: '해외장기체류보험은 최대 1년(365일)까지 가능합니다.' };
-    }
-    
+
     return { valid: true };
   };
 

@@ -12,6 +12,11 @@ import AccidentFreeCashModal from '@/components/travel/AccidentFreeCashModal';
 import ServiceModal from '@/components/ServiceModal';
 import GiftCardExchangeModal from '@/components/mileage/GiftCardExchangeModal';
 import { sendVerificationCode, verifyCode } from '@/services/smsService';
+import {
+  saveNonMemberContractAuth,
+  clearNonMemberContractAuth,
+  type NonMemberContractAuth,
+} from '@/utils/nonMemberContractAuth';
 import './page.css';
 
 export default function PCContractPage() {
@@ -463,6 +468,23 @@ export default function PCContractPage() {
 
       const data = await response.json();
       if (data.success) {
+        if (loginType === 'I') {
+          saveNonMemberContractAuth({
+            loginType: 'I',
+            insuredName,
+            birthDate,
+            gender,
+            phone: phoneNumber.replace(/-/g, ''),
+          } as Omit<NonMemberContractAuth, 'verifiedAt'>);
+        } else {
+          saveNonMemberContractAuth({
+            loginType: 'C',
+            companyName,
+            businessNumber: `${businessNumber1}-${businessNumber2}-${businessNumber3}`,
+            phone: companyPhoneNumber.replace(/-/g, ''),
+          } as Omit<NonMemberContractAuth, 'verifiedAt'>);
+        }
+
         const contractsData = data.contracts || [];
         setNonMemberContracts(contractsData);
         setNonMemberContractPagination({
@@ -902,6 +924,7 @@ export default function PCContractPage() {
                       checked={loginType === 'I'}
                       onChange={(e) => {
                         setLoginType('I');
+                        clearNonMemberContractAuth();
                         setShowVerificationInput(false);
                         setIsVerificationSent(false);
                         setRemainingTime(0);
@@ -920,6 +943,7 @@ export default function PCContractPage() {
                       checked={loginType === 'C'}
                       onChange={(e) => {
                         setLoginType('C');
+                        clearNonMemberContractAuth();
                         setShowCompanyVerificationInput(false);
                         setIsVerificationSent(false);
                         setCompanyRemainingTime(0);

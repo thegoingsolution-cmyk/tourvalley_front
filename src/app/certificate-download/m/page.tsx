@@ -395,7 +395,19 @@ function CertificateDownloadContent() {
             <div className="cdm-content">
               <h1 className="cdm-title">가입증서 다운로드</h1>
               
-              <form className="cdm-form">
+              <form
+                className="cdm-form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (isEmailEntry) {
+                    verifyByIdentity();
+                  } else if (showSignArea) {
+                    compareNo();
+                  } else {
+                    checkInput();
+                  }
+                }}
+              >
                 <section className="cdm-form-section">
                   {/* 개인/법인단체 선택 */}
                   <div className="cdm-member-type">

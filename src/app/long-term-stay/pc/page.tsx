@@ -283,15 +283,18 @@ export default function PCLongTermStayPage() {
       return { valid: false, message: '도착일시는 출발일시보다 이후여야 합니다.' };
     }
     
-    const diffTime = arrival.getTime() - departure.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    // 해외장기체류보험은 최소 3개월 초과(91일 이상), 최대 1년(365일) 이하
-    if (diffDays <= 90) {
+    // 해외장기체류보험은 최소 3개월 초과
+    const minArrival = new Date(departure.getTime());
+    minArrival.setMonth(minArrival.getMonth() + 3);
+    if (arrival <= minArrival) {
       return { valid: false, message: '해외장기체류보험은 3개월 초과시 가능합니다.' };
     }
-    if (diffDays > 365) {
-      return { valid: false, message: '해외장기체류보험은 최대 1년(365일)까지 가능합니다.' };
+
+    // 해외장기체류보험은 최대 1년 미만
+    const maxArrival = new Date(departure.getTime());
+    maxArrival.setFullYear(maxArrival.getFullYear() + 1);
+    if (arrival >= maxArrival) {
+      return { valid: false, message: '해외장기체류보험은 최대 1년까지 가능합니다.' };
     }
     
     return { valid: true };

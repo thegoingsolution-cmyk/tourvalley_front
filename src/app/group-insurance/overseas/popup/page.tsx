@@ -108,6 +108,31 @@ export default function OverseasInsurancePopupPage() {
       return;
     }
 
+    // 출발/도착 일시 검증 (해외 단체여행보험: 출발 기준 최대 3개월 미만)
+    const departure = new Date(`${startDate}T00:00:00`);
+    departure.setHours(Number(startHour) % 24, 0, 0, 0);
+    if (Number(startHour) === 24) {
+      departure.setDate(departure.getDate() + 1);
+    }
+
+    const arrival = new Date(`${endDate}T00:00:00`);
+    arrival.setHours(Number(endHour) % 24, 0, 0, 0);
+    if (Number(endHour) === 24) {
+      arrival.setDate(arrival.getDate() + 1);
+    }
+
+    if (arrival <= departure) {
+      alert('도착일시는 출발일시보다 이후여야 합니다.');
+      return;
+    }
+
+    const maxArrival = new Date(departure.getTime());
+    maxArrival.setMonth(maxArrival.getMonth() + 3);
+    if (arrival >= maxArrival) {
+      alert('해외여행보험은 최대 3개월까지 가능합니다.');
+      return;
+    }
+
     // 입력한 정보를 localStorage에 저장
     const formData = {
       startDate,
