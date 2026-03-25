@@ -7,6 +7,10 @@ import { format, parse } from 'date-fns';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCorporateMemberInfo } from '@/services/authService';
+import {
+  getDomesticInsuranceMaxArrivalFromPickedDate,
+  parseInsuranceDateHourToInstant,
+} from '@/utils/dateTime';
 import '../../popup/page.css';
 
 // 한국어 locale 등록
@@ -105,26 +109,16 @@ export default function DomesticInsurancePopupPage() {
     }
 
     // 출발/도착 일시 검증 (국내 단체여행보험: 출발 기준 최대 1개월 미만)
-    const departure = new Date(`${startDate}T00:00:00`);
-    departure.setHours(Number(startHour) % 24, 0, 0, 0);
-    if (Number(startHour) === 24) {
-      departure.setDate(departure.getDate() + 1);
-    }
-
-    const arrival = new Date(`${endDate}T00:00:00`);
-    arrival.setHours(Number(endHour) % 24, 0, 0, 0);
-    if (Number(endHour) === 24) {
-      arrival.setDate(arrival.getDate() + 1);
-    }
+    const departure = parseInsuranceDateHourToInstant(startDate, String(startHour));
+    const arrival = parseInsuranceDateHourToInstant(endDate, String(endHour));
 
     if (arrival <= departure) {
       alert('도착일시는 출발일시보다 이후여야 합니다.');
       return;
     }
 
-    const maxArrival = new Date(departure.getTime());
-    maxArrival.setMonth(maxArrival.getMonth() + 1);
-    if (arrival >= maxArrival) {
+    const maxArrival = getDomesticInsuranceMaxArrivalFromPickedDate(startDate, String(startHour));
+    if (arrival > maxArrival) {
       alert('국내여행보험은 최대 1개월까지 가능합니다.');
       return;
     }

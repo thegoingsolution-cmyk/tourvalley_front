@@ -199,6 +199,16 @@ export default function ContractDetailPage() {
     }
   };
 
+  const handleCardReceiptClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    const url = typeof contractDetail?.receiptUrl === 'string' ? contractDetail.receiptUrl.trim() : '';
+    if (!url) {
+      alert('등록된 카드영수증이 없습니다.');
+      return;
+    }
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   if (loading) {
     return (
       <div className="contract-detail-page">
@@ -460,6 +470,17 @@ export default function ContractDetailPage() {
                 className="tourGuard_btn_b tour2023_btn06_gray"
               >
                 보험료입금증<span className="tour2023_arr01"></span>
+              </a>
+            </div>
+          )}
+          {isPaymentCompleted && contractDetail?.paymentSubMethod === '수기카드' && (
+            <div className="tourG_mat04">
+              <a
+                href="#"
+                onClick={handleCardReceiptClick}
+                className="tourGuard_btn_b tour2023_btn06_gray"
+              >
+                카드영수증<span className="tour2023_arr01"></span>
               </a>
             </div>
           )}

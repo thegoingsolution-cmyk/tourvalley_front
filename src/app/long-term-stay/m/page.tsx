@@ -4,6 +4,10 @@ import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { requestNicepayPayment, openNicepayWindow, processNaverPayPayment, processKakaoPayPayment } from '@/services/paymentService';
 import { getTrackingInfo } from '@/utils/tracking';
+import {
+  addInsuranceCalendarMonthsToPickedInstant,
+  parseInsuranceDateHourToInstant,
+} from '@/utils/dateTime';
 import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -304,26 +308,30 @@ function MobileLongTermStayContent() {
     return domain ? `${participant.email1}@${domain}` : '';
   };
 
-  // 기간 검증 함수
+  // 기간 검증 (해외장기체류보험 최소 3개월 초과, 최대 1년)
   const validateDuration = () => {
-    const departure = new Date(`${departureDate}T${departureTime}:00:00`);
-    const arrival = new Date(`${arrivalDate}T${arrivalTime}:00:00`);
+    const departure = parseInsuranceDateHourToInstant(departureDate, departureTime);
+    const arrival = parseInsuranceDateHourToInstant(arrivalDate, arrivalTime);
     
     if (arrival <= departure) {
       return { valid: false, message: '도착일시는 출발일시보다 이후여야 합니다.' };
     }
     
-    // 해외장기체류보험은 최소 3개월 초과
-    const minArrival = new Date(departure.getTime());
-    minArrival.setMonth(minArrival.getMonth() + 3);
+    const minArrival = addInsuranceCalendarMonthsToPickedInstant(
+      departureDate,
+      departureTime,
+      3
+    );
     if (arrival <= minArrival) {
       return { valid: false, message: '해외장기체류보험은 3개월 초과시 가능합니다.' };
     }
 
-    // 해외장기체류보험은 최대 1년 미만
-    const maxArrival = new Date(departure.getTime());
-    maxArrival.setFullYear(maxArrival.getFullYear() + 1);
-    if (arrival >= maxArrival) {
+    const maxArrival = addInsuranceCalendarMonthsToPickedInstant(
+      departureDate,
+      departureTime,
+      12
+    );
+    if (arrival > maxArrival) {
       return { valid: false, message: '해외장기체류보험은 최대 1년까지 가능합니다.' };
     }
     

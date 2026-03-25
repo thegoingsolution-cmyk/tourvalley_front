@@ -7,6 +7,10 @@ import { format, parse } from 'date-fns';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCorporateMemberInfo } from '@/services/authService';
+import {
+  addInsuranceCalendarMonthsToPickedInstant,
+  parseInsuranceDateHourToInstant,
+} from '@/utils/dateTime';
 import '../../popup/page.css';
 
 // 한국어 locale 등록
@@ -89,33 +93,20 @@ export default function LongStayInsurancePopupPage() {
 
   // 기간 검증 (해외장기체류보험 최소 3개월 초과, 최대 1년 미만) - long-term-stay/pc와 동일
   const validateDuration = (): { valid: boolean; message?: string } => {
-    const departure = new Date(`${startDate}T00:00:00`);
-    departure.setHours(Number(startHour) % 24, 0, 0, 0);
-    if (Number(startHour) === 24) {
-      departure.setDate(departure.getDate() + 1);
-    }
-
-    const arrival = new Date(`${endDate}T00:00:00`);
-    arrival.setHours(Number(endHour) % 24, 0, 0, 0);
-    if (Number(endHour) === 24) {
-      arrival.setDate(arrival.getDate() + 1);
-    }
+    const departure = parseInsuranceDateHourToInstant(startDate, String(startHour));
+    const arrival = parseInsuranceDateHourToInstant(endDate, String(endHour));
 
     if (arrival <= departure) {
       return { valid: false, message: '도착일시는 출발일시보다 이후여야 합니다.' };
     }
 
-    // 해외장기체류보험은 최소 3개월 초과
-    const minArrival = new Date(departure.getTime());
-    minArrival.setMonth(minArrival.getMonth() + 3);
+    const minArrival = addInsuranceCalendarMonthsToPickedInstant(startDate, String(startHour), 3);
     if (arrival <= minArrival) {
       return { valid: false, message: '해외장기체류보험은 3개월 초과시 가능합니다.' };
     }
 
-    // 해외장기체류보험은 최대 1년 미만
-    const maxArrival = new Date(departure.getTime());
-    maxArrival.setFullYear(maxArrival.getFullYear() + 1);
-    if (arrival >= maxArrival) {
+    const maxArrival = addInsuranceCalendarMonthsToPickedInstant(startDate, String(startHour), 12);
+    if (arrival > maxArrival) {
       return { valid: false, message: '해외장기체류보험은 최대 1년까지 가능합니다.' };
     }
 

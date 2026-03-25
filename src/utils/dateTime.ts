@@ -76,3 +76,97 @@ export function formatInsurancePeriod(
   if (!start || !end) return emptyValue;
   return `${formatDateTimePart(start)} ~ ${formatDateTimePart(end)}`;
 }
+
+/**
+ * 가입 화면의 날짜(YYYY-MM-DD) + 시(1~24)를 절대 시각으로 변환.
+ * 24시는 "해당 날짜의 끝"이므로 다음날 00:00으로 두어, `new Date('...T24:00:00')`처럼
+ * 월이 밀리며 최대기간이 잘못 계산되는 것을 막음.
+ */
+export function parseInsuranceDateHourToInstant(dateStr: string, hourStr: string): Date {
+  const h = parseInt(String(hourStr).trim(), 10);
+  if (Number.isNaN(h)) {
+    return new Date(NaN);
+  }
+  if (h === 24) {
+    const d = new Date(`${dateStr}T00:00:00`);
+    if (Number.isNaN(d.getTime())) return d;
+    d.setDate(d.getDate() + 1);
+    return d;
+  }
+  const hh = String(h).padStart(2, '0');
+  return new Date(`${dateStr}T${hh}:00:00`);
+}
+
+/**
+ * 달력상 `dateStr`이 속한 월을 기준으로, 그로부터 `monthOffset`개월 뒤 달의 말일까지 허용되는
+ * 마지막 시각(같은 시 표기). 24시인 경우 그 말일의 24시(= 다음날 00:00 instant).
+ * monthOffset: 국내 1, 해외 단기 3
+ */
+function getInsuranceMaxArrivalInstantFromPickedCalendar(
+  dateStr: string,
+  hourStr: string,
+  monthOffset: number
+): Date {
+  const h = parseInt(String(hourStr).trim(), 10);
+  const segs = dateStr.split('-');
+  if (segs.length !== 3) return new Date(NaN);
+  const y0 = parseInt(segs[0], 10);
+  const mCal = parseInt(segs[1], 10);
+  if ([y0, mCal, h].some((n) => Number.isNaN(n))) return new Date(NaN);
+  const monthIndex = mCal - 1;
+  const targetFirst = new Date(y0, monthIndex + monthOffset, 1);
+  const lastDay = new Date(targetFirst.getFullYear(), targetFirst.getMonth() + 1, 0);
+  if (h === 24) {
+    return new Date(
+      lastDay.getFullYear(),
+      lastDay.getMonth(),
+      lastDay.getDate() + 1,
+      0,
+      0,
+      0,
+      0
+    );
+  }
+  lastDay.setHours(h, 0, 0, 0);
+  return lastDay;
+}
+
+/** 국내여행보험 최대 도착 시각 (날짜+시 피커 기준) */
+export function getDomesticInsuranceMaxArrivalFromPickedDate(
+  dateStr: string,
+  hourStr: string
+): Date {
+  return getInsuranceMaxArrivalInstantFromPickedCalendar(dateStr, hourStr, 1);
+}
+
+/** 해외여행(단기) 최대 도착 시각 (날짜+시 피커 기준) */
+export function getOverseasShortTripMaxArrivalFromPickedDate(
+  dateStr: string,
+  hourStr: string
+): Date {
+  return getInsuranceMaxArrivalInstantFromPickedCalendar(dateStr, hourStr, 3);
+}
+
+/**
+ * 피커 날짜(YYYY-MM-DD)·시(1~24) 기준으로 달력 월을 `monthsToAdd`만큼 더한 시각.
+ * 해외장기체류 최소(3개월 초과)·최대(1년) 등에 사용. setMonth/setFullYear 누적 오차·말일 보정에 의존하지 않음.
+ */
+export function addInsuranceCalendarMonthsToPickedInstant(
+  dateStr: string,
+  hourStr: string,
+  monthsToAdd: number
+): Date {
+  const segs = dateStr.split('-');
+  if (segs.length !== 3) return new Date(NaN);
+  const y0 = parseInt(segs[0], 10);
+  const mo = parseInt(segs[1], 10);
+  const day = parseInt(segs[2], 10);
+  const h = parseInt(String(hourStr).trim(), 10);
+  if ([y0, mo, day, h].some((n) => Number.isNaN(n))) return new Date(NaN);
+  const d = new Date(y0, mo - 1 + monthsToAdd, day);
+  if (h === 24) {
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1, 0, 0, 0, 0);
+  }
+  d.setHours(h, 0, 0, 0);
+  return d;
+}

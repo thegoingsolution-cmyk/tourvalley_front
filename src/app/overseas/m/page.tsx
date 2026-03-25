@@ -4,6 +4,10 @@ import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { requestNicepayPayment, openNicepayWindow, processNaverPayPayment, processKakaoPayPayment } from '@/services/paymentService';
 import { getTrackingInfo } from '@/utils/tracking';
+import {
+  getOverseasShortTripMaxArrivalFromPickedDate,
+  parseInsuranceDateHourToInstant,
+} from '@/utils/dateTime';
 import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -232,18 +236,16 @@ function MobileOverseasStep1Content() {
 
   // 기간 검증 함수
   const validateDuration = () => {
-    const departure = new Date(`${departureDate}T${departureTime}:00:00`);
-    const arrival = new Date(`${arrivalDate}T${arrivalTime}:00:00`);
+    const departure = parseInsuranceDateHourToInstant(departureDate, departureTime);
+    const arrival = parseInsuranceDateHourToInstant(arrivalDate, arrivalTime);
     
     if (arrival <= departure) {
       return { valid: false, message: '도착일시는 출발일시보다 이후여야 합니다.' };
     }
     
-    // 해외여행보험(단기)은 출발 기준 최대 3개월 이내
-    const maxArrival = new Date(departure.getTime());
-    maxArrival.setMonth(maxArrival.getMonth() + 3);
-    if (type === 'short' && arrival >= maxArrival) {
-      return { valid: false, message: '해외여행보험은 최대 3개월(90일)까지 가능합니다.' };
+    const maxArrival = getOverseasShortTripMaxArrivalFromPickedDate(departureDate, departureTime);
+    if (type === 'short' && arrival > maxArrival) {
+      return { valid: false, message: '해외여행보험은 최대 3개월까지 가능합니다.' };
     }
     
     return { valid: true };

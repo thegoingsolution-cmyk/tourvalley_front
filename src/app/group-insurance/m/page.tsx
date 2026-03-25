@@ -4,6 +4,12 @@ import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { requestNicepayPayment, openNicepayWindow, processNaverPayPayment, processKakaoPayPayment } from '@/services/paymentService';
 import { getTrackingInfo } from '@/utils/tracking';
+import {
+  addInsuranceCalendarMonthsToPickedInstant,
+  getDomesticInsuranceMaxArrivalFromPickedDate,
+  getOverseasShortTripMaxArrivalFromPickedDate,
+  parseInsuranceDateHourToInstant,
+} from '@/utils/dateTime';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCorporateMemberInfo, CorporateInfo, ContactInfo } from '@/services/authService';
 import Header from '@/components/Header';
@@ -1196,49 +1202,50 @@ function MobileGroupInsuranceContent() {
 
   // 기간 검증
   const validateDuration = (): { valid: boolean; message?: string } => {
-    const departure = new Date(`${departureDate}T00:00:00`);
-    departure.setHours(Number(departureTime) % 24, 0, 0, 0);
-    if (Number(departureTime) === 24) {
-      departure.setDate(departure.getDate() + 1);
-    }
-
-    const arrival = new Date(`${arrivalDate}T00:00:00`);
-    arrival.setHours(Number(arrivalTime) % 24, 0, 0, 0);
-    if (Number(arrivalTime) === 24) {
-      arrival.setDate(arrival.getDate() + 1);
-    }
+    const departure = parseInsuranceDateHourToInstant(departureDate, String(departureTime));
+    const arrival = parseInsuranceDateHourToInstant(arrivalDate, String(arrivalTime));
     
     if (arrival <= departure) {
       return { valid: false, message: '도착일시는 출발일시보다 이후여야 합니다.' };
     }
     
     if (activeTab === 'DS') {
-      const maxArrival = new Date(departure.getTime());
-      maxArrival.setMonth(maxArrival.getMonth() + 1);
-      if (arrival >= maxArrival) {
+      const maxArrival = getDomesticInsuranceMaxArrivalFromPickedDate(
+        departureDate,
+        String(departureTime)
+      );
+      if (arrival > maxArrival) {
         return { valid: false, message: '국내여행보험은 최대 1개월까지 가능합니다.' };
       }
     }
 
     if (activeTab === 'FS') {
-      const maxArrival = new Date(departure.getTime());
-      maxArrival.setMonth(maxArrival.getMonth() + 3);
-      if (arrival >= maxArrival) {
+      const maxArrival = getOverseasShortTripMaxArrivalFromPickedDate(
+        departureDate,
+        String(departureTime)
+      );
+      if (arrival > maxArrival) {
         return { valid: false, message: '해외여행보험은 최대 3개월까지 가능합니다.' };
       }
     }
 
     // 해외장기체류보험: 최소 3개월 초과, 최대 1년 미만
     if (activeTab === 'FL') {
-      const minArrival = new Date(departure.getTime());
-      minArrival.setMonth(minArrival.getMonth() + 3);
+      const minArrival = addInsuranceCalendarMonthsToPickedInstant(
+        departureDate,
+        String(departureTime),
+        3
+      );
       if (arrival <= minArrival) {
         return { valid: false, message: '해외장기체류보험은 3개월 초과시 가능합니다.' };
       }
 
-      const maxArrival = new Date(departure.getTime());
-      maxArrival.setFullYear(maxArrival.getFullYear() + 1);
-      if (arrival >= maxArrival) {
+      const maxArrival = addInsuranceCalendarMonthsToPickedInstant(
+        departureDate,
+        String(departureTime),
+        12
+      );
+      if (arrival > maxArrival) {
         return { valid: false, message: '해외장기체류보험은 최대 1년까지 가능합니다.' };
       }
     }
