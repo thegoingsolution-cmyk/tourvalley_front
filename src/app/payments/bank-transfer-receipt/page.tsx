@@ -3,6 +3,10 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  readNonMemberContractAuth,
+  buildFullBirthDateFromSixDigits,
+} from '@/utils/nonMemberContractAuth';
 
 type ContractDetail = {
   insuranceType?: string;
@@ -47,31 +51,70 @@ function BankTransferReceiptContent() {
   const [scale, setScale] = useState(1);
 
   useEffect(() => {
+    if (!contractId) {
+      setLoading(false);
+      setDetail(null);
+      return;
+    }
+    if (authLoading) return;
+
     const fetchDetail = async () => {
-      if (!contractId) {
-        setLoading(false);
-        return;
-      }
+      setLoading(true);
+      setDetail(null);
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+
       try {
-        const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-        if (authLoading) return;
-        if (!isLoggedIn || !member?.id) return;
-        const response = await fetch(
-          `${API_BASE_URL}/api/contracts/detail/${contractId}?member_id=${encodeURIComponent(
-            String(member.id)
-          )}`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include',
+        if (isLoggedIn && member?.id) {
+          const response = await fetch(
+            `${API_BASE_URL}/api/contracts/detail/${contractId}?member_id=${encodeURIComponent(
+              String(member.id)
+            )}`,
+            {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              credentials: 'include',
+            }
+          );
+          if (!response.ok) return;
+          const data = await response.json();
+          if (data?.success && data?.contract) {
+            setDetail(data.contract as ContractDetail);
           }
-        );
-        if (!response.ok) {
-          setLoading(false);
           return;
         }
+
+        const auth = readNonMemberContractAuth();
+        if (!auth) {
+          return;
+        }
+
+        let url = `${API_BASE_URL}/api/contracts/non-member/detail/${encodeURIComponent(contractId)}?`;
+        if (auth.loginType === 'I') {
+          const birth = buildFullBirthDateFromSixDigits(auth.birthDate);
+          url += new URLSearchParams({
+            name: auth.insuredName,
+            birth_date: birth,
+            gender: auth.gender,
+            phone: auth.phone,
+          }).toString();
+        } else {
+          url += new URLSearchParams({
+            company_name: auth.companyName,
+            business_number: auth.businessNumber,
+            phone: auth.phone,
+          }).toString();
+        }
+
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        });
+        if (!response.ok) return;
         const data = await response.json();
         if (data?.success && data?.contract) {
           setDetail(data.contract as ContractDetail);
@@ -83,8 +126,8 @@ function BankTransferReceiptContent() {
       }
     };
 
-    fetchDetail();
-  }, [contractId]);
+    void fetchDetail();
+  }, [contractId, authLoading, isLoggedIn, member?.id]);
 
   useEffect(() => {
     const updateScale = () => {
@@ -108,9 +151,17 @@ function BankTransferReceiptContent() {
   }
 
   if (!detail) {
+    const emptyMessage =
+      !contractId
+        ? '계약 정보가 없습니다.'
+        : !authLoading &&
+            !isLoggedIn &&
+            !readNonMemberContractAuth()
+          ? '가입내역 조회에서 휴대폰 인증을 완료한 뒤 다시 시도해 주세요.'
+          : '입금확인증 정보를 찾을 수 없습니다.';
     return (
       <div style={{ textAlign: 'center', padding: '50px' }}>
-        입금확인증 정보를 찾을 수 없습니다.
+        {emptyMessage}
       </div>
     );
   }

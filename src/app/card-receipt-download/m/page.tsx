@@ -357,7 +357,19 @@ function CardReceiptDownloadContent() {
             <div className="cdm-content">
               <h1 className="cdm-title">카드영수증 다운로드</h1>
 
-              <form className="cdm-form">
+              <form
+                className="cdm-form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (isEmailEntry) {
+                    verifyByIdentity();
+                  } else if (showSignArea) {
+                    compareNo();
+                  } else {
+                    checkInput();
+                  }
+                }}
+              >
                 <section className="cdm-form-section">
                   <div className="cdm-member-type">
                     <ul className="cdm-radio-list">

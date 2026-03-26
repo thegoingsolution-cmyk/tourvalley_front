@@ -98,58 +98,10 @@ export function parseInsuranceDateHourToInstant(dateStr: string, hourStr: string
 }
 
 /**
- * 달력상 `dateStr`이 속한 월을 기준으로, 그로부터 `monthOffset`개월 뒤 달의 말일까지 허용되는
- * 마지막 시각(같은 시 표기). 24시인 경우 그 말일의 24시(= 다음날 00:00 instant).
- * monthOffset: 국내 1, 해외 단기 3
- */
-function getInsuranceMaxArrivalInstantFromPickedCalendar(
-  dateStr: string,
-  hourStr: string,
-  monthOffset: number
-): Date {
-  const h = parseInt(String(hourStr).trim(), 10);
-  const segs = dateStr.split('-');
-  if (segs.length !== 3) return new Date(NaN);
-  const y0 = parseInt(segs[0], 10);
-  const mCal = parseInt(segs[1], 10);
-  if ([y0, mCal, h].some((n) => Number.isNaN(n))) return new Date(NaN);
-  const monthIndex = mCal - 1;
-  const targetFirst = new Date(y0, monthIndex + monthOffset, 1);
-  const lastDay = new Date(targetFirst.getFullYear(), targetFirst.getMonth() + 1, 0);
-  if (h === 24) {
-    return new Date(
-      lastDay.getFullYear(),
-      lastDay.getMonth(),
-      lastDay.getDate() + 1,
-      0,
-      0,
-      0,
-      0
-    );
-  }
-  lastDay.setHours(h, 0, 0, 0);
-  return lastDay;
-}
-
-/** 국내여행보험 최대 도착 시각 (날짜+시 피커 기준) */
-export function getDomesticInsuranceMaxArrivalFromPickedDate(
-  dateStr: string,
-  hourStr: string
-): Date {
-  return getInsuranceMaxArrivalInstantFromPickedCalendar(dateStr, hourStr, 1);
-}
-
-/** 해외여행(단기) 최대 도착 시각 (날짜+시 피커 기준) */
-export function getOverseasShortTripMaxArrivalFromPickedDate(
-  dateStr: string,
-  hourStr: string
-): Date {
-  return getInsuranceMaxArrivalInstantFromPickedCalendar(dateStr, hourStr, 3);
-}
-
-/**
  * 피커 날짜(YYYY-MM-DD)·시(1~24) 기준으로 달력 월을 `monthsToAdd`만큼 더한 시각.
- * 해외장기체류 최소(3개월 초과)·최대(1년) 등에 사용. setMonth/setFullYear 누적 오차·말일 보정에 의존하지 않음.
+ * - 같은 '일'이 목표 월에 없으면 해당 월 말일로 맞춤 (예: 1/31 + 1개월 → 2/28).
+ * - `new Date(y, m+n, day)` 오버플로우(예: 1/31+1→3월)에 의존하지 않음.
+ * 해외 단기 최대·국내 최대·국내/해외 장기 등에 사용.
  */
 export function addInsuranceCalendarMonthsToPickedInstant(
   dateStr: string,
@@ -163,10 +115,40 @@ export function addInsuranceCalendarMonthsToPickedInstant(
   const day = parseInt(segs[2], 10);
   const h = parseInt(String(hourStr).trim(), 10);
   if ([y0, mo, day, h].some((n) => Number.isNaN(n))) return new Date(NaN);
-  const d = new Date(y0, mo - 1 + monthsToAdd, day);
+
+  const monthZeroIndex = mo - 1;
+  const targetFirstOfMonth = new Date(y0, monthZeroIndex + monthsToAdd, 1);
+  const lastDayInTargetMonth = new Date(
+    targetFirstOfMonth.getFullYear(),
+    targetFirstOfMonth.getMonth() + 1,
+    0
+  ).getDate();
+  const dayClamped = Math.min(day, lastDayInTargetMonth);
+  const d = new Date(
+    targetFirstOfMonth.getFullYear(),
+    targetFirstOfMonth.getMonth(),
+    dayClamped
+  );
+
   if (h === 24) {
     return new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1, 0, 0, 0, 0);
   }
   d.setHours(h, 0, 0, 0);
   return d;
+}
+
+/** 국내여행보험 최대 도착 시각 (날짜+시 피커 기준, 출발일 + 1달) */
+export function getDomesticInsuranceMaxArrivalFromPickedDate(
+  dateStr: string,
+  hourStr: string
+): Date {
+  return addInsuranceCalendarMonthsToPickedInstant(dateStr, hourStr, 1);
+}
+
+/** 해외여행(단기) 최대 도착 시각 (날짜+시 피커 기준, 출발일 + 3달) */
+export function getOverseasShortTripMaxArrivalFromPickedDate(
+  dateStr: string,
+  hourStr: string
+): Date {
+  return addInsuranceCalendarMonthsToPickedInstant(dateStr, hourStr, 3);
 }

@@ -356,7 +356,7 @@ export default function ExcelUploadModal({
 
         <div className="excel-notes">
           <ul>
-            <li>대표가입자(가입자1)를 포함한 가입자(피보험자) 전체리스트를 업로드해주셔야 합니다.</li>
+            <li>대표가입자(가입자1)를 제외한 명단을 업로드해주셔야합니다.</li>
             <li>외국인은 외국인 등록번호가 있는 사람만 가입이 가능합니다.</li>
           </ul>
         </div>
