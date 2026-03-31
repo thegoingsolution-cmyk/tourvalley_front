@@ -6,6 +6,11 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { SITE_URL, SEO_DEFAULT, VERIFICATION } from '@/config/seo';
 import JsonLd from '@/components/JsonLd';
 
+const NAVER_SITE_VERIFICATION_TOKENS = [
+  VERIFICATION.naver,
+  VERIFICATION.naverMobile,
+].filter((token): token is string => Boolean(token));
+
 // 운영 환경에서 basePath를 고려한 favicon 경로
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 const faviconPath = basePath ? `${basePath}/favicon.ico` : '/favicon.ico';
@@ -44,8 +49,8 @@ export const metadata: Metadata = {
   alternates: { canonical: SITE_URL },
   verification: {
     ...(VERIFICATION.google && { google: VERIFICATION.google }),
-    ...(VERIFICATION.naver && {
-      other: { 'naver-site-verification': VERIFICATION.naver },
+    ...(NAVER_SITE_VERIFICATION_TOKENS.length > 0 && {
+      other: { 'naver-site-verification': NAVER_SITE_VERIFICATION_TOKENS },
     }),
   },
 };

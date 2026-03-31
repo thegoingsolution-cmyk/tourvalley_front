@@ -3,6 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { readNonMemberContractAuth, buildFullBirthDateFromSixDigits } from '@/utils/nonMemberContractAuth';
 import './page.css';
 
 function PCPremiumDetailContent() {
@@ -87,31 +88,90 @@ function PCPremiumDetailContent() {
   const fetchParticipants = async (contractId: string) => {
     try {
       if (authLoading) return;
-      if (!isLoggedIn || !member?.id) return;
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-      const response = await fetch(
-        `${API_BASE_URL}/api/contracts/${contractId}/participants?member_id=${encodeURIComponent(
-          String(member.id)
-        )}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-        }
-      );
 
-      if (response.ok) {
+      // 1) 로그인 유저: 회원 participants API 사용
+      if (isLoggedIn && member?.id) {
+        const response = await fetch(
+          `${API_BASE_URL}/api/contracts/${contractId}/participants?member_id=${encodeURIComponent(
+            String(member.id)
+          )}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+          }
+        );
+
+        if (!response.ok) {
+          console.error('피보험자 정보 조회 실패');
+          return;
+        }
+
         const data = await response.json();
         if (data.success) {
-          setParticipants(data.participants || []);
+          const normalized = normalizeParticipants(data.participants || []);
+          setParticipants(normalized);
           setTotalPremium(data.totalPremium || 0);
           setHasMedicalExpense(data.hasMedicalExpense ?? true);
           if (data.insuranceType) setInsuranceType(data.insuranceType);
         }
+        return;
+      }
+
+      // 2) 비회원: non-member participants API 사용
+      const auth = readNonMemberContractAuth();
+      if (!auth) return;
+
+      let url = `${API_BASE_URL}/api/contracts/non-member/${encodeURIComponent(contractId)}/participants`;
+
+      if (auth.loginType === 'I') {
+        const birthDate = buildFullBirthDateFromSixDigits(auth.birthDate);
+        const params = new URLSearchParams({
+          name: auth.insuredName,
+          birth_date: birthDate,
+          gender: auth.gender,
+          phone: auth.phone,
+        });
+        url += `?${params.toString()}`;
       } else {
-        console.error('피보험자 정보 조회 실패');
+        const params = new URLSearchParams({
+          company_name: auth.companyName,
+          business_number: auth.businessNumber,
+          phone: auth.phone,
+        });
+        url += `?${params.toString()}`;
+      }
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        console.error('비회원 피보험자 정보 조회 실패');
+        return;
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        const fetchedParticipants = data.participants || [];
+        const normalized = normalizeParticipants(fetchedParticipants);
+        setParticipants(normalized);
+        setTotalPremium(data.totalPremium ?? data.contractInfo?.totalPremium ?? 0);
+
+        const computedHasMedicalExpense =
+          data.hasMedicalExpense ??
+          fetchedParticipants.some((p: any) => p.hasMedicalExpense === true || p.hasMedicalExpense === 1);
+        setHasMedicalExpense(computedHasMedicalExpense === 1 || computedHasMedicalExpense === true);
+
+        const insType = data.insuranceType ?? data.contractInfo?.insuranceType;
+        if (insType) setInsuranceType(insType);
       }
     } catch (error) {
       console.error('피보험자 정보 조회 오류:', error);

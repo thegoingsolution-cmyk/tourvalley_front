@@ -29,6 +29,7 @@ import RestrictedCountryModal from '@/components/travel/RestrictedCountryModal';
 import ConsentModalMobile from '@/components/mobiletravel/ConsentModalMobile';
 import { PlanType, PlanInfo, Participant, CalculatedPremiums, PaymentMethod, PaymentSubMethod } from '@/components/travel/types';
 import { frequentCountries, allCountries } from '@/components/travel/utils/countries';
+import { resolveGroupTierBucketDbPlanType, findGroupBucketPlanTypeForInsured } from '@/utils/domesticPlanTier';
 import './page.css';
 
 // 워킹홀리데이 DB plan_type (화면에 그대로 표시)
@@ -1160,6 +1161,41 @@ function MobileGroupInsuranceContent() {
     }
   };
 
+  const resolveB2cParticipantContractPlanType = (
+    p: Participant,
+    participantPremium: CalculatedPremiums['participants'][number] | undefined,
+    premiums: CalculatedPremiums | null
+  ): string => {
+    if (participantPremium?.planType) return participantPremium.planType;
+    if (hasGroupParticipants && selectedPlan) {
+      const fromBucket = findGroupBucketPlanTypeForInsured(p, selectedPlan, participantPremiumsByPlan);
+      if (fromBucket) return fromBucket;
+    }
+    if (premiums?.participants?.length) {
+      const birth = (p.birthDate || '').replace(/[^0-9]/g, '');
+      const hit = premiums.participants.find((cp) => {
+        if (cp.name !== p.name) return false;
+        const cb = (cp.birthDate || '').replace(/[^0-9]/g, '');
+        if (birth && cb) return cb === birth;
+        return true;
+      });
+      if (hit?.planType) return hit.planType;
+    }
+    return selectedPlan || '실속플랜';
+  };
+
+  const groupTierDbPlanLabels: Partial<Record<PlanType, string>> | undefined = (() => {
+    if (!hasGroupParticipants) return undefined;
+    const o: Partial<Record<PlanType, string>> = {};
+    (['실속플랜', '표준플랜', '고급플랜'] as const).forEach((k) => {
+      const b = participantPremiumsByPlan[k];
+      if (!b?.length) return;
+      const u = Array.from(new Set(b.map((x) => x.planType)));
+      if (u.length === 1) o[k] = u[0];
+    });
+    return Object.keys(o).length ? o : undefined;
+  })();
+
   const contractBreakdownText = (() => {
     if (!hasGroupParticipants || groupInsuredData.length === 0) return '';
     const counts = { adult: 0, senior: 0, child: 0 };
@@ -2062,7 +2098,7 @@ function MobileGroupInsuranceContent() {
               resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}000000`,
               gender: p.gender,
               age: age || 0,
-              plan_type: participantPremium?.planType || selectedPlan || '실속플랜',
+              plan_type: resolveB2cParticipantContractPlanType(p, participantPremium, currentCalculatedPremiums),
               premium: participantPremium?.premium || 0,
               has_medical_expense: hasMedicalExpense ? 1 : 0,
               nationality_type: nationalityType,
@@ -2241,7 +2277,7 @@ function MobileGroupInsuranceContent() {
               resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}000000`,
               gender: p.gender,
               age: age || 0,
-              plan_type: participantPremium?.planType || selectedPlan || '실속플랜',
+              plan_type: resolveB2cParticipantContractPlanType(p, participantPremium, currentCalculatedPremiums),
               premium: participantPremium?.premium || 0,
               has_medical_expense: hasMedicalExpense ? 1 : 0,
               nationality_type: nationalityType,
@@ -2370,7 +2406,7 @@ function MobileGroupInsuranceContent() {
               resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}000000`,
               gender: p.gender,
               age: age || 0,
-              plan_type: selectedPlan || '실속플랜',
+              plan_type: resolveB2cParticipantContractPlanType(p, participantPremium, currentCalculatedPremiums),
               premium: participantPremium?.premium || 0,
               has_medical_expense: hasMedicalExpense ? 1 : 0,
               nationality_type: nationalityType,
@@ -2756,6 +2792,7 @@ function MobileGroupInsuranceContent() {
               <GroupPlanSelection
                 planInfo={planInfo}
                 selectedPlan={selectedPlan}
+                groupTierDbPlanLabels={groupTierDbPlanLabels}
                 onPlanSelect={(plan) => {
                   setSelectedPlan(plan);
                   // 플랜 변경 시 calculatedPremiums 업데이트
@@ -2857,7 +2894,10 @@ function MobileGroupInsuranceContent() {
                   const insuranceType = getTitle();
                   // 단체보험은 실손/비실손 구분이 있음
                   const isMedicalExpenseParam = hasMedicalExpense ? 'true' : 'false';
-                  router.push(`/coverage-detail/m?planType=${planType}&insuranceType=${encodeURIComponent(insuranceType)}&isMedicalExpense=${isMedicalExpenseParam}&returnUrl=${returnUrl}`);
+                  const detailPlanType = hasGroupParticipants
+                    ? resolveGroupTierBucketDbPlanType(planType, participantPremiumsByPlan[planType])
+                    : planType;
+                  router.push(`/coverage-detail/m?planType=${encodeURIComponent(detailPlanType)}&insuranceType=${encodeURIComponent(insuranceType)}&isMedicalExpense=${isMedicalExpenseParam}&returnUrl=${returnUrl}`);
                 }}
                 travelCountry={activeTab !== 'DS' ? travelCountry : undefined}
                 travelPurpose={activeTab === 'FL' ? getInsuranceType() : undefined}

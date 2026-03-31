@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { PlanType, PlanInfo } from './types';
+import { isDomesticPlanCardSelected } from '@/utils/domesticPlanTier';
 
 interface PlanSelectionProps {
   planInfo: Record<string, PlanInfo>;
@@ -260,8 +261,8 @@ export default function PlanSelection({
         {(() => {
           // 플랜 표시 순서 정의: 국내여행보험과 해외장기체류보험은 실속플랜 먼저, 해외여행보험은 표준플랜 먼저
           const planDisplayOrder: PlanType[] = insuranceType === '국내여행자보험' || insuranceType === '국내여행보험' || insuranceType === '해외장기체류보험'
-            ? ['실속플랜', '표준플랜', '고급플랜', '어린이플랜', '어르신플랜1', '어르신플랜2', '워킹홀리데이실속플랜', '워킹홀리데이표준플랜', '워킹홀리데이(유로화플랜)']
-            : ['표준플랜', '실속플랜', '고급플랜', '어린이플랜', '어르신플랜1', '어르신플랜2', '워킹홀리데이실속플랜', '워킹홀리데이표준플랜', '워킹홀리데이(유로화플랜)'];
+            ? ['실속플랜', '표준플랜', '고급플랜', '어린이플랜', '어르신플랜1(실속)', '어르신플랜1(표준)', '어르신플랜1', '어르신플랜2', '워킹홀리데이실속플랜', '워킹홀리데이표준플랜', '워킹홀리데이(유로화플랜)']
+            : ['표준플랜', '실속플랜', '고급플랜', '어린이플랜', '어르신플랜1(실속)', '어르신플랜1(표준)', '어르신플랜1', '어르신플랜2', '워킹홀리데이실속플랜', '워킹홀리데이표준플랜', '워킹홀리데이(유로화플랜)'];
           
           // planInfo에서 순서대로 정렬된 플랜 목록 생성
           const sortedPlans = planDisplayOrder
@@ -281,6 +282,8 @@ export default function PlanSelection({
             '고급플랜': '고급플랜',
             '어린이플랜': '어린이플랜',
             '어르신플랜1': '어르신플랜1',
+            '어르신플랜1(실속)': '어르신플랜1(실속)',
+            '어르신플랜1(표준)': '어르신플랜1(표준)',
             '어르신플랜2': '어르신플랜2',
             '워킹홀리데이실속플랜': '워킹홀리데이실속플랜',
             '워킹홀리데이표준플랜': '워킹홀리데이표준플랜',
@@ -294,6 +297,8 @@ export default function PlanSelection({
             '고급플랜': '#2cc5ca',
             '어린이플랜': '#377af6',
             '어르신플랜1': '#377af6',
+            '어르신플랜1(실속)': '#f65b64',
+            '어르신플랜1(표준)': '#377af6',
             '어르신플랜2': '#377af6',
             '워킹홀리데이실속플랜': '#f65b64',
             '워킹홀리데이표준플랜': '#377af6',
@@ -302,7 +307,13 @@ export default function PlanSelection({
 
           // 플랜 배지 스타일 결정
           const getBadgeClass = (type: string) => {
-            if (type === '실속플랜' || type === '어린이플랜' || type === '어르신플랜1' || type === '워킹홀리데이실속플랜') {
+            if (
+              type === '실속플랜' ||
+              type === '어린이플랜' ||
+              type === '어르신플랜1' ||
+              type === '어르신플랜1(실속)' ||
+              type === '워킹홀리데이실속플랜'
+            ) {
               return 'plan-badge-economy';
             }
             return 'plan-badge-high';
@@ -321,7 +332,7 @@ export default function PlanSelection({
           return (
             <div 
               key={planType}
-              className={`plan-card ${selectedPlan === planType ? 'selected' : ''}`}
+              className={`plan-card ${isDomesticPlanCardSelected(selectedPlan, planType, insuranceType) ? 'selected' : ''}`}
               onClick={() => onPlanSelect(planType as PlanType)}
             >
               <div className="plan-header-row">

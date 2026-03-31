@@ -18,6 +18,31 @@ const normalizePlanType = (planCd: string): string => {
   return planMap[planCd] || planCd || '실속플랜';
 };
 
+/** 국내 단체: 실속/표준 등급 ↔ 피보험자 나이에 맞는 DB plan_type */
+const DOMESTIC_TIER_ORDER: { 실속: string[]; 표준: string[] } = {
+  실속: ['실속플랜', '어르신플랜1(실속)', '어르신플랜1'],
+  표준: ['표준플랜', '어르신플랜1(표준)'],
+};
+
+/** 실속·표준 동기화: 15–70세끼리 / 71세 이상끼리만 각각 묶어서 변경 (서로 영향 없음) */
+const isDomesticAdultSyncCohort = (age: number) => age >= 15 && age <= 70;
+const isDomesticSeniorSyncCohort = (age: number) => age >= 71;
+
+const getDomesticPlanTier = (planType: string): '실속' | '표준' | null => {
+  const p = normalizePlanType(planType);
+  if (DOMESTIC_TIER_ORDER.실속.includes(p)) return '실속';
+  if (DOMESTIC_TIER_ORDER.표준.includes(p)) return '표준';
+  return null;
+};
+
+const pickDomesticPlanForTier = (availablePlans: string[], tier: '실속' | '표준'): string | null => {
+  if (!availablePlans.length) return null;
+  for (const candidate of DOMESTIC_TIER_ORDER[tier]) {
+    if (availablePlans.includes(candidate)) return candidate;
+  }
+  return null;
+};
+
 export default function DomesticInsuranceStep3Page() {
   const { isLoggedIn, member, isLoading } = useAuth();
   const [corporateName, setCorporateName] = useState<string | null>(null);
@@ -334,7 +359,7 @@ export default function DomesticInsuranceStep3Page() {
   }, [selectedPlans, insuredList, availablePlansByIndex, startDate, endDate, scheduleCalculate]);
 
   const handlePlanChange = (index: number, planCd: string) => {
-    setSelectedPlans(prev => {
+    setSelectedPlans((prev) => {
       const normalizedPlan = normalizePlanType(planCd);
       const canUsePlan = (personIndex: number, plan: string) => {
         const availablePlans = availablePlansByIndex[personIndex];
@@ -343,22 +368,42 @@ export default function DomesticInsuranceStep3Page() {
         }
         return availablePlans.includes(plan);
       };
-      if (!canUsePlan(index, normalizedPlan)) {
-        return prev;
-      }
-      const newSelectedPlans = {
-        ...prev,
-        [index]: normalizedPlan
-      };
 
-      // 일반 플랜(실속/표준)인 경우에만 다른 피보험자들에게도 동일 플랜 일괄 적용
-      const normalPlans = ['실속플랜', '표준플랜'];
-      if (normalPlans.includes(normalizedPlan)) {
-        insuredList.forEach(person => {
-          if (person.index !== index && canUsePlan(person.index, normalizedPlan)) {
-            newSelectedPlans[person.index] = normalizedPlan;
+      const tier = getDomesticPlanTier(normalizedPlan);
+      const newSelectedPlans = { ...prev };
+
+      if (tier) {
+        const changer = insuredList.find((p) => p.index === index);
+        if (!changer) return prev;
+        const changerList = availablePlansByIndex[index] || [];
+        const changerPick = pickDomesticPlanForTier(changerList, tier);
+        if (!changerPick || !canUsePlan(index, changerPick)) {
+          return prev;
+        }
+        const inSameSyncGroup = (personAge: number) => {
+          if (isDomesticAdultSyncCohort(changer.age)) {
+            return isDomesticAdultSyncCohort(personAge);
           }
+          if (isDomesticSeniorSyncCohort(changer.age)) {
+            return isDomesticSeniorSyncCohort(personAge);
+          }
+          return false;
+        };
+        insuredList.forEach((person) => {
+          if (!inSameSyncGroup(person.age)) return;
+          const list = availablePlansByIndex[person.index];
+          if (!list || list.length === 0) return;
+          const picked = pickDomesticPlanForTier(list, tier);
+          if (picked) newSelectedPlans[person.index] = picked;
         });
+        queueMicrotask(() => {
+          setPlanGuideType(tier === '표준' ? 'HCW' : 'BAW');
+        });
+      } else {
+        if (!canUsePlan(index, normalizedPlan)) {
+          return prev;
+        }
+        newSelectedPlans[index] = normalizedPlan;
       }
 
       const sanitizedPlans = sanitizeSelectedPlans(newSelectedPlans);
@@ -515,11 +560,13 @@ export default function DomesticInsuranceStep3Page() {
                   <table className="specialB" border={1} cellSpacing="0">
                     <caption></caption>
                     <colgroup>
-                      <col width="13%" />
-                      <col width="25%" />
-                      <col width="15%" />
-                      <col width="15%" />
-                      <col width="15%" />
+                      <col width="12%" />
+                      <col width="22%" />
+                      <col width="11.5%" />
+                      <col width="11.5%" />
+                      <col width="11%" />
+                      <col width="11%" />
+                      <col width="11%" />
                     </colgroup>
                     <tbody>
                       <tr>
@@ -528,7 +575,10 @@ export default function DomesticInsuranceStep3Page() {
                           <strong>어린이플랜<br />(국내실손 포함)</strong>
                         </td>
                         <td className="sName ag_center" style={{ paddingRight: '5px' }}>
-                          <strong>어르신플랜<br />(국내실손 포함)</strong>
+                          <strong>어르신플랜1(실속)<br />(국내실손 포함)</strong>
+                        </td>
+                        <td className="sName ag_center" style={{ paddingRight: '5px' }}>
+                          <strong>어르신플랜1(표준)<br />(국내실손 포함)</strong>
                         </td>
                         <td className="sName ag_center" style={{ paddingRight: '5px' }}>
                           <strong>어르신플랜2<br />(국내실손 포함)</strong>
@@ -555,6 +605,7 @@ export default function DomesticInsuranceStep3Page() {
                         <td colSpan={2} className="ag_left bgcolor_04">가입연령</td>
                         <td className="ag_center bgcolor_04">0-14세</td>
                         <td className="ag_center bgcolor_04">71-90세</td>
+                        <td className="ag_center bgcolor_04">71-90세</td>
                         <td className="ag_center bgcolor_04">91-100세</td>
                         <td className="ag_center bgcolor_04">15-70세</td>
                       </tr>
@@ -563,11 +614,13 @@ export default function DomesticInsuranceStep3Page() {
                         <td className="ag_center">-</td>
                         <td className="ag_center">3,000만원</td>
                         <td className="ag_center">5,000만원</td>
+                        <td className="ag_center">5,000만원</td>
                         <td className="ag_center">1억원</td>
                       </tr>
                       <tr>
                         <td colSpan={2} className="ag_left bgcolor_red">국내여행 중 상해후유장해</td>
                         <td className="ag_center">1억원</td>
+                        <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
@@ -579,9 +632,11 @@ export default function DomesticInsuranceStep3Page() {
                         <td className="ag_center">1,000만원</td>
                         <td className="ag_center">1,000만원</td>
                         <td className="ag_center">1,000만원</td>
+                        <td className="ag_center">1,000만원</td>
                       </tr>
                       <tr>
                         <td className="ag_center bgcolor_red">국내의료비<br />(상해급여_통원_기본)</td>
+                        <td className="ag_center">10만원</td>
                         <td className="ag_center">10만원</td>
                         <td className="ag_center">10만원</td>
                         <td className="ag_center">10만원</td>
@@ -593,9 +648,11 @@ export default function DomesticInsuranceStep3Page() {
                         <td className="ag_center">1,000만원</td>
                         <td className="ag_center">1,000만원</td>
                         <td className="ag_center">1,000만원</td>
+                        <td className="ag_center">1,000만원</td>
                       </tr>
                       <tr>
                         <td className="ag_center bgcolor_red">국내의료비<br />(상해 비급여_통원_특약)</td>
+                        <td className="ag_center">10만원</td>
                         <td className="ag_center">10만원</td>
                         <td className="ag_center">10만원</td>
                         <td className="ag_center">10만원</td>
@@ -608,10 +665,12 @@ export default function DomesticInsuranceStep3Page() {
                         <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
+                        <td className="ag_center">-</td>
                       </tr>
                       <tr>
                         <td className="ag_center bgcolor_red">국내의료비<br />(질병 급여_통원_기본)</td>
                         <td className="ag_center">10만원</td>
+                        <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
@@ -622,10 +681,12 @@ export default function DomesticInsuranceStep3Page() {
                         <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
+                        <td className="ag_center">-</td>
                       </tr>
                       <tr>
                         <td className="ag_center bgcolor_red">국내의료비<br />(질병 비급여_통원_특약)</td>
                         <td className="ag_center">10만원</td>
+                        <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
@@ -637,11 +698,13 @@ export default function DomesticInsuranceStep3Page() {
                         <td className="ag_center">-</td>
                         <td className="ag_center">350만원</td>
                         <td className="ag_center">350만원</td>
+                        <td className="ag_center">350만원</td>
                       </tr>
                       <tr>
                         <td className="ag_left bgcolor_red">국내의료비<br />(주사치료특약)</td>
                         <td className="ag_center">250만원</td>
                         <td className="ag_center">-</td>
+                        <td className="ag_center">250만원</td>
                         <td className="ag_center">250만원</td>
                         <td className="ag_center">250만원</td>
                       </tr>
@@ -651,9 +714,11 @@ export default function DomesticInsuranceStep3Page() {
                         <td className="ag_center">-</td>
                         <td className="ag_center">300만원</td>
                         <td className="ag_center">300만원</td>
+                        <td className="ag_center">300만원</td>
                       </tr>
                       <tr>
                         <td colSpan={2} className="ag_left bgcolor_red">국내여행 중 질병사망 및<br />80%이상 고도후유장해</td>
+                        <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
@@ -663,6 +728,7 @@ export default function DomesticInsuranceStep3Page() {
                         <td colSpan={2} className="ag_left bgcolor_red">국내여행 중 배상책임(면책1만원)</td>
                         <td className="ag_center">500만원</td>
                         <td className="ag_center">500만원</td>
+                        <td className="ag_center">500만원</td>
                         <td className="ag_center">100만원</td>
                         <td className="ag_center">500만원</td>
                       </tr>
@@ -670,11 +736,13 @@ export default function DomesticInsuranceStep3Page() {
                         <td colSpan={2} className="ag_left bgcolor_red">국내여행 중 휴대품손해(분실제외,<br />자기부담금1만원, 이동통신단말기 보상제외)</td>
                         <td className="ag_center">50만원</td>
                         <td className="ag_center">30만원</td>
+                        <td className="ag_center">30만원</td>
                         <td className="ag_center">20만원</td>
                         <td className="ag_center">50만원</td>
                       </tr>
                       <tr>
                         <td colSpan={2} className="ag_left bgcolor_red">해외여행중 골절(치아파절제외)진단비(동일사고당 1회한)</td>
+                        <td className="ag_center">10만원</td>
                         <td className="ag_center">10만원</td>
                         <td className="ag_center">10만원</td>
                         <td className="ag_center">10만원</td>
@@ -686,6 +754,7 @@ export default function DomesticInsuranceStep3Page() {
                         <td className="ag_center">20만원</td>
                         <td className="ag_center">20만원</td>
                         <td className="ag_center">20만원</td>
+                        <td className="ag_center">20만원</td>
                       </tr>
                       <tr>
                         <td colSpan={2} className="ag_left bgcolor_red">국내여행 상해수술비(동일사고당 1회한)</td>
@@ -693,9 +762,11 @@ export default function DomesticInsuranceStep3Page() {
                         <td className="ag_center">20만원</td>
                         <td className="ag_center">20만원</td>
                         <td className="ag_center">20만원</td>
+                        <td className="ag_center">20만원</td>
                       </tr>
                       <tr>
                         <td colSpan={2} className="ag_left bgcolor_red">국내여행 깁스치료비(동일사고 또는 질병당 1회한) 단, 부목(Splint cast)치료 보상제외</td>
+                        <td className="ag_center">20만원</td>
                         <td className="ag_center">20만원</td>
                         <td className="ag_center">20만원</td>
                         <td className="ag_center">20만원</td>
@@ -707,6 +778,7 @@ export default function DomesticInsuranceStep3Page() {
                         <td colSpan={2} className="ag_left bgcolor_04">가입연령</td>
                         <td className="ag_center bgcolor_04">0-14세</td>
                         <td className="ag_center bgcolor_04">71-90세</td>
+                        <td className="ag_center bgcolor_04">71-90세</td>
                         <td className="ag_center bgcolor_04">91-100세</td>
                         <td className="ag_center bgcolor_04">15-70세</td>
                       </tr>
@@ -715,11 +787,13 @@ export default function DomesticInsuranceStep3Page() {
                         <td className="ag_center">-</td>
                         <td className="ag_center">3,000만원</td>
                         <td className="ag_center">5,000만원</td>
+                        <td className="ag_center">5,000만원</td>
                         <td className="ag_center">1억원</td>
                       </tr>
                       <tr>
                         <td colSpan={2} className="ag_left bgcolor_red">국내여행 중 상해후유장해</td>
                         <td className="ag_center">1억원</td>
+                        <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
@@ -731,9 +805,11 @@ export default function DomesticInsuranceStep3Page() {
                         <td className="ag_center">1,000만원</td>
                         <td className="ag_center">1,000만원</td>
                         <td className="ag_center">1,000만원</td>
+                        <td className="ag_center">1,000만원</td>
                       </tr>
                       <tr>
                         <td className="ag_center bgcolor_red">국내의료비<br />(상해급여_통원_기본)</td>
+                        <td className="ag_center">10만원</td>
                         <td className="ag_center">10만원</td>
                         <td className="ag_center">10만원</td>
                         <td className="ag_center">10만원</td>
@@ -745,9 +821,11 @@ export default function DomesticInsuranceStep3Page() {
                         <td className="ag_center">1,000만원</td>
                         <td className="ag_center">1,000만원</td>
                         <td className="ag_center">1,000만원</td>
+                        <td className="ag_center">1,000만원</td>
                       </tr>
                       <tr>
                         <td className="ag_center bgcolor_red">국내의료비<br />(상해 비급여_통원_특약)</td>
+                        <td className="ag_center">10만원</td>
                         <td className="ag_center">10만원</td>
                         <td className="ag_center">10만원</td>
                         <td className="ag_center">10만원</td>
@@ -759,11 +837,13 @@ export default function DomesticInsuranceStep3Page() {
                         <td className="ag_center">1,000만원</td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
+                        <td className="ag_center">-</td>
                         <td className="ag_center">1,000만원</td>
                       </tr>
                       <tr>
                         <td className="ag_center bgcolor_red">국내의료비<br />(질병 급여_통원_기본)</td>
                         <td className="ag_center">10만원</td>
+                        <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">10만원</td>
@@ -773,11 +853,13 @@ export default function DomesticInsuranceStep3Page() {
                         <td className="ag_center">1,000만원</td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
+                        <td className="ag_center">-</td>
                         <td className="ag_center">1,000만원</td>
                       </tr>
                       <tr>
                         <td className="ag_center bgcolor_red">국내의료비<br />(질병 비급여_통원_특약)</td>
                         <td className="ag_center">10만원</td>
+                        <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">10만원</td>
@@ -789,11 +871,13 @@ export default function DomesticInsuranceStep3Page() {
                         <td className="ag_center">-</td>
                         <td className="ag_center">350만원</td>
                         <td className="ag_center">350만원</td>
+                        <td className="ag_center">350만원</td>
                       </tr>
                       <tr>
                         <td className="ag_left bgcolor_red">국내의료비<br />(주사치료특약)</td>
                         <td className="ag_center">250만원</td>
                         <td className="ag_center">-</td>
+                        <td className="ag_center">250만원</td>
                         <td className="ag_center">250만원</td>
                         <td className="ag_center">250만원</td>
                       </tr>
@@ -803,9 +887,11 @@ export default function DomesticInsuranceStep3Page() {
                         <td className="ag_center">-</td>
                         <td className="ag_center">300만원</td>
                         <td className="ag_center">300만원</td>
+                        <td className="ag_center">300만원</td>
                       </tr>
                       <tr>
                         <td colSpan={2} className="ag_left bgcolor_red">국내여행 중 질병사망 및<br />80%이상 고도후유장해</td>
+                        <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
@@ -815,6 +901,7 @@ export default function DomesticInsuranceStep3Page() {
                         <td colSpan={2} className="ag_left bgcolor_red">국내여행 중 배상책임(면책1만원)</td>
                         <td className="ag_center">500만원</td>
                         <td className="ag_center">500만원</td>
+                        <td className="ag_center">500만원</td>
                         <td className="ag_center">100만원</td>
                         <td className="ag_center">1,000만원</td>
                       </tr>
@@ -822,11 +909,13 @@ export default function DomesticInsuranceStep3Page() {
                         <td colSpan={2} className="ag_left bgcolor_red">국내여행 중 휴대품손해(분실제외,<br />자기부담금1만원, 이동통신단말기 보상제외)</td>
                         <td className="ag_center">50만원</td>
                         <td className="ag_center">30만원</td>
+                        <td className="ag_center">30만원</td>
                         <td className="ag_center">20만원</td>
                         <td className="ag_center">50만원</td>
                       </tr>
                       <tr>
                         <td colSpan={2} className="ag_left bgcolor_red">해외여행중 골절(치아파절제외)진단비(동일사고당 1회한)</td>
+                        <td className="ag_center">10만원</td>
                         <td className="ag_center">10만원</td>
                         <td className="ag_center">10만원</td>
                         <td className="ag_center">10만원</td>
@@ -838,6 +927,7 @@ export default function DomesticInsuranceStep3Page() {
                         <td className="ag_center">20만원</td>
                         <td className="ag_center">20만원</td>
                         <td className="ag_center">20만원</td>
+                        <td className="ag_center">20만원</td>
                       </tr>
                       <tr>
                         <td colSpan={2} className="ag_left bgcolor_red">국내여행 상해수술비(동일사고당 1회한)</td>
@@ -845,9 +935,11 @@ export default function DomesticInsuranceStep3Page() {
                         <td className="ag_center">20만원</td>
                         <td className="ag_center">20만원</td>
                         <td className="ag_center">20만원</td>
+                        <td className="ag_center">20만원</td>
                       </tr>
                       <tr>
                         <td colSpan={2} className="ag_left bgcolor_red">국내여행 깁스치료비(동일사고 또는 질병당 1회한) 단, 부목(Splint cast)치료 보상제외</td>
+                        <td className="ag_center">20만원</td>
                         <td className="ag_center">20만원</td>
                         <td className="ag_center">20만원</td>
                         <td className="ag_center">20만원</td>

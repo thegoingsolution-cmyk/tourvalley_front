@@ -27,6 +27,21 @@ const parseDate = (dateString: string): Date | null => {
   }
 };
 
+const isValidBirthDateYYYYMMDD = (value: string): boolean => {
+  if (!/^(19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])$/.test(value)) {
+    return false;
+  }
+  const year = Number(value.slice(0, 4));
+  const month = Number(value.slice(4, 6));
+  const day = Number(value.slice(6, 8));
+  const date = new Date(year, month - 1, day);
+  return (
+    date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day
+  );
+};
+
 // 여행목적 코드 → DB 저장용 한글 라벨 (팝업 option value와 동일)
 const TRAVEL_PURPOSE_LABELS: Record<string, string> = {
   '001': '일반관광',
@@ -492,11 +507,12 @@ export default function OverseasInsuranceStep2Page() {
           continue;
         }
         
-        // 생년월일 형식 검증 (YYYYMMDD)
-        const birthRegex = /^(19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])$/;
-        if (!birthRegex.test(birthInput.value)) {
-          incompleteInsuredList.push(i);
-          continue;
+        // 생년월일 형식/실제 날짜 검증 (YYYYMMDD)
+        const insuredName = (nameInput?.value || '').trim() || `${i}번 가입자`;
+        if (!isValidBirthDateYYYYMMDD(birthInput.value)) {
+          alert(`${insuredName} 생년월일 잘못 입력 했습니다. 다시 확인 해주세요.`);
+          birthInput?.focus();
+          return;
         }
         
         // 성별 검증

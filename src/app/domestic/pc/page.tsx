@@ -26,6 +26,7 @@ import ConsentModal from '@/components/travel/ConsentModal';
 import ExcelUploadModal from '@/components/travel/ExcelUploadModal';
 import CoverageDetailModal from '@/components/travel/CoverageDetailModal';
 import { PlanType, PlanInfo, Participant, CalculatedPremiums, PaymentMethod, PaymentSubMethod, Gender } from '@/components/travel/types';
+import { pickDomesticPlanForTier, resolveDomesticPlanForParticipant } from '@/utils/domesticPlanTier';
 import './page.css';
 
 export default function PCDomesticPage() {
@@ -413,7 +414,7 @@ export default function PCDomesticPage() {
 
           const data = await response.json();
           if (data.success) {
-            const hasDiseaseCoverage = planType !== '실속플랜';
+            const hasDiseaseCoverage = planType !== '실속플랜' && planType !== '어르신플랜1(실속)';
             if (planInfo[planType]) {
               updatedPlans[planType] = {
                 ...planInfo[planType],
@@ -442,11 +443,14 @@ export default function PCDomesticPage() {
         }
       }
 
-      // 현재 선택된 플랜이 더 이상 유효하지 않으면 첫 번째 사용 가능한 플랜으로 변경
+      // 선택 플랜이 목록에 없으면 동일 등급(실속/표준)의 어르신·일반 플랜으로 맞춤
       if (selectedPlan && !updatedPlans[selectedPlan]) {
-        const availablePlans = Object.keys(updatedPlans);
-        if (availablePlans.length > 0) {
-          setSelectedPlan(availablePlans[0] as PlanType);
+        const planKeys = Object.keys(updatedPlans);
+        const resolved = resolveDomesticPlanForParticipant(selectedPlan, planKeys) as PlanType;
+        if (updatedPlans[resolved]) {
+          setSelectedPlan(resolved);
+        } else if (planKeys.length > 0) {
+          setSelectedPlan(planKeys[0] as PlanType);
         }
       }
 
@@ -605,9 +609,8 @@ export default function PCDomesticPage() {
           setIsCalculating(false);
           return;
         }
-        // STEP1에서 선택한 플랜이 허용 목록에 있으면 사용, 없으면 첫 번째 플랜
-        const planType =
-          selectedPlan && availablePlans.includes(selectedPlan) ? selectedPlan : availablePlans[0];
+        // STEP1 등급(실속/표준)을 해당 가입자 허용 ENUM(일반·어르신)에 맞게 변환
+        const planType = resolveDomesticPlanForParticipant(selectedPlan, availablePlans);
 
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/travel/calculate-premium`, {
           method: 'POST',
@@ -778,8 +781,8 @@ export default function PCDomesticPage() {
       }
 
       setPlanInfo(plans);
-      // 기본값: 실속플랜이 있으면 실속플랜, 없으면 첫 번째 플랜(어린이플랜/어르신플랜1 등)
-      const defaultPlan = (availablePlans.includes('실속플랜') ? '실속플랜' : availablePlans[0]) as PlanType;
+      // 기본: 실속 등급 우선(일반·어르신 공통), 없으면 첫 플랜
+      const defaultPlan = (pickDomesticPlanForTier(availablePlans, '실속') || availablePlans[0]) as PlanType;
       setSelectedPlan(defaultPlan);
       setShowPlanSelection(true);
     } catch (error) {
@@ -1222,7 +1225,10 @@ export default function PCDomesticPage() {
               resident_number: `${p.birthDate}-${getResidentGenderCode(p.birthDate, p.gender)}000000`,
               gender: p.gender,
               age: age || 0,
-              plan_type: selectedPlan || '실속플랜',
+              plan_type:
+                calculatedPremiums?.participants.find((cp) => cp.id === p.id)?.planType ||
+                selectedPlan ||
+                '실속플랜',
               premium: calculatedPremiums?.participants.find(cp => cp.id === p.id)?.premium || 0,
               has_medical_expense: hasMedicalExpense ? 1 : 0,
               nationality_type: nationalityType,

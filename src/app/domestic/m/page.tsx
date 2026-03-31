@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, Suspense } from 'react';
+import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { requestNicepayPayment, openNicepayWindow, processNaverPayPayment, processKakaoPayPayment } from '@/services/paymentService';
 import { getTrackingInfo } from '@/utils/tracking';
@@ -24,6 +24,7 @@ import ExcelUploadModal from '@/components/travel/ExcelUploadModal';
 import DangerousActivityModal from '@/components/travel/DangerousActivityModal';
 import ConsentModalMobile from '@/components/mobiletravel/ConsentModalMobile';
 import { PlanType, PlanInfo, Participant, CalculatedPremiums, PaymentMethod, PaymentSubMethod } from '@/components/travel/types';
+import { pickDomesticPlanForTier, resolveDomesticPlanForParticipant } from '@/utils/domesticPlanTier';
 import './page.css';
 
 function MobileDomesticStep1Content() {
@@ -274,30 +275,43 @@ function MobileDomesticStep1Content() {
     return [];
   };
 
-  // 보험료 계산 함수 (재사용 가능)
+  const fetchPlanCoverages = useCallback(async (planTypes: PlanType[], medicalExpenseValue: boolean = hasMedicalExpense) => {
+    try {
+      const response = await fetch('/api/travel/plan-coverages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          insurance_type: '국내여행보험',
+          plan_types: planTypes,
+          has_medical_expense: medicalExpenseValue ? 1 : 0,
+        }),
+      });
+      const data = await response.json();
+      if (data?.success && data.coverages) {
+        return data.coverages as Record<string, { label: string; amount: string }[]>;
+      }
+    } catch (error) {
+      console.error('보장내용 조회 실패:', error);
+    }
+    return {};
+  }, [hasMedicalExpense]);
+
+  // 보험료 재계산 (실손 포함/제외 변경 등, PC recalculatePremium과 동일한 보장·플랜 목록 처리)
   const calculatePremiums = async (medicalExpenseValue?: boolean) => {
     if (!planInfo || !selectedPlan) return;
+    if (!birthDate || birthDate.length !== 8) return;
 
-    // 나이 계산
     const age = calculateAgeFromBirthDate(birthDate);
     if (age === null) return;
 
     const medicalExpense = medicalExpenseValue !== undefined ? medicalExpenseValue : hasMedicalExpense;
-    // 현재 화면에 표시된 플랜 그대로 재계산 (planInfo 키 기준)
     let availablePlans: PlanType[] = planInfo ? (Object.keys(planInfo) as PlanType[]) : ['실속플랜', '표준플랜'];
-
-    // 기본 보장 항목 정의
-    const baseCoverages = [
-      { label: '상해사망/후유장해', amount: '3,000만원' },
-      { label: '상해의료비', amount: '100만원' },
-      { label: '질병사망', amount: '100만원' },
-      { label: '배상책임', amount: '1,000만원' },
-    ];
 
     setIsCalculating(true);
 
     try {
-      // 24시는 다음날 00시로 변환
       let departureDateFormatted = departureDate;
       let departureHour = parseInt(departureTime);
       if (departureHour === 24) {
@@ -306,7 +320,7 @@ function MobileDomesticStep1Content() {
         departureDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
         departureHour = 0;
       }
-      
+
       let arrivalDateFormatted = arrivalDate;
       let arrivalHour = parseInt(arrivalTime);
       if (arrivalHour === 24) {
@@ -315,7 +329,7 @@ function MobileDomesticStep1Content() {
         arrivalDateFormatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
         arrivalHour = 0;
       }
-      
+
       const departureDateTime = `${departureDateFormatted} ${String(departureHour).padStart(2, '0')}:00:00`;
       const arrivalDateTime = `${arrivalDateFormatted} ${String(arrivalHour).padStart(2, '0')}:00:00`;
       const genderValue = getGenderFromBirthDate(birthDate, gender);
@@ -339,7 +353,8 @@ function MobileDomesticStep1Content() {
         availablePlans = refreshedPlans;
       }
 
-      // 각 플랜별 보험료 계산 (모든 availablePlans를 계산)
+      const coveragesMap = await fetchPlanCoverages(availablePlans, medicalExpense);
+
       const plans: Record<string, PlanInfo> = {};
 
       for (const planType of availablePlans) {
@@ -366,14 +381,42 @@ function MobileDomesticStep1Content() {
 
           const data = await response.json();
           if (data.success) {
-            plans[planType] = {
-              type: planType,
-              premium: data.premium,
-              coverages: baseCoverages, // baseCoverages 사용
-            };
+            const hasDiseaseCoverage = planType !== '실속플랜' && planType !== '어르신플랜1(실속)';
+            if (planInfo[planType]) {
+              plans[planType] = {
+                ...planInfo[planType],
+                premium: data.premium,
+                coverages: coveragesMap[planType] || planInfo[planType].coverages,
+              };
+            } else {
+              plans[planType] = {
+                type: planType as PlanType,
+                premium: data.premium,
+                coverages: coveragesMap[planType] || [
+                  { label: '상해사망후유장해', amount: '1억원' },
+                  { label: '상해입원의료비', amount: '1,000만원' },
+                  { label: '상해통원의료비', amount: '10만원' },
+                  ...(hasDiseaseCoverage ? [
+                    { label: '질병입원의료비', amount: '1,000만원' },
+                    { label: '질병통원의료비', amount: '10만원' },
+                  ] : []),
+                  { label: '휴대품손해(휴대폰은 보상제외)', amount: '50만원' },
+                ],
+              };
+            }
           }
         } catch (error) {
           console.error(`보험료 계산 오류 (${planType}):`, error);
+        }
+      }
+
+      const planKeys = Object.keys(plans);
+      if (selectedPlan && !plans[selectedPlan]) {
+        const resolved = resolveDomesticPlanForParticipant(selectedPlan, planKeys) as PlanType;
+        if (plans[resolved]) {
+          setSelectedPlan(resolved);
+        } else if (planKeys.length > 0) {
+          setSelectedPlan(planKeys[0] as PlanType);
         }
       }
 
@@ -486,29 +529,7 @@ function MobileDomesticStep1Content() {
       alert('가입 가능한 플랜이 없습니다.');
       return;
     }
-    const fetchPlanCoverages = async (planTypes: PlanType[]) => {
-      try {
-        const response = await fetch('/api/travel/plan-coverages', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            insurance_type: '국내여행보험',
-            plan_types: planTypes,
-            has_medical_expense: hasMedicalExpense ? 1 : 0,
-          }),
-        });
-        const data = await response.json();
-        if (data?.success && data.coverages) {
-          return data.coverages as Record<string, { label: string; amount: string }[]>;
-        }
-      } catch (error) {
-        console.error('보장내용 조회 실패:', error);
-      }
-      return {};
-    };
-    const coveragesMap = await fetchPlanCoverages(availablePlans);
+    const coveragesMap = await fetchPlanCoverages(availablePlans, hasMedicalExpense);
 
     setIsCalculating(true);
 
@@ -582,7 +603,8 @@ function MobileDomesticStep1Content() {
       }
 
       setPlanInfo(plans);
-      setSelectedPlan(availablePlans[0]);
+      const defaultPlan = (pickDomesticPlanForTier(availablePlans, '실속') || availablePlans[0]) as PlanType;
+      setSelectedPlan(defaultPlan);
       setShowPlanSelection(true);
       
       // 상태를 localStorage에 저장 (coverage-detail 페이지에서 돌아올 때 복원용)
@@ -590,7 +612,7 @@ function MobileDomesticStep1Content() {
         localStorage.setItem('domestic_m_state', JSON.stringify({
           showPlanSelection: true,
           planInfo: plans,
-          selectedPlan: availablePlans[0],
+          selectedPlan: defaultPlan,
           hasMedicalExpense,
           departureDate,
           departureTime,
@@ -755,9 +777,7 @@ function MobileDomesticStep1Content() {
           setIsCalculating(false);
           return;
         }
-        // STEP1에서 선택한 플랜이 허용 목록에 있으면 사용, 없으면 첫 번째 플랜
-        const planType =
-          selectedPlan && availablePlans.includes(selectedPlan) ? selectedPlan : availablePlans[0];
+        const planType = resolveDomesticPlanForParticipant(selectedPlan, availablePlans);
 
         const response = await fetch('/api/travel/calculate-premium', {
           method: 'POST',
