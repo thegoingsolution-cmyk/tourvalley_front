@@ -2,7 +2,8 @@
  * SEO 공통 설정 (네이버 서치어드바이저, 구글 검색 대응)
  * - NEXT_PUBLIC_SITE_URL: 실제 서비스 도메인 (예: https://www.tourvalley.net)
  * - NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION: 구글 Search Console 소유 확인 메타 content 값
- * - NEXT_PUBLIC_NAVER_SITE_VERIFICATION: 네이버 서치어드바이저 소유 확인 메타 content 값
+ * - NEXT_PUBLIC_NAVER_SITE_VERIFICATION: 네이버 서치어드바이저 소유 확인 (예: www / https://tourvalley.net)
+ * - NEXT_PUBLIC_NAVER_SITE_VERIFICATION_M: 네이버 서치어드바이저 소유 확인 (예: https://m.tourvalley.net)
  */
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || 'https://www.tourvalley.net';
@@ -10,6 +11,7 @@ export const SITE_URL =
 export const VERIFICATION = {
   google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
   naver: process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION || undefined,
+  naverMobile: process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION_M || undefined,
 };
 
 export const SEO_DEFAULT = {

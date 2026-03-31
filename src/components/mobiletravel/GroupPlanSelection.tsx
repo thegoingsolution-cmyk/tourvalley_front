@@ -19,6 +19,8 @@ interface GroupPlanSelectionProps {
   travelCountry?: string;
   travelPurpose?: string; // 여행목적 (워킹홀리데이인 경우 통화 플랜 선택 숨김)
   hideMedicalExpenseOption?: boolean; // 국내실손의료비 보장 옵션 숨김 여부
+  /** 단체: 카드 키(실속/표준/고급)에 대해 버킷 내 plan_type이 하나일 때 배지에 실제 DB 플랜명 */
+  groupTierDbPlanLabels?: Partial<Record<PlanType, string>>;
 }
 
 const STANDARD_PLAN_LABELS = ['실속플랜', '표준플랜', '고급플랜'] as const;
@@ -67,6 +69,7 @@ export default function GroupPlanSelection({
   travelCountry,
   travelPurpose,
   hideMedicalExpenseOption = false,
+  groupTierDbPlanLabels,
 }: GroupPlanSelectionProps) {
   const [exchangeRate, setExchangeRate] = useState<{ rate: number; date: string; currency: string } | null>(null);
   const [supportedCurrency, setSupportedCurrency] = useState<'USD' | 'EUR'>('USD');
@@ -200,13 +203,16 @@ export default function GroupPlanSelection({
       <div className="plans-container">
         {buildDisplayPlanEntries(planInfo)
           .sort((a, b) => a.sortTier - b.sortTier)
-          .map(({ planType, plan, displayName }) => {
+          .map(({ planType, plan, displayName: tierDisplayName }) => {
+            const badgeLabel = groupTierDbPlanLabels?.[planType as PlanType] ?? tierDisplayName;
             const planBadgeColors: Record<string, string> = {
               '실속플랜': '#f65b64',
               '표준플랜': '#377af6',
               '고급플랜': '#2cc5ca',
               '어린이플랜': '#377af6',
               '어르신플랜1': '#377af6',
+              '어르신플랜1(실속)': '#f65b64',
+              '어르신플랜1(표준)': '#377af6',
               '어르신플랜2': '#377af6',
               '워킹홀리데이실속플랜': '#f65b64',
               '워킹홀리데이표준플랜': '#377af6',
@@ -214,7 +220,7 @@ export default function GroupPlanSelection({
             };
 
             const getBadgeClass = (type: string) => {
-              if (type === '실속플랜' || type === '어린이플랜' || type === '어르신플랜1' || type === '워킹홀리데이실속플랜') {
+              if (type === '실속플랜' || type === '어린이플랜' || type === '어르신플랜1' || type === '어르신플랜1(실속)' || type === '워킹홀리데이실속플랜') {
                 return 'plan-badge-economy';
               }
               return 'plan-badge-high';
@@ -224,6 +230,9 @@ export default function GroupPlanSelection({
               return planBadgeColors[type] || '#999';
             };
 
+            const styleKey =
+              planBadgeColors[badgeLabel] !== undefined ? badgeLabel : tierDisplayName;
+
             return (
               <div 
                 key={planType}
@@ -232,13 +241,13 @@ export default function GroupPlanSelection({
               >
                 <div className="plan-header-row">
                   <div
-                    className={`plan-badge ${getBadgeClass(displayName)}`}
+                    className={`plan-badge ${getBadgeClass(styleKey)}`}
                     style={{
-                      background: getBadgeColor(displayName),
+                      background: getBadgeColor(styleKey),
                       color: '#fff'
                     }}
                   >
-                    {displayName}
+                    {badgeLabel}
                   </div>
                   <div className="plan-price">{plan.premium.toLocaleString()}원</div>
                 </div>
