@@ -2,15 +2,27 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/Header';
+import Header, { CORPORATE_USE_GROUP_INSURANCE_MSG } from '@/components/Header';
 import Footer from '@/components/Footer';
+import { useAuth } from '@/contexts/AuthContext';
 import './page.css';
 
 export default function DomesticStepPage() {
   const router = useRouter();
+  const { isLoggedIn, member } = useAuth();
 
   const goToDomesticPage = (type: string) => {
     router.push(`/domestic/m?type=${type}`);
+  };
+
+  const handleIndividualEntry = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isLoggedIn && member?.member_type === '법인') {
+      alert(CORPORATE_USE_GROUP_INSURANCE_MSG);
+      router.push('/group-insurance/m');
+      return;
+    }
+    goToDomesticPage('individual');
   };
 
   return (
@@ -26,10 +38,7 @@ export default function DomesticStepPage() {
                 <p className="tour2023_intro_txt06 tourG_mab05">개인, 단체 누구나! 국내 어디든 안전하게!</p>
                 <a
                   href="javascript:void(0);"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    goToDomesticPage('individual');
-                  }}
+                  onClick={handleIndividualEntry}
                 >
                   <div className="tour2023_intro_box04">
                     <p className="tour2023_intro_txt11">국내여행 보험료 확인</p>

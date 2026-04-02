@@ -2,16 +2,22 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/Header';
+import Header, { CORPORATE_USE_GROUP_INSURANCE_MSG } from '@/components/Header';
 import Footer from '@/components/Footer';
+import { useAuth } from '@/contexts/AuthContext';
 import './page.css';
 
 export default function OverseasStepPage() {
   const router = useRouter();
+  const { isLoggedIn, member } = useAuth();
 
-  const goToOverseasPage = (type: string) => {
-    // 해외여행보험 페이지로 이동
-    router.push(`/overseas?type=${type}`);
+  const blockCorporateThen = (nav: () => void) => {
+    if (isLoggedIn && member?.member_type === '법인') {
+      alert(CORPORATE_USE_GROUP_INSURANCE_MSG);
+      router.push('/group-insurance/m');
+      return;
+    }
+    nav();
   };
 
   return (
@@ -28,7 +34,9 @@ export default function OverseasStepPage() {
                 
                 <section className="tour2023_intro_BWrap">
                   <div 
-                    onClick={() => router.push('/overseas/m?type=short')}
+                    onClick={() =>
+                      blockCorporateThen(() => router.push('/overseas/m?type=short'))
+                    }
                     style={{ cursor: 'pointer' }}
                   >
                     <div className="tour2023_intro_box02">
@@ -39,7 +47,9 @@ export default function OverseasStepPage() {
                   </div>
                   
                   <div 
-                    onClick={() => router.push('/long-term-stay/m')}
+                    onClick={() =>
+                      blockCorporateThen(() => router.push('/long-term-stay/m'))
+                    }
                     style={{ cursor: 'pointer' }}
                   >
                     <div className="tour2023_intro_box03">

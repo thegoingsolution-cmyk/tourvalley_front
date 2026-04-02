@@ -2,15 +2,17 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/Header';
+import Header, { CORPORATE_USE_GROUP_INSURANCE_MSG } from '@/components/Header';
 import Footer from '@/components/Footer';
 import AccidentFreeCashModal from '@/components/travel/AccidentFreeCashModal';
 import { getImagePath } from '@/utils/path';
+import { useAuth } from '@/contexts/AuthContext';
 import './page.css';
 
 export default function PCMainPage() {
   const router = useRouter();
   const [showCashModal, setShowCashModal] = useState(false);
+  const { isLoggedIn, member } = useAuth();
 
   const openGroupInsurancePopup = () => {
     const width = 1200;
@@ -23,6 +25,15 @@ export default function PCMainPage() {
       'groupInsurancePopup',
       `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
     );
+  };
+
+  const routeOrGuideCorporate = (route: string) => {
+    if (isLoggedIn && member?.member_type === '법인') {
+      alert(CORPORATE_USE_GROUP_INSURANCE_MSG);
+      openGroupInsurancePopup();
+      return;
+    }
+    router.push(route);
   };
 
   return (
@@ -57,7 +68,7 @@ export default function PCMainPage() {
                       가족여행, 야유회, 등산, 낚시, 캠핑 등..<br />
                       <span className="card-title-bold">국내 어디라도 안전하게~</span>
                     </p>
-                    <button className="card-button" onClick={() => router.push('/domestic')}>
+                    <button className="card-button" onClick={() => routeOrGuideCorporate('/domestic')}>
                       국내 여행자보험 <img src={getImagePath('/images/link_more.png')} alt="" className="card-button-arrow" />
                     </button>
                     <div className="card-illustration">
@@ -75,7 +86,7 @@ export default function PCMainPage() {
                       <span className="card-title-bold">3개월 이하</span><br />
                       해외여행, 골프, 배낭여행, 단기출장,<br />어학연수 등
                     </p>
-                    <button className="card-button" onClick={() => router.push('/overseas')}>
+                    <button className="card-button" onClick={() => routeOrGuideCorporate('/overseas')}>
                       해외 여행자보험 <img src={getImagePath('/images/link_more.png')} alt="" className="card-button-arrow" />
                     </button>
                     <div className="card-illustration">
@@ -96,7 +107,7 @@ export default function PCMainPage() {
                       <span className="card-title-bold">3개월 초과</span><br />
                       유학, 어학연수, 출장, 주재원,<br />워킹홀리데이 등
                     </p>
-                    <button className="card-button" onClick={() => router.push('/long-term-stay')}>
+                    <button className="card-button" onClick={() => routeOrGuideCorporate('/long-term-stay')}>
                       해외장기체류보험 <img src={getImagePath('/images/link_more.png')} alt="" className="card-button-arrow" />
                     </button>
                     <div className="card-illustration">
@@ -217,7 +228,7 @@ export default function PCMainPage() {
         {/* Bottom Navigation Icons */}
         <section className="bottom-nav">
           <div className="bottom-nav-container">
-            <div className="nav-icon-item" onClick={() => router.push('/domestic')}>
+            <div className="nav-icon-item" onClick={() => routeOrGuideCorporate('/domestic')}>
               <img
                 src={getImagePath('/bottom-menu/b_menu01.png')}
                 alt="국내 여행자보험"
@@ -225,7 +236,7 @@ export default function PCMainPage() {
               />
               <span className="nav-icon-label">국내<br />여행자보험</span>
             </div>
-            <div className="nav-icon-item" onClick={() => router.push('/overseas')}>
+            <div className="nav-icon-item" onClick={() => routeOrGuideCorporate('/overseas')}>
               <img
                 src={getImagePath('/bottom-menu/b_menu02.png')}
                 alt="해외 여행자보험"
@@ -233,7 +244,7 @@ export default function PCMainPage() {
               />
               <span className="nav-icon-label">해외<br />여행자보험</span>
             </div>
-            <div className="nav-icon-item" onClick={() => router.push('/long-term-stay')}>
+            <div className="nav-icon-item" onClick={() => routeOrGuideCorporate('/long-term-stay')}>
               <img
                 src={getImagePath('/bottom-menu/b_menu03.png')}
                 alt="해외 장기체류보험"

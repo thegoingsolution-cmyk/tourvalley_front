@@ -2,12 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { getImagePath } from '@/utils/path';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCorporateMemberInfo } from '@/services/authService';
 import ServiceModal from './ServiceModal';
 import './Header.css';
+
+export const CORPORATE_USE_GROUP_INSURANCE_MSG =
+  '고객님은 법인회원이십니다. 법인단체계약으로 가입하시기 바랍니다.';
 
 interface HeaderProps {
   isMobile?: boolean;
@@ -19,6 +22,7 @@ export default function Header({ isMobile = false, onOpenAccidentFreeCashModal }
   const [isServiceModalOpen, setIsServiceModalOpen] = useState<boolean>(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   // 단체여행보험 팝업 열기 (화면 가운데, 멀티모니터·태스크바 고려)
   const openGroupInsurancePopup = () => {
@@ -37,6 +41,7 @@ export default function Header({ isMobile = false, onOpenAccidentFreeCashModal }
   
   // 인증 상태 가져오기
   const { isLoggedIn, member, logout, isLoading } = useAuth();
+  const isCorporateLoggedIn = Boolean(isLoggedIn && member && member.member_type === '법인');
   const [corporateName, setCorporateName] = useState<string | null>(null);
 
   // 법인 회원일 경우 법인명 가져오기
@@ -179,18 +184,57 @@ export default function Header({ isMobile = false, onOpenAccidentFreeCashModal }
               </button>
             </div>
             <div className="mobile-menu-content">
-              <Link href="/overseas" className="mobile-menu-item" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link
+                href="/overseas"
+                className="mobile-menu-item"
+                onClick={(e) => {
+                  if (isCorporateLoggedIn) {
+                    e.preventDefault();
+                    alert(CORPORATE_USE_GROUP_INSURANCE_MSG);
+                    setIsMobileMenuOpen(false);
+                    router.push('/group-insurance');
+                    return;
+                  }
+                  setIsMobileMenuOpen(false);
+                }}
+              >
                 <span className="mobile-menu-text">해외여행자보험</span>
                 <span className="mobile-menu-arrow">›</span>
               </Link>
-              <Link href="/long-term-stay" className="mobile-menu-item" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link
+                href="/long-term-stay"
+                className="mobile-menu-item"
+                onClick={(e) => {
+                  if (isCorporateLoggedIn) {
+                    e.preventDefault();
+                    alert(CORPORATE_USE_GROUP_INSURANCE_MSG);
+                    setIsMobileMenuOpen(false);
+                    router.push('/group-insurance');
+                    return;
+                  }
+                  setIsMobileMenuOpen(false);
+                }}
+              >
                 <div className="mobile-menu-text-wrapper">
                   <span className="mobile-menu-text">해외장기체류보험 (3개월초과)</span>
                   <span className="mobile-menu-subtext">(유학,주재원,워킹홀리데이)</span>
                 </div>
                 <span className="mobile-menu-arrow">›</span>
               </Link>
-              <Link href="/domestic" className="mobile-menu-item" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link
+                href="/domestic"
+                className="mobile-menu-item"
+                onClick={(e) => {
+                  if (isCorporateLoggedIn) {
+                    e.preventDefault();
+                    alert(CORPORATE_USE_GROUP_INSURANCE_MSG);
+                    setIsMobileMenuOpen(false);
+                    router.push('/group-insurance');
+                    return;
+                  }
+                  setIsMobileMenuOpen(false);
+                }}
+              >
                 <span className="mobile-menu-text">국내여행자보험</span>
                 <span className="mobile-menu-arrow">›</span>
               </Link>
@@ -312,18 +356,39 @@ export default function Header({ isMobile = false, onOpenAccidentFreeCashModal }
           <Link 
             href="/domestic" 
             className={`nav-link ${pathname?.startsWith('/domestic') ? 'active' : ''}`}
+            onClick={(e) => {
+              if (isCorporateLoggedIn) {
+                e.preventDefault();
+                alert(CORPORATE_USE_GROUP_INSURANCE_MSG);
+                openGroupInsurancePopup();
+              }
+            }}
           >
             국내여행보험
           </Link>
           <Link 
             href="/overseas" 
             className={`nav-link ${pathname?.startsWith('/overseas') ? 'active' : ''}`}
+            onClick={(e) => {
+              if (isCorporateLoggedIn) {
+                e.preventDefault();
+                alert(CORPORATE_USE_GROUP_INSURANCE_MSG);
+                openGroupInsurancePopup();
+              }
+            }}
           >
             해외여행보험
           </Link>
           <Link 
             href="/long-term-stay" 
             className={`nav-link ${pathname?.startsWith('/long-term-stay') ? 'active' : ''}`}
+            onClick={(e) => {
+              if (isCorporateLoggedIn) {
+                e.preventDefault();
+                alert(CORPORATE_USE_GROUP_INSURANCE_MSG);
+                openGroupInsurancePopup();
+              }
+            }}
           >
             해외장기체류보험
           </Link>
