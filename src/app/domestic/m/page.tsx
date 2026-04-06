@@ -1684,7 +1684,7 @@ function MobileDomesticStep1Content() {
           
           <ContractInfoStep
             insuranceType={getTitle()}
-            insuranceCompany="메리츠화재"
+            insuranceCompany="라이나손해"
             departureDate={departureDate}
             departureTime={departureTime}
             arrivalDate={arrivalDate}

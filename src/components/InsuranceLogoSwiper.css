@@ -1,0 +1,160 @@
+.insurance-logo-swiper {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+  box-sizing: border-box;
+}
+
+.insurance-logo-swiper--pc {
+  max-width: 100%;
+  padding: 0 0 0.75rem;
+  box-sizing: border-box;
+  border-top: none;
+  border-bottom: none;
+}
+
+.insurance-logo-swiper--mobile {
+  padding: 0 0 0.5rem;
+  margin-bottom: 0.35rem;
+  box-sizing: border-box;
+}
+
+.insurance-logo-swiper__root.swiper {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 슬라이드가 화살표와 겹치지 않도록 트랙 영역만 안쪽 여백 */
+.insurance-logo-swiper--pc .insurance-logo-swiper__root.swiper {
+  padding-left: 44px;
+  padding-right: 44px;
+  height: auto;
+}
+
+/* PC 그리드(2줄): % 기반 행 높이로 커지는 여백 방지 — 행 높이 고정 */
+.insurance-logo-swiper--pc .insurance-logo-swiper__root .swiper-slide {
+  height: 92px !important;
+}
+
+.insurance-logo-swiper--pc .insurance-logo-swiper__img {
+  max-height: 78px;
+}
+
+.insurance-logo-swiper--mobile .insurance-logo-swiper__root.swiper {
+  padding-left: 26px;
+  padding-right: 26px;
+}
+
+.insurance-logo-swiper__slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.insurance-logo-swiper__slide-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 102px;
+  padding: 0.35rem 0.25rem;
+  box-sizing: border-box;
+}
+
+/* 모바일: 한 줄 4칸 유지, 세로만 조금 여유 있게 */
+.insurance-logo-swiper--mobile .insurance-logo-swiper__slide-inner {
+  min-height: 0;
+  height: 48px;
+  padding: 0.15rem 0.08rem;
+  box-sizing: border-box;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* PC 그리드(2줄×6칸): 셀 높이를 스와이퍼가 지정 */
+.insurance-logo-swiper--pc .insurance-logo-swiper__slide-inner {
+  min-height: 0;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.insurance-logo-swiper__img {
+  max-width: 100%;
+  max-height: 96px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+/* 모바일: Swiper transform 합성 시 번짐 완화 */
+.insurance-logo-swiper--mobile .insurance-logo-swiper__slide {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.insurance-logo-swiper--mobile .insurance-logo-swiper__img {
+  display: block;
+  flex-shrink: 0;
+  max-width: 100%;
+  max-height: 30px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
+  image-rendering: auto;
+}
+
+.insurance-logo-swiper .swiper-button-prev,
+.insurance-logo-swiper .swiper-button-next {
+  width: 32px;
+  height: 32px;
+  margin-top: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #e0e0e0;
+  color: #333;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.insurance-logo-swiper .swiper-button-prev::after,
+.insurance-logo-swiper .swiper-button-next::after {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.insurance-logo-swiper--mobile .swiper-button-prev,
+.insurance-logo-swiper--mobile .swiper-button-next {
+  width: 26px;
+  height: 26px;
+}
+
+.insurance-logo-swiper--mobile .swiper-button-prev::after,
+.insurance-logo-swiper--mobile .swiper-button-next::after {
+  font-size: 11px;
+}
+
+/* 화살표는 패딩 구역(슬라이드 밖)에 붙여 로고와 분리 */
+.insurance-logo-swiper--pc .swiper-button-prev {
+  left: 4px;
+}
+
+.insurance-logo-swiper--pc .swiper-button-next {
+  right: 4px;
+}
+
+.insurance-logo-swiper--mobile .swiper-button-prev {
+  left: 2px;
+}
+
+.insurance-logo-swiper--mobile .swiper-button-next {
+  right: 2px;
+}
+
+.insurance-logo-swiper .swiper-button-prev.swiper-button-disabled,
+.insurance-logo-swiper .swiper-button-next.swiper-button-disabled {
+  opacity: 0.35;
+}

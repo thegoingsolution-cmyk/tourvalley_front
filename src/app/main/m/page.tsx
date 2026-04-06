@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { getImagePath } from '@/utils/path';
+import InsuranceLogoSwiper from '@/components/InsuranceLogoSwiper';
 import './page.css';
 
 export default function MobileMainPage() {
@@ -85,6 +85,13 @@ export default function MobileMainPage() {
             </div>
           </div>
         </section>
+
+        <div
+          className="bgcolor_white prow_01 essential_Wrap"
+          style={{ paddingTop: 0, paddingBottom: 20 }}
+        >
+          <InsuranceLogoSwiper variant="mobile" />
+        </div>
 
         {/* Disclaimer */}
         <div className="bgcolor_white prow_01 ptb20 essential_Wrap" style={{textAlign: 'center'}}>

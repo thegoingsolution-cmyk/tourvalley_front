@@ -8,6 +8,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCorporateMemberInfo } from '@/services/authService';
 import { Participant } from '@/components/travel/types';
+import { calculateAgeAndGenderFromResidentNumber, calculateInsuranceAge } from '@/utils/age';
 import '../../popup/page.css';
 
 // 한국어 locale 등록
@@ -500,6 +501,40 @@ export default function DomesticInsuranceStep2Page() {
       
       // 모든 필수 필드가 입력된 경우
       validatedInsuredList.push(i);
+    }
+
+    const overMaxInsuranceAge: { seq: number; name: string }[] = [];
+    for (const i of validatedInsuredList) {
+      const nameInput = document.querySelector(`input[name="insured_name_${i}"]`) as HTMLInputElement;
+      const birthInput = document.querySelector(`input[name="birth_${i}"]`) as HTMLInputElement;
+      const countryTypeSelect = document.querySelector(`select[name="country_type_${i}"]`) as HTMLSelectElement;
+      const ssn1Input = document.querySelector(`input[name="insured_ssn1_${i}"]`) as HTMLInputElement;
+      const ssn2Input = document.querySelector(`input[name="insured_ssn2_${i}"]`) as HTMLInputElement;
+      const countryType = countryTypeSelect?.value || 'D';
+      const displayName = (nameInput?.value || '').trim() || `${i}번 가입자`;
+      if (countryType === 'D') {
+        const birth = birthInput?.value || '';
+        if (birth.length === 8) {
+          const y = parseInt(birth.substring(0, 4), 10);
+          const m = parseInt(birth.substring(4, 6), 10);
+          const d = parseInt(birth.substring(6, 8), 10);
+          if (!Number.isNaN(y) && !Number.isNaN(m) && !Number.isNaN(d)) {
+            const insuranceAge = calculateInsuranceAge(y, m, d);
+            if (insuranceAge > 100) overMaxInsuranceAge.push({ seq: i, name: displayName });
+          }
+        }
+      } else {
+        const full = (ssn1Input?.value || '') + (ssn2Input?.value || '');
+        if (full.length >= 7) {
+          const { age } = calculateAgeAndGenderFromResidentNumber(full);
+          if (age > 100) overMaxInsuranceAge.push({ seq: i, name: displayName });
+        }
+      }
+    }
+    if (overMaxInsuranceAge.length > 0) {
+      const lines = overMaxInsuranceAge.map((r) => `${r.seq} ${r.name}`).join('\n');
+      alert(`${lines}\n\n101세 이상은 보험가입이 불가합니다.`);
+      return;
     }
     
     // 일부만 입력된 경우 확인 메시지 표시

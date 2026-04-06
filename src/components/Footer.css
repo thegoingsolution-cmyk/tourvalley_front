@@ -2,9 +2,17 @@
 .footer-pc {
   width: 100%;
   background: #fff;
-  padding-top: 2rem;
+  padding-top: 0;
   padding-bottom: 0.5rem;
-  margin-top: 1rem;
+  margin-top: 0rem;
+}
+
+/* 메인(hero / blocks / bottom-nav)과 동일한 가로 폭 · 좌우 정렬 */
+.footer-pc-main-width {
+  max-width: 980px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .footer-pc-container {
@@ -28,11 +36,61 @@
   margin: 25px 0 15px 0;
 }
 
+.footer-pc-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem 0.35rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.25rem;
+  border: 0;
+  border-bottom: none;
+  box-shadow: none;
+}
+
+.footer-pc-side {
+  flex: 1;
+  min-width: 0;
+  padding-left: 30px;
+}
+
+.footer-pc-nav-link {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+  color: #484a4f;
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0.2rem 0.15rem;
+  cursor: pointer;
+  font-family: inherit;
+  line-height: 1.4;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+
+.footer-pc-nav-link:hover {
+  color: #000;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.footer-pc-nav-sep {
+  color: #c5c7cc;
+  font-size: 13px;
+  font-weight: 300;
+  user-select: none;
+  padding: 0 0.1rem;
+}
+
 .footer-pc-content {
   display: flex;
   gap: 2rem;
   align-items: flex-start;
   justify-content: center;
+  border: 0;
+  border-top: none;
 }
 
 .footer-pc-logo {
@@ -40,7 +98,7 @@
 }
 
 .footer-pc-info {
-  flex: 1;
+  width: 100%;
 }
 
 .footer-pc-info p {
@@ -50,7 +108,7 @@
   color: #95979d;
   line-height: 140%;
   text-align: left;
-  margin-left: 30px;
+  margin-left: 0;
 }
 
 .footer-pc-info .footer-pc-info-company {
@@ -196,6 +254,29 @@
 
 .company-modal-close-btn:hover {
   background-color: #555;
+}
+
+.footer-agency-reg-link {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.footer-mobile-info .footer-agency-reg-link {
+  color: #fff;
+}
+
+.company-modal-content .footer-agency-reg-link,
+.footer-pc-info .footer-agency-reg-link {
+  color: #1a56db;
+}
+
+.footer-pc-info .footer-agency-reg-link:hover,
+.company-modal-content .footer-agency-reg-link:hover {
+  color: #1447b8;
+}
+
+.footer-mobile-info .footer-agency-reg-link:hover {
+  color: #e8e8e8;
 }
 
 
