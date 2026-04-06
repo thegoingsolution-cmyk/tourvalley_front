@@ -11,9 +11,10 @@ const AGENCY_REGISTRATION_PDF = '/images/대리점등록증.pdf';
 
 interface FooterProps {
   isMobile?: boolean;
+  showPcInsuranceLogos?: boolean;
 }
 
-export default function Footer({ isMobile = false }: FooterProps) {
+export default function Footer({ isMobile = false, showPcInsuranceLogos = false }: FooterProps) {
   const router = useRouter();
   const [logoError, setLogoError] = useState<boolean>(false);
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState<boolean>(false);
@@ -103,9 +104,11 @@ export default function Footer({ isMobile = false }: FooterProps) {
   return (
     <>
       <footer className="footer-pc">
-        <div className="footer-pc-main-width">
-          <InsuranceLogoSwiper variant="pc" />
-        </div>
+        {showPcInsuranceLogos && (
+          <div className="footer-pc-main-width">
+            <InsuranceLogoSwiper variant="pc" />
+          </div>
+        )}
         <div className="footer-pc-container">
           <div className="footer-pc-disclaimer">
             <p>※본 광고는 광고심의기준을 준수하였으며, 유효기간은 심의일로부터 1년입니다.<br />준법감시필 제2026-광고T-001(2026.03.04-2027-03.03)</p>

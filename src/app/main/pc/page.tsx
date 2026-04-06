@@ -296,7 +296,7 @@ export default function PCMainPage() {
         </section>
       </main>
 
-      <Footer isMobile={false} />
+      <Footer isMobile={false} showPcInsuranceLogos />
 
       {/* 무사고캐시 모달 */}
       <AccidentFreeCashModal
