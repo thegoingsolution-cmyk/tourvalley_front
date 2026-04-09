@@ -2,11 +2,6 @@
 
 import React, { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
-import {
-  readNonMemberContractAuth,
-  buildFullBirthDateFromSixDigits,
-} from '@/utils/nonMemberContractAuth';
 
 type ContractDetail = {
   insuranceType?: string;
@@ -43,11 +38,13 @@ const getInsuranceTypeDisplay = (insuranceType?: string) => {
 };
 
 function BankTransferReceiptContent() {
+  const BANK_RECEIPT_VERIFY_KEY_PREFIX = 'bank_receipt_verified_';
+  const VERIFY_MAX_AGE_MS = 10 * 60 * 1000;
   const searchParams = useSearchParams();
   const contractId = searchParams.get('contractId');
-  const { isLoggedIn, member, isLoading: authLoading } = useAuth();
   const [detail, setDetail] = useState<ContractDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [accessDenied, setAccessDenied] = useState(false);
   const [scale, setScale] = useState(1);
 
   useEffect(() => {
@@ -56,58 +53,30 @@ function BankTransferReceiptContent() {
       setDetail(null);
       return;
     }
-    if (authLoading) return;
+
+    const key = `${BANK_RECEIPT_VERIFY_KEY_PREFIX}${contractId}`;
+    const verifiedAtRaw = localStorage.getItem(key);
+    const verifiedAt = verifiedAtRaw ? Number(verifiedAtRaw) : 0;
+    if (!verifiedAt || Number.isNaN(verifiedAt) || Date.now() - verifiedAt > VERIFY_MAX_AGE_MS) {
+      setLoading(false);
+      setDetail(null);
+      setAccessDenied(true);
+      if (verifiedAtRaw) {
+        localStorage.removeItem(key);
+      }
+      return;
+    }
+    // 인증 체크 통과 즉시 사용 완료 처리(재사용 방지)
+    localStorage.removeItem(key);
 
     const fetchDetail = async () => {
       setLoading(true);
       setDetail(null);
+      setAccessDenied(false);
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
       try {
-        if (isLoggedIn && member?.id) {
-          const response = await fetch(
-            `${API_BASE_URL}/api/contracts/detail/${contractId}?member_id=${encodeURIComponent(
-              String(member.id)
-            )}`,
-            {
-              method: 'GET',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              credentials: 'include',
-            }
-          );
-          if (!response.ok) return;
-          const data = await response.json();
-          if (data?.success && data?.contract) {
-            setDetail(data.contract as ContractDetail);
-          }
-          return;
-        }
-
-        const auth = readNonMemberContractAuth();
-        if (!auth) {
-          return;
-        }
-
-        let url = `${API_BASE_URL}/api/contracts/non-member/detail/${encodeURIComponent(contractId)}?`;
-        if (auth.loginType === 'I') {
-          const birth = buildFullBirthDateFromSixDigits(auth.birthDate);
-          url += new URLSearchParams({
-            name: auth.insuredName,
-            birth_date: birth,
-            gender: auth.gender,
-            phone: auth.phone,
-          }).toString();
-        } else {
-          url += new URLSearchParams({
-            company_name: auth.companyName,
-            business_number: auth.businessNumber,
-            phone: auth.phone,
-          }).toString();
-        }
-
-        const response = await fetch(url, {
+        const response = await fetch(`${API_BASE_URL}/api/contracts/bank-transfer-receipt/${encodeURIComponent(contractId)}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -127,7 +96,7 @@ function BankTransferReceiptContent() {
     };
 
     void fetchDetail();
-  }, [contractId, authLoading, isLoggedIn, member?.id]);
+  }, [contractId]);
 
   useEffect(() => {
     const updateScale = () => {
@@ -152,13 +121,11 @@ function BankTransferReceiptContent() {
 
   if (!detail) {
     const emptyMessage =
-      !contractId
+      accessDenied
+        ? '카드 영수증 본인인증 후 접근 가능한 페이지입니다.'
+        : !contractId
         ? '계약 정보가 없습니다.'
-        : !authLoading &&
-            !isLoggedIn &&
-            !readNonMemberContractAuth()
-          ? '가입내역 조회에서 휴대폰 인증을 완료한 뒤 다시 시도해 주세요.'
-          : '입금확인증 정보를 찾을 수 없습니다.';
+        : '입금확인증 정보를 찾을 수 없습니다.';
     return (
       <div style={{ textAlign: 'center', padding: '50px' }}>
         {emptyMessage}

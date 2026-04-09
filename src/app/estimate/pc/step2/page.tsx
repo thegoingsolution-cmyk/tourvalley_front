@@ -10,6 +10,7 @@ import ExcelUploadModal from '@/components/travel/ExcelUploadModal';
 import EstimateCompletionModal from '@/components/estimate/EstimateCompletionModal';
 import StepIndicator from '@/components/travel/StepIndicator';
 import { getImagePath } from '@/utils/path';
+import { getTrackingInfo } from '@/utils/tracking';
 import './page.css';
 
 interface Participant {
@@ -150,7 +151,8 @@ function PCStep2PageContent() {
     try {
       const emailDomain = contractorInfo.email2 === '직접입력' ? contractorInfo.customEmail : contractorInfo.email2;
       const email = `${contractorInfo.email1}@${emailDomain}`;
-      
+      const trackingInfo = getTrackingInfo('PC');
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/estimate/submit`, {
         method: 'POST',
         headers: {
@@ -167,6 +169,8 @@ function PCStep2PageContent() {
           contractor_name: contractorInfo.name,
           contractor_phone: contractorInfo.phone,
           contractor_email: email,
+          affiliate: trackingInfo.affiliate,
+          access_path: trackingInfo.access_path,
           participants: participants.map((p, index) => ({
             sequence: index + 1,
             gender: p.gender,

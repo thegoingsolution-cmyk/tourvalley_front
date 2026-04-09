@@ -949,6 +949,7 @@ function MobileOverseasStep1Content() {
             return {
               sequence_number: idx + 1,
               name: p.name,
+              english_name: (p as any).englishName || null,
               resident_number: residentNumber,
               gender: p.gender,
               age: age || 0,
@@ -1120,6 +1121,7 @@ function MobileOverseasStep1Content() {
             return {
               sequence_number: idx + 1,
               name: p.name,
+              english_name: (p as any).englishName || null,
               resident_number: residentNumber,
               gender: p.gender,
               age: age || 0,

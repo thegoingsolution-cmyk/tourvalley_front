@@ -529,6 +529,20 @@
     color: #808181;
 }
 
+/* 모바일 메인 면책: 짧은 줄·가독 (PC 푸터와 동일 문구, 개행만 세분화) */
+.main-page-mobile .main-mobile-disclaimer {
+    text-align: center;
+    padding-left: 12px;
+    padding-right: 12px;
+    box-sizing: border-box;
+}
+
+.main-page-mobile .main-mobile-disclaimer .tour2023_txt02 {
+    line-height: 1.75;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
+
 /* Responsive adjustments */
 @media screen and (max-width: 375px) {
     .tour2023_intro_w {

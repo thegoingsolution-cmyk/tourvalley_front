@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import ServiceModal from '@/components/ServiceModal';
 import AccidentFreeCashModal from '@/components/travel/AccidentFreeCashModal';
 import { getImagePath } from '@/utils/path';
+import { checkAndSaveTrackingInfo, getTrackingInfo } from '@/utils/tracking';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { ko } from 'date-fns/locale';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -16,6 +17,10 @@ import './page.css';
 
 export default function PCEventInsurancePage() {
   const today = new Date();
+
+  useEffect(() => {
+    checkAndSaveTrackingInfo();
+  }, []);
 
   // 현재 시간 + 2시간 계산 (00~23시 형식)
   const getDefaultHour = () => {
@@ -344,7 +349,11 @@ export default function PCEventInsurancePage() {
       if (memberId) {
         formData.append('member_id', memberId);
       }
-      
+
+      const trackingInfo = getTrackingInfo('PC');
+      formData.append('affiliate', trackingInfo.affiliate);
+      formData.append('access_path', trackingInfo.access_path);
+
       // 위험활동 정보 (유인 것만 포함)
       const actionInfoList = [actionInfo1, actionInfo2, actionInfo3, actionInfo4, actionInfo5, actionInfo6]
         .filter(info => info && info !== 'N')

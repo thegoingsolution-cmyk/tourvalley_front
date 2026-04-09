@@ -93,14 +93,28 @@ export default function MobileMainPage() {
           <InsuranceLogoSwiper variant="mobile" />
         </div>
 
-        {/* Disclaimer */}
-        <div className="bgcolor_white prow_01 ptb20 essential_Wrap" style={{textAlign: 'center'}}>
+        {/* Disclaimer — 모바일 좁은 폭용 줄바꿈 */}
+        <div className="bgcolor_white prow_01 ptb20 essential_Wrap main-mobile-disclaimer">
           <span className="tour2023_txt02 tour2023_grey">
-            <span style={{whiteSpace: 'nowrap'}}>
-              ※ 본 광고는 광고심의기준을 준수하였으며, 유효기간은 심의일로부터 1년입니다.
-            </span>
+            본 광고는 광고심의 기준을 준수하였으며,
             <br />
-            준법감시필 제2026-광고T-002(2026.03.04-2027-03.03)
+            유효기간은 심의일로부터 1년입니다.
+            <br />
+            ㈜빨주노초파남보 준법감시인 심의필
+            <br />
+            제2026-광고T-001(2026.03.04-2027-03.03)
+            <br />
+            보험계약자가 기존 보험을 해지하고
+            <br />
+            새로운 보험계약을 체결하는 과정에서
+            <br />
+            ① 질병이력, 연령증가 등으로
+            <br />
+            가입이 거절되거나 보험료가 인상될 수 있습니다.
+            <br />
+            ② 가입 상품에 따라 새로운 면책기간 적용 및
+            <br />
+            보장제한 등 기타 불이익이 발생할 수 있습니다.
           </span>
         </div>
       </main>

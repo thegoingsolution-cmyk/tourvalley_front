@@ -111,7 +111,17 @@ export default function Footer({ isMobile = false, showPcInsuranceLogos = false 
         )}
         <div className="footer-pc-container">
           <div className="footer-pc-disclaimer">
-            <p>※본 광고는 광고심의기준을 준수하였으며, 유효기간은 심의일로부터 1년입니다.<br />준법감시필 제2026-광고T-001(2026.03.04-2027-03.03)</p>
+            <p>
+              본 광고는 광고심의 기준을 준수하였으며, 유효기간은 심의일로부터 1년입니다.
+              <br />
+              ㈜빨주노초파남보 준법감시인 심의필 제2026-광고T-001(2026.03.04-2027-03.03)
+              <br />
+              보험계약자가 기존 보험을 해지하고 새로운 보험계약을 체결하는 과정에서
+              <br />
+              ① 질병이력, 연령증가 등으로 가입이 거절되거나 보험료가 인상될 수 있습니다.
+              <br />
+              ② 가입 상품에 따라 새로운 면책기간 적용 및 보장제한 등 기타 불이익이 발생할 수 있습니다.
+            </p>
           </div>
           <div className="footer-pc-content">
             <div className="footer-pc-logo">

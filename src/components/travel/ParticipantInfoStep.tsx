@@ -359,8 +359,10 @@ export default function ParticipantInfoStep({
                   </div>
                 </section>
 
-                {/* 영문이름 - 해외장기체류보험인 경우에만 표시 */}
-                {insuranceType === '해외장기체류보험' && (
+                {/* 영문이름 - 해외여행(PC: 해외여행자보험 / M: 해외여행보험)·해외장기체류 */}
+                {(insuranceType === '해외여행자보험' ||
+                  insuranceType === '해외여행보험' ||
+                  insuranceType === '해외장기체류보험') && (
                   <div className="tourGuard_form_tt mag5 tourG_mab03">
                     <label htmlFor={`english_name_${index}`}>영문이름</label>
                     <input

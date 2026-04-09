@@ -7,6 +7,7 @@ import { format, parse } from 'date-fns';
 import 'react-datepicker/dist/react-datepicker.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { checkAndSaveTrackingInfo, getTrackingInfo } from '@/utils/tracking';
 import './page.css';
 
 // 한국어 locale 등록
@@ -27,6 +28,10 @@ const parseDate = (dateString: string): Date | null => {
 };
 
 export default function MobileEventInsurancePage() {
+  useEffect(() => {
+    checkAndSaveTrackingInfo();
+  }, []);
+
   // Get today's date in YYYY-MM-DD format (Korea timezone)
   const today = new Date();
   const year = today.getFullYear();
@@ -327,7 +332,11 @@ export default function MobileEventInsurancePage() {
       if (memberId) {
         apiFormData.append('member_id', memberId);
       }
-      
+
+      const trackingInfo = getTrackingInfo('모바일');
+      apiFormData.append('affiliate', trackingInfo.affiliate);
+      apiFormData.append('access_path', trackingInfo.access_path);
+
       // 위험활동 정보 (유인 것만 포함)
       const actionInfoList = [
         formData.action_info_1,

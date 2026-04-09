@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import './page.css';
 
 function CardReceiptDownloadContent() {
+  const BANK_RECEIPT_VERIFY_KEY_PREFIX = 'bank_receipt_verified_';
   const searchParams = useSearchParams();
   const contractIdFromUrl = searchParams.get('contract_id') || '';
   const isEmailEntry = !!contractIdFromUrl.trim();
@@ -276,6 +277,16 @@ function CardReceiptDownloadContent() {
       if (!data.success || !data.receiptUrl) {
         alert(data.message || '영수증 정보를 찾을 수 없습니다.');
         return;
+      }
+
+      try {
+        const url = new URL(data.receiptUrl, window.location.origin);
+        const contractId = url.searchParams.get('contractId');
+        if (url.pathname.includes('/payments/bank-transfer-receipt') && contractId) {
+          localStorage.setItem(`${BANK_RECEIPT_VERIFY_KEY_PREFIX}${contractId}`, String(Date.now()));
+        }
+      } catch {
+        // ignore
       }
 
       window.open(data.receiptUrl, '_blank', 'noopener,noreferrer');

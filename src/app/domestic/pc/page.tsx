@@ -599,7 +599,7 @@ export default function PCDomesticPage() {
           }
         }
 
-        // 가능 플랜 API로 해당 가입자 허용 플랜 조회 (보험나이 15세 시 만 나이 기준 적용)
+        // 가능 플랜 API (보험나이 15세일 때 성인/어린이는 백엔드에서 KST 당일 기준 만 나이)
         const availablePlans = await fetchAvailablePlans(age, participant.gender, undefined, {
           birth_date: birthDateForApi,
           departure_date: departureDateTime,
@@ -693,7 +693,7 @@ export default function PCDomesticPage() {
 
     const genderValue = getGenderFromBirthDate(birthDate, gender);
 
-    // 출발일시(기준일) 생성 - available-plans에서 보험나이 15세 시 만 나이 기준일로 사용
+    // available-plans 호출용 출발일시(백엔드 보험나이15 분기는 KST 당일, 출발일과 무관)
     let depDateFormatted = departureDate;
     let depHour = parseInt(departureTime, 10) || 0;
     if (depHour === 24) {

@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import ExcelUploadModal from '@/components/travel/ExcelUploadModal';
 import EstimateCompletionModal from '@/components/estimate/EstimateCompletionModal';
 import './page.css';
+import { getTrackingInfo } from '@/utils/tracking';
 
 interface Participant {
   id: number;
@@ -144,7 +145,8 @@ function MobileStep2PageContent() {
     try {
       const emailDomain = contractorInfo.email2 === '직접입력' ? contractorInfo.customEmail : contractorInfo.email2;
       const email = `${contractorInfo.email1}@${emailDomain}`;
-      
+      const trackingInfo = getTrackingInfo('모바일');
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/estimate/submit`, {
         method: 'POST',
         headers: {
@@ -161,6 +163,8 @@ function MobileStep2PageContent() {
           contractor_name: contractorInfo.name,
           contractor_phone: contractorInfo.phone,
           contractor_email: email,
+          affiliate: trackingInfo.affiliate,
+          access_path: trackingInfo.access_path,
           participants: participants.map((p, index) => ({
             sequence: index + 1,
             gender: p.gender,

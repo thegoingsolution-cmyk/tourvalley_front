@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { ko } from 'date-fns/locale';
@@ -9,6 +9,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getImagePath } from '@/utils/path';
+import { checkAndSaveTrackingInfo } from '@/utils/tracking';
 import './page.css';
 
 // 한국어 locale 등록
@@ -48,6 +49,10 @@ export default function MobileStep1Page() {
   const [productCd, setProductCd] = useState('국내여행'); // 기본값: 국내여행 (PC와 동일)
   const [hasSelectedStartDate, setHasSelectedStartDate] = useState(true);
   const [hasSelectedEndDate, setHasSelectedEndDate] = useState(true);
+
+  useEffect(() => {
+    checkAndSaveTrackingInfo();
+  }, []);
 
   // 시간 옵션 생성 (01시 ~ 24시)
   const hourOptions = Array.from({ length: 24 }, (_, i) => {

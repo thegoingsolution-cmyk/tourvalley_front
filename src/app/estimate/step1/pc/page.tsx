@@ -13,6 +13,7 @@ import AccidentFreeCashModal from '@/components/travel/AccidentFreeCashModal';
 import CountrySelectModal from '@/components/travel/CountrySelectModal';
 import StepIndicator from '@/components/travel/StepIndicator';
 import { getImagePath } from '@/utils/path';
+import { checkAndSaveTrackingInfo } from '@/utils/tracking';
 import './page.css';
 
 // 한국어 locale 등록
@@ -56,6 +57,10 @@ export default function PCStep1Page() {
   const [isCountryModalOpen, setIsCountryModalOpen] = useState(false);
   const [hasSelectedStartDate, setHasSelectedStartDate] = useState(true);
   const [hasSelectedEndDate, setHasSelectedEndDate] = useState(true);
+
+  useEffect(() => {
+    checkAndSaveTrackingInfo();
+  }, []);
 
   // 시간 옵션 생성 (01시 ~ 24시)
   const hourOptions = Array.from({ length: 24 }, (_, i) => {
