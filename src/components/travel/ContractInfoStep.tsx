@@ -254,10 +254,12 @@ export default function ContractInfoStep({
                 <label>합계 보험료</label>
                 <div>{calculatedPremiums?.totalPremium.toLocaleString() || 0}원</div>
               </div>
-              <div className="contract-info-item">
-                <label>포괄계약자(취급자)</label>
-                <div>(주)빨주노초파남보</div>
-              </div>
+              {!companyName?.trim() && (
+                <div className="contract-info-item">
+                  <label>포괄계약자(취급자)</label>
+                  <div>(주)빨주노초파남보</div>
+                </div>
+              )}
               {companyName && (
                 <div className="contract-info-item">
                   <label>법인단체명</label>

@@ -42,6 +42,47 @@ const isValidBirthDateYYYYMMDD = (value: string): boolean => {
   );
 };
 
+const calculateInsuranceAgeFromBirthDate = (birthDateStr: string): number | null => {
+  if (!birthDateStr || birthDateStr.length !== 8) return null;
+  try {
+    const year = parseInt(birthDateStr.substring(0, 4), 10);
+    const month = parseInt(birthDateStr.substring(4, 6), 10);
+    const day = parseInt(birthDateStr.substring(6, 8), 10);
+    const today = new Date();
+    const birthDate = new Date(year, month - 1, day);
+    if (birthDate.getMonth() !== month - 1 || birthDate.getDate() !== day) return null;
+
+    let age = today.getFullYear() - year;
+    if (today.getMonth() + 1 < month || ((today.getMonth() + 1 === month) && today.getDate() < day)) {
+      age--;
+    }
+
+    const sixMonthsLater = new Date(today.getFullYear(), month - 1 + 6, day);
+    if (today >= sixMonthsLater) {
+      age++;
+    }
+    return age;
+  } catch {
+    return null;
+  }
+};
+
+const toComparableDateTime = (dateText: string, hourText: string): Date | null => {
+  if (!dateText) return null;
+  const parsed = new Date(dateText);
+  if (Number.isNaN(parsed.getTime())) return null;
+  const hour = parseInt(hourText, 10);
+  if (Number.isNaN(hour)) return null;
+
+  if (hour === 24) {
+    parsed.setDate(parsed.getDate() + 1);
+    parsed.setHours(0, 0, 0, 0);
+    return parsed;
+  }
+  parsed.setHours(hour, 0, 0, 0);
+  return parsed;
+};
+
 // 여행목적 코드 → DB 저장용 한글 라벨 (팝업 option value와 동일)
 const TRAVEL_PURPOSE_LABELS: Record<string, string> = {
   '001': '일반관광',
@@ -565,6 +606,52 @@ export default function OverseasInsuranceStep2Page() {
       const firstNameInput = document.querySelector('input[name="insured_name_1"]') as HTMLInputElement;
       firstNameInput?.focus();
       return;
+    }
+
+    // 보험나이 80세 이상자의 해외여행보험 기간 30일 제한 검증 (입력 완료된 인원 기준)
+    const departure = toComparableDateTime(startDate, startHour);
+    const arrival = toComparableDateTime(endDate, endHour);
+    if (departure && arrival) {
+      const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
+      const isOverThirtyDays = arrival.getTime() - departure.getTime() > THIRTY_DAYS_IN_MS;
+
+      if (isOverThirtyDays) {
+        for (const i of validatedInsuredList) {
+          const countryTypeSelect = document.querySelector(`select[name="country_type_${i}"]`) as HTMLSelectElement;
+          const birthInput = document.querySelector(`input[name="birth_${i}"]`) as HTMLInputElement;
+          const ssn1Input = document.querySelector(`input[name="insured_ssn1_${i}"]`) as HTMLInputElement;
+          const nameInput = document.querySelector(`input[name="insured_name_${i}"]`) as HTMLInputElement;
+
+          const countryType = countryTypeSelect?.value || 'D';
+          let birthDateForAge = '';
+
+          if (countryType === 'D') {
+            birthDateForAge = birthInput?.value || '';
+          } else {
+            const ssn1 = ssn1Input?.value || '';
+            if (ssn1.length === 6) {
+              const yy = parseInt(ssn1.substring(0, 2), 10);
+              const mm = ssn1.substring(2, 4);
+              const dd = ssn1.substring(4, 6);
+              if (!Number.isNaN(yy)) {
+                const year = yy >= 50 ? 1900 + yy : 2000 + yy;
+                birthDateForAge = `${year}${mm}${dd}`;
+              }
+            }
+          }
+
+          const age = calculateInsuranceAgeFromBirthDate(birthDateForAge);
+          if (age !== null && age >= 80) {
+            const insuredName = (nameInput?.value || '').trim();
+            alert(
+              insuredName
+                ? `${insuredName}님은 보험나이 80세 이상으로, 여행기간 30일 이상 갈수 없습니다.`
+                : '보험나이 80세 이상은, 여행기간 30일 이상 갈수 없습니다.'
+            );
+            return;
+          }
+        }
+      }
     }
     
     // 사업자번호 합치기 (3-2-5 형식)

@@ -251,6 +251,38 @@ function MobileOverseasStep1Content() {
     return { valid: true };
   };
 
+  const isOverThirtyDaysDuration = (): boolean => {
+    const departure = parseInsuranceDateHourToInstant(departureDate, departureTime);
+    const arrival = parseInsuranceDateHourToInstant(arrivalDate, arrivalTime);
+    const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
+    return arrival.getTime() - departure.getTime() > THIRTY_DAYS_IN_MS;
+  };
+
+  const getBirthDateForAgeValidation = (participant: Participant): string => {
+    if (participant.nationality === '외국인' && participant.residentNumber) {
+      const residentNum = participant.residentNumber;
+      if (residentNum.length >= 6) {
+        const yy = parseInt(residentNum.substring(0, 2), 10);
+        const mm = residentNum.substring(2, 4);
+        const dd = residentNum.substring(4, 6);
+        if (!Number.isNaN(yy)) {
+          const year = yy >= 50 ? 1900 + yy : 2000 + yy;
+          return `${year}${mm}${dd}`;
+        }
+      }
+    }
+    return participant.birthDate || '';
+  };
+
+  const hasSeniorWithOverThirtyDays = (targetParticipants: Participant[]): boolean => {
+    if (type !== 'short') return false;
+    if (!isOverThirtyDaysDuration()) return false;
+    return targetParticipants.some((participant) => {
+      const age = calculateAgeFromBirthDate(getBirthDateForAgeValidation(participant));
+      return age !== null && age >= 80;
+    });
+  };
+
   const fetchAvailablePlans = async (
     age: number,
     genderValue: '남자' | '여자',
@@ -495,6 +527,10 @@ function MobileOverseasStep1Content() {
       alert('생년월일을 올바르게 입력해주세요.');
       return;
     }
+    if (type === 'short' && age >= 80 && isOverThirtyDaysDuration()) {
+      alert('보험나이 80세 이상은, 여행기간 30일 이상 갈수 없습니다.');
+      return;
+    }
     const insuranceType = type === 'short' ? '해외여행보험' : type === 'long' ? '해외장기체류보험' : '단체여행자보험';
 
     const genderValue = getGenderFromBirthDate(birthDate, gender);
@@ -659,6 +695,10 @@ function MobileOverseasStep1Content() {
     // 대표 가입자 인증 확인
     if (!isLoggedIn && !participants[0].isVerified) {
       alert('대표 가입자의 휴대폰 인증을 완료해주세요.');
+      return;
+    }
+    if (hasSeniorWithOverThirtyDays(participants)) {
+      alert('보험나이 80세 이상은, 여행기간 30일 이상 갈수 없습니다.');
       return;
     }
 
@@ -855,6 +895,10 @@ function MobileOverseasStep1Content() {
         alert('소유자 생년월일 6자리 또는 사업자번호(10자리) 또는 13자리를 입력해주세요.');
         return;
       }
+    }
+    if (hasSeniorWithOverThirtyDays(participants)) {
+      alert('보험나이 80세 이상은, 여행기간 30일 이상 갈수 없습니다.');
+      return;
     }
 
     // 결제 방법별 처리

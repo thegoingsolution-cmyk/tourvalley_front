@@ -104,8 +104,64 @@ export default function ParticipantInfoStep({
 
     return true;
   };
+
+  const isOverseasShortTripInsurance =
+    insuranceType === '해외여행자보험' || insuranceType === '해외여행보험';
+
+  const toComparableDateTime = (date: string, hourText: string): Date | null => {
+    if (!date) return null;
+    const parsedHour = parseInt(hourText, 10);
+    const hour = Number.isNaN(parsedHour) ? 0 : parsedHour;
+    const baseDate = new Date(date);
+    if (Number.isNaN(baseDate.getTime())) return null;
+    if (hour === 24) {
+      baseDate.setDate(baseDate.getDate() + 1);
+      baseDate.setHours(0, 0, 0, 0);
+      return baseDate;
+    }
+    baseDate.setHours(hour, 0, 0, 0);
+    return baseDate;
+  };
+
+  const getBirthDateForAgeValidation = (participant: Participant): string => {
+    if (participant.nationality === '외국인' && participant.residentNumber && participant.residentNumber.length >= 6) {
+      const yy = parseInt(participant.residentNumber.substring(0, 2), 10);
+      const mm = participant.residentNumber.substring(2, 4);
+      const dd = participant.residentNumber.substring(4, 6);
+      if (!Number.isNaN(yy)) {
+        const year = yy >= 50 ? 1900 + yy : 2000 + yy;
+        return `${year}${mm}${dd}`;
+      }
+    }
+    return participant.birthDate;
+  };
+
+  const validateSeniorDurationLimit = (): boolean => {
+    if (!isOverseasShortTripInsurance) return true;
+    const departure = toComparableDateTime(departureDate, departureTime);
+    const arrival = toComparableDateTime(arrivalDate, arrivalTime);
+    if (!departure || !arrival) return true;
+
+    const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
+    const isOverThirtyDays = arrival.getTime() - departure.getTime() > THIRTY_DAYS_IN_MS;
+    if (!isOverThirtyDays) return true;
+
+    const hasSeniorParticipant = participants.some((participant) => {
+      const birthDateForAge = getBirthDateForAgeValidation(participant);
+      const age = calculateAgeFromBirthDate(birthDateForAge);
+      return age !== null && age >= 80;
+    });
+
+    if (hasSeniorParticipant) {
+      alert('보험나이 80세 이상은, 여행기간 30일 이상 갈수 없습니다.');
+      return false;
+    }
+    return true;
+  };
+
   const handleCalculateClick = async () => {
     if (!validateRepresentativeEmail()) return;
+    if (!validateSeniorDurationLimit()) return;
     await onCalculate();
   };
   const handleApplyClick = () => {

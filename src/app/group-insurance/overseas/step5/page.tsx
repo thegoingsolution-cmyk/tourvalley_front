@@ -224,7 +224,7 @@ export default function OverseasInsuranceStep5Page() {
       { value: 'AZ', label: '아제르바이젠' },
       { value: 'AF', label: '아프가니스탄(가입불가)' },
       { value: 'YE', label: '예멘(가입불가)' },
-      { value: 'OM', label: '오만' },
+      { value: 'OM', label: '오만(가입불가)' },
       { value: 'JO', label: '요르단(가입불가)' },
       { value: 'UZ', label: '우즈베키스탄' },
       { value: 'IQ', label: '이라크(가입불가)' },

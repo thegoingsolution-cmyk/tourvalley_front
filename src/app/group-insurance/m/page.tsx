@@ -1289,6 +1289,38 @@ function MobileGroupInsuranceContent() {
     return { valid: true };
   };
 
+  const isOverThirtyDaysDuration = (): boolean => {
+    const departure = parseInsuranceDateHourToInstant(departureDate, String(departureTime));
+    const arrival = parseInsuranceDateHourToInstant(arrivalDate, String(arrivalTime));
+    const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
+    return arrival.getTime() - departure.getTime() > THIRTY_DAYS_IN_MS;
+  };
+
+  const getParticipantBirthDateForAge = (participant: Participant): string => {
+    if (participant.nationality === '외국인' && participant.residentNumber) {
+      const residentNum = participant.residentNumber;
+      if (residentNum.length >= 6) {
+        const yy = parseInt(residentNum.substring(0, 2), 10);
+        const mm = residentNum.substring(2, 4);
+        const dd = residentNum.substring(4, 6);
+        if (!Number.isNaN(yy)) {
+          const year = yy >= 50 ? 1900 + yy : 2000 + yy;
+          return `${year}${mm}${dd}`;
+        }
+      }
+    }
+    return participant.birthDate || '';
+  };
+
+  const hasSeniorWithOverThirtyDays = (targetParticipants: Participant[]): boolean => {
+    if (activeTab !== 'FS') return false;
+    if (!isOverThirtyDaysDuration()) return false;
+    return targetParticipants.some((participant) => {
+      const age = calculateAgeFromBirthDate(getParticipantBirthDateForAge(participant));
+      return age !== null && age >= 80;
+    });
+  };
+
   // 보험료 계산 함수
   const calculatePremiums = async () => {
     if (!planInfo || !selectedPlan) return;
@@ -1407,9 +1439,11 @@ function MobileGroupInsuranceContent() {
     const isLongTermStay = activeTab === 'FL';
     const insuranceType = getInsuranceType();
     const plans: Record<string, PlanInfo> = {};
+    const groupTierLabels: PlanType[] =
+      activeTab === 'DS' ? ['실속플랜', '표준플랜'] : GROUP_PLAN_TIER_LABELS;
     const newParticipantPremiumsByPlan: Record<string, Array<{ id: number; name: string; gender: string; birthDate: string; planType: string; premium: number }>> = {};
 
-    GROUP_PLAN_TIER_LABELS.forEach((label) => {
+    groupTierLabels.forEach((label) => {
       newParticipantPremiumsByPlan[label] = [];
     });
 
@@ -1475,7 +1509,7 @@ function MobileGroupInsuranceContent() {
 
       planPremiums.sort((a, b) => a.premium - b.premium);
 
-      GROUP_PLAN_TIER_LABELS.forEach((tierLabel, tierIndex) => {
+      groupTierLabels.forEach((tierLabel, tierIndex) => {
         const selectedPlan = planPremiums[Math.min(tierIndex, planPremiums.length - 1)];
         if (!selectedPlan) return;
 
@@ -1506,7 +1540,7 @@ function MobileGroupInsuranceContent() {
         )
       : {};
 
-    GROUP_PLAN_TIER_LABELS.forEach((tierLabel) => {
+    groupTierLabels.forEach((tierLabel) => {
       const participants = newParticipantPremiumsByPlan[tierLabel];
       if (participants.length === 0) return;
 
@@ -1620,6 +1654,10 @@ function MobileGroupInsuranceContent() {
         alert(durationValidation.message);
         return;
       }
+      if (hasSeniorWithOverThirtyDays(groupParticipantsData)) {
+        alert('보험나이 80세 이상은, 여행기간 30일 이상 갈수 없습니다.');
+        return;
+      }
 
       // 그룹 가입자 데이터가 있으면 바로 플랜 선택 화면으로 이동
       setIsCalculating(true);
@@ -1699,6 +1737,10 @@ function MobileGroupInsuranceContent() {
     const age = calculateAgeFromBirthDate(birthDate);
     if (age === null) {
       alert('생년월일을 올바르게 입력해주세요.');
+      return;
+    }
+    if (activeTab === 'FS' && age >= 80 && isOverThirtyDaysDuration()) {
+      alert('보험나이 80세 이상은, 여행기간 30일 이상 갈수 없습니다.');
       return;
     }
 
@@ -1832,6 +1874,10 @@ function MobileGroupInsuranceContent() {
           return;
         }
       }
+    }
+    if (hasSeniorWithOverThirtyDays(participants)) {
+      alert('보험나이 80세 이상은, 여행기간 30일 이상 갈수 없습니다.');
+      return;
     }
 
     if (!participants[0].isVerified) {
@@ -2047,6 +2093,10 @@ function MobileGroupInsuranceContent() {
         alert('보험료 정보가 없습니다.');
         return;
       }
+      if (hasSeniorWithOverThirtyDays(currentParticipants)) {
+        alert('보험나이 80세 이상은, 여행기간 30일 이상 갈수 없습니다.');
+        return;
+      }
 
       // 나이스페이먼츠, 네이버페이, 카카오페이는 먼저 계약 등록 후 결제
       if (paymentMethod === '나이스페이먼츠' || paymentMethod === '네이버페이' || paymentMethod === '카카오페이') {
@@ -2071,7 +2121,7 @@ function MobileGroupInsuranceContent() {
           },
           contractor: hasGroupParticipants && groupInfo ? {
             // 그룹 보험인 경우 - 회원 타입에 따라 결정
-            contractor_type: (isLoggedIn && member && member.member_type !== '개인') ? '법인' : '개인',
+            contractor_type: ((isLoggedIn && member && member.member_type !== '개인') || isGuestApply) ? '법인' : '개인',
             name: groupInfo.contactPerson || '', // 담당자명 → contractors.name
             resident_number: null,
             company_name: groupInfo.groupName || '', // 단체명 → contractors.company_name
@@ -2251,7 +2301,7 @@ function MobileGroupInsuranceContent() {
             affiliate: trackingInfo.affiliate,
           },
           contractor: hasGroupParticipants && groupInfo ? {
-            contractor_type: (isLoggedIn && member && member.member_type !== '개인') ? '법인' : '개인',
+            contractor_type: ((isLoggedIn && member && member.member_type !== '개인') || isGuestApply) ? '법인' : '개인',
             name: groupInfo.contactPerson || '',
             resident_number: null,
             company_name: groupInfo.groupName || '',
@@ -2379,7 +2429,7 @@ function MobileGroupInsuranceContent() {
           },
           contractor: hasGroupParticipants && groupInfo ? {
             // 그룹 보험인 경우 - 회원 타입에 따라 결정
-            contractor_type: (isLoggedIn && member && member.member_type !== '개인') ? '법인' : '개인',
+            contractor_type: ((isLoggedIn && member && member.member_type !== '개인') || isGuestApply) ? '법인' : '개인',
             name: groupInfo.contactPerson || '', // 담당자명 → contractors.name
             resident_number: null,
             company_name: groupInfo.groupName || '', // 단체명 → contractors.company_name

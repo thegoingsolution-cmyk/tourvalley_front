@@ -280,6 +280,27 @@ export default function PCOverseasPage() {
     return { valid: true };
   };
 
+  const isOverThirtyDaysDuration = (): boolean => {
+    const departure = parseInsuranceDateHourToInstant(departureDate, departureTime);
+    const arrival = parseInsuranceDateHourToInstant(arrivalDate, arrivalTime);
+    const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
+    return arrival.getTime() - departure.getTime() > THIRTY_DAYS_IN_MS;
+  };
+
+  const getBirthDateForAgeCalculation = (participant: Participant): string => {
+    if (participant.nationality === '외국인' && participant.residentNumber) {
+      const residentNum = participant.residentNumber;
+      if (residentNum.length >= 6) {
+        const yy = parseInt(residentNum.substring(0, 2), 10);
+        const mm = residentNum.substring(2, 4);
+        const dd = residentNum.substring(4, 6);
+        const year = yy >= 50 ? 1900 + yy : 2000 + yy;
+        return `${year}${mm}${dd}`;
+      }
+    }
+    return participant.birthDate;
+  };
+
   const fetchAvailablePlans = useCallback(async (
     age: number,
     genderValue: Gender,
@@ -669,6 +690,10 @@ export default function PCOverseasPage() {
       alert('생년월일을 올바르게 입력해주세요.');
       return;
     }
+    if (age >= 80 && isOverThirtyDaysDuration()) {
+      alert('보험나이 80세 이상은, 여행기간 30일 이상 갈수 없습니다.');
+      return;
+    }
 
     const genderValue = getGenderFromBirthDate(birthDate, gender);
 
@@ -838,6 +863,18 @@ export default function PCOverseasPage() {
     setIsSubmitting(true);
     
     try {
+      if (isOverThirtyDaysDuration()) {
+        const hasSeniorInsured = participants.some((participant) => {
+          const age = calculateAgeFromBirthDate(getBirthDateForAgeCalculation(participant));
+          return age !== null && age >= 80;
+        });
+        if (hasSeniorInsured) {
+          alert('보험나이 80세 이상은, 여행기간 30일 이상 갈수 없습니다.');
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       // 결제 방법별 처리
       // 24시는 다음날 00시로 변환
       let departureDateFormatted = departureDate;

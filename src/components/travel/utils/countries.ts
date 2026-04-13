@@ -93,7 +93,7 @@ const allCountriesSource: Country[] = [
   { code: 'AZ', name: '아제르바이젠' },
   { code: 'AF', name: '아프가니스탄(가입불가)' },
   { code: 'YE', name: '예멘(가입불가)' },
-  { code: 'OM', name: '오만' },
+  { code: 'OM', name: '오만(가입불가)' },
   { code: 'JO', name: '요르단(가입불가)' },
   { code: 'UZ', name: '우즈베키스탄' },
   { code: 'IQ', name: '이라크(가입불가)' },
