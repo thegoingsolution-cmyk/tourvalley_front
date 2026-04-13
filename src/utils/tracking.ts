@@ -10,12 +10,14 @@
 const INFLUENCER_REF_MAP: Record<string, { affiliate: string; access_path: string }> = {
   // 예: 블로그
   '7k2m9x4p': { affiliate: '한상윤블로그', access_path: '블로그' },
+  'i3s9m2n8': { affiliate: '이상민블로그', access_path: '블로그' },
   // 새 인플루언서 추가 시: 고유 토큰 발급 후 한 줄 추가
   // 'x3n8q1w5': { affiliate: 'OO인플루언서', access_path: '인스타그램' },
 };
 
 const LEGACY_UTM_SLUGS: Record<string, { affiliate: string; access_path: string }> = {
   hansangyunblog: { affiliate: '한상윤블로그', access_path: '블로그' },
+  leesangminblog: { affiliate: '이상민블로그', access_path: '블로그' },
 };
 
 function getInfluencerFromRefOrUtm(
