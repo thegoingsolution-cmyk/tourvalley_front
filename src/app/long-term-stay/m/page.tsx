@@ -1879,6 +1879,7 @@ function MobileLongTermStayContent() {
           setShowExcelModal(false);
         }}
         currentParticipants={participants}
+        includeEnglishName={true}
       />
 
       {/* 심의번호 */}

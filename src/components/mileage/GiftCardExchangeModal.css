@@ -1,4 +1,4 @@
-/* 모바일 친화적 문화상품권 전환신청 모달 스타일 */
+/* 모바일 친화적 상품권 전환신청 모달 스타일 */
 
 .gift-card-modal-overlay {
   display: flex;
@@ -18,12 +18,14 @@
   padding: 16px;
   box-sizing: border-box;
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .gift-card-modal-container {
   width: 100%;
   max-width: 500px;
   max-height: 90vh;
+  min-height: 0;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -71,7 +73,9 @@
   padding: 20px;
   overflow-y: auto;
   flex: 1;
+  min-height: 0;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .gift-card-modal-section-title {
@@ -150,6 +154,130 @@
   font-size: 12px;
 }
 
+.gift-card-form-textarea-outer {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #f9f9f9;
+  padding: 8px 12px;
+  min-height: 48px;
+}
+
+.gift-card-form-textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: #333;
+  background: transparent;
+  resize: vertical;
+  min-height: 72px;
+  line-height: 1.4;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.gift-card-form-textarea::placeholder {
+  color: #999;
+}
+
+.gift-card-address-search-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.gift-card-address-hits {
+  list-style: none;
+  margin: 6px 0 0 0;
+  padding: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 2;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+}
+
+.gift-card-address-hits li {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.gift-card-address-hits li:last-child {
+  border-bottom: none;
+}
+
+.gift-card-address-hit-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: #fff;
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 10px 12px;
+  cursor: pointer;
+  color: #333;
+  font-family: inherit;
+}
+
+.gift-card-address-hit-btn:hover,
+.gift-card-address-hit-btn:focus {
+  background: #f0f5ff;
+  outline: none;
+}
+
+.gift-card-address-hint {
+  font-size: 12px;
+  color: #666;
+  margin: 8px 0 0 0;
+  line-height: 1.4;
+}
+
+.gift-card-address-error {
+  font-size: 12px;
+  color: #c0392b;
+  margin: 8px 0 0 0;
+  line-height: 1.45;
+}
+
+.gift-card-address-readonly {
+  min-height: 52px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #ececec;
+  color: #333;
+  padding: 10px 12px;
+  font-size: 16px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-all;
+  box-sizing: border-box;
+}
+
+.gift-card-address-placeholder {
+  color: #888;
+  font-size: 15px;
+}
+
+.gift-card-address-search-loading {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: #999;
+  pointer-events: none;
+  animation: gift-card-addr-blink 0.6s ease-in-out infinite;
+}
+
+@keyframes gift-card-addr-blink {
+  50% { opacity: 0.3; }
+}
+
 .gift-card-form-unit {
   font-size: 14px;
   color: #666;
@@ -205,14 +333,17 @@
 /* 모바일 최적화 */
 @media (max-width: 768px) {
   .gift-card-modal-overlay {
+    height: var(--gift-modal-vvh, 100svh);
     padding: 0;
     align-items: flex-end;
   }
 
   .gift-card-modal-container {
     max-width: 100%;
-    max-height: 85vh;
-    border-radius: 16px 16px 0 0;
+    height: var(--gift-modal-vvh, 100svh);
+    max-height: var(--gift-modal-vvh, 100svh);
+    min-height: 0;
+    border-radius: 0;
   }
 
   .gift-card-modal-header {
@@ -224,7 +355,8 @@
   }
 
   .gift-card-modal-content {
-    padding: 20px 16px;
+    min-height: 0;
+    padding: 20px 16px calc(96px + env(safe-area-inset-bottom));
   }
 
   .gift-card-form-field {
@@ -238,13 +370,29 @@
   .gift-card-submit-button {
     height: 50px;
     font-size: 16px;
+    margin-top: 0;
+  }
+
+  .gift-card-submit-sticky {
+    position: relative;
+    margin: 16px 0 0;
+    padding: 0;
+    background: transparent;
   }
 }
 
 /* 작은 모바일 화면 */
 @media (max-width: 375px) {
   .gift-card-modal-content {
-    padding: 16px 12px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .gift-card-submit-sticky {
+    margin-left: -12px;
+    margin-right: -12px;
+    padding-left: 12px;
+    padding-right: 12px;
   }
 
   .gift-card-modal-header {

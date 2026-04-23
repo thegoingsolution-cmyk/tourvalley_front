@@ -92,7 +92,9 @@ export default function Footer({ isMobile = false, showPcInsuranceLogos = false 
                 )
               </p>
               <p>통신판매업신고번호 제2023-서울중구-0084호</p>
-              <p>admin@tourvalley.net</p>
+              <p>
+                <span className="footer-pc-info-company">admin@tourvalley.net</span>
+              </p>
             </div>
           </div>
         </footer>
@@ -173,7 +175,7 @@ export default function Footer({ isMobile = false, showPcInsuranceLogos = false 
                 </p>
                 <p>(04543) 서울시 중구 을지로11길 15 동화빌딩 603호 사업자등록번호 256-81-03026</p>
                 <p>
-                  <span className="footer-pc-info-company">고객센터 1599-2541</span> 팩스번호 02)2261-0098 이메일 admin@tourvalley.net
+                  <span className="footer-pc-info-company">고객센터 1599-2541</span> 팩스번호 02)2261-0098 <span className="footer-pc-info-company">이메일 admin@tourvalley.net</span>
                 </p>
                 <p>
                   보험대리점등록번호:제2022120036호(

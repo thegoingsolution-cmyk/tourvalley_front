@@ -1765,6 +1765,7 @@ function MobileOverseasStep1Content() {
           setShowExcelModal(false);
         }}
         currentParticipants={participants}
+        includeEnglishName={true}
       />
 
       {/* 심의번호 */}

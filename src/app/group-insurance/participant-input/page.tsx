@@ -115,7 +115,7 @@ export default function ParticipantInputPage() {
       return {
         name: p.name,
         countryType: p.nationality === '외국인' ? 'F' : 'D',
-        engName: '',
+        engName: (p.englishName || '').trim(),
         birthDate: p.birthDate,
         gender: p.gender === '여자' ? 'W' : 'M',
         ssn1: ssn1,
@@ -171,6 +171,7 @@ export default function ParticipantInputPage() {
     const participants: Participant[] = insuredList.map((insured, index) => ({
       id: index + 1,
       name: insured.name,
+      englishName: insured.engName?.trim() || undefined,
       nationality: insured.countryType === 'F' ? '외국인' : '내국인',
       birthDate: insured.birthDate,
       gender: insured.gender === 'W' ? '여자' : '남자',
@@ -274,8 +275,10 @@ export default function ParticipantInputPage() {
                       const height = 760;
                       const left = (window.screen.width / 2) - (width / 2);
                       const top = (window.screen.height / 2) - (height / 2);
+                      const query = new URLSearchParams();
+                      query.set('tab', travelType);
                       window.open(
-                        '/group-insurance/participant-input/excel-upload',
+                        `/group-insurance/participant-input/excel-upload?${query.toString()}`,
                         'excelUpload',
                         `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
                       );
@@ -348,7 +351,32 @@ export default function ParticipantInputPage() {
                           </div>
                         </div>
 
-                        {/* 영문이름 - 모든 탭에서 숨김 */}
+                        {/* 영문이름 - 해외여행(FS), 해외장기체류(FL)에서 표시 */}
+                        {(travelType === 'FS' || travelType === 'FL') && (
+                          <div className="tourGuard_form_tt mag5 tourG_mab03 tourG_line tourG_no_divider">
+                            <label htmlFor={`insured_eng_${index + 1}`}>영문이름</label>
+                            <input
+                              type="text"
+                              id={`insured_eng_${index + 1}`}
+                              name="insured_eng"
+                              value={insured.engName}
+                              onChange={(e) => handleInputChange(index, 'engName', e.target.value)}
+                              placeholder="예)HONG GIL DONG"
+                              className="tourGuard_input_w05"
+                              style={{
+                                height: '32px',
+                                paddingLeft: '10px',
+                                color: '#000',
+                                fontSize: '18px',
+                                letterSpacing: '0px',
+                                marginTop: '23px',
+                                marginLeft: '10px',
+                                paddingTop: '0px',
+                                width: 'calc(100% - 20px)',
+                              }}
+                            />
+                          </div>
+                        )}
 
                         {/* 생년월일 - 내국인일 때만 표시 (모든 탭에서 표시) */}
                         {insured.countryType === 'D' && (

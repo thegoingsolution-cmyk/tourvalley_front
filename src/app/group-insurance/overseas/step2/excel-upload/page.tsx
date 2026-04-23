@@ -28,7 +28,7 @@ export default function ExcelUploadPopupPage() {
 
   return (
     <div style={{ background: '#fff', minHeight: '100vh', width: '100%' }}>
-      <ExcelUploadPage onClose={handleClose} onUpload={handleUpload} />
+      <ExcelUploadPage onClose={handleClose} onUpload={handleUpload} includeEnglishName={true} />
     </div>
   );
 }

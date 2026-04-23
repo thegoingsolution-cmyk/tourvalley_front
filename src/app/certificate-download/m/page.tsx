@@ -118,11 +118,6 @@ function CertificateDownloadContent() {
     let birth_ssn = '';
 
     if (memberType === 'I') {
-      if (!formData.name.trim()) {
-        alert('대표피보험자 이름을 입력해주세요.');
-        return;
-      }
-
       if (!formData.birth_date || formData.birth_date.length !== 8) {
         alert('생년월일 8자리를 입력해주세요.');
         return;
@@ -136,11 +131,6 @@ function CertificateDownloadContent() {
       contract_name = formData.name.trim();
       birth_ssn = formData.birth_date.substring(2);
     } else {
-      if (!formData.company_name.trim()) {
-        alert('법인(단체)명을 입력해주세요');
-        return;
-      }
-
       if (formData.resno1.length < 3) {
         alert('사업자번호를 정확히 입력해주세요.');
         return;
@@ -190,10 +180,14 @@ function CertificateDownloadContent() {
       };
 
       if (memberType === 'I') {
-        findRequestBody.name = contract_name;
+        if (contract_name) {
+          findRequestBody.name = contract_name;
+        }
         findRequestBody.birth_date = formData.birth_date;
       } else {
-        findRequestBody.company_name = contract_name;
+        if (contract_name) {
+          findRequestBody.company_name = contract_name;
+        }
         findRequestBody.business_number = birth_ssn;
       }
 
@@ -228,10 +222,14 @@ function CertificateDownloadContent() {
       };
 
       if (memberType === 'I') {
-        sendCodeRequestBody.name = contract_name;
+        if (contract_name) {
+          sendCodeRequestBody.name = contract_name;
+        }
         sendCodeRequestBody.birth_date = formData.birth_date;
       } else {
-        sendCodeRequestBody.company_name = contract_name;
+        if (contract_name) {
+          sendCodeRequestBody.company_name = contract_name;
+        }
         sendCodeRequestBody.business_number = birth_ssn;
       }
 

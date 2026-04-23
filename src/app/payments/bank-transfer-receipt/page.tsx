@@ -2,6 +2,8 @@
 
 import React, { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
+import { readNonMemberContractAuth } from '@/utils/nonMemberContractAuth';
 
 type ContractDetail = {
   insuranceType?: string;
@@ -40,6 +42,7 @@ const getInsuranceTypeDisplay = (insuranceType?: string) => {
 function BankTransferReceiptContent() {
   const BANK_RECEIPT_VERIFY_KEY_PREFIX = 'bank_receipt_verified_';
   const VERIFY_MAX_AGE_MS = 10 * 60 * 1000;
+  const { isLoggedIn, isLoading: authLoading } = useAuth();
   const searchParams = useSearchParams();
   const contractId = searchParams.get('contractId');
   const [detail, setDetail] = useState<ContractDetail | null>(null);
@@ -48,6 +51,8 @@ function BankTransferReceiptContent() {
   const [scale, setScale] = useState(1);
 
   useEffect(() => {
+    if (authLoading) return;
+
     if (!contractId) {
       setLoading(false);
       setDetail(null);
@@ -57,7 +62,14 @@ function BankTransferReceiptContent() {
     const key = `${BANK_RECEIPT_VERIFY_KEY_PREFIX}${contractId}`;
     const verifiedAtRaw = localStorage.getItem(key);
     const verifiedAt = verifiedAtRaw ? Number(verifiedAtRaw) : 0;
-    if (!verifiedAt || Number.isNaN(verifiedAt) || Date.now() - verifiedAt > VERIFY_MAX_AGE_MS) {
+    const hasFreshVerifyKey =
+      !!verifiedAt &&
+      !Number.isNaN(verifiedAt) &&
+      Date.now() - verifiedAt <= VERIFY_MAX_AGE_MS;
+    const hasNonMemberVerifiedSession = !!readNonMemberContractAuth();
+    const canAccessWithoutKey = isLoggedIn || hasNonMemberVerifiedSession;
+
+    if (!hasFreshVerifyKey && !canAccessWithoutKey) {
       setLoading(false);
       setDetail(null);
       setAccessDenied(true);
@@ -66,8 +78,10 @@ function BankTransferReceiptContent() {
       }
       return;
     }
-    // 인증 체크 통과 즉시 사용 완료 처리(재사용 방지)
-    localStorage.removeItem(key);
+    // 인증키로 접근한 케이스만 사용 완료 처리(재사용 방지)
+    if (hasFreshVerifyKey) {
+      localStorage.removeItem(key);
+    }
 
     const fetchDetail = async () => {
       setLoading(true);
@@ -96,7 +110,7 @@ function BankTransferReceiptContent() {
     };
 
     void fetchDetail();
-  }, [contractId]);
+  }, [contractId, isLoggedIn, authLoading]);
 
   useEffect(() => {
     const updateScale = () => {
@@ -235,7 +249,7 @@ function BankTransferReceiptContent() {
                         letterSpacing: '-0.2px',
                       }}
                     >
-                      계좌정보: {accountInfo}{detail.depositorName ? `, 예금주 ${detail.depositorName}` : ''}
+                      계좌정보: {accountInfo}, 예금주 (주)빨주노초파남보
                     </td>
                   </tr>
                   <tr><td height="5px" colSpan={2}></td></tr>

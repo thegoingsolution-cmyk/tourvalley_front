@@ -2325,14 +2325,14 @@ export default function PCContractPage() {
                   </ul>
                   <ul className="tour2023_mypage_cash tourG_mab09">
                     <li className="tourG_mypage_cash02 tour2023_mypage_cashTxt">4. </li>
-                    <li className="tour2023_mypage_cashTxt01">마일리지는 문화상품권(온라인)으로 전환하여 사용하실 수 있으며 이 경우 1P는 1원으로 환원되며 10,000원 단위로 사용하실 수 있습니다.</li>
+                    <li className="tour2023_mypage_cashTxt01">마일리지는 상품권(온라인)으로 전환하여 사용하실 수 있으며 이 경우 1P는 1원으로 환원되며 10,000원 단위로 사용하실 수 있습니다.</li>
                   </ul>
                 </div>
 
                 {/* 문화상품권 전환신청 버튼 */}
                 <div className="tourG_mat06 tourG_mab02">
                   <a href="javascript:void(0);" onClick={(e) => { e.preventDefault(); setShowGiftCardModal(true); }} className="tourGuard_btn_b01 tour2023_btn19">
-                    문화상품권 전환신청&nbsp;&gt;
+                    상품권 전환신청&nbsp;&gt;
                   </a>
                 </div>
 

@@ -361,6 +361,11 @@ export default function OverseasInsuranceStep2Page() {
           if (nameInput) {
             nameInput.value = participant.name || '';
           }
+
+          const engNameInput = document.querySelector(`input[name="insured_engname_${fieldIndex}"]`) as HTMLInputElement;
+          if (engNameInput) {
+            engNameInput.value = participant.englishName || '';
+          }
           
           // 생년월일 입력 (내국인인 경우)
           if (participant.nationality === '내국인' && participant.birthDate) {

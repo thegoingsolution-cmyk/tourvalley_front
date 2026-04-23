@@ -20,6 +20,7 @@ interface ExcelUploadModalProps {
   excelTemplatePath?: string;
   currentParticipants?: Participant[]; // 기존 참가자 목록 (ID 계산용)
   variant?: 'modal' | 'page';
+  includeEnglishName?: boolean;
 }
 
 export default function ExcelUploadModal({
@@ -29,6 +30,7 @@ export default function ExcelUploadModal({
   excelTemplatePath = '/excel/sample_insured_ssn.xls',
   currentParticipants = [],
   variant = 'modal',
+  includeEnglishName = false,
 }: ExcelUploadModalProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -71,7 +73,9 @@ export default function ExcelUploadModal({
 
           // 헤더 검증 (선택적)
           const headers = jsonData[0];
-          const expectedHeaders = ['이름', '성별', '생년월일'];
+          const expectedHeaders = includeEnglishName
+            ? ['이름', '영문이름', '성별', '생년월일']
+            : ['이름', '성별', '생년월일'];
           const hasValidHeaders = expectedHeaders.every(header => 
             headers.some((h: any) => String(h).trim() === header)
           );
@@ -88,11 +92,14 @@ export default function ExcelUploadModal({
 
           for (let i = 1; i < jsonData.length; i++) {
             const row = jsonData[i];
-            if (!row || row.length < 3) continue;
+            if (!row || row.length < (includeEnglishName ? 4 : 3)) continue;
 
             const name = String(row[0] || '').trim();
-            const genderStr = String(row[1] || '').trim();
-            let birthDateStr = String(row[2] || '').trim().replace(/[^0-9]/g, '');
+            const englishName = includeEnglishName ? String(row[1] || '').trim() : '';
+            const genderColIdx = includeEnglishName ? 2 : 1;
+            const birthColIdx = includeEnglishName ? 3 : 2;
+            const genderStr = String(row[genderColIdx] || '').trim();
+            let birthDateStr = String(row[birthColIdx] || '').trim().replace(/[^0-9]/g, '');
 
             // 유효성 검증
             if (!name || !genderStr || !birthDateStr) continue;
@@ -126,6 +133,7 @@ export default function ExcelUploadModal({
             participants.push({
               id: startId + participants.length,
               name: name,
+              ...(includeEnglishName && englishName ? { englishName } : {}),
               nationality: '내국인', // 기본값
               birthDate: birthDateStr,
               gender: gender,
@@ -156,6 +164,19 @@ export default function ExcelUploadModal({
   };
 
   const handleDownload = () => {
+    if (includeEnglishName && XLSX) {
+      const rows = [
+        ['이름', '영문이름', '성별', '생년월일'],
+        ['홍길동', 'HONG GIL DONG', '남', '19950101'],
+        ['홍길녀', 'HONG GIL NYEO', '여', '20010305'],
+      ];
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'insured');
+      XLSX.writeFile(wb, 'sample_insured_overseas.xlsx');
+      return;
+    }
+
     const link = document.createElement('a');
     link.href = excelTemplatePath;
     link.download = 'sample_insured_ssn.xls';
@@ -234,11 +255,14 @@ export default function ExcelUploadModal({
                   </a>
                 </div>
                 <div className="tourG_mat13">
-                  <p className="tour2023_pcBox_txt07">- 이름, 주민번호를 정확히 입력해주시기 바랍니다.(예시)</p>
+                  <p className="tour2023_pcBox_txt07">
+                    - {includeEnglishName ? '이름, 영문이름, 성별, 생년월일' : '이름, 성별, 생년월일'}을 정확히 입력해주시기 바랍니다.(예시)
+                  </p>
                   <table className="tour2023_pc_ta">
                     <thead>
                       <tr>
                         <td className="tour2023_pc_td01">이름</td>
+                        {includeEnglishName && <td className="tour2023_pc_td01">영문이름</td>}
                         <td className="tour2023_pc_td01">성별</td>
                         <td>생년월일(8자리)</td>
                       </tr>
@@ -246,11 +270,13 @@ export default function ExcelUploadModal({
                     <tbody>
                       <tr>
                         <td className="tour2023_pc_td01">홍길동</td>
+                        {includeEnglishName && <td className="tour2023_pc_td01">HONG GIL DONG</td>}
                         <td className="tour2023_pc_td01">남</td>
                         <td>19950101</td>
                       </tr>
                       <tr>
                         <td className="tour2023_pc_td01">홍길녀</td>
+                        {includeEnglishName && <td className="tour2023_pc_td01">HONG GIL NYEO</td>}
                         <td className="tour2023_pc_td01">여</td>
                         <td>20010305</td>
                       </tr>
@@ -335,6 +361,7 @@ export default function ExcelUploadModal({
             <thead>
               <tr>
                 <th>이름</th>
+                {includeEnglishName && <th>영문이름</th>}
                 <th>성별</th>
                 <th>생년월일(8자리)</th>
               </tr>
@@ -342,11 +369,13 @@ export default function ExcelUploadModal({
             <tbody>
               <tr>
                 <td>홍길동</td>
+                {includeEnglishName && <td>HONG GIL DONG</td>}
                 <td>남</td>
                 <td>19950101</td>
               </tr>
               <tr>
                 <td>홍길녀</td>
+                {includeEnglishName && <td>HONG GIL NYEO</td>}
                 <td>여</td>
                 <td>20010305</td>
               </tr>

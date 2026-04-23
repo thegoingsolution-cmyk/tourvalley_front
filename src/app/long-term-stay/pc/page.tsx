@@ -1772,6 +1772,7 @@ export default function PCLongTermStayPage() {
             setShowExcelModal(false);
           }}
           currentParticipants={participants}
+          includeEnglishName={true}
         />
 
       </main>

@@ -260,10 +260,19 @@ export default function GroupParticipantInfoStep({
 
   const handleApply = () => {
     // 필수 필드 검증
-    // 사업자번호가 입력된 경우 올바른 형식인지 확인
+    // 사업자번호 필수 + 형식(10자리) 검증
     const businessNumber = groupInfo.businessNumber1 + groupInfo.businessNumber2 + groupInfo.businessNumber3;
-    if (businessNumber.length > 0 && businessNumber.length !== 10) {
+    if (!businessNumber) {
+      alert('사업자번호를 입력해주세요.');
+      return;
+    }
+    if (businessNumber.length !== 10) {
       alert('사업자번호를 올바르게 입력해주세요.');
+      return;
+    }
+
+    if (!groupInfo.groupName?.trim()) {
+      alert('법인단체명을 입력해주세요.');
       return;
     }
     

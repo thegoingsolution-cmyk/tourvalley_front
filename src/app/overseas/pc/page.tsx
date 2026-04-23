@@ -1668,6 +1668,7 @@ export default function PCOverseasPage() {
             setShowExcelModal(false);
           }}
           currentParticipants={participants}
+          includeEnglishName={true}
         />
 
       </main>

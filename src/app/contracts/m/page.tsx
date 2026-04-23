@@ -2261,7 +2261,7 @@ export default function MobileContractPage() {
                 onClick={() => setShowGiftCardModal(true)}
                 style={{ marginTop: 10, width: '100%' }}
               >
-                문화상품권 전환신청
+                상품권 전환신청
               </button>
             </div>
 

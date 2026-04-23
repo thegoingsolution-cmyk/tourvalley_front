@@ -462,6 +462,18 @@ export default function ContractDetailPage() {
               </a>
             </div>
           )}
+          {contractDetail?.englishCertificateUrl && (
+            <div className="tourG_mat04">
+              <a
+                href={contractDetail.englishCertificateUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="tourGuard_btn_b tour2023_btn06_gray"
+              >
+                영문 증권 다운로드 받기<span className="tour2023_arr01"></span>
+              </a>
+            </div>
+          )}
           {isPaymentCompleted && contractDetail?.paymentSubMethod !== '수기카드' && (
             <div className="tourG_mat04">
               <a 
