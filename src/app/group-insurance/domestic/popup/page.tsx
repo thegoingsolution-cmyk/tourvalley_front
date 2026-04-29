@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { ko } from 'date-fns/locale';
 import { format, parse } from 'date-fns';
@@ -29,6 +29,16 @@ const parseDate = (dateString: string): Date | null => {
     return null;
   }
 };
+
+const MIN_DEPARTURE_LEAD_MS = 2 * 60 * 60 * 1000;
+
+function isDepartureAtLeastTwoHoursFromNow(dateStr: string, timeStr: string) {
+  const dep = parseInsuranceDateHourToInstant(dateStr, timeStr);
+  if (Number.isNaN(dep.getTime())) return false;
+  const now = new Date();
+  const currentHourStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours()).getTime();
+  return dep.getTime() >= currentHourStart + MIN_DEPARTURE_LEAD_MS;
+}
 
 export default function DomesticInsurancePopupPage() {
   const { isLoggedIn, member, isLoading } = useAuth();
@@ -91,6 +101,30 @@ export default function DomesticInsurancePopupPage() {
     setHasSelectedStartDate(false);
     setHasSelectedEndDate(false);
   }, []);
+
+  const handleStartDateInput = useCallback(
+    (date: string): boolean => {
+      if (date && !isDepartureAtLeastTwoHoursFromNow(date, startHour)) {
+        alert('출발시간은 가입시점 2시간 뒤부터 설정 가능합니다');
+        return false;
+      }
+      setStartDate(date);
+      return true;
+    },
+    [startHour]
+  );
+
+  const handleStartHourInput = useCallback(
+    (hour: string): boolean => {
+      if (startDate && !isDepartureAtLeastTwoHoursFromNow(startDate, hour)) {
+        alert('출발시간은 가입시점 2시간 뒤부터 설정 가능합니다');
+        return false;
+      }
+      setStartHour(hour);
+      return true;
+    },
+    [startDate]
+  );
 
   const handleSubmit = () => {
     if (!startDate || !endDate) {
@@ -202,18 +236,18 @@ export default function DomesticInsurancePopupPage() {
                             onChange={(date: Date | null) => {
                               if (date) {
                                 const formattedDate = formatDate(date);
-                                setStartDate(formattedDate);
+                                if (!handleStartDateInput(formattedDate)) return;
                                 setHasSelectedStartDate(formattedDate !== initialStartDateRef.current);
                                 setUserHasInteractedWithStartDate(true);
                               } else {
-                                setStartDate('');
+                                if (!handleStartDateInput('')) return;
                                 setHasSelectedStartDate(false);
                               }
                             }}
                             onSelect={(date: Date | null) => {
                               if (date) {
                                 const formattedDate = formatDate(date);
-                                setStartDate(formattedDate);
+                                if (!handleStartDateInput(formattedDate)) return;
                                 setHasSelectedStartDate(formattedDate !== initialStartDateRef.current);
                                 setUserHasInteractedWithStartDate(true);
                               }
@@ -242,7 +276,7 @@ export default function DomesticInsurancePopupPage() {
                             <select
                               className="sel01"
                               value={startHour}
-                              onChange={(e) => setStartHour(e.target.value)}
+                              onChange={(e) => handleStartHourInput(e.target.value)}
                             >
                               {Array.from({ length: 24 }, (_, i) => i + 1).map(h => (
                                 <option key={h} value={String(h).padStart(2, '0')}>{String(h).padStart(2, '0')}시</option>

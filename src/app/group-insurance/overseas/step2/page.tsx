@@ -148,7 +148,7 @@ export default function OverseasInsuranceStep2Page() {
     AS: [
       { value: 'JP', label: '일본' },
       { value: 'CN', label: '중국' },
-      { value: 'TW', label: '대만' },
+      { value: 'TW', label: '대만(타이완)' },
       { value: 'HK', label: '홍콩' },
       { value: 'SG', label: '싱가포르' },
       { value: 'TH', label: '태국' },
@@ -478,29 +478,60 @@ export default function OverseasInsuranceStep2Page() {
       return;
     }
     
-    // 핸드폰번호 필수 검증
-    const ctelNo1 = ctelNo1Select?.value || '';
-    const ctelNo2 = ctelNo2Input?.value || '';
-    const ctelNo3 = ctelNo3Input?.value || '';
-    
-    const hasMobile = ctelNo1 && ctelNo2 && ctelNo3;
-    
-    if (!hasMobile) {
-      alert('핸드폰번호를 입력해주세요.');
-      if (!ctelNo2) {
-        ctelNo2Input?.focus();
-      } else if (!ctelNo3) {
-        ctelNo3Input?.focus();
-      } else {
-        ctelNo2Input?.focus();
-      }
-      return;
-    }
-    
-    // 전화번호는 선택사항 (핸드폰번호가 있으면 통과)
+    // 전화번호/핸드폰번호 검증 (둘 중 하나는 필수, 부분 입력 불가)
     const telno1 = telno1Input?.value || '';
     const telno2 = telno2Input?.value || '';
     const telno3 = telno3Input?.value || '';
+    const ctelNo1 = ctelNo1Select?.value || '';
+    const ctelNo2 = ctelNo2Input?.value || '';
+    const ctelNo3 = ctelNo3Input?.value || '';
+
+    const hasAnyTel = !!(telno1 || telno2 || telno3);
+    const isTelComplete = !!(telno1 && telno2 && telno3);
+    if (hasAnyTel && !isTelComplete) {
+      alert('전화번호를 끝까지 입력해주세요.');
+      if (!telno1) {
+        telno1Input?.focus();
+      } else if (!telno2) {
+        telno2Input?.focus();
+      } else {
+        telno3Input?.focus();
+      }
+      return;
+    }
+    if (isTelComplete) {
+      const telRegex = /^0\d{1,2}-\d{3,4}-\d{4}$/;
+      if (!telRegex.test(`${telno1}-${telno2}-${telno3}`)) {
+        alert('전화번호 형식이 올바르지 않습니다.');
+        telno1Input?.focus();
+        return;
+      }
+    }
+
+    const hasAnyMobile = !!(ctelNo2 || ctelNo3);
+    const isMobileComplete = !!(ctelNo1 && ctelNo2 && ctelNo3);
+    if (hasAnyMobile && !isMobileComplete) {
+      alert('핸드폰번호를 끝까지 입력해주세요.');
+      if (!ctelNo2) {
+        ctelNo2Input?.focus();
+      } else {
+        ctelNo3Input?.focus();
+      }
+      return;
+    }
+    if (isMobileComplete) {
+      const mobileRegex = /^01\d-\d{3,4}-\d{4}$/;
+      if (!mobileRegex.test(`${ctelNo1}-${ctelNo2}-${ctelNo3}`)) {
+        alert('핸드폰번호 형식이 올바르지 않습니다.');
+        ctelNo2Input?.focus();
+        return;
+      }
+    }
+    if (!isTelComplete && !isMobileComplete) {
+      alert('전화번호 또는 핸드폰번호를 입력해주세요.');
+      ctelNo2Input?.focus();
+      return;
+    }
     
     // 이메일 검증
     const emailDomain = email2SelSelect?.value || email2;

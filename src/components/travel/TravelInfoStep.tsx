@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { ko } from 'date-fns/locale';
 import { format, parse } from 'date-fns';
 import 'react-datepicker/dist/react-datepicker.css';
+import { parseInsuranceDateHourToInstant } from '@/utils/dateTime';
 
 // 한국어 locale 등록
 registerLocale('ko', ko);
@@ -22,6 +23,17 @@ const parseDate = (dateString: string): Date | null => {
     return null;
   }
 };
+
+const MS_PER_HOUR = 60 * 60 * 1000;
+
+function isDepartureAtLeastHoursFromNow(dateStr: string, timeStr: string, hours: number): boolean {
+  const dep = parseInsuranceDateHourToInstant(dateStr, timeStr);
+  if (Number.isNaN(dep.getTime())) return false;
+  const now = new Date();
+  const currentHourStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours()).getTime();
+  return dep.getTime() >= currentHourStart + hours * MS_PER_HOUR;
+}
+
 import StepIndicator from './StepIndicator';
 import PlanSelection from './PlanSelection';
 import CountrySelectModal from './CountrySelectModal';
@@ -58,6 +70,8 @@ interface TravelInfoStepProps {
   // Insurance type specific
   insuranceType: string;
   timeOptions?: number[];
+  /** 출발일시가 가입 시점(현재) 기준 최소 N시간 이후인지 검사. 0이면 검사 안 함. 기본 2. */
+  minDepartureLeadFromNow?: number;
   
   // 해외여행보험용 여행국가 필드
   travelCountry?: string;
@@ -105,6 +119,7 @@ export default function TravelInfoStep({
   onAddParticipant,
   insuranceType,
   timeOptions = Array.from({ length: 24 }, (_, i) => i + 1),
+  minDepartureLeadFromNow = 2,
   travelCountry,
   travelCountries,
   onTravelCountryChange,
@@ -126,6 +141,30 @@ export default function TravelInfoStep({
   const [userHasInteractedWithArrivalDate, setUserHasInteractedWithArrivalDate] = useState(false);
   const initialDepartureDateRef = useRef(departureDate);
   const initialArrivalDateRef = useRef(arrivalDate);
+
+  const handleDepartureDateInput = useCallback(
+    (date: string): boolean => {
+      if (date && minDepartureLeadFromNow > 0 && !isDepartureAtLeastHoursFromNow(date, departureTime, minDepartureLeadFromNow)) {
+        alert('출발시간은 가입시점 2시간 뒤부터 설정 가능합니다');
+        return false;
+      }
+      onDepartureDateChange(date);
+      return true;
+    },
+    [departureTime, minDepartureLeadFromNow, onDepartureDateChange]
+  );
+
+  const handleDepartureTimeInput = useCallback(
+    (time: string): boolean => {
+      if (departureDate && minDepartureLeadFromNow > 0 && !isDepartureAtLeastHoursFromNow(departureDate, time, minDepartureLeadFromNow)) {
+        alert('출발시간은 가입시점 2시간 뒤부터 설정 가능합니다');
+        return false;
+      }
+      onDepartureTimeChange(time);
+      return true;
+    },
+    [departureDate, minDepartureLeadFromNow, onDepartureTimeChange]
+  );
 
   // 단체여행보험 팝업 열기
   const openGroupInsurancePopup = () => {
@@ -181,18 +220,18 @@ export default function TravelInfoStep({
                   onChange={(date: Date | null) => {
                     if (date) {
                       const formattedDate = formatDate(date);
-                      onDepartureDateChange(formattedDate);
+                      if (!handleDepartureDateInput(formattedDate)) return;
                       setHasSelectedDepartureDate(formattedDate !== initialDepartureDateRef.current);
                       setUserHasInteractedWithDepartureDate(true);
                     } else {
-                      onDepartureDateChange('');
+                      if (!handleDepartureDateInput('')) return;
                       setHasSelectedDepartureDate(false);
                     }
                   }}
                   onSelect={(date: Date | null) => {
                     if (date) {
                       const formattedDate = formatDate(date);
-                      onDepartureDateChange(formattedDate);
+                      if (!handleDepartureDateInput(formattedDate)) return;
                       setHasSelectedDepartureDate(formattedDate !== initialDepartureDateRef.current);
                       setUserHasInteractedWithDepartureDate(true);
                     }
@@ -217,7 +256,7 @@ export default function TravelInfoStep({
               <div className="field-group time-field">
                 <select
                   value={departureTime}
-                  onChange={(e) => onDepartureTimeChange(e.target.value)}
+                  onChange={(e) => handleDepartureTimeInput(e.target.value)}
                   className="field-input time-select"
                 >
                   {timeOptions.map((hour) => (

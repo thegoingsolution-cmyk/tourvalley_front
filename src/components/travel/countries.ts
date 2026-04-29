@@ -8,7 +8,7 @@ export const frequentCountries: Country[] = [
   { code: 'JP', name: '일본' },
   { code: 'VN', name: '베트남' },
   { code: 'TH', name: '태국' },
-  { code: 'TW', name: '대만' },
+  { code: 'TW', name: '대만(타이완)' },
   { code: 'PH', name: '필리핀' },
   { code: 'GU', name: '괌' },
   { code: 'SG', name: '싱가포르' },

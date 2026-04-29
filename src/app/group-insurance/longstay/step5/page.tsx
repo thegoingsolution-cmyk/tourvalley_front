@@ -786,7 +786,7 @@ export default function LongStayInsuranceStep5Page() {
                 { value: 'HU', label: '헝가리' },
               ],
               AS: [
-                { value: 'TW', label: '대만' },
+                { value: 'TW', label: '대만(타이완)' },
                 { value: 'MY', label: '말레이시아' },
                 { value: 'MN', label: '몽골' },
                 { value: 'VN', label: '베트남' },
@@ -900,7 +900,7 @@ export default function LongStayInsuranceStep5Page() {
           { value: 'HU', label: '헝가리' },
         ],
         AS: [
-          { value: 'TW', label: '대만' },
+          { value: 'TW', label: '대만(타이완)' },
           { value: 'MY', label: '말레이시아' },
           { value: 'MN', label: '몽골' },
           { value: 'VN', label: '베트남' },

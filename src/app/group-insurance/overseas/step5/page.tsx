@@ -845,7 +845,7 @@ export default function OverseasInsuranceStep5Page() {
               AS: [
                 { value: 'JP', label: '일본' },
                 { value: 'CN', label: '중국' },
-                { value: 'TW', label: '대만' },
+                { value: 'TW', label: '대만(타이완)' },
                 { value: 'HK', label: '홍콩' },
                 { value: 'SG', label: '싱가포르' },
                 { value: 'TH', label: '태국' },
@@ -959,7 +959,7 @@ export default function OverseasInsuranceStep5Page() {
         AS: [
           { value: 'JP', label: '일본' },
           { value: 'CN', label: '중국' },
-          { value: 'TW', label: '대만' },
+          { value: 'TW', label: '대만(타이완)' },
           { value: 'HK', label: '홍콩' },
           { value: 'SG', label: '싱가포르' },
           { value: 'TH', label: '태국' },

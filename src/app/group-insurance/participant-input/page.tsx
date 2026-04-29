@@ -520,7 +520,7 @@ export default function ParticipantInputPage() {
                                   <option value="MY">말레이시아</option>
                                   <option value="SG">싱가포르</option>
                                   <option value="HK">홍콩</option>
-                                  <option value="TW">대만</option>
+                                  <option value="TW">대만(타이완)</option>
                                   <option value="MO">마카오</option>
                                   <option value="GB">영국</option>
                                   <option value="FR">프랑스</option>
