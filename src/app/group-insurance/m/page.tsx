@@ -27,7 +27,15 @@ import ExcelUploadModal from '@/components/travel/ExcelUploadModal';
 import DangerousActivityModal from '@/components/travel/DangerousActivityModal';
 import RestrictedCountryModal from '@/components/travel/RestrictedCountryModal';
 import ConsentModalMobile from '@/components/mobiletravel/ConsentModalMobile';
-import { PlanType, PlanInfo, Participant, CalculatedPremiums, PaymentMethod, PaymentSubMethod } from '@/components/travel/types';
+import {
+  PlanType,
+  PlanInfo,
+  Participant,
+  CalculatedPremiums,
+  PaymentMethod,
+  PaymentSubMethod,
+  getParticipantEmail,
+} from '@/components/travel/types';
 import { frequentCountries, allCountries } from '@/components/travel/utils/countries';
 import { resolveGroupTierBucketDbPlanType, findGroupBucketPlanTypeForInsured } from '@/utils/domesticPlanTier';
 import './page.css';
@@ -1220,14 +1228,6 @@ function MobileGroupInsuranceContent() {
     return parts.length > 0 ? parts.join(', ') : '';
   })();
 
-  // 이메일 전체 주소 가져오기
-  const getFullEmail = (participant: Participant): string => {
-    if (!participant.email1 || !participant.email2) return '';
-    const domain = participant.email2 === '직접입력' ? (participant.customEmail || '') : participant.email2;
-    if (!domain) return '';
-    return `${participant.email1}@${domain}`;
-  };
-
   // 그룹 정보에서 이메일 전체 주소 가져오기
   const getGroupFullEmail = (info: GroupInfo | null): string => {
     if (!info || !info.email1 || !info.email2) return '';
@@ -2136,7 +2136,7 @@ function MobileGroupInsuranceContent() {
             name: currentParticipants[0]?.name || '',
             resident_number: currentParticipants[0]?.birthDate ? `${currentParticipants[0].birthDate}-${getResidentGenderCode(currentParticipants[0].birthDate, currentParticipants[0].gender)}000000` : '',
             mobile_phone: currentParticipants[0]?.phone || '',
-            email: getFullEmail(currentParticipants[0]),
+            email: getParticipantEmail(currentParticipants[0]),
           },
           insured_persons: currentParticipants.map((p, idx) => {
             const age = calculateAgeFromBirthDate(p.birthDate);
@@ -2194,7 +2194,7 @@ function MobileGroupInsuranceContent() {
             : currentParticipants[0]?.name || '';
           const buyerEmail = hasGroupParticipants && groupInfo 
             ? getGroupFullEmail(groupInfo) 
-            : getFullEmail(currentParticipants[0]);
+            : getParticipantEmail(currentParticipants[0]);
           const buyerTel = hasGroupParticipants && groupInfo 
             ? groupInfo.phone || '' 
             : currentParticipants[0]?.phone || '';
@@ -2233,7 +2233,7 @@ function MobileGroupInsuranceContent() {
             : currentParticipants[0]?.name || '';
           const customerEmail = hasGroupParticipants && groupInfo 
             ? getGroupFullEmail(groupInfo) 
-            : getFullEmail(currentParticipants[0]);
+            : getParticipantEmail(currentParticipants[0]);
           const customerPhone = hasGroupParticipants && groupInfo 
             ? groupInfo.phone || '' 
             : currentParticipants[0]?.phone || '';
@@ -2260,7 +2260,7 @@ function MobileGroupInsuranceContent() {
             : currentParticipants[0]?.name || '';
           const customerEmail = hasGroupParticipants && groupInfo 
             ? getGroupFullEmail(groupInfo) 
-            : getFullEmail(currentParticipants[0]);
+            : getParticipantEmail(currentParticipants[0]);
           const customerPhone = hasGroupParticipants && groupInfo 
             ? groupInfo.phone || '' 
             : currentParticipants[0]?.phone || '';
@@ -2315,7 +2315,7 @@ function MobileGroupInsuranceContent() {
             name: currentParticipants[0]?.name || '',
             resident_number: currentParticipants[0]?.birthDate ? `${currentParticipants[0].birthDate}-${getResidentGenderCode(currentParticipants[0].birthDate, currentParticipants[0].gender)}000000` : '',
             mobile_phone: currentParticipants[0]?.phone || '',
-            email: getFullEmail(currentParticipants[0]),
+            email: getParticipantEmail(currentParticipants[0]),
           },
           insured_persons: currentParticipants.map((p, idx) => {
             const age = calculateAgeFromBirthDate(p.birthDate);
@@ -2370,7 +2370,7 @@ function MobileGroupInsuranceContent() {
           : currentParticipants[0]?.name || '';
         const buyerEmail = hasGroupParticipants && groupInfo 
           ? getGroupFullEmail(groupInfo) 
-          : getFullEmail(currentParticipants[0]);
+          : getParticipantEmail(currentParticipants[0]);
         const buyerTel = hasGroupParticipants && groupInfo 
           ? groupInfo.phone || '' 
           : currentParticipants[0]?.phone || '';
@@ -2444,7 +2444,7 @@ function MobileGroupInsuranceContent() {
             name: currentParticipants[0]?.name || '',
             resident_number: currentParticipants[0]?.birthDate ? `${currentParticipants[0].birthDate}-${getResidentGenderCode(currentParticipants[0].birthDate, currentParticipants[0].gender)}000000` : '',
             mobile_phone: currentParticipants[0]?.phone || '',
-            email: getFullEmail(currentParticipants[0]),
+            email: getParticipantEmail(currentParticipants[0]),
           },
           insured_persons: currentParticipants.map((p, idx) => {
             const age = calculateAgeFromBirthDate(p.birthDate);

@@ -23,7 +23,15 @@ import CompletionStep from '@/components/travel/CompletionStep';
 import ExcelUploadModal from '@/components/travel/ExcelUploadModal';
 import DangerousActivityModal from '@/components/travel/DangerousActivityModal';
 import ConsentModalMobile from '@/components/mobiletravel/ConsentModalMobile';
-import { PlanType, PlanInfo, Participant, CalculatedPremiums, PaymentMethod, PaymentSubMethod } from '@/components/travel/types';
+import {
+  PlanType,
+  PlanInfo,
+  Participant,
+  CalculatedPremiums,
+  PaymentMethod,
+  PaymentSubMethod,
+  getParticipantEmail,
+} from '@/components/travel/types';
 import { pickDomesticPlanForTier, resolveDomesticPlanForParticipant } from '@/utils/domesticPlanTier';
 import { getPremiumGenderFromParticipant } from '@/utils/age';
 import './page.css';
@@ -215,13 +223,6 @@ function MobileDomesticStep1Content() {
     } catch (error) {
       return null;
     }
-  };
-
-  // 이메일 전체 주소 가져오기
-  const getFullEmail = (participant: Participant): string => {
-    if (!participant.email1) return '';
-    const domain = participant.email2 === '직접입력' ? participant.customEmail : participant.email2;
-    return domain ? `${participant.email1}@${domain}` : '';
   };
 
   // 기간 검증 (국내여행보험 최대 1개월)
@@ -1014,7 +1015,7 @@ function MobileDomesticStep1Content() {
             name: participants[0]?.name || '',
             resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${getResidentGenderCode(participants[0].birthDate, participants[0].gender)}000000` : '',
             mobile_phone: participants[0]?.phone || '',
-            email: getFullEmail(participants[0]),
+            email: getParticipantEmail(participants[0]),
           },
           insured_persons: participants.map((p, idx) => {
             // 외국인일 경우 외국인등록번호에서 생년월일 추출
@@ -1103,7 +1104,7 @@ function MobileDomesticStep1Content() {
             orderId: String(contractData_result.contract_id),
             goodsName: '국내여행자보험',
             buyerName: participants[0]?.name || '',
-            buyerEmail: getFullEmail(participants[0]),
+            buyerEmail: getParticipantEmail(participants[0]),
             buyerTel: participants[0]?.phone || '',
             returnUrl: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/payments/nicepay/callback`,
             closeUrl: `${window.location.origin}/payment/close`,
@@ -1132,7 +1133,7 @@ function MobileDomesticStep1Content() {
               productName: '국내여행자보험',
               productCount: participants.length,
               customerName: participants[0]?.name || '',
-              customerEmail: getFullEmail(participants[0]),
+              customerEmail: getParticipantEmail(participants[0]),
               customerPhone: participants[0]?.phone || '',
               checkOutDate: arrivalDate,
               purchaserName: participants[0]?.name || '',
@@ -1150,7 +1151,7 @@ function MobileDomesticStep1Content() {
               itemName: '국내여행자보험',
               quantity: participants.length,
               customerName: participants[0]?.name || '',
-              customerEmail: getFullEmail(participants[0]),
+              customerEmail: getParticipantEmail(participants[0]),
               customerPhone: participants[0]?.phone || '',
             });
           } catch (error) {
@@ -1183,7 +1184,7 @@ function MobileDomesticStep1Content() {
             name: participants[0]?.name || '',
             resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${getResidentGenderCode(participants[0].birthDate, participants[0].gender)}000000` : '',
             mobile_phone: participants[0]?.phone || '',
-            email: getFullEmail(participants[0]),
+            email: getParticipantEmail(participants[0]),
           },
           insured_persons: participants.map((p, idx) => {
             // 외국인일 경우 외국인등록번호에서 생년월일 추출
@@ -1303,7 +1304,7 @@ function MobileDomesticStep1Content() {
             contractor_type: (isLoggedIn && member) ? member.member_type : '개인',
             name: participants[0]?.name || '',
             phone: participants[0]?.phone || '',
-            email: getFullEmail(participants[0]) || null,
+            email: getParticipantEmail(participants[0]) || null,
           },
           insured_persons: participants.map((p, idx) => {
             // 외국인일 경우 외국인등록번호에서 생년월일 추출
@@ -1391,7 +1392,7 @@ function MobileDomesticStep1Content() {
           orderId: String(contractData_result.contract_id),
           goodsName: '국내여행보험',
           buyerName: participants[0]?.name || '',
-          buyerEmail: getFullEmail(participants[0]) || '',
+          buyerEmail: getParticipantEmail(participants[0]) || '',
           buyerTel: participants[0]?.phone || '',
           returnUrl: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/payments/nicepay/callback`,
           closeUrl: `${window.location.origin}/payment/close`,

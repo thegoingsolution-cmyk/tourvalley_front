@@ -2,7 +2,13 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import StepIndicator from './StepIndicator';
-import { Participant, CalculatedPremiums, PlanType } from './types';
+import {
+  Participant,
+  CalculatedPremiums,
+  PlanType,
+  getParticipantEmail,
+  getParticipantEmailInputValue,
+} from './types';
 import { sendVerificationCode, verifyCode } from '@/services/smsService';
 import { getPremiumGenderFromParticipant } from '@/utils/age';
 
@@ -60,45 +66,18 @@ export default function ParticipantInfoStep({
   isLoggedIn = false,
   memberPhone,
 }: ParticipantInfoStepProps) {
-  const openEmailSelect = (index: number) => {
-    const selectEl = document.getElementById(`select_email_${index}`) as HTMLSelectElement | null;
-    if (!selectEl) return;
-
-    if (typeof (selectEl as HTMLSelectElement & { showPicker?: () => void }).showPicker === 'function') {
-      try {
-        (selectEl as HTMLSelectElement & { showPicker: () => void }).showPicker();
-        return;
-      } catch {
-        // Some browsers require a direct user gesture for showPicker.
-      }
-    }
-
-    selectEl.focus();
-    selectEl.click();
-  };
   const validateRepresentativeEmail = () => {
     const representative = participants[0];
     if (!representative) return true;
 
-    const emailId = (representative.email1 || '').trim();
-    const emailDomain =
-      representative.email2 === '직접입력'
-        ? (representative.customEmail || '').trim()
-        : (representative.email2 || '').trim();
-
-    if (!emailId || !emailDomain) {
+    const email = getParticipantEmail(representative).trim();
+    if (!email) {
       alert('이메일 주소를 입력해주세요.');
       return false;
     }
 
-    if (emailId.includes('@') || emailDomain.includes('@')) {
-      alert('이메일은 아이디와 도메인을 나눠서 입력해주세요.');
-      return false;
-    }
-
-    const emailIdPattern = /^[A-Za-z0-9._%+-]+$/;
-    const domainPattern = /^[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-    if (!emailIdPattern.test(emailId) || !domainPattern.test(emailDomain)) {
+    const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!pattern.test(email)) {
       alert('이메일 형식이 올바르지 않습니다.');
       return false;
     }
@@ -264,6 +243,18 @@ export default function ParticipantInfoStep({
     onParticipantsChange(updated);
   };
 
+  /** 이메일 전체 문자열 저장: email1에 보관하고 도메인 분리 필드는 비움(구형 데이터는 getParticipantEmail로 합성 표시). */
+  const handleParticipantFullEmailChange = (index: number, value: string) => {
+    const updated = [...participants];
+    updated[index] = {
+      ...updated[index],
+      email1: value,
+      email2: '',
+      customEmail: '',
+    };
+    onParticipantsChange(updated);
+  };
+
   const handleDeleteParticipant = (id: number) => {
     onParticipantsChange(participants.filter((p) => p.id !== id));
   };
@@ -350,6 +341,21 @@ export default function ParticipantInfoStep({
           border-bottom: 1px solid #d5d7dd;
           vertical-align: middle;
           z-index: 1;
+        }
+        .tourGuard_form_tt .participant-email-full-input {
+          width: calc(100% - 28px) !important;
+          max-width: calc(100% - 28px);
+          flex: 1 1 auto;
+          min-width: 0;
+          box-sizing: border-box;
+          padding-right: 12px;
+          letter-spacing: -0.65px !important;
+          font-size: 18px !important;
+        }
+        @media (max-width: 768px) {
+          .tourGuard_form_tt .participant-email-full-input {
+            font-size: 15px !important;
+          }
         }
       `}</style>
       <section className="form-section">
@@ -592,124 +598,31 @@ export default function ParticipantInfoStep({
                 {/* 이메일 주소 - 가입자 1(대표)만 */}
                 {index === 0 && (
                   <div className="tourGuard_form_tt mag5 tourG_mab03">
-                    <label htmlFor={`email1_${index}`}>이메일 주소</label>
+                    <label htmlFor={`email_full_${index}`}>이메일 주소</label>
                     <input
                       type="text"
-                      id={`email1_${index}`}
-                      name="email1"
-                      maxLength={20}
-                      placeholder="아이디"
-                      className="tourGuard_input_w01"
-                      value={participant.email1}
-                      onChange={(e) => handleParticipantChange(index, 'email1', e.target.value)}
+                      inputMode="email"
+                      id={`email_full_${index}`}
+                      name="email"
+                      autoComplete="email"
+                      maxLength={100}
+                      placeholder="이메일을 입력해 주세요(예 : tourvalley@naver.com)"
+                      className="tourGuard_input_w01 participant-email-full-input"
+                      value={getParticipantEmailInputValue(participant)}
+                      onChange={(e) => handleParticipantFullEmailChange(index, e.target.value)}
                       style={{
                         height: '32px',
                         paddingLeft: '10px',
                         color: '#000',
-                        fontSize: '18px',
-                        letterSpacing: '0px',
                         marginTop: '23px',
                         marginLeft: '10px',
                         paddingTop: '0px',
+                        border: 0,
+                        outline: 'none',
+                        boxShadow: 'none',
+                        background: 'transparent',
                       }}
                     />
-                    <div 
-                      className="tourGuard_txt03"
-                      style={{
-                        marginTop: '23px',
-                        marginLeft: '10px',
-                      }}
-                    >@</div>
-                    <input
-                      type="text"
-                      id={`email2_${index}`}
-                      name="email2"
-                      maxLength={20}
-                      className="tourGuard_input_w01"
-                      value={participant.email2 === '직접입력' ? (participant.customEmail || '') : (participant.email2 || '')}
-                      onChange={(e) => {
-                        if (participant.email2 === '직접입력') {
-                          handleParticipantChange(index, 'customEmail', e.target.value);
-                        }
-                      }}
-                      readOnly={participant.email2 !== '직접입력' && participant.email2 !== ''}
-                      style={{
-                        height: '32px',
-                        paddingLeft: '10px',
-                        color: '#000',
-                        fontSize: '18px',
-                        letterSpacing: '0px',
-                        marginTop: '23px',
-                        marginLeft: '10px',
-                        paddingTop: '0px',
-                      }}
-                    />
-                    <div 
-                      className="tourGuard_input_cell08 tourGuard_input_cell09 tourGuard"
-                      style={{
-                        marginTop: '23px',
-                        marginLeft: '10px',
-                        marginRight: '15px',
-                        display: 'inline-block',
-                        verticalAlign: 'middle',
-                      }}
-                    >
-                      <span
-                        className="tourGuard_ps_box"
-                        onMouseDown={(event) => {
-                          event.preventDefault();
-                          openEmailSelect(index);
-                        }}
-                        style={{
-                          position: 'relative',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          height: '32px',
-                          lineHeight: '32px',
-                        }}
-                      >
-                        <select
-                          className="tourGuard_sel"
-                          id={`select_email_${index}`}
-                          name="select_email"
-                          value={participant.email2 || ''}
-                          onChange={(e) => {
-                            const updated = [...participants];
-                            updated[index] = { 
-                              ...updated[index], 
-                              email2: e.target.value,
-                              customEmail: e.target.value !== '직접입력' ? '' : updated[index].customEmail
-                            };
-                            onParticipantsChange(updated);
-                          }}
-                          style={{
-                            flex: 1,
-                            appearance: 'none',
-                            WebkitAppearance: 'none',
-                            MozAppearance: 'none',
-                          }}
-                        >
-                          <option value="">선택</option>
-                          <option value="gmail.com">gmail.com</option>
-                          <option value="naver.com">naver.com</option>
-                          <option value="hanmail.net">hanmail.net</option>
-                          <option value="daum.net">daum.net</option>
-                          <option value="nate.com">nate.com</option>
-                          <option value="hotmail.com">hotmail.com</option>
-                          <option value="직접입력">직접입력</option>
-                        </select>
-                        <img
-                          src="/icons/icon_sel.png"
-                          alt="선택"
-                          onMouseDown={(event) => {
-                            event.preventDefault();
-                            openEmailSelect(index);
-                          }}
-                          style={{ width: 'auto', height: '7px', marginLeft: '8px', cursor: 'pointer' }}
-                        />
-                      </span>
-                    </div>
                   </div>
                 )}
 

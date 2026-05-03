@@ -25,7 +25,16 @@ import DangerousActivityModal from '@/components/travel/DangerousActivityModal';
 import ConsentModal from '@/components/travel/ConsentModal';
 import ExcelUploadModal from '@/components/travel/ExcelUploadModal';
 import CoverageDetailModal from '@/components/travel/CoverageDetailModal';
-import { PlanType, PlanInfo, Participant, CalculatedPremiums, PaymentMethod, PaymentSubMethod, Gender } from '@/components/travel/types';
+import {
+  PlanType,
+  PlanInfo,
+  Participant,
+  CalculatedPremiums,
+  PaymentMethod,
+  PaymentSubMethod,
+  Gender,
+  getParticipantEmail,
+} from '@/components/travel/types';
 import { pickDomesticPlanForTier, resolveDomesticPlanForParticipant } from '@/utils/domesticPlanTier';
 import './page.css';
 import { getPremiumGenderFromParticipant } from '@/utils/age';
@@ -169,13 +178,6 @@ export default function PCDomesticPage() {
       isVerified: false,
     },
   ]);
-
-  // 이메일 주소 조합 헬퍼 함수
-  const getFullEmail = (participant: Participant): string => {
-    if (!participant.email1) return '';
-    const domain = participant.email2 === '직접입력' ? participant.customEmail : participant.email2;
-    return domain ? `${participant.email1}@${domain}` : '';
-  };
 
   // 시간 옵션: 1시부터 24시까지 (0시 제외, 24시 포함)
   const timeOptions = Array.from({ length: 24 }, (_, i) => i + 1);
@@ -906,7 +908,7 @@ export default function PCDomesticPage() {
             name: participants[0]?.name || '',
             resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${getResidentGenderCode(participants[0].birthDate, participants[0].gender)}000000` : '',
             mobile_phone: participants[0]?.phone || '',
-            email: participants[0] ? getFullEmail(participants[0]) : '',
+            email: participants[0] ? getParticipantEmail(participants[0]) : '',
           },
           insured_persons: participants.map((p, idx) => {
             // 외국인일 경우 외국인등록번호에서 생년월일 추출
@@ -995,7 +997,7 @@ export default function PCDomesticPage() {
             orderId: String(contractData_result.contract_id),
             goodsName: '국내여행보험',
             buyerName: participants[0]?.name || '',
-            buyerEmail: participants[0]?.email1 && participants[0]?.email2 ? `${participants[0].email1}@${participants[0].email2}` : '',
+            buyerEmail: participants[0] ? getParticipantEmail(participants[0]) : '',
             buyerTel: participants[0]?.phone || '',
             returnUrl: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/payments/nicepay/callback`,
             closeUrl: `${window.location.origin}/payment/close`,
@@ -1031,7 +1033,7 @@ export default function PCDomesticPage() {
               productName: '국내여행보험',
               productCount: participants.length,
               customerName: participants[0]?.name || '',
-              customerEmail: getFullEmail(participants[0]),
+              customerEmail: getParticipantEmail(participants[0]),
               customerPhone: participants[0]?.phone || '',
               checkOutDate: arrivalDate,
               purchaserName: participants[0]?.name || '',
@@ -1056,7 +1058,7 @@ export default function PCDomesticPage() {
               itemName: '국내여행보험',
               quantity: participants.length,
               customerName: participants[0]?.name || '',
-              customerEmail: getFullEmail(participants[0]),
+              customerEmail: getParticipantEmail(participants[0]),
               customerPhone: participants[0]?.phone || '',
             });
             // 카카오페이 결제 페이지로 리다이렉트됨
@@ -1090,7 +1092,7 @@ export default function PCDomesticPage() {
             name: participants[0]?.name || '',
             resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${getResidentGenderCode(participants[0].birthDate, participants[0].gender)}000000` : '',
             mobile_phone: participants[0]?.phone || '',
-            email: participants[0]?.email1 && participants[0]?.email2 ? `${participants[0].email1}@${participants[0].email2}` : '',
+            email: participants[0] ? getParticipantEmail(participants[0]) : '',
           },
           insured_persons: participants.map((p, idx) => {
             // 외국인일 경우 외국인등록번호에서 생년월일 추출
@@ -1214,9 +1216,7 @@ export default function PCDomesticPage() {
             name: participants[0]?.name || '',
             resident_number: participants[0]?.birthDate ? `${participants[0].birthDate}-${getResidentGenderCode(participants[0].birthDate, participants[0].gender)}000000` : '',
             mobile_phone: participants[0]?.phone || '',
-            email: participants[0]?.email1 && participants[0]?.email2 
-              ? `${participants[0].email1}@${participants[0].email2 === '직접입력' ? participants[0].customEmail : participants[0].email2}`
-              : '',
+            email: participants[0] ? getParticipantEmail(participants[0]) : '',
           },
           insured_persons: participants.map((p, idx) => {
             const age = calculateAgeFromBirthDate(p.birthDate);
@@ -1273,9 +1273,7 @@ export default function PCDomesticPage() {
           orderId: String(contractData_result.contract_id),
           goodsName: '국내여행보험',
           buyerName: participants[0]?.name || '',
-          buyerEmail: participants[0]?.email1 && participants[0]?.email2 
-            ? `${participants[0].email1}@${participants[0].email2 === '직접입력' ? participants[0].customEmail : participants[0].email2}`
-            : '',
+          buyerEmail: participants[0] ? getParticipantEmail(participants[0]) : '',
           buyerTel: participants[0]?.phone || '',
           returnUrl: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/payments/nicepay/callback`,
           closeUrl: `${window.location.origin}/payment/close`,

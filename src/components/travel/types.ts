@@ -41,6 +41,32 @@ export interface Participant {
   planType?: string;
 }
 
+/** 전체 이메일 문자열(email1 한 필드 입력 또는 기존 email1+도메인 분리 형식 모두 지원). */
+export function getParticipantEmail(p: Participant | undefined): string {
+  if (!p) return '';
+  const local = (p.email1 || '').trim();
+  if (!local) return '';
+  if (local.includes('@')) return local;
+  const domain =
+    p.email2 === '직접입력'
+      ? (p.customEmail || '').trim()
+      : (p.email2 || '').trim();
+  return domain ? `${local}@${domain}` : '';
+}
+
+/** 이메일 입력란 표시용(도메인 입력 전 local-only 문자열도 유지). */
+export function getParticipantEmailInputValue(p: Participant | undefined): string {
+  if (!p) return '';
+  const e1 = p.email1 ?? '';
+  if (e1.includes('@')) return e1;
+  const domain =
+    p.email2 === '직접입력'
+      ? (p.customEmail || '').trim()
+      : (p.email2 || '').trim();
+  if (domain) return `${e1.trim()}@${domain}`;
+  return e1;
+}
+
 export interface CalculatedPremium {
   id: number;
   name: string;

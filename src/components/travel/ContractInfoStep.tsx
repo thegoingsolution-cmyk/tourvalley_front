@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import StepIndicator from './StepIndicator';
-import { Participant, CalculatedPremiums } from './types';
+import { Participant, CalculatedPremiums, getParticipantEmail } from './types';
 import AccidentFreeCashModal from './AccidentFreeCashModal';
 
 interface ContractInfoStepProps {
@@ -130,9 +130,7 @@ export default function ContractInfoStep({
                     return;
                   }
                   const first = participants[0];
-                  const memberEmail = first?.email1 && first?.email2
-                    ? `${first.email1}@${first.email2}`
-                    : (first as { customEmail?: string })?.customEmail ?? '';
+                  const memberEmail = first ? getParticipantEmail(first) : '';
                   const draft = {
                     detail: {
                       id: 0,
@@ -273,9 +271,7 @@ export default function ContractInfoStep({
                   <div>{participants[0]?.birthDate && participants[0]?.gender ? formatResidentNumber(participants[0].birthDate, participants[0].gender) : ''}</div>
                   <div>{participants[0]?.phone ? `${participants[0].phone.substring(0, 3)}-${participants[0].phone.substring(3, 7)}-${participants[0].phone.substring(7)}` : ''}</div>
                   <div>
-                    {participants[0]?.email1 && participants[0]?.email2 
-                      ? `${participants[0].email1}@${participants[0].email2 === '직접입력' ? (participants[0].customEmail || '') : participants[0].email2}`
-                      : ''}
+                    {participants[0] ? getParticipantEmail(participants[0]) : ''}
                   </div>
                 </div>
               </div>
