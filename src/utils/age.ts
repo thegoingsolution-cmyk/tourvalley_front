@@ -77,6 +77,22 @@ export const calculateAgeAndGenderFromResidentNumber = (
 };
 
 /**
+ * 개인 여행 플로우 Participant — 보험료/플랜 API에 넣을 성별.
+ * 내국인은 화면 성별 선택 값을 쓴다.
+ * 외국인은 성별 입력 UI가 없고 외국인등록번호 7번째 자리 규칙(5·6 또는 7·8)과 동일하다.
+ */
+export const getPremiumGenderFromParticipant = (participant: {
+  nationality?: string;
+  gender: '남자' | '여자';
+  residentNumber?: string;
+}): '남자' | '여자' => {
+  if (participant.nationality !== '외국인') return participant.gender;
+  const digits = (participant.residentNumber ?? '').replace(/\D/g, '');
+  if (digits.length < 7) return participant.gender;
+  return calculateAgeAndGenderFromResidentNumber(digits).gender;
+};
+
+/**
  * 주민등록번호에서 생년월일 문자열(YYYYMMDD) 반환
  * available-plans API의 만 나이 기준 15세 판별용
  */

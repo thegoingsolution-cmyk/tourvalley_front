@@ -27,6 +27,7 @@ import AccidentFreeCashModal from '@/components/travel/AccidentFreeCashModal';
 import ServiceModal from '@/components/ServiceModal';
 import CoverageDetailModal from '@/components/travel/CoverageDetailModal';
 import { PlanType, PlanInfo, Participant, CalculatedPremiums, PaymentMethod, PaymentSubMethod, Gender } from '@/components/travel/types';
+import { getPremiumGenderFromParticipant } from '@/utils/age';
 import './page.css';
 
 export default function PCLongTermStayPage() {
@@ -613,9 +614,11 @@ export default function PCLongTermStayPage() {
           }
         }
 
+        const genderForPremium = getPremiumGenderFromParticipant(participant);
+
         // 가능 플랜 API로 해당 가입자 허용 플랜 조회 (보험나이 15세 시 만 나이 기준 적용)
         const insuranceTypeForPlans = travelPurpose || '유학/어학연수';
-        const availablePlans = await fetchAvailablePlans(insuranceTypeForPlans, age, participant.gender, undefined, {
+        const availablePlans = await fetchAvailablePlans(insuranceTypeForPlans, age, genderForPremium, undefined, {
           birth_date: birthDateForApi,
           departure_date: departureDateTime,
         });
@@ -638,7 +641,7 @@ export default function PCLongTermStayPage() {
             insurance_type: travelPurpose || '유학/어학연수',
             age: age,
             birth_date: birthDateForApi,
-            gender: participant.gender,
+            gender: genderForPremium,
             plan_type: dbPlanType, // DB에 저장된 플랜명 사용
             plan_variant: 'B',
             has_medical_expense: hasMedicalExpense ? 1 : 0,
@@ -657,7 +660,7 @@ export default function PCLongTermStayPage() {
           calculatedParticipants.push({
             id: participant.id,
             name: participant.name,
-            gender: participant.gender,
+            gender: genderForPremium,
             birthDate: displayBirthDate,
             planType: dbPlanType, // DB plan_type 그대로 표시
             premium: data.premium,

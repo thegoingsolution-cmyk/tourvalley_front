@@ -27,6 +27,7 @@ import AccidentFreeCashModal from '@/components/travel/AccidentFreeCashModal';
 import ServiceModal from '@/components/ServiceModal';
 import CoverageDetailModal from '@/components/travel/CoverageDetailModal';
 import { PlanType, PlanInfo, Participant, CalculatedPremiums, PaymentMethod, PaymentSubMethod, Gender } from '@/components/travel/types';
+import { getPremiumGenderFromParticipant } from '@/utils/age';
 import './page.css';
 
 export default function PCOverseasPage() {
@@ -594,8 +595,10 @@ export default function PCOverseasPage() {
           }
         }
 
+        const genderForPremium = getPremiumGenderFromParticipant(participant);
+
         // 가능 플랜 API로 해당 가입자 허용 플랜 조회 (보험나이 15세 시 만 나이 기준 적용)
-        const availablePlans = await fetchAvailablePlans(age, participant.gender, undefined, {
+        const availablePlans = await fetchAvailablePlans(age, genderForPremium, undefined, {
           birth_date: birthDateForApi,
           departure_date: departureDateTime,
         });
@@ -616,7 +619,7 @@ export default function PCOverseasPage() {
             insurance_type: '해외여행보험',
             age: age,
             birth_date: birthDateForApi,
-            gender: participant.gender,
+            gender: genderForPremium,
             plan_type: planType,
             plan_variant: 'B',
             has_medical_expense: hasMedicalExpense ? 1 : 0,
@@ -635,7 +638,7 @@ export default function PCOverseasPage() {
           calculatedParticipants.push({
             id: participant.id,
             name: participant.name,
-            gender: participant.gender,
+            gender: genderForPremium,
             birthDate: displayBirthDate,
             planType: planType,
             premium: data.premium,

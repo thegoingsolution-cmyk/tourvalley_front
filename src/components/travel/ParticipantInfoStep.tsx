@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import StepIndicator from './StepIndicator';
 import { Participant, CalculatedPremiums, PlanType } from './types';
 import { sendVerificationCode, verifyCode } from '@/services/smsService';
+import { getPremiumGenderFromParticipant } from '@/utils/age';
 
 interface ParticipantInfoStepProps {
   insuranceType: string;
@@ -185,15 +186,39 @@ export default function ParticipantInfoStep({
   useEffect(() => {
     if (!isInitialized && participants.length > 0 && birthDate) {
       const updated = [...participants];
+      const cur = updated[0];
       updated[0] = {
-        ...updated[0],
+        ...cur,
         birthDate: birthDate,
-        gender: gender === 'male' ? '남자' : gender === 'female' ? '여자' : updated[0].gender,
+        // 외국인은 성별이 외국인등록번호로 정해지므로 STEP1 성별로 덮어쓰지 않음
+        gender:
+          cur.nationality === '외국인'
+            ? cur.gender
+            : gender === 'male'
+              ? '남자'
+              : gender === 'female'
+                ? '여자'
+                : cur.gender,
       };
       onParticipantsChange(updated);
       setIsInitialized(true);
     }
   }, [birthDate, gender, participants, onParticipantsChange, isInitialized]);
+
+  // 외국인: 등록번호 7번째 자리(5·6·7·8)로 성별 동기화 — 단체 step3와 동일 규칙
+  useEffect(() => {
+    let changed = false;
+    const next = participants.map((p) => {
+      const g = getPremiumGenderFromParticipant(p);
+      if (g !== p.gender) {
+        changed = true;
+        return { ...p, gender: g };
+      }
+      return p;
+    });
+    if (!changed) return;
+    onParticipantsChange(next);
+  }, [participants, onParticipantsChange]);
 
   // 로그인 회원: 가입 시 저장된 휴대폰 번호를 대표 가입자 번호로 반영(입력란 미노출)
   useEffect(() => {

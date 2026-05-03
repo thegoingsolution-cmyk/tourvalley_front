@@ -25,6 +25,7 @@ import DangerousActivityModal from '@/components/travel/DangerousActivityModal';
 import ConsentModalMobile from '@/components/mobiletravel/ConsentModalMobile';
 import { PlanType, PlanInfo, Participant, CalculatedPremiums, PaymentMethod, PaymentSubMethod } from '@/components/travel/types';
 import { pickDomesticPlanForTier, resolveDomesticPlanForParticipant } from '@/utils/domesticPlanTier';
+import { getPremiumGenderFromParticipant } from '@/utils/age';
 import './page.css';
 
 function MobileDomesticStep1Content() {
@@ -768,8 +769,10 @@ function MobileDomesticStep1Content() {
           }
         }
 
+        const genderForPremium = getPremiumGenderFromParticipant(participant);
+
         // 가능 플랜 API (보험나이 15세일 때 성인/어린이는 백엔드에서 KST 당일 기준 만 나이)
-        const availablePlans = await fetchAvailablePlans(age, participant.gender, undefined, {
+        const availablePlans = await fetchAvailablePlans(age, genderForPremium, undefined, {
           birth_date: birthDateForApi,
           departure_date: departureDateTime,
         });
@@ -789,7 +792,7 @@ function MobileDomesticStep1Content() {
             insurance_type: '국내여행보험',
             age: age,
             birth_date: birthDateForApi,
-            gender: participant.gender,
+            gender: genderForPremium,
             plan_type: planType,
             plan_variant: 'B',
             has_medical_expense: hasMedicalExpense ? 1 : 0,
@@ -809,7 +812,7 @@ function MobileDomesticStep1Content() {
           calculatedParticipants.push({
             id: participant.id,
             name: participant.name,
-            gender: participant.gender,
+            gender: genderForPremium,
             birthDate: displayBirthDate,
             planType: planType,
             premium: data.premium,

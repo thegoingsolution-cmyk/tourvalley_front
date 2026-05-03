@@ -26,6 +26,7 @@ import RestrictedCountryModal from '@/components/travel/RestrictedCountryModal';
 import ConsentModalMobile from '@/components/mobiletravel/ConsentModalMobile';
 import { PlanType, PlanInfo, Participant, CalculatedPremiums, PaymentMethod, PaymentSubMethod } from '@/components/travel/types';
 import { allCountries, frequentCountries } from '@/components/travel/utils/countries';
+import { getPremiumGenderFromParticipant } from '@/utils/age';
 import './page.css';
 
 function MobileOverseasStep1Content() {
@@ -765,8 +766,10 @@ function MobileOverseasStep1Content() {
           }
         }
 
+        const genderForPremium = getPremiumGenderFromParticipant(participant);
+
         // 가능 플랜 API로 해당 가입자 허용 플랜 조회 (보험나이 15세 시 만 나이 기준 적용)
-        const availablePlans = await fetchAvailablePlans(age, participant.gender, undefined, {
+        const availablePlans = await fetchAvailablePlans(age, genderForPremium, undefined, {
           birth_date: birthDateForApi,
           departure_date: departureDateTime,
         });
@@ -787,7 +790,7 @@ function MobileOverseasStep1Content() {
             insurance_type: type === 'short' ? '해외여행보험' : type === 'long' ? '유학/어학연수' : '해외여행보험',
             age: age,
             birth_date: birthDateForApi,
-            gender: participant.gender,
+            gender: genderForPremium,
             plan_type: planType,
             plan_variant: 'B',
             has_medical_expense: hasMedicalExpense ? 1 : 0,
@@ -806,7 +809,7 @@ function MobileOverseasStep1Content() {
           calculatedParticipants.push({
             id: participant.id,
             name: participant.name,
-            gender: participant.gender,
+            gender: genderForPremium,
             birthDate: displayBirthDate,
             planType: planType,
             premium: data.premium,
