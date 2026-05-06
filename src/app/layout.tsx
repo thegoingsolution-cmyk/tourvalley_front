@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import './globals.css';
 import Favicon from '@/components/Favicon';
+import TrackingCapture from '@/components/TrackingCapture';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { SITE_URL, SEO_DEFAULT, VERIFICATION } from '@/config/seo';
 import JsonLd from '@/components/JsonLd';
@@ -79,6 +80,7 @@ export default function RootLayout({
       <body>
         <JsonLd />
         <AuthProvider>
+          <TrackingCapture />
           <Favicon />
           {children}
         </AuthProvider>

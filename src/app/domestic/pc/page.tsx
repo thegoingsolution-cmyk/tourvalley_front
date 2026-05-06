@@ -884,7 +884,12 @@ export default function PCDomesticPage() {
 
       // 나이스페이먼츠, 네이버페이, 카카오페이는 먼저 계약 등록 후 결제 처리
       if (paymentMethod === '나이스페이먼츠' || paymentMethod === '네이버페이' || paymentMethod === '카카오페이') {
-        // 1. 계약 등록 (결제 대기 상태)
+        const totalPremiumForPg = calculatedPremiums?.totalPremium || 0;
+        const instantPgComplete =
+          totalPremiumForPg > 0 &&
+          receiptPremium === 0 &&
+          useAccidentFreeCash === totalPremiumForPg;
+        // 1. 계약 등록 (무사고캐시로 카드 등 PG 금액이 0이면 즉시 완료; 아니면 PG 대기)
         const trackingInfo = getTrackingInfo('PC');
         const contractData = {
           contract: {
@@ -967,7 +972,7 @@ export default function PCDomesticPage() {
             payment_method: paymentMethod,
             payment_sub_method: null,
             amount: receiptPremium,
-            status: '대기',
+            status: instantPgComplete ? '완료' : '대기',
             use_accident_free_cash: useAccidentFreeCash,
           },
         };
@@ -988,6 +993,14 @@ export default function PCDomesticPage() {
         }
 
         const contract_id = contractData_result.contract_id;
+
+        if (instantPgComplete) {
+          setCompletedContractorName(participants[0]?.name || '');
+          setShowPaymentScreen(false);
+          setShowCompletionScreen(true);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
 
         // 2. 결제 처리
         if (paymentMethod === '나이스페이먼츠') {

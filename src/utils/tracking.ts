@@ -1,10 +1,27 @@
 /**
  * UTM·ref 등으로 유입 채널을 확인하고 세션 스토리지에 저장
- * (메인·견적 step1 등 진입 페이지에서 호출)
+ * (레이아웃·메인·견적 step1 등에서 호출)
  *
  * 인플루언서: ?ref=토큰 (또는 utm_source=동일토큰) → 아래 INFLUENCER_REF_MAP 매핑
- * 네이버 검색광고: utm_source=naver 또는 utm_medium=cpc
+ * 네이버 검색 광고(유료): utm_medium=cpc (캠페인별 utm_campaign 분기)
+ *   - utm_campaign=tourvalley_kw 또는 투어밸리 → 투어밸리검색광고(브랜드 키워드 SA 집계용)
+ *   - 그 외 cpc → 네이버검색광고
+ * 네이버 자연/검색 유입: ?NaPm=…(통합검색 클릭 추적) 또는 utm_source=naver 단독(CPC 아님)
  */
+
+/** 네이버 SA 최종 URL의 utm_campaign: ASCII는 tourvalley_kw 권장, 한글 캠페인명은 투어밸리 */
+function isNaverTourvalleyKeywordSaCampaign(utmCampaignRaw: string | null): boolean {
+  if (!utmCampaignRaw) return false;
+  let key = utmCampaignRaw.trim();
+  try {
+    key = decodeURIComponent(key).trim();
+  } catch {
+    /* utm_campaign 원문 사용 */
+  }
+  if (key === '투어밸리') return true;
+  if (key.toLowerCase() === 'tourvalley_kw') return true;
+  return false;
+}
 
 /** ref / utm_source에 쓰는 불투명 토큰 → DB에 넣을 affiliate, access_path */
 const INFLUENCER_REF_MAP: Record<string, { affiliate: string; access_path: string }> = {
@@ -44,6 +61,8 @@ function isKnownInfluencerPair(affiliate: string, accessPath: string): boolean {
 
 function isValidStoredPair(affiliate: string, accessPath: string): boolean {
   if (affiliate === '네이버검색광고' && accessPath === '네이버') return true;
+  if (affiliate === '투어밸리검색광고' && accessPath === '네이버') return true;
+  if (affiliate === '네이버 투어밸리' && accessPath === '네이버') return true;
   if (
     affiliate === '투어밸리' &&
     (accessPath === '투어밸리 사이트' || accessPath === '투어밸리 모바일 사이트')
@@ -59,11 +78,30 @@ export const checkAndSaveTrackingInfo = (): void => {
   const urlParams = new URLSearchParams(window.location.search);
   const utmSource = urlParams.get('utm_source');
   const utmMedium = urlParams.get('utm_medium');
+  const utmCampaign = urlParams.get('utm_campaign');
   const refParam = urlParams.get('ref');
+  const napm = urlParams.get('NaPm') ?? urlParams.get('napm');
 
-  // 네이버 검색 광고 유입 (우선)
-  if (utmSource === 'naver' || utmMedium === 'cpc') {
-    sessionStorage.setItem('tracking_affiliate', '네이버검색광고');
+  // 네이버 검색 광고(유료): CPC — utm_campaign으로 브랜드 키워드 전용 집계 분리
+  if (utmMedium === 'cpc') {
+    if (isNaverTourvalleyKeywordSaCampaign(utmCampaign)) {
+      sessionStorage.setItem('tracking_affiliate', '투어밸리검색광고');
+    } else {
+      sessionStorage.setItem('tracking_affiliate', '네이버검색광고');
+    }
+    sessionStorage.setItem('tracking_access_path', '네이버');
+    return;
+  }
+
+  // 네이버 통합검색 등 자연 유입: NaPm 파라미터가 붙는 경우가 많음
+  if (napm) {
+    sessionStorage.setItem('tracking_affiliate', '네이버 투어밸리');
+    sessionStorage.setItem('tracking_access_path', '네이버');
+    return;
+  }
+
+  if (utmSource === 'naver') {
+    sessionStorage.setItem('tracking_affiliate', '네이버 투어밸리');
     sessionStorage.setItem('tracking_access_path', '네이버');
     return;
   }
