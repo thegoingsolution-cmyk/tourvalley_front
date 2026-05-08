@@ -29,6 +29,7 @@ type ContractDetail = {
   memberEmail?: string | null;
   paymentMethod?: string | null;
   paymentSubMethod?: string | null;
+  /** 계약 상세 API: DB `travel_contracts.payment_status`. `?draft=1` 인쇄: 세션 초안 값(항상 DB와 동일하지는 않음) */
   paymentStatus?: string | null;
   bankName?: string | null;
   bank_name?: string | null;

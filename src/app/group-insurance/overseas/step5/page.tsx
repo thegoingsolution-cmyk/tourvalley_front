@@ -18,8 +18,11 @@ export default function OverseasInsuranceStep5Page() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [paymentCompleted, setPaymentCompleted] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('');
+  const [paymentSubMethod, setPaymentSubMethod] = useState('');
   const [paymentContractId, setPaymentContractId] = useState('');
   const [paymentContractNumber, setPaymentContractNumber] = useState('');
+  /** PG 결제 후 step5로 리다이렉트될 때만 true (무통장·수기 등은 false → DB와 같이 미결제) */
+  const [paymentSettledByPgRedirect, setPaymentSettledByPgRedirect] = useState(false);
   const [accountBank, setAccountBank] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [expectedDate, setExpectedDate] = useState('');
@@ -514,8 +517,12 @@ export default function OverseasInsuranceStep5Page() {
             setStep3Data({
               total_premium: Number(contract.totalPremium || 0),
             });
-            if (!paymentMethodParam && contract.paymentMethod) {
-              setPaymentMethod(contract.paymentMethod);
+            if (contract.paymentMethod) setPaymentMethod(contract.paymentMethod);
+            if (contract.paymentSubMethod) setPaymentSubMethod(contract.paymentSubMethod);
+            if (contract.bankName || contract.bank_name) setAccountBank(contract.bankName || contract.bank_name);
+            if (contract.accountNumber || contract.account_number) setAccountNumber(contract.accountNumber || contract.account_number);
+            if (contract.paymentStatus) {
+              setPaymentSettledByPgRedirect(contract.paymentStatus === '결제완료');
             }
           }
         }
@@ -541,6 +548,7 @@ export default function OverseasInsuranceStep5Page() {
 
     // 결제 완료 후 리다이렉트인 경우 상태 설정
     if (paymentSuccess === 'true') {
+      setPaymentSettledByPgRedirect(true);
       // 결제 완료 상태로 설정
       setPaymentCompleted(true);
       if (paymentMethodParam) {
@@ -552,7 +560,7 @@ export default function OverseasInsuranceStep5Page() {
       if (contractNumberParam) {
         setPaymentContractNumber(contractNumberParam);
       }
-      if ((!step1 || !step2 || !step3) && contractIdParam) {
+      if (contractIdParam) {
         loadFallbackContractData(contractIdParam);
       }
       // URL에서 파라미터 제거
@@ -606,6 +614,63 @@ export default function OverseasInsuranceStep5Page() {
       totalPremium: step3Data?.total_premium || 0,
       hasMedicalExpense: true,
     };
+  };
+
+  /** 결제 완료 후에만 노출되는 인쇄용 확인서 (미결제 상태 인쇄로 인한 고객 혼란 방지) */
+  const openB2cConfirmationPrintAfterPayment = () => {
+    if (!step1Data || !step2Data || !step3Data) {
+      alert('계약 정보를 불러올 수 없습니다.');
+      return;
+    }
+    const detailData = buildPremiumDetailData();
+    if (!detailData) {
+      alert('계약 정보를 불러올 수 없습니다.');
+      return;
+    }
+    const { participants } = detailData;
+    const departureDate = (step1Data.startDate || '').replace(/\./g, '-');
+    const arrivalDate = (step1Data.endDate || '').replace(/\./g, '-');
+    const contractIdNum = paymentContractId ? parseInt(paymentContractId, 10) : NaN;
+    const draft = {
+      detail: {
+        id: Number.isFinite(contractIdNum) ? contractIdNum : 0,
+        insuranceType: '해외여행자보험',
+        departureDate: departureDate || new Date().toISOString().slice(0, 10),
+        arrivalDate: arrivalDate || new Date().toISOString().slice(0, 10),
+        travelCountry: getTourPlaceLabel(step1Data.tourContinent, step1Data.tourPlace) || null,
+        travelRegion: null,
+        travelParticipants: step1Data.tourNum || participants.length,
+        totalPremium: step3Data?.total_premium ?? 0,
+        createdAt: new Date().toISOString(),
+        contractorType: '법인',
+        contractorCompanyName: step2Data.contractor_name || null,
+        memberName: step2Data.contractor_name ?? '',
+        memberBirthDate: '',
+        memberPhone: step2Data.contractor_phone ?? '',
+        memberEmail: step2Data.contractor_email ?? '',
+        paymentMethod: paymentMethod || null,
+        paymentSubMethod: paymentSubMethod || ((accountBank || accountNumber) ? '가상계좌' : null),
+        bankName: accountBank || null,
+        accountNumber: accountNumber || null,
+        paymentStatus: paymentSettledByPgRedirect ? '결제완료' : '미결제',
+        status: '가입신청',
+        businessNumber: step2Data.contractor_business_number ?? null,
+      },
+      participants: participants.map((p, i: number) => ({
+        id: p.id ?? i + 1,
+        name: p.name,
+        gender: p.gender ?? '',
+        birthDate: p.birthDate ?? '',
+        planType: p.planType ?? '',
+        premium: p.premium ?? 0,
+      })),
+    };
+    try {
+      sessionStorage.setItem('b2c_confirmation_draft', JSON.stringify(draft));
+      window.open('/confirmation?draft=1', '_blank');
+    } catch {
+      alert('인쇄 화면을 열 수 없습니다.');
+    }
   };
 
   const handlePayment = async () => {
@@ -1337,7 +1402,37 @@ export default function OverseasInsuranceStep5Page() {
               <span className="font16">안전여행을 위한 가장 안전한 투자! 바로 여행보험입니다.</span>
             </p>
             <div className="bgcolor_white">
-              <h2 className="sub_title ag_left pt30">여행보험 신청내역</h2>
+              <div
+                className="pt30"
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: '12px',
+                  flexWrap: 'wrap',
+                  marginBottom: '16px',
+                }}
+              >
+                <h2 className="sub_title ag_left" style={{ margin: 0 }}>
+                  여행보험 신청내역
+                </h2>
+                <button
+                  type="button"
+                  onClick={openB2cConfirmationPrintAfterPayment}
+                  className="tour2023_btn_b02 tour2023_btn08"
+                  style={{
+                    font: 'unset',
+                    flexShrink: 0,
+                    backgroundColor: '#fff',
+                    padding: '6px 14px',
+                    border: '1px solid #000',
+                    color: '#000',
+                    fontSize: '13px',
+                  }}
+                >
+                  <span style={{ color: '#000' }}>인쇄</span>
+                </button>
+              </div>
               <div className="detailView01 bgcolor_white">
                 <table className="specialB" border={1} cellSpacing={0}>
                   <caption></caption>
@@ -1373,9 +1468,9 @@ export default function OverseasInsuranceStep5Page() {
                     </tr>
                     <tr>
                       <td className="sName01 ag_left">결제방법</td>
-                      <td colSpan={3} className="dd ag_left">{paymentMethod}</td>
+                      <td colSpan={3} className="dd ag_left">{paymentMethod === '기타결제' ? (paymentSubMethod || paymentMethod) : paymentMethod}</td>
                     </tr>
-                    {payMethod === 'B' && (
+                    {(payMethod === 'B' || paymentSubMethod === '가상계좌') && (
                       <>
                         <tr>
                           <td className="sName01 ag_left">입금은행</td>
@@ -1383,10 +1478,12 @@ export default function OverseasInsuranceStep5Page() {
                           <td className="sName01 ag_left">계좌번호</td>
                           <td className="dd ag_left">{accountNumber}</td>
                         </tr>
-                        <tr>
-                          <td className="sName01 ag_left">입금예정일</td>
-                          <td colSpan={3} className="dd ag_left">{expectedDate}</td>
-                        </tr>
+                        {payMethod === 'B' && (
+                          <tr>
+                            <td className="sName01 ag_left">입금예정일</td>
+                            <td colSpan={3} className="dd ag_left">{expectedDate}</td>
+                          </tr>
+                        )}
                       </>
                     )}
                   </tbody>
@@ -1465,68 +1562,7 @@ export default function OverseasInsuranceStep5Page() {
           
           <div className="bgcolor_white">
             <p className="sub_title_02 ag_left pt10">5단계 : 보험료 결제</p>
-            <div className="pt30" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '16px' }}>
-              <h2 className="sub_title ag_left" style={{ margin: 0 }}>여행자보험 계약정보</h2>
-              <button
-                type="button"
-                onClick={() => {
-                  if (!step1Data || !step2Data || !step3Data) {
-                    alert('계약 정보를 불러올 수 없습니다.');
-                    return;
-                  }
-                  const detailData = buildPremiumDetailData();
-                  if (!detailData) {
-                    alert('계약 정보를 불러올 수 없습니다.');
-                    return;
-                  }
-                  const { participants } = detailData;
-                  const departureDate = (step1Data.startDate || '').replace(/\./g, '-');
-                  const arrivalDate = (step1Data.endDate || '').replace(/\./g, '-');
-                  const draft = {
-                    detail: {
-                      id: 0,
-                      insuranceType: '해외여행자보험',
-                      departureDate: departureDate || new Date().toISOString().slice(0, 10),
-                      arrivalDate: arrivalDate || new Date().toISOString().slice(0, 10),
-                      travelCountry: getTourPlaceLabel(step1Data.tourContinent, step1Data.tourPlace) || null,
-                      travelRegion: null,
-                      travelParticipants: step1Data.tourNum || participants.length,
-                      totalPremium: step3Data?.total_premium ?? 0,
-                      createdAt: new Date().toISOString(),
-                      contractorType: '법인',
-                      contractorCompanyName: step2Data.contractor_name || null,
-                      memberName: step2Data.contractor_name ?? '',
-                      memberBirthDate: '',
-                      memberPhone: step2Data.contractor_phone ?? '',
-                      memberEmail: step2Data.contractor_email ?? '',
-                      paymentMethod: null,
-                      paymentSubMethod: null,
-                      paymentStatus: '미결제',
-                      status: '가입신청',
-                      businessNumber: step2Data.contractor_business_number ?? null,
-                    },
-                    participants: participants.map((p: { id?: number; name: string; gender?: string; birthDate?: string; planType?: string; premium?: number }, i: number) => ({
-                      id: p.id ?? i + 1,
-                      name: p.name,
-                      gender: p.gender ?? '',
-                      birthDate: p.birthDate ?? '',
-                      planType: p.planType ?? '',
-                      premium: p.premium ?? 0,
-                    })),
-                  };
-                  try {
-                    sessionStorage.setItem('b2c_confirmation_draft', JSON.stringify(draft));
-                    window.open('/confirmation?draft=1', '_blank');
-                  } catch {
-                    alert('인쇄 화면을 열 수 없습니다.');
-                  }
-                }}
-                className="tour2023_btn_b02 tour2023_btn08"
-                style={{ font: 'unset', flexShrink: 0, backgroundColor: '#fff', padding: '6px 14px', border: '1px solid #000', color: '#000', fontSize: '13px' }}
-              >
-                <span style={{ color: '#000' }}>인쇄</span>
-              </button>
-            </div>
+            <h2 className="sub_title ag_left pt30">여행자보험 계약정보</h2>
             <div className="detailView01 bgcolor_white">
               <table className="specialB" border={1} cellSpacing={0}>
                 <caption></caption>
