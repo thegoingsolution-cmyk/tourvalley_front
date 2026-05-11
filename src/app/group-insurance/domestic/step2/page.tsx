@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getCorporateMemberInfo } from '@/services/authService';
 import { Participant } from '@/components/travel/types';
 import { calculateAgeAndGenderFromResidentNumber, calculateInsuranceAge } from '@/utils/age';
+import { isValidBirthDateYYYYMMDD } from '@/utils/birthDate';
 import '../../popup/page.css';
 
 // 한국어 locale 등록
@@ -26,21 +27,6 @@ const parseDate = (dateString: string): Date | null => {
   } catch {
     return null;
   }
-};
-
-const isValidBirthDateYYYYMMDD = (value: string): boolean => {
-  if (!/^(19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])$/.test(value)) {
-    return false;
-  }
-  const year = Number(value.slice(0, 4));
-  const month = Number(value.slice(4, 6));
-  const day = Number(value.slice(6, 8));
-  const date = new Date(year, month - 1, day);
-  return (
-    date.getFullYear() === year &&
-    date.getMonth() === month - 1 &&
-    date.getDate() === day
-  );
 };
 
 // 여행목적 코드 → DB 저장용 한글 라벨 (팝업 option value와 동일)
