@@ -11,6 +11,43 @@ import { checkUsername, registerPersonalMember, registerCorporateMember } from '
 import { uploadFile } from '@/services/uploadService';
 import './page.css';
 
+const EMAIL_DOMAIN_CUSTOM = '__custom__';
+const INVALID_SIGNUP_EMAIL_DOMAINS = new Set([
+  '',
+  '선택',
+  '직접입력',
+  EMAIL_DOMAIN_CUSTOM,
+]);
+
+function signupDomainOptionValue(domain: string): string {
+  if (domain === '선택') return '';
+  if (domain === '직접입력') return EMAIL_DOMAIN_CUSTOM;
+  return domain;
+}
+
+/** API용 로컬/도메인 분리 (직접입력·전체주소 오입력 대응) */
+function buildSignupEmailPayloadParts(
+  localRaw: string,
+  selectDomain: string,
+  customDomain: string,
+): { email: string; emailDomain: string } {
+  let domain =
+    selectDomain === EMAIL_DOMAIN_CUSTOM ? customDomain.trim() : selectDomain.trim();
+  if (INVALID_SIGNUP_EMAIL_DOMAINS.has(domain)) {
+    domain = '';
+  }
+  let local = localRaw.trim();
+  if (local.includes('@')) {
+    const [first, ...rest] = local.split('@');
+    local = first.trim();
+    const fromLocal = rest.join('@').trim();
+    if (fromLocal) {
+      domain = fromLocal;
+    }
+  }
+  return { email: local, emailDomain: domain };
+}
+
 type MemberType = 'personal' | 'corporate' | null;
 type Step = 'select' | 'terms' | 'form' | 'complete';
 
@@ -21,6 +58,7 @@ interface CorporateContact {
   position: string;
   email: string;
   emailDomain: string;
+  customEmailDomain: string;
   phone: string;
 }
 
@@ -49,6 +87,7 @@ export default function PCSignupPage() {
   const [gender, setGender] = useState('');
   const [email, setEmail] = useState('');
   const [emailDomain, setEmailDomain] = useState('');
+  const [emailCustomDomain, setEmailCustomDomain] = useState('');
   const [phone, setPhone] = useState('');
   const [phoneVerified, setPhoneVerified] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
@@ -62,7 +101,16 @@ export default function PCSignupPage() {
   const [businessNumber2, setBusinessNumber2] = useState('');
   const [businessNumber3, setBusinessNumber3] = useState('');
   const [contacts, setContacts] = useState<CorporateContact[]>([
-    { id: 1, name: '', department: '', position: '', email: '', emailDomain: '', phone: '' }
+    {
+      id: 1,
+      name: '',
+      department: '',
+      position: '',
+      email: '',
+      emailDomain: '',
+      customEmailDomain: '',
+      phone: '',
+    },
   ]);
   const [comprehensiveContract, setComprehensiveContract] = useState<'apply' | 'not_apply' | null>(null);
   const [businessFile, setBusinessFile] = useState<File | null>(null);
@@ -225,7 +273,19 @@ export default function PCSignupPage() {
   // Add corporate contact
   const addContact = () => {
     const newId = Math.max(...contacts.map(c => c.id)) + 1;
-    setContacts([...contacts, { id: newId, name: '', department: '', position: '', email: '', emailDomain: '', phone: '' }]);
+    setContacts([
+      ...contacts,
+      {
+        id: newId,
+        name: '',
+        department: '',
+        position: '',
+        email: '',
+        emailDomain: '',
+        customEmailDomain: '',
+        phone: '',
+      },
+    ]);
   };
 
   // Update contact
@@ -267,10 +327,45 @@ export default function PCSignupPage() {
       return;
     }
 
+    if (memberType === 'personal') {
+      const parts = buildSignupEmailPayloadParts(email, emailDomain, emailCustomDomain);
+      if (
+        emailDomain === EMAIL_DOMAIN_CUSTOM &&
+        !parts.emailDomain &&
+        !email.trim().includes('@')
+      ) {
+        alert('이메일 도메인을 직접 입력해 주세요. (도메인 "직접입력" 선택 시)');
+        return;
+      }
+    }
+
+    if (memberType === 'corporate') {
+      for (const c of contacts) {
+        const parts = buildSignupEmailPayloadParts(
+          c.email,
+          c.emailDomain,
+          c.customEmailDomain,
+        );
+        if (
+          c.emailDomain === EMAIL_DOMAIN_CUSTOM &&
+          !parts.emailDomain &&
+          !c.email.trim().includes('@')
+        ) {
+          alert('이메일 도메인을 직접 입력해 주세요. (도메인 "직접입력" 선택 시)');
+          return;
+        }
+      }
+    }
+
     try {
       let result;
       
       if (memberType === 'personal') {
+        const emailParts = buildSignupEmailPayloadParts(
+          email,
+          emailDomain,
+          emailCustomDomain,
+        );
         // 개인회원 가입
         result = await registerPersonalMember({
           username,
@@ -278,8 +373,8 @@ export default function PCSignupPage() {
           name,
           birthDate,
           gender,
-          email,
-          emailDomain,
+          email: emailParts.email,
+          emailDomain: emailParts.emailDomain,
           phone,
           termsAgreed,
           privacyAgreed,
@@ -310,14 +405,21 @@ export default function PCSignupPage() {
           password,
           companyName,
           businessNumber,
-          contacts: contacts.map(c => ({
-            name: c.name,
-            department: c.department,
-            position: c.position,
-            email: c.email,
-            emailDomain: c.emailDomain,
-            phone: c.phone,
-          })),
+          contacts: contacts.map((c) => {
+            const p = buildSignupEmailPayloadParts(
+              c.email,
+              c.emailDomain,
+              c.customEmailDomain,
+            );
+            return {
+              name: c.name,
+              department: c.department,
+              position: c.position,
+              email: p.email,
+              emailDomain: p.emailDomain,
+              phone: c.phone,
+            };
+          }),
           comprehensiveContract,
           termsAgreed,
           privacyAgreed,
@@ -693,9 +795,15 @@ export default function PCSignupPage() {
 
                   {/* Email */}
                   <div className="form-row">
-                    <div className="form-field email-field">
+                    <div className="form-field email-field form-field-email-cq">
                       <label className="form-label">이메일 주소</label>
-                      <div className="email-input-group">
+                      <div
+                        className={
+                          emailDomain === EMAIL_DOMAIN_CUSTOM
+                            ? 'email-input-group email-input-group--custom'
+                            : 'email-input-group'
+                        }
+                      >
                         <input
                           type="text"
                           value={email}
@@ -704,15 +812,42 @@ export default function PCSignupPage() {
                           className="form-input email-id"
                         />
                         <span className="email-at">@</span>
-                        <select
-                          value={emailDomain}
-                          onChange={(e) => setEmailDomain(e.target.value)}
-                          className="form-select email-domain"
+                        <div
+                          className={
+                            emailDomain === EMAIL_DOMAIN_CUSTOM
+                              ? 'email-domain-tail email-domain-tail--custom'
+                              : 'email-domain-tail'
+                          }
                         >
-                          {emailDomains.map(domain => (
-                            <option key={domain} value={domain === '선택' ? '' : domain}>{domain}</option>
-                          ))}
-                        </select>
+                          {emailDomain === EMAIL_DOMAIN_CUSTOM && (
+                            <input
+                              type="text"
+                              value={emailCustomDomain}
+                              onChange={(e) => setEmailCustomDomain(e.target.value)}
+                              placeholder="예: company.co.kr"
+                              aria-label="이메일 도메인 직접입력"
+                              className="form-input email-custom-domain"
+                            />
+                          )}
+                          <select
+                            value={emailDomain}
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              setEmailDomain(v);
+                              if (v !== EMAIL_DOMAIN_CUSTOM) {
+                                setEmailCustomDomain('');
+                              }
+                            }}
+                            className="form-select email-domain"
+                            aria-label="이메일 도메인 선택"
+                          >
+                            {emailDomains.map((domain) => (
+                              <option key={domain} value={signupDomainOptionValue(domain)}>
+                                {domain}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -921,9 +1056,15 @@ export default function PCSignupPage() {
 
                       {/* Contact Email */}
                       <div className="form-row">
-                        <div className="form-field email-field">
+                        <div className="form-field email-field form-field-email-cq">
                           <label className="form-label">이메일 주소</label>
-                          <div className="email-input-group">
+                          <div
+                            className={
+                              contact.emailDomain === EMAIL_DOMAIN_CUSTOM
+                                ? 'email-input-group email-input-group--custom'
+                                : 'email-input-group'
+                            }
+                          >
                             <input
                               type="text"
                               value={contact.email}
@@ -932,15 +1073,53 @@ export default function PCSignupPage() {
                               className="form-input email-id"
                             />
                             <span className="email-at">@</span>
-                            <select
-                              value={contact.emailDomain}
-                              onChange={(e) => updateContact(contact.id, 'emailDomain', e.target.value)}
-                              className="form-select email-domain"
+                            <div
+                              className={
+                                contact.emailDomain === EMAIL_DOMAIN_CUSTOM
+                                  ? 'email-domain-tail email-domain-tail--custom'
+                                  : 'email-domain-tail'
+                              }
                             >
-                              {emailDomains.map(domain => (
-                                <option key={domain} value={domain === '선택' ? '' : domain}>{domain}</option>
-                              ))}
-                            </select>
+                              {contact.emailDomain === EMAIL_DOMAIN_CUSTOM && (
+                                <input
+                                  type="text"
+                                  value={contact.customEmailDomain}
+                                  onChange={(e) =>
+                                    updateContact(contact.id, 'customEmailDomain', e.target.value)
+                                  }
+                                  placeholder="예: company.co.kr"
+                                  aria-label="이메일 도메인 직접입력"
+                                  className="form-input email-custom-domain"
+                                />
+                              )}
+                              <select
+                                value={contact.emailDomain}
+                                onChange={(e) => {
+                                  const v = e.target.value;
+                                  setContacts(
+                                    contacts.map((c) =>
+                                      c.id === contact.id
+                                        ? {
+                                            ...c,
+                                            emailDomain: v,
+                                            ...(v !== EMAIL_DOMAIN_CUSTOM
+                                              ? { customEmailDomain: '' }
+                                              : {}),
+                                          }
+                                        : c,
+                                    ),
+                                  );
+                                }}
+                                className="form-select email-domain"
+                                aria-label="이메일 도메인 선택"
+                              >
+                                {emailDomains.map((domain) => (
+                                  <option key={domain} value={signupDomainOptionValue(domain)}>
+                                    {domain}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
                           </div>
                         </div>
                       </div>

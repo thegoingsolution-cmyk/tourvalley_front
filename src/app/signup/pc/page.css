@@ -716,26 +716,119 @@
 }
 
 /* Email Field */
+.form-field-email-cq {
+  container-type: inline-size;
+}
+
+/* 기본(목록 도메인): 한 줄, 도메인 셀렉트는 내용 너비만 — 오른쪽 빈 flex 여백 제거 */
 .email-input-group {
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 8px;
-  height: 32px;
+  min-height: 32px;
   margin-top: 23px;
   padding: 0 10px;
 }
 
-.email-id {
-  flex: 1;
+.email-input-group:not(.email-input-group--custom) {
+  height: 32px;
+}
+
+/* 직접입력: 1행 아이디·@ / 2행 도메인 입력·목록(가독성) */
+.email-input-group--custom {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  column-gap: 8px;
+  row-gap: 10px;
+  align-items: center;
+  height: auto;
+  min-height: auto;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.email-input-group--custom > .email-id {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+
+.email-input-group--custom > .email-at {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.email-input-group--custom > .email-domain-tail--custom {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  width: 100%;
+  min-width: 0;
+}
+
+.email-domain-tail {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.email-domain-tail:not(.email-domain-tail--custom) {
+  max-width: 100%;
+}
+
+/* 목록만: 셀렉트가 남는 가로를 먹지 않도록 */
+.email-domain-tail:not(.email-domain-tail--custom) .email-domain {
+  flex: 0 1 auto;
+  width: auto;
+  min-width: min(148px, 100%);
+  max-width: 100%;
+}
+
+.email-domain-tail--custom {
+  flex: 1 1 auto;
+}
+
+.email-domain-tail--custom .email-custom-domain {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.email-domain-tail--custom .email-domain {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 118px;
+  max-width: 42%;
+}
+
+@container (max-width: 520px) {
+  .email-domain-tail--custom .email-domain {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .email-domain-tail--custom .email-domain {
+    max-width: 100%;
+  }
+}
+
+.email-input-group:not(.email-input-group--custom) > .email-id {
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .email-at {
+  flex-shrink: 0;
   color: #9797a3;
   font-size: 18px;
 }
 
 .email-domain {
-  flex: 1;
   min-width: 120px;
 }
 
