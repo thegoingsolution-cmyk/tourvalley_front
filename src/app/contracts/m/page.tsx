@@ -53,6 +53,7 @@ export default function MobileContractPage() {
     travelRegion?: string | null;
     travelCountry?: string | null;
     travelPurpose?: string | null;
+    representativeInsuredName?: string | null;
   }
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [contractPagination, setContractPagination] = useState<{
@@ -1314,7 +1315,7 @@ export default function MobileContractPage() {
                             <li className="tour2023_conList">
                               <span className="tour2023_txt09">가입자</span>
                               <span className="tour2023_txt10">
-                                {loginType === 'I' ? insuredName : companyName}
+                                {contract.representativeInsuredName || '-'}
                               </span>
                             </li>
                             <li className="tour2023_conList">
@@ -1659,7 +1660,7 @@ export default function MobileContractPage() {
                             <li className="tour2023_conList">
                               <span className="tour2023_txt09">가입자</span>
                               <span className="tour2023_txt10">
-                                {member?.name || '-'}
+                                {contract.representativeInsuredName || '-'}
                               </span>
                             </li>
                             <li className="tour2023_conList">

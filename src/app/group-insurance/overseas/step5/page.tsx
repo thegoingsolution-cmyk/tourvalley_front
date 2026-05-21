@@ -999,86 +999,9 @@ export default function OverseasInsuranceStep5Page() {
         'SA': '남아메리카',
       };
 
-      const continentPlaces: { [key: string]: { value: string; label: string }[] } = {
-        EU: [
-          { value: 'DE', label: '독일' },
-          { value: 'FR', label: '프랑스' },
-          { value: 'GB', label: '영국' },
-          { value: 'IT', label: '이탈리아' },
-          { value: 'ES', label: '스페인' },
-          { value: 'NL', label: '네덜란드' },
-          { value: 'BE', label: '벨기에' },
-          { value: 'CH', label: '스위스' },
-          { value: 'AT', label: '오스트리아' },
-          { value: 'GR', label: '그리스' },
-          { value: 'PT', label: '포르투갈' },
-          { value: 'CZ', label: '체코' },
-          { value: 'PL', label: '폴란드' },
-          { value: 'HU', label: '헝가리' },
-          { value: 'SE', label: '스웨덴' },
-          { value: 'NO', label: '노르웨이' },
-          { value: 'DK', label: '덴마크' },
-          { value: 'FI', label: '핀란드' },
-          { value: 'RU', label: '러시아' },
-        ],
-        AS: [
-          { value: 'JP', label: '일본' },
-          { value: 'CN', label: '중국' },
-          { value: 'TW', label: '대만(타이완)' },
-          { value: 'HK', label: '홍콩' },
-          { value: 'SG', label: '싱가포르' },
-          { value: 'TH', label: '태국' },
-          { value: 'VN', label: '베트남' },
-          { value: 'PH', label: '필리핀' },
-          { value: 'ID', label: '인도네시아' },
-          { value: 'MY', label: '말레이시아' },
-          { value: 'IN', label: '인도' },
-          { value: 'MN', label: '몽골' },
-          { value: 'KZ', label: '카자흐스탄' },
-          { value: 'UZ', label: '우즈베키스탄' },
-        ],
-        AF: [
-          { value: 'ZA', label: '남아프리카공화국' },
-          { value: 'EG', label: '이집트' },
-          { value: 'MA', label: '모로코' },
-          { value: 'KE', label: '케냐' },
-          { value: 'TZ', label: '탄자니아' },
-        ],
-        AU: [
-          { value: 'AU', label: '호주' },
-          { value: 'NZ', label: '뉴질랜드' },
-          { value: 'FJ', label: '피지' },
-          { value: 'PG', label: '파푸아뉴기니' },
-        ],
-        NA: [
-          { value: 'US', label: '미국' },
-          { value: 'CA', label: '캐나다' },
-          { value: 'MX', label: '멕시코' },
-          { value: 'CU', label: '쿠바' },
-        ],
-        SA: [
-          { value: 'BR', label: '브라질' },
-          { value: 'AR', label: '아르헨티나' },
-          { value: 'CL', label: '칠레' },
-          { value: 'PE', label: '페루' },
-          { value: 'CO', label: '콜롬비아' },
-        ],
-      };
-
-      // 대륙명 변환
+      // 대륙명 변환 (국가명은 popup과 동일한 continentPlaceLabels 사용)
       const travelRegion = step1Data.tourContinent ? (continentMap[step1Data.tourContinent] || null) : null;
-      
-      // 국가명 변환
-      let travelCountry = null;
-      if (step1Data.tourContinent && step1Data.tourPlace) {
-        const places = continentPlaces[step1Data.tourContinent];
-        if (places) {
-          const selectedPlace = places.find(p => p.value === step1Data.tourPlace);
-          if (selectedPlace) {
-            travelCountry = selectedPlace.label;
-          }
-        }
-      }
+      const travelCountry = getTourPlaceLabel(step1Data.tourContinent, step1Data.tourPlace) || null;
 
       // 계약 데이터 구성
       const trackingInfo = getTrackingInfo('PC');
