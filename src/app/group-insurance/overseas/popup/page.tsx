@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getCorporateMemberInfo } from '@/services/authService';
 import {
   getOverseasShortTripMaxArrivalFromPickedDate,
+  isDepartureAtLeastTwoHoursFromNow,
   parseInsuranceDateHourToInstant,
 } from '@/utils/dateTime';
 import '../../popup/page.css';
@@ -29,16 +30,6 @@ const parseDate = (dateString: string): Date | null => {
     return null;
   }
 };
-
-const MIN_DEPARTURE_LEAD_MS = 2 * 60 * 60 * 1000;
-
-function isDepartureAtLeastTwoHoursFromNow(dateStr: string, timeStr: string) {
-  const dep = parseInsuranceDateHourToInstant(dateStr, timeStr);
-  if (Number.isNaN(dep.getTime())) return false;
-  const now = new Date();
-  const currentHourStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours()).getTime();
-  return dep.getTime() >= currentHourStart + MIN_DEPARTURE_LEAD_MS;
-}
 
 export default function OverseasInsurancePopupPage() {
   const { isLoggedIn, member, isLoading } = useAuth();

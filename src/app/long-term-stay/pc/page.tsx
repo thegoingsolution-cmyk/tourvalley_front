@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import { getImagePath } from '@/utils/path';
 import {
   addInsuranceCalendarMonthsToPickedInstant,
+  isDepartureAtLeastTwoHoursFromNow,
   parseInsuranceDateHourToInstant,
 } from '@/utils/dateTime';
 import { getTrackingInfo } from '@/utils/tracking';
@@ -912,6 +913,16 @@ export default function PCLongTermStayPage() {
 
   // 결제 처리 함수
   const handlePaymentSubmit = async () => {
+    if (!departureDate || departureTime == null || String(departureTime).trim() === '') {
+      alert('출발일시 정보가 없습니다. 처음부터 다시 진행해 주세요.');
+      return;
+    }
+
+    if (!isDepartureAtLeastTwoHoursFromNow(departureDate, String(departureTime))) {
+      alert('출발시간은 가입시점 2시간 뒤부터 설정 가능합니다');
+      return;
+    }
+
     if (!paymentMethod) {
       alert('결제 방법을 선택해주세요.');
       return;

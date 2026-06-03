@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import { isDepartureAtLeastTwoHoursFromNow } from '@/utils/dateTime';
 import { PaymentMethod, PaymentSubMethod } from './types';
 
 interface PaymentStepProps {
@@ -635,6 +636,13 @@ export default function PaymentStep({
             type="button"
             className="payment-submit-btn"
             onClick={() => {
+              if (departureDate && departureTime != null && String(departureTime).trim() !== '') {
+                if (!isDepartureAtLeastTwoHoursFromNow(departureDate, String(departureTime))) {
+                  alert('출발시간은 가입시점 2시간 뒤부터 설정 가능합니다');
+                  return;
+                }
+              }
+
               // 무통장입금 선택 시 입금예정일 검증
               if (paymentMethod === '기타결제' && paymentSubMethod === '무통장입금') {
                 if (!validateExpectedDepositDate(expectedDepositYear, expectedDepositMonth, expectedDepositDay)) {

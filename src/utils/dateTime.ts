@@ -83,18 +83,30 @@ export function formatInsurancePeriod(
  * 월이 밀리며 최대기간이 잘못 계산되는 것을 막음.
  */
 export function parseInsuranceDateHourToInstant(dateStr: string, hourStr: string): Date {
+  const normalizedDate = String(dateStr).trim().replace(/\./g, '-');
   const h = parseInt(String(hourStr).trim(), 10);
   if (Number.isNaN(h)) {
     return new Date(NaN);
   }
   if (h === 24) {
-    const d = new Date(`${dateStr}T00:00:00`);
+    const d = new Date(`${normalizedDate}T00:00:00`);
     if (Number.isNaN(d.getTime())) return d;
     d.setDate(d.getDate() + 1);
     return d;
   }
   const hh = String(h).padStart(2, '0');
-  return new Date(`${dateStr}T${hh}:00:00`);
+  return new Date(`${normalizedDate}T${hh}:00:00`);
+}
+
+const MIN_DEPARTURE_LEAD_MS = 2 * 60 * 60 * 1000;
+
+/** 출발일시가 가입(결제) 시점 기준 현재 시 0분 + 2시간 이후인지 */
+export function isDepartureAtLeastTwoHoursFromNow(dateStr: string, timeStr: string): boolean {
+  const dep = parseInsuranceDateHourToInstant(dateStr, timeStr);
+  if (Number.isNaN(dep.getTime())) return false;
+  const now = new Date();
+  const currentHourStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours()).getTime();
+  return dep.getTime() >= currentHourStart + MIN_DEPARTURE_LEAD_MS;
 }
 
 /**

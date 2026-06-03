@@ -6,7 +6,8 @@ import './GiftCardExchangeModal.css';
 
 /** DB·API와 동일한 코드 */
 export const GIFT_EXCHANGE_TYPE = {
-  CULTURE_POST: 'CC10K_POST',
+  // CULTURE_POST: 'CC10K_POST',
+  BAEMIN_ALIM: 'BM10K_ALIM',
   SK_GAS_ALIM: 'SK10K_ALIM',
   STARBUCKS_ALIM: 'SB10K_ALIM',
 } as const;
@@ -60,9 +61,12 @@ const GiftCardExchangeModal: React.FC<GiftCardExchangeModalProps> = ({
   const addressDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const addressAbortRef = useRef<AbortController | null>(null);
 
-  const isPostalGift = giftType === GIFT_EXCHANGE_TYPE.CULTURE_POST;
+  // const isPostalGift = giftType === GIFT_EXCHANGE_TYPE.CULTURE_POST;
+  const isPostalGift = false;
   const isAlimtalkGift =
-    giftType === GIFT_EXCHANGE_TYPE.SK_GAS_ALIM || giftType === GIFT_EXCHANGE_TYPE.STARBUCKS_ALIM;
+    giftType === GIFT_EXCHANGE_TYPE.BAEMIN_ALIM ||
+    giftType === GIFT_EXCHANGE_TYPE.SK_GAS_ALIM ||
+    giftType === GIFT_EXCHANGE_TYPE.STARBUCKS_ALIM;
 
   useEffect(() => {
     if (isOpen) {
@@ -126,7 +130,7 @@ const GiftCardExchangeModal: React.FC<GiftCardExchangeModalProps> = ({
 
   const setAmount = () => {
     const giftPrice =
-      giftType === GIFT_EXCHANGE_TYPE.CULTURE_POST ||
+      giftType === GIFT_EXCHANGE_TYPE.BAEMIN_ALIM ||
       giftType === GIFT_EXCHANGE_TYPE.SK_GAS_ALIM ||
       giftType === GIFT_EXCHANGE_TYPE.STARBUCKS_ALIM
         ? 10000
@@ -382,8 +386,11 @@ const GiftCardExchangeModal: React.FC<GiftCardExchangeModalProps> = ({
                     }}
                   >
                     <option value="">선택</option>
-                    <option value={GIFT_EXCHANGE_TYPE.CULTURE_POST}>
+                    {/* <option value={GIFT_EXCHANGE_TYPE.CULTURE_POST}>
                       문화상품권 10,000원권(우편)
+                    </option> */}
+                    <option value={GIFT_EXCHANGE_TYPE.BAEMIN_ALIM}>
+                      배달의민족 10,000원권(알림톡)
                     </option>
                     <option value={GIFT_EXCHANGE_TYPE.SK_GAS_ALIM}>
                       SK주유상품권 10,000원권(알림톡)

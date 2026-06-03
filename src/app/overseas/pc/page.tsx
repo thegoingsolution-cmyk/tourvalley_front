@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import { getImagePath } from '@/utils/path';
 import {
   getOverseasShortTripMaxArrivalFromPickedDate,
+  isDepartureAtLeastTwoHoursFromNow,
   parseInsuranceDateHourToInstant,
 } from '@/utils/dateTime';
 import { getTrackingInfo } from '@/utils/tracking';
@@ -805,6 +806,16 @@ export default function PCOverseasPage() {
   const handlePaymentSubmit = async () => {
     if (isSubmitting) {
       return; // 이미 제출 중이면 무시
+    }
+
+    if (!departureDate || departureTime == null || String(departureTime).trim() === '') {
+      alert('출발일시 정보가 없습니다. 처음부터 다시 진행해 주세요.');
+      return;
+    }
+
+    if (!isDepartureAtLeastTwoHoursFromNow(departureDate, String(departureTime))) {
+      alert('출발시간은 가입시점 2시간 뒤부터 설정 가능합니다');
+      return;
     }
     
     if (!paymentMethod) {

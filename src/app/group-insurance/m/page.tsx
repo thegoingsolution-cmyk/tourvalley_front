@@ -8,6 +8,7 @@ import {
   addInsuranceCalendarMonthsToPickedInstant,
   getDomesticInsuranceMaxArrivalFromPickedDate,
   getOverseasShortTripMaxArrivalFromPickedDate,
+  isDepartureAtLeastTwoHoursFromNow,
   parseInsuranceDateHourToInstant,
 } from '@/utils/dateTime';
 import { useAuth } from '@/contexts/AuthContext';
@@ -2040,6 +2041,16 @@ function MobileGroupInsuranceContent() {
   };
 
   const handlePaymentSubmit = async () => {
+    if (!departureDate || departureTime == null || String(departureTime).trim() === '') {
+      alert('출발일시 정보가 없습니다. 처음부터 다시 진행해 주세요.');
+      return;
+    }
+
+    if (!isDepartureAtLeastTwoHoursFromNow(departureDate, String(departureTime))) {
+      alert('출발시간은 가입시점 2시간 뒤부터 설정 가능합니다');
+      return;
+    }
+
     // 결제 방법 검증
     if (!paymentMethod) {
       alert('결제 방법을 선택해주세요.');
@@ -3269,6 +3280,10 @@ function MobileGroupInsuranceContent() {
               onNormalPremiumChange={setNormalPremium}
               onReceiptPremiumChange={setReceiptPremium}
               onIsSamePremiumChange={setIsSamePremium}
+              departureDate={departureDate}
+              departureTime={departureTime}
+              arrivalDate={arrivalDate}
+              arrivalTime={arrivalTime}
               onSubmit={handlePaymentSubmit}
             />
           )}

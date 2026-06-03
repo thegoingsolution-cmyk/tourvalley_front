@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getCorporateMemberInfo } from '@/services/authService';
 import { getTrackingInfo } from '@/utils/tracking';
 import { requestNicepayPayment, openNicepayWindow, processNaverPayPayment, processKakaoPayPayment } from '@/services/paymentService';
+import { isDepartureAtLeastTwoHoursFromNow } from '@/utils/dateTime';
 import '../../popup/page.css';
 
 export default function DomesticInsuranceStep5Page() {
@@ -401,6 +402,18 @@ export default function DomesticInsuranceStep5Page() {
     setIsProcessing(true);
 
     try {
+      if (!step1Data?.startDate || step1Data?.startHour == null || String(step1Data.startHour).trim() === '') {
+        alert('보험 기간 정보가 없습니다. 처음부터 다시 진행해 주세요.');
+        setIsProcessing(false);
+        return;
+      }
+
+      if (!isDepartureAtLeastTwoHoursFromNow(step1Data.startDate, String(step1Data.startHour))) {
+        alert('출발시간은 가입시점 2시간 뒤부터 설정 가능합니다');
+        setIsProcessing(false);
+        return;
+      }
+
       // 결제 방법 검증
       if (payMethod === 'W') {
         // 수기카드 검증
