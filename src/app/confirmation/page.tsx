@@ -7,6 +7,14 @@ import {
   readNonMemberContractAuth,
   buildFullBirthDateFromSixDigits,
 } from '@/utils/nonMemberContractAuth';
+import {
+  buildCoverageDetailsRequestBody,
+  buildPlanCoverageKey,
+  formatConfirmationPlanLabel,
+  getCoverageDetailPlanTypeCandidates,
+  normalizeConfirmationInsuranceType,
+  parseHasMedicalExpense,
+} from '@/utils/travelPlanDisplay';
 import './page.css';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
@@ -48,6 +56,15 @@ type Participant = {
   birthDate?: string;
   planType?: string;
   premium?: number;
+  hasMedicalExpense?: boolean;
+};
+
+type PlanSummary = {
+  planKey: string;
+  planName: string;
+  planType: string;
+  hasMedicalExpense: boolean;
+  ageRange: string;
 };
 
 type PlanCoverage = {
@@ -55,50 +72,61 @@ type PlanCoverage = {
   sections: { title: string; items: { label: string; amount: string; note?: string }[] }[];
 };
 
-/** 피보험자 명단에서 등장한 플랜 타입만 수집 (첫 등장 순서 유지) */
-function getPlanListFromParticipants(participants: Participant[]): { planKey: string; planName: string; ageRange: string }[] {
+/** 피보험자 명단에서 등장한 플랜 타입만 수집 (실손/비실손 구분, 첫 등장 순서 유지) */
+function getPlanListFromParticipants(participants: Participant[]): PlanSummary[] {
   const seen = new Set<string>();
-  const list: { planKey: string; planName: string; ageRange: string }[] = [];
+  const list: PlanSummary[] = [];
   for (const p of participants) {
-    const pt = (p.planType ?? '').trim();
-    if (pt && !seen.has(pt)) {
-      seen.add(pt);
-      list.push({ planKey: pt, planName: pt, ageRange: '' });
-    }
+    const planType = (p.planType ?? '').trim();
+    if (!planType) continue;
+    const hasMedicalExpense = parseHasMedicalExpense(p.hasMedicalExpense);
+    const planKey = buildPlanCoverageKey(planType, hasMedicalExpense);
+    if (seen.has(planKey)) continue;
+    seen.add(planKey);
+    list.push({
+      planKey,
+      planName: formatConfirmationPlanLabel(planType, hasMedicalExpense),
+      planType,
+      hasMedicalExpense,
+      ageRange: '',
+    });
   }
   return list;
 }
 
-/** 플랜별 보장내용 머지: section별로 item을 합치고 플랜별 금액 매핑 */
-function mergePlansCoverage(
-  plans: { planKey: string; planName: string; ageRange?: string }[],
-  coverages: (PlanCoverage | null)[]
-): { title: string; items: { label: string; note?: string; amounts: Record<string, string> }[] }[] {
-  const sectionMap = new Map<string, { label: string; note?: string; amounts: Record<string, string> }[]>();
-  plans.forEach((plan, idx) => {
-    const cov = coverages[idx];
-    if (!cov?.sections) return;
-    cov.sections.forEach((sec) => {
-      let list = sectionMap.get(sec.title);
-      if (!list) {
-        list = [];
-        sectionMap.set(sec.title, list);
-      }
-      sec.items.forEach((item) => {
-        const found = list.find((x) => x.label === item.label && (x.note ?? '') === (item.note ?? ''));
-        if (found) {
-          found.amounts[plan.planKey] = item.amount;
-        } else {
-          list.push({
-            label: item.label,
-            note: item.note,
-            amounts: { [plan.planKey]: item.amount },
-          });
-        }
+type PlanCoverageEntry = {
+  plan: PlanSummary;
+  coverage: PlanCoverage | null;
+};
+
+async function fetchPlanCoverageDetail(
+  insuranceType: string,
+  plan: PlanSummary,
+  apiBaseUrl: string,
+): Promise<PlanCoverage | null> {
+  const candidates = getCoverageDetailPlanTypeCandidates(plan.planType);
+  for (const planType of candidates) {
+    try {
+      const res = await fetch(`${apiBaseUrl}/api/travel/coverage-details`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(
+          buildCoverageDetailsRequestBody(insuranceType, planType, plan.hasMedicalExpense),
+        ),
       });
-    });
-  });
-  return Array.from(sectionMap.entries()).map(([title, items]) => ({ title, items }));
+      const json = await res.json();
+      if (res.ok && json.success && Array.isArray(json.sections) && json.sections.length > 0) {
+        return {
+          planName: plan.planName,
+          sections: json.sections,
+        };
+      }
+    } catch {
+      // try next candidate
+    }
+  }
+  return null;
 }
 
 const formatDate = (value?: string | null) => {
@@ -145,7 +173,7 @@ function ConfirmationContent() {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(!!contractId || isDraft);
   const [error, setError] = useState<string | null>(null);
-  const [plansCoverage, setPlansCoverage] = useState<(PlanCoverage | null)[]>([]);
+  const [planCoverageEntries, setPlanCoverageEntries] = useState<PlanCoverageEntry[]>([]);
   const [coverageLoading, setCoverageLoading] = useState(false);
   const [coverageError, setCoverageError] = useState<string | null>(null);
   const [coverageReady, setCoverageReady] = useState(false);
@@ -316,6 +344,7 @@ function ConfirmationContent() {
         if (response.ok) {
           const data = await response.json();
           if (data.success && Array.isArray(data.participants)) {
+            const contractHasMedicalExpense = parseHasMedicalExpense(data.hasMedicalExpense);
             setParticipants(
               data.participants.map((p: any, i: number) => ({
                 id: p.id ?? i + 1,
@@ -324,6 +353,10 @@ function ConfirmationContent() {
                 birthDate: p.birthDate ?? p.birth_date ?? '',
                 planType: p.planType ?? p.plan_type ?? '',
                 premium: typeof p.premium === 'number' ? p.premium : Number(p.premium) || 0,
+                hasMedicalExpense: parseHasMedicalExpense(
+                  p.hasMedicalExpense ?? p.has_medical_expense,
+                  contractHasMedicalExpense,
+                ),
               }))
             );
           }
@@ -338,40 +371,21 @@ function ConfirmationContent() {
   useEffect(() => {
     const plans = getPlanListFromParticipants(participants);
     if (!detail?.insuranceType || plans.length === 0) {
-      setPlansCoverage([]);
+      setPlanCoverageEntries([]);
       setCoverageReady(true);
       return;
     }
     setCoverageLoading(true);
     setCoverageError(null);
     setCoverageReady(false);
-    const insuranceTypeRaw = detail.insuranceType ?? '';
-    const insuranceType =
-      insuranceTypeRaw === '해외여행' || insuranceTypeRaw === '해외여행자보험'
-        ? '해외여행보험'
-        : insuranceTypeRaw === '국내여행자보험'
-          ? '국내여행보험'
-          : insuranceTypeRaw;
-    Promise.all(
-      plans.map((p) =>
-        fetch(`${API_BASE_URL}/api/travel/coverage-details`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({
-            insurance_type: insuranceType,
-            plan_type: p.planKey,
-            is_medical_expense: true,
-            plan_variant: 'B',
-          }),
-        })
-          .then((r) => r.json())
-          .then((r) => (r.success && r.sections ? { planName: r.planName ?? p.planKey, sections: r.sections } : null))
-          .catch(() => null)
-      )
-    )
+    const insuranceType = normalizeConfirmationInsuranceType(detail.insuranceType);
+    Promise.all(plans.map((plan) => fetchPlanCoverageDetail(insuranceType, plan, API_BASE_URL)))
       .then((results) => {
-        setPlansCoverage(results);
+        const entries = plans.map((plan, idx) => ({
+          plan,
+          coverage: results[idx],
+        }));
+        setPlanCoverageEntries(entries);
         setCoverageLoading(false);
         const hasAny = results.some(Boolean);
         if (!hasAny) setCoverageError('보장내용을 불러올 수 없습니다.');
@@ -405,7 +419,7 @@ function ConfirmationContent() {
         printTimeoutRef.current = null;
       }
     };
-  }, [loading, error, detail, contractId, plansCoverage.length, coverageLoading, coverageReady]);
+  }, [loading, error, detail, contractId, planCoverageEntries.length, coverageLoading, coverageReady]);
 
   if (loading) {
     return (
@@ -516,7 +530,12 @@ function ConfirmationContent() {
                       <td>{p.name}</td>
                       <td>{p.gender ?? ''}</td>
                       <td>{formatBirth(p.birthDate)}</td>
-                      <td>{p.planType ?? ''}</td>
+                      <td>
+                        {formatConfirmationPlanLabel(
+                          p.planType ?? '',
+                          parseHasMedicalExpense(p.hasMedicalExpense),
+                        )}
+                      </td>
                       <td>{p.premium != null ? `${formatNumber(p.premium)}원` : ''}</td>
                     </tr>
                   ))
@@ -557,9 +576,9 @@ function ConfirmationContent() {
                 </tr>
                 <tr>
                   <th>진행단계</th>
-                  <td className="cf-dotted">{detail?.status ?? ''}</td>
-                  <th></th>
-                  <td className="cf-dotted"></td>
+                  <td className="cf-dotted" colSpan={3}>
+                    {detail?.status ?? ''}
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -570,59 +589,55 @@ function ConfirmationContent() {
             {coverageLoading && (
               <p className="cf-overseas-loading">보장내용을 불러오는 중...</p>
             )}
-            {coverageError && plansCoverage.length === 0 && (
+            {coverageError && planCoverageEntries.every((entry) => !entry.coverage) && (
               <p className="cf-overseas-error">{coverageError}</p>
             )}
-            {(() => {
-              const plans = getPlanListFromParticipants(participants);
-              const merged = mergePlansCoverage(plans, plansCoverage);
-              if (merged.length === 0 && !coverageLoading) return null;
-              return (
-                <table className="cf-overseas-table cf-overseas-table--coverage cf-overseas-table--plans">
-                  <thead>
-                    <tr>
-                      <th className="cf-coverage-name">담보명</th>
-                      <th className="cf-coverage-amount-header" colSpan={plans.length}>
-                        보장금액
-                      </th>
-                    </tr>
-                    <tr>
-                      <th className="cf-coverage-name"></th>
-                      {plans.map((p) => (
-                        <th key={p.planKey} className="cf-amount">
-                          {p.planName}
-                          {p.ageRange ? <span className="cf-plan-age">({p.ageRange})</span> : null}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {merged.map((section) => (
-                      <React.Fragment key={section.title}>
+            {planCoverageEntries.some((entry) => entry.coverage) && !coverageLoading && (
+              <div className="cf-plan-coverage-blocks">
+                {planCoverageEntries.map(({ plan, coverage }) =>
+                  coverage ? (
+                    <table
+                      key={plan.planKey}
+                      className="cf-overseas-table cf-overseas-table--coverage cf-overseas-table--plan-block"
+                    >
+                      <colgroup>
+                        <col className="cf-plan-block-label-col" />
+                        <col className="cf-plan-block-amount-col" />
+                      </colgroup>
+                      <tbody>
                         <tr>
-                          <th className="cf-cat" colSpan={1 + plans.length}>
-                            {section.title}
+                          <th colSpan={2} className="cf-plan-block-title">
+                            가입플랜: {plan.planName}
                           </th>
                         </tr>
-                        {section.items.map((item) => (
-                          <tr key={`${section.title}-${item.label}-${item.note ?? ''}`}>
-                            <td className="cf-coverage-label">
-                              {item.label}
-                              {item.note ? ` ${item.note}` : ''}
-                            </td>
-                            {plans.map((p) => (
-                              <td key={p.planKey} className="cf-amount">
-                                {item.amounts[p.planKey] ?? '-'}
-                              </td>
+                        {coverage.sections.map((section) => (
+                          <React.Fragment key={`${plan.planKey}-${section.title}`}>
+                            <tr>
+                              <th colSpan={2} className="cf-cat">
+                                {section.title}
+                              </th>
+                            </tr>
+                            {section.items.map((item) => (
+                              <tr key={`${plan.planKey}-${section.title}-${item.label}-${item.note ?? ''}`}>
+                                <td className="cf-coverage-label">
+                                  {item.label}
+                                  {item.note ? ` ${item.note}` : ''}
+                                </td>
+                                <td className="cf-amount">{item.amount}</td>
+                              </tr>
                             ))}
-                          </tr>
+                          </React.Fragment>
                         ))}
-                      </React.Fragment>
-                    ))}
-                  </tbody>
-                </table>
-              );
-            })()}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <p key={plan.planKey} className="cf-overseas-error cf-plan-block-error">
+                      {plan.planName} 보장내용을 불러올 수 없습니다.
+                    </p>
+                  ),
+                )}
+              </div>
+            )}
           </section>
 
           {/*

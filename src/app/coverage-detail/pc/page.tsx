@@ -2,6 +2,7 @@
 
 import React, { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { resolveMedicalExpenseForCoverageDetail } from '@/utils/coverageDetailParams';
 import './page.css';
 
 interface CoverageItem {
@@ -28,7 +29,6 @@ function PCCoverageDetailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const planType = searchParams.get('planType') || '표준플랜';
-  const hasMedicalExpense = searchParams.get('hasMedicalExpense') !== 'false';
   const insuranceTypeParam = searchParams.get('insuranceType');
   const insuranceType: InsuranceType = (() => {
     const raw = insuranceTypeParam || '국내여행보험';
@@ -36,6 +36,12 @@ function PCCoverageDetailContent() {
     if (raw === '국내여행자보험') return '국내여행보험';
     return raw as InsuranceType;
   })();
+  const needsMedicalExpenseDistinction =
+    insuranceType === '국내여행보험' || insuranceType === '해외여행보험';
+  const hasMedicalExpense = resolveMedicalExpenseForCoverageDetail(
+    searchParams,
+    needsMedicalExpenseDistinction,
+  );
   const currencyPlan = searchParams.get('currencyPlan') as '원화플랜' | '외화플랜' | undefined;
   const planVariantParam = searchParams.get('planVariant');
   const planVariant = planVariantParam === 'null' || planVariantParam === ''

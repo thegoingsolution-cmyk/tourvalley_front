@@ -2,6 +2,7 @@
 
 import React, { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { resolveMedicalExpenseForCoverageDetail } from '@/utils/coverageDetailParams';
 import './page.css';
 
 // 보장 상세 데이터 타입 정의
@@ -32,7 +33,6 @@ function MobileCoverageDetailContent() {
   const insuranceTypeParam = searchParams.get('insuranceType') || '국내여행보험';
   const returnUrlParam = searchParams.get('returnUrl');
   const returnUrl = returnUrlParam ? decodeURIComponent(returnUrlParam) : '/domestic/m';
-  const isMedicalExpenseParam = searchParams.get('isMedicalExpense');
   const currencyPlanParam = searchParams.get('currencyPlan') as '원화플랜' | '외화플랜' | null;
   const planVariantParam = searchParams.get('planVariant');
 
@@ -45,6 +45,10 @@ function MobileCoverageDetailContent() {
   const planType = planTypeParam as PlanType;
   const planVariant = planVariantParam === 'null' || planVariantParam === '' ? null : (planVariantParam || 'B');
   const needsMedicalExpenseDistinction = insuranceType === '국내여행보험' || insuranceType === '해외여행보험';
+  const isMedicalExpense = resolveMedicalExpenseForCoverageDetail(
+    searchParams,
+    needsMedicalExpenseDistinction,
+  );
   const openGuidePopup = (url: string) => {
     const w = 650;
     const h = 700;
@@ -67,7 +71,6 @@ function MobileCoverageDetailContent() {
 
   useEffect(() => {
     let isMounted = true;
-    const isMedicalExpense = needsMedicalExpenseDistinction ? isMedicalExpenseParam !== 'false' : undefined;
     const currencyPlan = needsCurrencyPlanDistinction ? (currencyPlanParam || '원화플랜') : undefined;
 
     const fetchDetail = async () => {
@@ -105,7 +108,7 @@ function MobileCoverageDetailContent() {
     };
     fetchDetail();
     return () => { isMounted = false; };
-  }, [insuranceType, planType, planVariant, needsMedicalExpenseDistinction, needsCurrencyPlanDistinction, isMedicalExpenseParam, currencyPlanParam]);
+  }, [insuranceType, planType, planVariant, needsMedicalExpenseDistinction, needsCurrencyPlanDistinction, isMedicalExpense, currencyPlanParam]);
 
   const handleConfirm = (e?: React.MouseEvent<HTMLAnchorElement>) => {
     if (e) {

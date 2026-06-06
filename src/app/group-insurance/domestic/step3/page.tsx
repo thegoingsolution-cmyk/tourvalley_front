@@ -586,19 +586,12 @@ export default function DomesticInsuranceStep3Page() {
                         <td className="ag_center bgcolor_04">80~100세</td>
                       </tr>
                       <tr>
-                        <td rowSpan={9} className="ag_left bgcolor_red">상해</td>
+                        <td rowSpan={8} className="ag_left bgcolor_red">상해</td>
                         <td className="ag_left bgcolor_red">국내여행중 상해사망후유장해</td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">1억원</td>
                         <td className="ag_center">1억원</td>
                         <td className="ag_center">5,000만원</td>
-                      </tr>
-                      <tr>
-                        <td className="ag_left bgcolor_red">레저(골프/사이클링/스키) 중상해사망후유장해</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
                       </tr>
                       <tr>
                         <td className="ag_left bgcolor_red">국내여행상해 후유장해</td>
@@ -811,52 +804,75 @@ export default function DomesticInsuranceStep3Page() {
                   </div>
                 </div>
 
-                {/* 실손의료비 본인부담금 안내 */}
+                {/* 5세대 실손의료보험(국내의료비) 본인부담금 안내 */}
                 <div className="Box_line01 mtb20" style={{ marginBottom: '30px' }}>
-                  <p className="txt">※ 실손의료비 본인부담금 안내</p>
-                  <div className="login_Btxt pb10">
+                  <p className="txt">※ 5세대 실손의료보험(국내의료비) 본인부담금 안내</p>
+                  <div className="login_Btxt pb10 Pslist-copay-intro">
                     <dl>
-                      <dd className="font_gray">실손의료보험은 급여(건강보험의 본인부담금)과 비급여를 보상하는 상품으로 보상대상 의료비에 대해 일정금액의 자기부담금이 있습니다.(4세대 실손의료보험 개정 2021년 8월 1일 적용)</dd>
-                      <dd className="font_gray">가입 전 알아두실 사항 및 보장내용에 관한 자세한 사항은 해당약관을 참조하시기 바랍니다.</dd>
+                      <dd className="font_gray">급여 의료비 : 본인부담금(본인이 실제로 부담한 금액)의 20%(4세대와 동일)</dd>
+                      <dd className="font_gray">비급여 의료비는 중증 비급여, 비중증 비급여 의료비로 구분</dd>
+                      <dd className="font_gray">
+                        국민건강보험 본인부담금 산정특례 대상 질환 비급여(중증)는 4세대 실손과 동일하게 보상
+                      </dd>
+                      <dd className="font_gray">
+                        국민건강보험 본인부담금 산정특례 대상 질환 이외의 질환은 비중증으로 구분하여 본인부담금을 상향 조정
+                      </dd>
                     </dl>
                   </div>
-                  <table className="Pslist" border={1} cellSpacing="0">
+                  <table className="Pslist Pslist-copay" border={1} cellSpacing="0">
                     <caption></caption>
                     <colgroup>
+                      <col width="10%" />
                       <col width="30%" />
-                      <col width="70%" />
+                      <col width="30%" />
+                      <col width="30%" />
                     </colgroup>
+                    <thead>
+                      <tr>
+                        <th scope="col" />
+                        <th scope="col">급여</th>
+                        <th scope="col">
+                          중증 비급여 특약1
+                          <span className="Pslist-copay-sub">(산정특례대상 질환 대상)</span>
+                        </th>
+                        <th scope="col">
+                          비중증 비급여 특약2
+                          <span className="Pslist-copay-sub">(산정특례대상질환 이외의 질환)</span>
+                        </th>
+                      </tr>
+                    </thead>
                     <tbody>
                       <tr>
-                        <td className="ag_left sName">상해/질병<br />급여 국내입원</td>
-                        <td className="sName">본인부담금(본인이 실제로 부담한 금액)의 20%</td>
+                        <th scope="row">입원</th>
+                        <td>본인부담금의 20%</td>
+                        <td>본인부담금의 30%</td>
+                        <td className="font_red">본인부담금의 50%</td>
                       </tr>
                       <tr>
-                        <td className="ag_left">상해/질병<br />급여 국내통원</td>
-                        <td className="">
-                          보건소, 병원, 의원급에서의 외래 및 그에 따른 약국에서의 처방조제<br />
-                          - 1만원과 보장대상의료비의 20％중 큰 금액<br />
-                          전문요양기관, 상급종합병원, 종합병원에서의 외래 및 그에 따른 약국에서의 처방조제<br />
-                          - 2만원과 보장대상의료비의 20％중 큰 금액
-                        </td>
+                        <th scope="row">통원</th>
+                        <td>1회당 2만원 또는 보장대상의료비의 20% 중 큰 금액</td>
+                        <td>1회당 3만원 또는 보장대상의료비의 30% 중 큰 금액</td>
+                        <td className="font_red">1회당 5만원 또는 보장대상의료비의 50% 중 큰 금액</td>
                       </tr>
                       <tr>
-                        <td className="ag_left">상해/질병<br />비급여 국내입원</td>
-                        <td className="">
-                          1. 본인부담금(본인이 실제로 부담한 금액)의 30%<br />
-                          2. 상급병실료차액<br />
-                          : 비급여 병실료의 50％ (1일 평균금액 10만원 한도)
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="ag_left">상해/질병<br />비급여 국내통원</td>
-                        <td className="">
-                          통원 1회당(외래 처방조제 합산) :3만원과 보장대상의료비의 30％중 큰 금액<br />
-                          (단, 3대 비급여 및 상급병실료차액 제외) ※ 연간 통원 100회까지 보상
+                        <th scope="row">3대 비급여</th>
+                        <td />
+                        <td>1회당 3만원 또는 30% 중 큰 금액</td>
+                        <td className="font_red">
+                          1회당 5만원 또는 보장대상의료비의 50% 중 큰 금액
+                          <br />
+                          비급여 도수치료, 주사비 보장 제외
                         </td>
                       </tr>
                     </tbody>
                   </table>
+                  <div className="login_Btxt pt10 Pslist-copay-note">
+                    <dl>
+                      <dd className="font_gray">
+                        ※ 산정특례대상질환 : 암, 뇌혈관질환, 심장질환, 중증 화상 등 보건복지부 고시 산정 특례 대상질환을 말합니다.
+                      </dd>
+                    </dl>
+                  </div>
                 </div>
 
                 <div className="con_btnWrap mt30 mb10">

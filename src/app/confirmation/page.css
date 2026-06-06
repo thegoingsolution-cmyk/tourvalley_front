@@ -111,7 +111,75 @@
   font-weight: 700;
 }
 
-/* 플랜별 보장내용 테이블 */
+/* 플랜별 보장내용 — 플랜당 개별 테이블 */
+.cf-plan-coverage-blocks {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cf-overseas-table--plan-block {
+  table-layout: fixed;
+  margin-top: 0;
+}
+
+.cf-overseas-table--plan-block .cf-plan-block-title {
+  background: #f0f0f0;
+  text-align: center;
+  font-weight: 700;
+  padding: 8px 10px;
+}
+
+.cf-overseas-table--plan-block .cf-plan-block-label-col {
+  width: 70%;
+}
+
+.cf-overseas-table--plan-block .cf-plan-block-amount-col {
+  width: 30%;
+}
+
+.cf-overseas-table--plan-block .cf-coverage-label {
+  padding-left: 12px;
+  text-align: left;
+  word-break: keep-all;
+  line-height: 1.45;
+}
+
+.cf-overseas-table--plan-block .cf-amount {
+  width: auto;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.cf-overseas-table--plan-block .cf-cat {
+  padding-left: 8px;
+  text-align: left;
+}
+
+.cf-plan-block-error {
+  padding: 12px 10px;
+  text-align: left;
+  font-size: 12px;
+}
+
+@media print {
+  .cf-plan-coverage-blocks {
+    gap: 12px;
+  }
+
+  .cf-overseas-table--plan-block {
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+
+  .cf-overseas-table--plan-block .cf-cat,
+  .cf-overseas-table--plan-block .cf-plan-block-title {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+}
+
+/* (legacy) 가로 비교 테이블 */
 .cf-overseas-table--plans .cf-coverage-name {
   width: 50%;
   min-width: 200px;
