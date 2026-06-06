@@ -5,6 +5,7 @@ import '../../popup/page.css';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCorporateMemberInfo } from '@/services/authService';
 import { calculateAgeAndGenderFromResidentNumber, getBirthDateStringFromResidentNumber } from '@/utils/age';
+import { isDomesticAdultSyncCohort, isDomesticSeniorSyncCohort } from '@/utils/domesticAgeBrackets';
 
 // 플랜 코드 또는 플랜명을 DB plan_type으로 정규화
 const normalizePlanType = (planCd: string): string => {
@@ -12,8 +13,8 @@ const normalizePlanType = (planCd: string): string => {
     'BAW': '실속플랜',
     'HCW': '표준플랜',
     'CHW': '어린이플랜',
-    'OLW': '어르신플랜1',
-    'O2W': '어르신플랜2',
+    'OLW': '어르신플랜1(실속)',
+    'O2W': '어르신플랜1(실속)',
   };
   return planMap[planCd] || planCd || '실속플랜';
 };
@@ -24,9 +25,7 @@ const DOMESTIC_TIER_ORDER: { 실속: string[]; 표준: string[] } = {
   표준: ['표준플랜', '어르신플랜1(표준)'],
 };
 
-/** 실속·표준 동기화: 15–70세끼리 / 71세 이상끼리만 각각 묶어서 변경 (서로 영향 없음) */
-const isDomesticAdultSyncCohort = (age: number) => age >= 15 && age <= 70;
-const isDomesticSeniorSyncCohort = (age: number) => age >= 71;
+/** 국내 단체(실손): 실속·표준 동기화 — 15–79세끼리 / 80세 이상끼리 */
 
 const getDomesticPlanTier = (planType: string): '실속' | '표준' | null => {
   const p = normalizePlanType(planType);
@@ -54,7 +53,6 @@ export default function DomesticInsuranceStep3Page() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [loading, setLoading] = useState(false);
-  const [planGuideType, setPlanGuideType] = useState<'BAW' | 'HCW'>('BAW');
   const [availablePlansByIndex, setAvailablePlansByIndex] = useState<{ [key: number]: string[] }>({});
   const inflightRef = React.useRef(false);
   const lastRequestKeyRef = React.useRef('');
@@ -381,11 +379,11 @@ export default function DomesticInsuranceStep3Page() {
           return prev;
         }
         const inSameSyncGroup = (personAge: number) => {
-          if (isDomesticAdultSyncCohort(changer.age)) {
-            return isDomesticAdultSyncCohort(personAge);
+          if (isDomesticAdultSyncCohort(changer.age, true)) {
+            return isDomesticAdultSyncCohort(personAge, true);
           }
-          if (isDomesticSeniorSyncCohort(changer.age)) {
-            return isDomesticSeniorSyncCohort(personAge);
+          if (isDomesticSeniorSyncCohort(changer.age, true)) {
+            return isDomesticSeniorSyncCohort(personAge, true);
           }
           return false;
         };
@@ -395,9 +393,6 @@ export default function DomesticInsuranceStep3Page() {
           if (!list || list.length === 0) return;
           const picked = pickDomesticPlanForTier(list, tier);
           if (picked) newSelectedPlans[person.index] = picked;
-        });
-        queueMicrotask(() => {
-          setPlanGuideType(tier === '표준' ? 'HCW' : 'BAW');
         });
       } else {
         if (!canUsePlan(index, normalizedPlan)) {
@@ -562,8 +557,7 @@ export default function DomesticInsuranceStep3Page() {
                     <colgroup>
                       <col width="12%" />
                       <col width="22%" />
-                      <col width="11.5%" />
-                      <col width="11.5%" />
+                      <col width="11%" />
                       <col width="11%" />
                       <col width="11%" />
                       <col width="11%" />
@@ -575,371 +569,223 @@ export default function DomesticInsuranceStep3Page() {
                           <strong>어린이플랜<br />(국내실손 포함)</strong>
                         </td>
                         <td className="sName ag_center" style={{ paddingRight: '5px' }}>
-                          <strong>어르신플랜1(실속)<br />(국내실손 포함)</strong>
+                          <strong>실속플랜<br />(국내실손 포함)</strong>
                         </td>
                         <td className="sName ag_center" style={{ paddingRight: '5px' }}>
-                          <strong>어르신플랜1(표준)<br />(국내실손 포함)</strong>
+                          <strong>표준플랜<br />(국내실손 포함)</strong>
                         </td>
                         <td className="sName ag_center" style={{ paddingRight: '5px' }}>
-                          <strong>어르신플랜2<br />(국내실손 포함)</strong>
-                        </td>
-                        <td className="sName">
-                          <div className="bg_join input_cell_01">
-                            <span className="ps_box02 wd_100">
-                              <select
-                                className="sel01"
-                                name="plan_cd"
-                                value={planGuideType}
-                                onChange={(e) => setPlanGuideType(e.target.value as 'BAW' | 'HCW')}
-                              >
-                                <option value="BAW">실속플랜(국내실손 포함)</option>
-                                <option value="HCW">표준플랜(국내실손 포함)</option>
-                              </select>
-                            </span>
-                          </div>
+                          <strong>어르신플랜<br />(국내실손 포함)</strong>
                         </td>
                       </tr>
-                    </tbody>
-                    <tbody id="planArea_BAW" style={{ display: planGuideType === 'BAW' ? '' : 'none' }}>
                       <tr>
                         <td colSpan={2} className="ag_left bgcolor_04">가입연령</td>
-                        <td className="ag_center bgcolor_04">0-14세</td>
-                        <td className="ag_center bgcolor_04">71-90세</td>
-                        <td className="ag_center bgcolor_04">71-90세</td>
-                        <td className="ag_center bgcolor_04">91-100세</td>
-                        <td className="ag_center bgcolor_04">15-70세</td>
+                        <td className="ag_center bgcolor_04">0~15세</td>
+                        <td className="ag_center bgcolor_04">15~79세</td>
+                        <td className="ag_center bgcolor_04">15~79세</td>
+                        <td className="ag_center bgcolor_04">80~100세</td>
                       </tr>
                       <tr>
-                        <td colSpan={2} className="ag_left bgcolor_red">국내여행 중 상해사망후유장해</td>
+                        <td rowSpan={9} className="ag_left bgcolor_red">상해</td>
+                        <td className="ag_left bgcolor_red">국내여행중 상해사망후유장해</td>
                         <td className="ag_center">-</td>
-                        <td className="ag_center">3,000만원</td>
-                        <td className="ag_center">5,000만원</td>
-                        <td className="ag_center">5,000만원</td>
                         <td className="ag_center">1억원</td>
+                        <td className="ag_center">1억원</td>
+                        <td className="ag_center">5,000만원</td>
                       </tr>
                       <tr>
-                        <td colSpan={2} className="ag_left bgcolor_red">국내여행 중 상해후유장해</td>
+                        <td className="ag_left bgcolor_red">레저(골프/사이클링/스키) 중상해사망후유장해</td>
+                        <td className="ag_center">-</td>
+                        <td className="ag_center">-</td>
+                        <td className="ag_center">-</td>
+                        <td className="ag_center">-</td>
+                      </tr>
+                      <tr>
+                        <td className="ag_left bgcolor_red">국내여행상해 후유장해</td>
                         <td className="ag_center">1억원</td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
                         <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
                       </tr>
                       <tr>
-                        <td rowSpan={4} className="ag_left bgcolor_red">상해</td>
-                        <td className="ag_center bgcolor_red">국내의료비<br />(상해 급여_입원_기본)</td>
-                        <td className="ag_center">1,000만원</td>
+                        <td className="ag_center bgcolor_red">상해 급여 실손의료비<br />(입원_기본)</td>
                         <td className="ag_center">1,000만원</td>
                         <td className="ag_center">1,000만원</td>
                         <td className="ag_center">1,000만원</td>
                         <td className="ag_center">1,000만원</td>
                       </tr>
                       <tr>
-                        <td className="ag_center bgcolor_red">국내의료비<br />(상해급여_통원_기본)</td>
-                        <td className="ag_center">10만원</td>
-                        <td className="ag_center">10만원</td>
-                        <td className="ag_center">10만원</td>
-                        <td className="ag_center">10만원</td>
-                        <td className="ag_center">10만원</td>
-                      </tr>
-                      <tr>
-                        <td className="ag_center bgcolor_red">국내의료비<br />(상해 비급여_입원_특약)</td>
-                        <td className="ag_center">1,000만원</td>
-                        <td className="ag_center">1,000만원</td>
-                        <td className="ag_center">1,000만원</td>
-                        <td className="ag_center">1,000만원</td>
-                        <td className="ag_center">1,000만원</td>
-                      </tr>
-                      <tr>
-                        <td className="ag_center bgcolor_red">국내의료비<br />(상해 비급여_통원_특약)</td>
-                        <td className="ag_center">10만원</td>
+                        <td className="ag_center bgcolor_red">상해 급여 실손의료비<br />(통원_기본)</td>
                         <td className="ag_center">10만원</td>
                         <td className="ag_center">10만원</td>
                         <td className="ag_center">10만원</td>
                         <td className="ag_center">10만원</td>
                       </tr>
                       <tr>
-                        <td rowSpan={4} className="ag_left bgcolor_red">질병</td>
-                        <td className="ag_center bgcolor_red">국내의료비<br />(질병 급여_입원_기본)</td>
+                        <td className="ag_center bgcolor_red">상해 중증 비급여 실손의료비<br />(입원_특약1)</td>
                         <td className="ag_center">1,000만원</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
+                        <td className="ag_center">1,000만원</td>
+                        <td className="ag_center">1,000만원</td>
+                        <td className="ag_center">1,000만원</td>
                       </tr>
                       <tr>
-                        <td className="ag_center bgcolor_red">국내의료비<br />(질병 급여_통원_기본)</td>
+                        <td className="ag_center bgcolor_red">상해 중증 비급여 실손의료비<br />(통원_특약1)</td>
                         <td className="ag_center">10만원</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                      </tr>
-                      <tr>
-                        <td className="ag_center bgcolor_red">국내의료비<br />(질병 비급여_입원_특약)</td>
-                        <td className="ag_center">1,000만원</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                      </tr>
-                      <tr>
-                        <td className="ag_center bgcolor_red">국내의료비<br />(질병 비급여_통원_특약)</td>
                         <td className="ag_center">10만원</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
+                        <td className="ag_center">10만원</td>
+                        <td className="ag_center">10만원</td>
                       </tr>
                       <tr>
-                        <td rowSpan={3} className="ag_left bgcolor_red">상해질병<br />3대비급여</td>
-                        <td className="ag_left bgcolor_red">국내의료비<br />(도수,체외충격파,증식치료_특약)</td>
-                        <td className="ag_center">350만원</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">350만원</td>
-                        <td className="ag_center">350만원</td>
-                        <td className="ag_center">350만원</td>
-                      </tr>
-                      <tr>
-                        <td className="ag_left bgcolor_red">국내의료비<br />(주사치료특약)</td>
-                        <td className="ag_center">250만원</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">250만원</td>
-                        <td className="ag_center">250만원</td>
-                        <td className="ag_center">250만원</td>
-                      </tr>
-                      <tr>
-                        <td className="ag_left bgcolor_red">국내의료비<br />(MRI/MRA_특약)</td>
-                        <td className="ag_center">300만원</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">300만원</td>
-                        <td className="ag_center">300만원</td>
-                        <td className="ag_center">300만원</td>
-                      </tr>
-                      <tr>
-                        <td colSpan={2} className="ag_left bgcolor_red">국내여행 중 질병사망 및<br />80%이상 고도후유장해</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
+                        <td className="ag_center bgcolor_red">상해 비중증 비급여 실손의료비<br />(입원_특약2)</td>
+                        <td className="ag_center">1,000만원</td>
+                        <td className="ag_center">1,000만원</td>
+                        <td className="ag_center">1,000만원</td>
                         <td className="ag_center">1,000만원</td>
                       </tr>
                       <tr>
-                        <td colSpan={2} className="ag_left bgcolor_red">국내여행 중 배상책임(면책1만원)</td>
-                        <td className="ag_center">500만원</td>
-                        <td className="ag_center">500만원</td>
-                        <td className="ag_center">500만원</td>
-                        <td className="ag_center">100만원</td>
-                        <td className="ag_center">500만원</td>
-                      </tr>
-                      <tr>
-                        <td colSpan={2} className="ag_left bgcolor_red">국내여행 중 휴대품손해(분실제외,<br />자기부담금1만원, 이동통신단말기 보상제외)</td>
-                        <td className="ag_center">50만원</td>
-                        <td className="ag_center">30만원</td>
-                        <td className="ag_center">30만원</td>
+                        <td className="ag_center bgcolor_red">상해 비중증 비급여 실손의료비<br />(통원_특약2)</td>
                         <td className="ag_center">20만원</td>
-                        <td className="ag_center">50만원</td>
+                        <td className="ag_center">20만원</td>
+                        <td className="ag_center">20만원</td>
+                        <td className="ag_center">20만원</td>
                       </tr>
                       <tr>
-                        <td colSpan={2} className="ag_left bgcolor_red">해외여행중 골절(치아파절제외)진단비(동일사고당 1회한)</td>
+                        <td rowSpan={7} className="ag_left bgcolor_red">질병</td>
+                        <td className="ag_center bgcolor_red">질병 급여 실손의료비<br />(입원_기본)</td>
+                        <td className="ag_center">1,000만원</td>
+                        <td className="ag_center">-</td>
+                        <td className="ag_center">1,000만원</td>
+                        <td className="ag_center">-</td>
+                      </tr>
+                      <tr>
+                        <td className="ag_center bgcolor_red">질병 급여 실손의료비<br />(통원_기본)</td>
                         <td className="ag_center">10만원</td>
+                        <td className="ag_center">-</td>
                         <td className="ag_center">10만원</td>
+                        <td className="ag_center">-</td>
+                      </tr>
+                      <tr>
+                        <td className="ag_center bgcolor_red">질병 중증 비급여 실손의료비<br />(입원_특약1)</td>
+                        <td className="ag_center">1,000만원</td>
+                        <td className="ag_center">-</td>
+                        <td className="ag_center">1,000만원</td>
+                        <td className="ag_center">-</td>
+                      </tr>
+                      <tr>
+                        <td className="ag_center bgcolor_red">질병 중증 비급여 실손의료비<br />(통원_특약1)</td>
                         <td className="ag_center">10만원</td>
+                        <td className="ag_center">-</td>
                         <td className="ag_center">10만원</td>
-                        <td className="ag_center">10만원</td>
+                        <td className="ag_center">-</td>
+                      </tr>
+                      <tr>
+                        <td className="ag_center bgcolor_red">질병 비중증 비급여 실손의료비<br />(입원_특약2)</td>
+                        <td className="ag_center">1,000만원</td>
+                        <td className="ag_center">-</td>
+                        <td className="ag_center">1,000만원</td>
+                        <td className="ag_center">-</td>
+                      </tr>
+                      <tr>
+                        <td className="ag_center bgcolor_red">질병 비중증 비급여 실손의료비<br />(통원_특약2)</td>
+                        <td className="ag_center">20만원</td>
+                        <td className="ag_center">-</td>
+                        <td className="ag_center">20만원</td>
+                        <td className="ag_center">-</td>
+                      </tr>
+                      <tr>
+                        <td className="ag_left bgcolor_red">국내여행중 질병사망 및<br />질병 80%이상 후유장해</td>
+                        <td className="ag_center">-</td>
+                        <td className="ag_center">-</td>
+                        <td className="ag_center">1,000만원</td>
+                        <td className="ag_center">-</td>
+                      </tr>
+                      <tr>
+                        <td rowSpan={4} className="ag_left bgcolor_red">상해질병</td>
+                        <td className="ag_left bgcolor_red">상해질병 중증 3대 비급여 실손의료비<br />(근골격계이학요법/체외충격파_특약1)</td>
+                        <td className="ag_center">350만원</td>
+                        <td className="ag_center">350만원</td>
+                        <td className="ag_center">350만원</td>
+                        <td className="ag_center">350만원</td>
+                      </tr>
+                      <tr>
+                        <td className="ag_left bgcolor_red">상해질병 중증 3대 비급여 실손의료비<br />(주사치료_특약1)</td>
+                        <td className="ag_center">250만원</td>
+                        <td className="ag_center">250만원</td>
+                        <td className="ag_center">250만원</td>
+                        <td className="ag_center">250만원</td>
+                      </tr>
+                      <tr>
+                        <td className="ag_left bgcolor_red">상해질병 중증 3대 비급여 실손의료비<br />(자기공명영상진단_특약1)</td>
+                        <td className="ag_center">300만원</td>
+                        <td className="ag_center">300만원</td>
+                        <td className="ag_center">300만원</td>
+                        <td className="ag_center">300만원</td>
+                      </tr>
+                      <tr>
+                        <td className="ag_left bgcolor_red">상해질병 비중증 비급여 실손의료비<br />(자기공명영상진단_특약2)</td>
+                        <td className="ag_center">200만원</td>
+                        <td className="ag_center">200만원</td>
+                        <td className="ag_center">200만원</td>
+                        <td className="ag_center">200만원</td>
+                      </tr>
+                      <tr>
+                        <td colSpan={2} className="ag_left bgcolor_red">국내여행중 배상책임(자기부담금 1만원)</td>
+                        <td className="ag_center">100만원</td>
+                        <td className="ag_center">100만원</td>
+                        <td className="ag_center">100만원</td>
+                        <td className="ag_center">100만원</td>
+                      </tr>
+                      <tr>
+                        <td colSpan={2} className="ag_left bgcolor_red">국내여행중 휴대품손해(분실제외,<br />자기부담금 1만원, 이동통신단말기 보상제외)</td>
+                        <td className="ag_center">20만원</td>
+                        <td className="ag_center">20만원</td>
+                        <td className="ag_center">20만원</td>
+                        <td className="ag_center">20만원</td>
+                      </tr>
+                      <tr>
+                        <td colSpan={2} className="ag_left bgcolor_red">국내여행 골절(치아파절제외)진단비</td>
+                        <td className="ag_center">20만원</td>
+                        <td className="ag_center">20만원</td>
+                        <td className="ag_center">20만원</td>
+                        <td className="ag_center">20만원</td>
+                      </tr>
+                      <tr>
+                        <td colSpan={2} className="ag_left bgcolor_red">국내여행 화상진단비</td>
+                        <td className="ag_center">30만원</td>
+                        <td className="ag_center">30만원</td>
+                        <td className="ag_center">30만원</td>
+                        <td className="ag_center">30만원</td>
+                      </tr>
+                      <tr>
+                        <td colSpan={2} className="ag_left bgcolor_red">국내여행 상해응급실내원(응급)치료비</td>
+                        <td className="ag_center">3만원</td>
+                        <td className="ag_center">3만원</td>
+                        <td className="ag_center">3만원</td>
+                        <td className="ag_center">3만원</td>
+                      </tr>
+                      <tr>
+                        <td colSpan={2} className="ag_left bgcolor_red">국내여행 상해입원일당(4일이상 30일한도)</td>
+                        <td className="ag_center">5만원</td>
+                        <td className="ag_center">5만원</td>
+                        <td className="ag_center">5만원</td>
+                        <td className="ag_center">5만원</td>
                       </tr>
                       <tr>
                         <td colSpan={2} className="ag_left bgcolor_red">국내여행 골절수술비(동일사고당 1회한)</td>
-                        <td className="ag_center">20만원</td>
-                        <td className="ag_center">20만원</td>
-                        <td className="ag_center">20만원</td>
-                        <td className="ag_center">20만원</td>
-                        <td className="ag_center">20만원</td>
-                      </tr>
-                      <tr>
-                        <td colSpan={2} className="ag_left bgcolor_red">국내여행 상해수술비(동일사고당 1회한)</td>
-                        <td className="ag_center">20만원</td>
-                        <td className="ag_center">20만원</td>
-                        <td className="ag_center">20만원</td>
-                        <td className="ag_center">20만원</td>
-                        <td className="ag_center">20만원</td>
-                      </tr>
-                      <tr>
-                        <td colSpan={2} className="ag_left bgcolor_red">국내여행 깁스치료비(동일사고 또는 질병당 1회한) 단, 부목(Splint cast)치료 보상제외</td>
-                        <td className="ag_center">20만원</td>
-                        <td className="ag_center">20만원</td>
-                        <td className="ag_center">20만원</td>
-                        <td className="ag_center">20만원</td>
-                        <td className="ag_center">20만원</td>
-                      </tr>
-                    </tbody>
-                    <tbody id="planArea_HCW" style={{ display: planGuideType === 'HCW' ? '' : 'none' }}>
-                      <tr>
-                        <td colSpan={2} className="ag_left bgcolor_04">가입연령</td>
-                        <td className="ag_center bgcolor_04">0-14세</td>
-                        <td className="ag_center bgcolor_04">71-90세</td>
-                        <td className="ag_center bgcolor_04">71-90세</td>
-                        <td className="ag_center bgcolor_04">91-100세</td>
-                        <td className="ag_center bgcolor_04">15-70세</td>
-                      </tr>
-                      <tr>
-                        <td colSpan={2} className="ag_left bgcolor_red">국내여행 중 상해사망후유장해</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">3,000만원</td>
-                        <td className="ag_center">5,000만원</td>
-                        <td className="ag_center">5,000만원</td>
-                        <td className="ag_center">1억원</td>
-                      </tr>
-                      <tr>
-                        <td colSpan={2} className="ag_left bgcolor_red">국내여행 중 상해후유장해</td>
-                        <td className="ag_center">1억원</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                      </tr>
-                      <tr>
-                        <td rowSpan={4} className="ag_left bgcolor_red">상해</td>
-                        <td className="ag_center bgcolor_red">국내의료비<br />(상해 급여_입원_기본)</td>
-                        <td className="ag_center">1,000만원</td>
-                        <td className="ag_center">1,000만원</td>
-                        <td className="ag_center">1,000만원</td>
-                        <td className="ag_center">1,000만원</td>
-                        <td className="ag_center">1,000만원</td>
-                      </tr>
-                      <tr>
-                        <td className="ag_center bgcolor_red">국내의료비<br />(상해급여_통원_기본)</td>
-                        <td className="ag_center">10만원</td>
-                        <td className="ag_center">10만원</td>
-                        <td className="ag_center">10만원</td>
-                        <td className="ag_center">10만원</td>
-                        <td className="ag_center">10만원</td>
-                      </tr>
-                      <tr>
-                        <td className="ag_center bgcolor_red">국내의료비<br />(상해 비급여_입원_특약)</td>
-                        <td className="ag_center">1,000만원</td>
-                        <td className="ag_center">1,000만원</td>
-                        <td className="ag_center">1,000만원</td>
-                        <td className="ag_center">1,000만원</td>
-                        <td className="ag_center">1,000만원</td>
-                      </tr>
-                      <tr>
-                        <td className="ag_center bgcolor_red">국내의료비<br />(상해 비급여_통원_특약)</td>
-                        <td className="ag_center">10만원</td>
-                        <td className="ag_center">10만원</td>
-                        <td className="ag_center">10만원</td>
-                        <td className="ag_center">10만원</td>
-                        <td className="ag_center">10만원</td>
-                      </tr>
-                      <tr>
-                        <td rowSpan={4} className="ag_left bgcolor_red">질병</td>
-                        <td className="ag_center bgcolor_red">국내의료비<br />(질병 급여_입원_기본)</td>
-                        <td className="ag_center">1,000만원</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">1,000만원</td>
-                      </tr>
-                      <tr>
-                        <td className="ag_center bgcolor_red">국내의료비<br />(질병 급여_통원_기본)</td>
-                        <td className="ag_center">10만원</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">10만원</td>
-                      </tr>
-                      <tr>
-                        <td className="ag_center bgcolor_red">국내의료비<br />(질병 비급여_입원_특약)</td>
-                        <td className="ag_center">1,000만원</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">1,000만원</td>
-                      </tr>
-                      <tr>
-                        <td className="ag_center bgcolor_red">국내의료비<br />(질병 비급여_통원_특약)</td>
-                        <td className="ag_center">10만원</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">10만원</td>
-                      </tr>
-                      <tr>
-                        <td rowSpan={3} className="ag_left bgcolor_red">상해질병<br />3대비급여</td>
-                        <td className="ag_left bgcolor_red">국내의료비<br />(도수,체외충격파,증식치료_특약)</td>
-                        <td className="ag_center">350만원</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">350만원</td>
-                        <td className="ag_center">350만원</td>
-                        <td className="ag_center">350만원</td>
-                      </tr>
-                      <tr>
-                        <td className="ag_left bgcolor_red">국내의료비<br />(주사치료특약)</td>
-                        <td className="ag_center">250만원</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">250만원</td>
-                        <td className="ag_center">250만원</td>
-                        <td className="ag_center">250만원</td>
-                      </tr>
-                      <tr>
-                        <td className="ag_left bgcolor_red">국내의료비<br />(MRI/MRA_특약)</td>
-                        <td className="ag_center">300만원</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">300만원</td>
-                        <td className="ag_center">300만원</td>
-                        <td className="ag_center">300만원</td>
-                      </tr>
-                      <tr>
-                        <td colSpan={2} className="ag_left bgcolor_red">국내여행 중 질병사망 및<br />80%이상 고도후유장해</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
-                        <td className="ag_center">1,000만원</td>
-                      </tr>
-                      <tr>
-                        <td colSpan={2} className="ag_left bgcolor_red">국내여행 중 배상책임(면책1만원)</td>
-                        <td className="ag_center">500만원</td>
-                        <td className="ag_center">500만원</td>
-                        <td className="ag_center">500만원</td>
-                        <td className="ag_center">100만원</td>
-                        <td className="ag_center">1,000만원</td>
-                      </tr>
-                      <tr>
-                        <td colSpan={2} className="ag_left bgcolor_red">국내여행 중 휴대품손해(분실제외,<br />자기부담금1만원, 이동통신단말기 보상제외)</td>
                         <td className="ag_center">50만원</td>
-                        <td className="ag_center">30만원</td>
-                        <td className="ag_center">30만원</td>
-                        <td className="ag_center">20만원</td>
+                        <td className="ag_center">50만원</td>
+                        <td className="ag_center">50만원</td>
                         <td className="ag_center">50만원</td>
                       </tr>
                       <tr>
-                        <td colSpan={2} className="ag_left bgcolor_red">해외여행중 골절(치아파절제외)진단비(동일사고당 1회한)</td>
-                        <td className="ag_center">10만원</td>
-                        <td className="ag_center">10만원</td>
-                        <td className="ag_center">10만원</td>
-                        <td className="ag_center">10만원</td>
-                        <td className="ag_center">10만원</td>
-                      </tr>
-                      <tr>
-                        <td colSpan={2} className="ag_left bgcolor_red">국내여행 골절수술비(동일사고당 1회한)</td>
-                        <td className="ag_center">20만원</td>
-                        <td className="ag_center">20만원</td>
-                        <td className="ag_center">20만원</td>
-                        <td className="ag_center">20만원</td>
-                        <td className="ag_center">20만원</td>
-                      </tr>
-                      <tr>
                         <td colSpan={2} className="ag_left bgcolor_red">국내여행 상해수술비(동일사고당 1회한)</td>
-                        <td className="ag_center">20만원</td>
-                        <td className="ag_center">20만원</td>
-                        <td className="ag_center">20만원</td>
-                        <td className="ag_center">20만원</td>
-                        <td className="ag_center">20만원</td>
+                        <td className="ag_center">50만원</td>
+                        <td className="ag_center">50만원</td>
+                        <td className="ag_center">50만원</td>
+                        <td className="ag_center">50만원</td>
                       </tr>
                       <tr>
-                        <td colSpan={2} className="ag_left bgcolor_red">국내여행 깁스치료비(동일사고 또는 질병당 1회한) 단, 부목(Splint cast)치료 보상제외</td>
-                        <td className="ag_center">20만원</td>
+                        <td colSpan={2} className="ag_left bgcolor_red">국내여행 깁스치료비(동일사고 또는 질병당 1회한)</td>
                         <td className="ag_center">20만원</td>
                         <td className="ag_center">20만원</td>
                         <td className="ag_center">20만원</td>

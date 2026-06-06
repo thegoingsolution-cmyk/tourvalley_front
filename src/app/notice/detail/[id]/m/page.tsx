@@ -5,12 +5,14 @@ import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getImagePath } from '@/utils/path';
+import NoticeContent from '@/components/notice/NoticeContent';
 import './page.css';
 
 interface Notice {
   id: number;
   title: string;
   content?: string;
+  content_type?: 'editor' | 'html_file' | string;
   author_name: string;
   view_count: number;
   created_at: string;
@@ -105,9 +107,10 @@ export default function NoticeDetailMobilePage() {
 
               <div className="notice-detail-divider"></div>
 
-              <div 
+              <NoticeContent
+                content={notice.content || ''}
+                contentType={notice.content_type}
                 className="notice-detail-body"
-                dangerouslySetInnerHTML={{ __html: notice.content || '' }}
               />
 
               <div className="notice-detail-footer">

@@ -9,6 +9,7 @@ export interface Notice {
   created_at: string;
   updated_at?: string;
   content?: string;
+  content_type?: 'editor' | 'html_file' | string;
 }
 
 export interface NoticeListResponse {

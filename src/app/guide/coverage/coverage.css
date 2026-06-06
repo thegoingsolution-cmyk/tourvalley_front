@@ -26,14 +26,34 @@
 }
 
 .layer_header .layer_title {
-  font-size: 20px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  max-width: calc(100% - 72px);
+  font-size: clamp(11px, 3.8vw, 20px);
   color: #202020;
   letter-spacing: -0.8px;
-  text-align: left;
-  display: inline-block;
+  text-align: center;
+  line-height: 1.2;
+  white-space: nowrap;
+  display: block;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+@media (max-width: 360px) {
+  .layer_header .layer_title {
+    font-size: 11px;
+    letter-spacing: -1px;
+  }
 }
 
 .layer_header .close {
+  position: absolute;
+  right: 4.68%;
+  top: 50%;
+  transform: translateY(-50%);
   font-size: 15px;
   color: #545454;
   text-decoration: none;

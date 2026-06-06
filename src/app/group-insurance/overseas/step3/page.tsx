@@ -5,6 +5,7 @@ import '../../popup/page.css';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCorporateMemberInfo } from '@/services/authService';
 import { calculateAgeAndGenderFromResidentNumber, getBirthDateStringFromResidentNumber } from '@/utils/age';
+import PlanCoverageGuideTable from './PlanCoverageGuideTable';
 
 const normalizePlanType = (planCd: string): string => {
   const planMap: { [key: string]: string } = {
@@ -590,6 +591,15 @@ export default function OverseasInsuranceStep3Page() {
                   <dd>실손 의료보험 계약보유여부 확인방법<br />한국신용정보원 보험신용정보 (<a href="http://www.credit4u.or.kr" target="_blank" style={{color:'blue'}}>www.credit4u.or.kr</a>)에서 이미 가입한 실손의료보험을 조회하실 수 있습니다.</dd>
                 </dl>
               </div>
+
+              <div className="con_btnWrap mt30 mb10">
+                <a href="#" onClick={(e) => { e.preventDefault(); handleSubmit(); }}>다음단계</a>
+              </div>
+              <div className="con_btnWrap_b mb40">
+                <a href="#" onClick={(e) => { e.preventDefault(); handleBack(); }}>이전단계</a>
+              </div>
+
+              <PlanCoverageGuideTable />
 
               <div className="con_btnWrap mt30 mb10">
                 <a href="#" onClick={(e) => { e.preventDefault(); handleSubmit(); }}>다음단계</a>

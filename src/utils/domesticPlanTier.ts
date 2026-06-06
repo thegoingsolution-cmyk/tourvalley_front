@@ -1,6 +1,6 @@
 import type { PlanType } from '@/components/travel/types';
 
-/** 국내: 일반 실속/표준 ↔ 71~90세 어르신플랜1(실속)/(표준) */
+/** 국내: 일반 실속/표준 ↔ 어르신플랜1(실속)/(표준) — 나이 구간은 DB·available-plans 기준 (실손 80~100세) */
 export const DOMESTIC_PLAN_TIER_ORDER: { 실속: readonly string[]; 표준: readonly string[] } = {
   실속: ['실속플랜', '어르신플랜1(실속)', '어르신플랜1'],
   표준: ['표준플랜', '어르신플랜1(표준)'],

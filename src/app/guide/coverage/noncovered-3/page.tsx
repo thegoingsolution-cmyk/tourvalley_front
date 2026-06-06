@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
@@ -48,7 +48,6 @@ export default function CoverageNoncoveredThreePage() {
         <div className="layer_header prow_01">
           <span
             className="layer_title"
-            style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}
           >
             상해질병 3대 비급여 국내의료비
           </span>
@@ -59,7 +58,6 @@ export default function CoverageNoncoveredThreePage() {
               handleClose();
             }}
             className="close"
-            style={{ position: 'absolute', right: '4.68%' }}
           >
             나가기
           </a>

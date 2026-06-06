@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
@@ -58,7 +58,6 @@ export default function CoverageAccidentPage() {
         <div className="layer_header prow_01">
           <span
             className="layer_title"
-            style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}
           >
             상해보장
           </span>
@@ -69,7 +68,6 @@ export default function CoverageAccidentPage() {
               handleClose();
             }}
             className="close"
-            style={{ position: 'absolute', right: '4.68%' }}
           >
             나가기
           </a>

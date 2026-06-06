@@ -8,6 +8,7 @@ import ServiceModal from '@/components/ServiceModal';
 import AccidentFreeCashModal from '@/components/travel/AccidentFreeCashModal';
 import { getImagePath } from '@/utils/path';
 import { getNoticeDetail, Notice } from '@/utils/api';
+import NoticeContent from '@/components/notice/NoticeContent';
 import './page.css';
 
 export default function NoticeDetailPCPage() {
@@ -125,9 +126,10 @@ export default function NoticeDetailPCPage() {
                       </div>
                     </div>
                     <div className="B02_Notice_contBox">
-                      <div
+                      <NoticeContent
+                        content={notice.content || ''}
+                        contentType={notice.content_type}
                         className="notice-content"
-                        dangerouslySetInnerHTML={{ __html: notice.content || '' }}
                       />
                     </div>
                     <div className="B02_Back_ListBtn">

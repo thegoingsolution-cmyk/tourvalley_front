@@ -447,7 +447,7 @@ function EstimatePrintContent() {
                         </tr>
                         <tr>
                           <td style={{ position: 'relative', padding: '14px 17px 13px 18px', border: 0, borderBottom: 'solid 1px #d8d8d8', fontSize: '14px', textAlign: 'center', verticalAlign: 'middle', fontFamily: "'Noto Sans KR', sans-serif,'Malgun Gothic','맑은 고딕'", lineHeight: '125%', boxSizing: 'border-box', background: '#eff7fe', borderRight: 'solid 1px #d8d8d8' }}>
-                            15-70세
+                            15-79세
                           </td>
                         </tr>
                         <tr>

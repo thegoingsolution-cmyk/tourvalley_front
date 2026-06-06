@@ -59,7 +59,13 @@ export default function DomesticInsuranceStep5Page() {
   const totalPremium = step3Data?.total_premium || 0;
   const isVirtualAccountAvailable = totalPremium >= 10000;
   const getPlanType = (planCode: string): string => {
-    const map: Record<string, string> = { BAW: '실속플랜', HCW: '표준플랜', CHW: '어린이플랜', OLW: '어르신플랜1', O2W: '어르신플랜2' };
+    const map: Record<string, string> = {
+      BAW: '실속플랜',
+      HCW: '표준플랜',
+      CHW: '어린이플랜',
+      OLW: '어르신플랜1(실속)',
+      O2W: '어르신플랜1(실속)',
+    };
     return map[planCode] || planCode || '실속플랜';
   };
   const getPlanDisplayName = (planCode: string) => getPlanType(planCode);

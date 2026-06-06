@@ -207,8 +207,9 @@
 
 .notice-detail-pc .B02_Notice_contBox {
   padding: 0;
-  min-height: 300px;
+  min-height: 0;
   margin-bottom: 32px;
+  overflow: visible;
 }
 
 .notice-detail-pc .notice-content {
@@ -244,6 +245,17 @@
 
 .notice-detail-pc .notice-content a:hover {
   color: #1e33c4;
+}
+
+.notice-detail-pc .notice-html-iframe {
+  width: 100%;
+  min-height: 0;
+  height: auto;
+  border: none;
+  display: block;
+  background: #fff;
+  overflow: hidden;
+  vertical-align: top;
 }
 
 /* ========================================

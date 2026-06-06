@@ -135,6 +135,17 @@
   height: auto;
 }
 
+.notice-detail-body.notice-html-iframe {
+  width: 100%;
+  min-height: 0;
+  height: auto;
+  border: none;
+  display: block;
+  background: #fff;
+  overflow: hidden;
+  vertical-align: top;
+}
+
 .notice-detail-footer {
   text-align: center;
   padding-top: 30px;

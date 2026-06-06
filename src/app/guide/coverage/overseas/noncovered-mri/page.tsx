@@ -6,18 +6,13 @@ import '../../coverage.css';
 
 const coverageItems = [
   {
-    title: '해외체류 중 중대사고 송환비용',
+    title: '자기공명영상진단(MRI, MRA)',
     description:
-      '해외체류 중 피보험자가 탑승한 항공기 또는 선박이 행방불명 또는 조난되는 등의 경우에 계약자, 피보험자 등이 부담하는 수색구조비용, 항공운임 등 교통비, 숙박비, 이송비용 등을 보상',
-  },
-  {
-    title: '해외체류 중 배상책임',
-    description:
-      '피보험자가 우연한 사고로 타인의 신체나 재물에 손해를 가하여 법률상 배상책임을 부담하는 경우, 약관에서 정한 보상한도액 내에서 보상(자기부담금 1만원)\n단, 친족간 사고, 호텔이나 객실내의 동산을 제외한 피보험자가 소유, 사용 또는 관리하는 재물배상, 차량(원동력이 인력에 의한 것을 제외) 및 카트사고 등은 제외',
+      '해외여행 중 상해 또는 질병의 치료목적으로 국내 의료기관에 산정특례대상질환이 아닌 질환으로 입원 또는 통원하여 「자기공명영상진단(MRI, MRA)」을 받은 경우, 본인이 실제로 부담한 비급여 의료비(조영제, 판독료 포함)에서 공제금액(1회당 3만원과 보장대상 의료비의 30% 중 큰 금액)을 뺀 금액을 보상한도(계약일부터 1년 단위로 각 상해·질병 치료행위를 합산하여 연간 300만원 한도)내에서 보상',
   },
 ];
 
-export default function CoverageOtherPage() {
+export default function CoverageNoncoveredMriPage() {
   const router = useRouter();
 
   const handleClose = () => {
@@ -44,7 +39,7 @@ export default function CoverageOtherPage() {
           <span
             className="layer_title"
           >
-            기타보장
+            상해질병 비중증 비급여 자기공명영상진단
           </span>
           <a
             href="#"
