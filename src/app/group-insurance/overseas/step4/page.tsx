@@ -398,9 +398,9 @@ export default function OverseasInsuranceStep4Page() {
               <strong>5. 여행보험 약관보기</strong>
             </p>
             <a
-              href="/pdf/ACE손해_해외여행보험약관.pdf"
+              href={`/pdf/${encodeURIComponent('2026.06 약관_Chubb 해외여행보험.pdf')}`}
               target="_blank"
-              download="ACE손해_해외여행보험약관.pdf"
+              download="2026.06 약관_Chubb 해외여행보험.pdf"
             >
               <div className="Box_line03">
                 <p className="txt">
@@ -725,10 +725,10 @@ export default function OverseasInsuranceStep4Page() {
                 </div>
                 <div className="tourG_mat12">
                   <a
-                    href="/pdf/ACE손해_해외여행보험약관.pdf"
+                    href={`/pdf/${encodeURIComponent('2026.06 약관_Chubb 해외여행보험.pdf')}`}
                     className="tourGuard_btn_b tour2023_btn06_gray"
                     target="_blank"
-                    download="ACE손해_해외여행보험약관.pdf"
+                    download="2026.06 약관_Chubb 해외여행보험.pdf"
                   >
                     해외여행보험 약관보기<span className="tour2023_arr01"></span>
                   </a>

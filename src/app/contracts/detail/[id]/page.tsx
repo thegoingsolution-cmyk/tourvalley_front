@@ -275,10 +275,10 @@ export default function ContractDetailPage() {
       return '/pdf/해외장기체류보험_약관.pdf';
     }
     if (insuranceType.includes('국내')) {
-      return '/pdf/ACE손해_국내여행보험약관.pdf';
+      return `/pdf/${encodeURIComponent('2026.06 약관_Chubb 국내여행보험.pdf')}`;
     }
     if (insuranceType.includes('해외')) {
-      return '/pdf/ACE손해_해외여행보험약관.pdf';
+      return `/pdf/${encodeURIComponent('2026.06 약관_Chubb 해외여행보험.pdf')}`;
     }
     return null;
   };

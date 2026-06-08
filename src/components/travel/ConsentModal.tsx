@@ -31,14 +31,14 @@ export default function ConsentModal({
   const defaultPdfPath = isLongTermStay
     ? '/pdf/해외장기체류보험_약관.pdf'
     : isOverseas
-    ? '/pdf/ACE손해_해외여행보험약관.pdf'
-    : '/pdf/ACE손해_국내여행보험약관.pdf';
+    ? `/pdf/${encodeURIComponent('2026.06 약관_Chubb 해외여행보험.pdf')}`
+    : `/pdf/${encodeURIComponent('2026.06 약관_Chubb 국내여행보험.pdf')}`;
   const finalPdfPath = pdfPath || defaultPdfPath;
   const pdfFileName = isLongTermStay 
     ? '해외장기체류보험_약관.pdf'
     : isOverseas 
-    ? '해외여행보험_약관.pdf' 
-    : '국내여행보험_약관.pdf';
+    ? '2026.06 약관_Chubb 해외여행보험.pdf'
+    : '2026.06 약관_Chubb 국내여행보험.pdf';
   const pdfButtonText = isLongTermStay
     ? '해외장기체류보험 약관보기'
     : isOverseas 
