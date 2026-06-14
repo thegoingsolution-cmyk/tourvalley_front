@@ -14,6 +14,11 @@ import CountrySelectModal from '@/components/travel/CountrySelectModal';
 import StepIndicator from '@/components/travel/StepIndicator';
 import { getImagePath } from '@/utils/path';
 import { checkAndSaveTrackingInfo } from '@/utils/tracking';
+import {
+  getDomesticInsuranceMaxArrivalFromPickedDate,
+  getOverseasShortTripMaxArrivalFromPickedDate,
+  parseInsuranceDateHourToInstant,
+} from '@/utils/dateTime';
 import './page.css';
 
 // 한국어 locale 등록
@@ -115,6 +120,24 @@ export default function PCStep1Page() {
     if (endDt.getTime() <= startDt.getTime()) {
       alert('도착일시는 출발일시보다 이후여야 합니다.');
       return;
+    }
+
+    if (productCd === '국내여행') {
+      const arrival = parseInsuranceDateHourToInstant(endDate, endHour);
+      const maxArrival = getDomesticInsuranceMaxArrivalFromPickedDate(startDate, startHour);
+      if (arrival > maxArrival) {
+        alert('국내여행보험은 최대 1개월까지 가능합니다.');
+        return;
+      }
+    }
+
+    if (productCd === '해외여행') {
+      const arrival = parseInsuranceDateHourToInstant(endDate, endHour);
+      const maxArrival = getOverseasShortTripMaxArrivalFromPickedDate(startDate, startHour);
+      if (arrival > maxArrival) {
+        alert('해외여행보험은 최대 3개월까지 가능합니다.');
+        return;
+      }
     }
 
     // 여행 기간(일) 계산 (시간 포함, 올림)

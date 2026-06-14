@@ -368,7 +368,10 @@ export default function ContractDetailPage() {
                   href="#" 
                   onClick={(e) => { 
                     e.preventDefault(); 
-                    router.push(`/premium-detail?contractId=${contractId}`);
+                    const insuranceTypeQuery = contractDetail?.insuranceType
+                      ? `&insuranceType=${encodeURIComponent(contractDetail.insuranceType)}`
+                      : '';
+                    router.push(`/premium-detail?contractId=${contractId}${insuranceTypeQuery}`);
                   }}
                   className="tour2023_btn_b02 tour2023_btn08"
                 >

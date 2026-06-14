@@ -4,6 +4,14 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { readNonMemberContractAuth, buildFullBirthDateFromSixDigits } from '@/utils/nonMemberContractAuth';
+import {
+  resolveMedicalExpenseFromPlanDisplay,
+  resolvePlanTypeForCoverageApi,
+} from '@/utils/coverageDetailParams';
+import {
+  normalizeConfirmationInsuranceType,
+  parseHasMedicalExpense,
+} from '@/utils/travelPlanDisplay';
 import './page.css';
 
 function MobilePremiumDetailContent() {
@@ -19,6 +27,7 @@ function MobilePremiumDetailContent() {
     birthDate: string;
     planType: string;
     premium: number;
+    hasMedicalExpense?: boolean;
   }>>([]);
   const [totalPremium, setTotalPremium] = useState(0);
   const [hasMedicalExpense, setHasMedicalExpense] = useState(true);
@@ -32,6 +41,7 @@ function MobilePremiumDetailContent() {
     birthDate: string;
     planType: string;
     premium: number;
+    hasMedicalExpense?: boolean;
   }> => {
     if (!Array.isArray(participants)) return [];
     
@@ -42,8 +52,16 @@ function MobilePremiumDetailContent() {
       birthDate: p.birthDate || p.birth_date || '',
       planType: p.planType || p.plan_type || '',
       premium: typeof p.premium === 'number' ? p.premium : (typeof p.premium === 'string' ? parseFloat(p.premium) || 0 : 0),
+      hasMedicalExpense: p.hasMedicalExpense !== undefined || p.has_medical_expense !== undefined
+        ? parseHasMedicalExpense(p.hasMedicalExpense ?? p.has_medical_expense, true)
+        : undefined,
     }));
   };
+
+  const resolveInsuranceTypeFromResponse = (data: {
+    insuranceType?: string;
+    contractInfo?: { insuranceType?: string };
+  }) => data.insuranceType ?? data.contractInfo?.insuranceType ?? null;
 
   useEffect(() => {
     const contractId = searchParams.get('contractId');
@@ -116,7 +134,8 @@ function MobilePremiumDetailContent() {
           setParticipants(normalized);
           setTotalPremium(data.totalPremium || 0);
           setHasMedicalExpense(data.hasMedicalExpense ?? true);
-          if (data.insuranceType) setInsuranceType(data.insuranceType);
+          const insType = resolveInsuranceTypeFromResponse(data);
+          if (insType) setInsuranceType(insType);
         }
         return;
       }
@@ -170,7 +189,7 @@ function MobilePremiumDetailContent() {
           fetchedParticipants.some((p: any) => p.hasMedicalExpense === true || p.hasMedicalExpense === 1);
         setHasMedicalExpense(computedHasMedicalExpense === 1 || computedHasMedicalExpense === true);
 
-        const insType = data.insuranceType ?? data.contractInfo?.insuranceType;
+        const insType = resolveInsuranceTypeFromResponse(data);
         if (insType) setInsuranceType(insType);
       }
     } catch (error) {
@@ -232,15 +251,20 @@ function MobilePremiumDetailContent() {
                             <button 
                               className="plan-badge-btn"
                               onClick={() => {
+                                const apiPlanType = resolvePlanTypeForCoverageApi(participant.planType);
+                                const participantMedical = participant.hasMedicalExpense !== undefined
+                                  ? participant.hasMedicalExpense
+                                  : resolveMedicalExpenseFromPlanDisplay(
+                                      participant.planType,
+                                      hasMedicalExpense,
+                                    );
                                 const params = new URLSearchParams({
-                                  planType: participant.planType,
-                                  hasMedicalExpense: String(hasMedicalExpense),
+                                  planType: apiPlanType,
+                                  hasMedicalExpense: String(participantMedical),
                                 });
-                                if (insuranceType) {
-                                  const apiInsuranceType = insuranceType === '해외여행자보험' ? '해외여행보험' : insuranceType;
-                                  params.set('insuranceType', apiInsuranceType);
-                                  if (apiInsuranceType === '해외여행보험') params.set('planVariant', 'null');
-                                }
+                                const apiInsuranceType = normalizeConfirmationInsuranceType(insuranceType);
+                                params.set('insuranceType', apiInsuranceType);
+                                if (apiInsuranceType === '해외여행보험') params.set('planVariant', 'null');
                                 window.open(`/coverage-detail?${params.toString()}`, '_blank');
                               }}
                             >

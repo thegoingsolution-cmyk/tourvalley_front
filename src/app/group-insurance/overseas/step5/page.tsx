@@ -614,6 +614,7 @@ export default function OverseasInsuranceStep5Page() {
       participants,
       totalPremium: step3Data?.total_premium || 0,
       hasMedicalExpense: true,
+      insuranceType: '해외여행자보험',
     };
   };
 

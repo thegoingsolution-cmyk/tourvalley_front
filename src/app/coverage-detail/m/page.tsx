@@ -2,7 +2,11 @@
 
 import React, { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { resolveMedicalExpenseForCoverageDetail } from '@/utils/coverageDetailParams';
+import {
+  resolveMedicalExpenseForCoverageDetail,
+  resolveMedicalExpenseFromPlanDisplay,
+  resolvePlanTypeForCoverageApi,
+} from '@/utils/coverageDetailParams';
 import './page.css';
 
 // 보장 상세 데이터 타입 정의
@@ -30,6 +34,7 @@ function MobileCoverageDetailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const planTypeParam = searchParams.get('planType') || '표준플랜';
+  const apiPlanType = resolvePlanTypeForCoverageApi(planTypeParam);
   const insuranceTypeParam = searchParams.get('insuranceType') || '국내여행보험';
   const returnUrlParam = searchParams.get('returnUrl');
   const returnUrl = returnUrlParam ? decodeURIComponent(returnUrlParam) : '/domestic/m';
@@ -42,12 +47,12 @@ function MobileCoverageDetailContent() {
     if (raw === '국내여행자보험') return '국내여행보험';
     return raw as InsuranceType;
   })();
-  const planType = planTypeParam as PlanType;
+  const planType = apiPlanType as PlanType;
   const planVariant = planVariantParam === 'null' || planVariantParam === '' ? null : (planVariantParam || 'B');
   const needsMedicalExpenseDistinction = insuranceType === '국내여행보험' || insuranceType === '해외여행보험';
-  const isMedicalExpense = resolveMedicalExpenseForCoverageDetail(
-    searchParams,
-    needsMedicalExpenseDistinction,
+  const isMedicalExpense = resolveMedicalExpenseFromPlanDisplay(
+    planTypeParam,
+    resolveMedicalExpenseForCoverageDetail(searchParams, needsMedicalExpenseDistinction) ?? true,
   );
   const openGuidePopup = (url: string) => {
     const w = 650;

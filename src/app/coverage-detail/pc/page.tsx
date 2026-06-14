@@ -2,7 +2,11 @@
 
 import React, { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { resolveMedicalExpenseForCoverageDetail } from '@/utils/coverageDetailParams';
+import {
+  resolveMedicalExpenseForCoverageDetail,
+  resolveMedicalExpenseFromPlanDisplay,
+  resolvePlanTypeForCoverageApi,
+} from '@/utils/coverageDetailParams';
 import './page.css';
 
 interface CoverageItem {
@@ -28,7 +32,8 @@ type InsuranceType = '국내여행보험' | '해외여행보험' | '유학/어�
 function PCCoverageDetailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const planType = searchParams.get('planType') || '표준플랜';
+  const planTypeParam = searchParams.get('planType') || '표준플랜';
+  const planType = resolvePlanTypeForCoverageApi(planTypeParam);
   const insuranceTypeParam = searchParams.get('insuranceType');
   const insuranceType: InsuranceType = (() => {
     const raw = insuranceTypeParam || '국내여행보험';
@@ -38,9 +43,9 @@ function PCCoverageDetailContent() {
   })();
   const needsMedicalExpenseDistinction =
     insuranceType === '국내여행보험' || insuranceType === '해외여행보험';
-  const hasMedicalExpense = resolveMedicalExpenseForCoverageDetail(
-    searchParams,
-    needsMedicalExpenseDistinction,
+  const hasMedicalExpense = resolveMedicalExpenseFromPlanDisplay(
+    planTypeParam,
+    resolveMedicalExpenseForCoverageDetail(searchParams, needsMedicalExpenseDistinction) ?? true,
   );
   const currencyPlan = searchParams.get('currencyPlan') as '원화플랜' | '외화플랜' | undefined;
   const planVariantParam = searchParams.get('planVariant');
