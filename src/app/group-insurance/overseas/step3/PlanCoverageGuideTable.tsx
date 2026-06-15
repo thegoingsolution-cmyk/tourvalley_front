@@ -554,7 +554,8 @@ function MedicalExpenseExcludedTable() {
         </tr>
         <tr>
           <td className="ag_left bgcolor_red">국내의료비<br />(상해질병 비중증 비급여_자기공명영상진단)</td>
-          {empty}{empty}{empty}{empty}{empty}{empty}
+          {empty}{empty}{empty}{empty}{empty}
+          <td className="ag_center">200만원</td>
         </tr>
         <tr>
           <td colSpan={2} className="ag_left bgcolor_red">해외여행중 배상책임(자기부담금 1만원)</td>
@@ -626,7 +627,12 @@ function MedicalExpenseExcludedTable() {
         </tr>
         <tr>
           <td colSpan={2} className="ag_left bgcolor_red">출국 항공기 지연(2시간이상 4시간 미만)에 따른 추가비용</td>
-          {empty}{empty}{empty}{empty}{empty}{empty}
+          <td className="ag_center">10만원</td>
+          <td className="ag_center">5만원</td>
+          <td className="ag_center">7만원</td>
+          <td className="ag_center">10만원</td>
+          <td className="ag_center">5만원</td>
+          <td className="ag_center">5만원</td>
         </tr>
         <tr>
           <td colSpan={2} className="ag_left bgcolor_red">해외여행중 식중독입원일당(4일이상 120일한도)</td>

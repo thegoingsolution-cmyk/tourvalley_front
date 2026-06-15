@@ -688,7 +688,7 @@ export default function DomesticInsuranceStep3Page() {
                       <tr>
                         <td className="ag_left bgcolor_red">국내여행중 질병사망 및<br />질병 80%이상 후유장해</td>
                         <td className="ag_center">-</td>
-                        <td className="ag_center">-</td>
+                        <td className="ag_center">1,000만원</td>
                         <td className="ag_center">1,000만원</td>
                         <td className="ag_center">-</td>
                       </tr>
@@ -723,17 +723,17 @@ export default function DomesticInsuranceStep3Page() {
                       </tr>
                       <tr>
                         <td colSpan={2} className="ag_left bgcolor_red">국내여행중 배상책임(자기부담금 1만원)</td>
-                        <td className="ag_center">100만원</td>
-                        <td className="ag_center">100만원</td>
-                        <td className="ag_center">100만원</td>
-                        <td className="ag_center">100만원</td>
+                        <td className="ag_center">500만원</td>
+                        <td className="ag_center">500만원</td>
+                        <td className="ag_center">1,000만원</td>
+                        <td className="ag_center">500만원</td>
                       </tr>
                       <tr>
                         <td colSpan={2} className="ag_left bgcolor_red">국내여행중 휴대품손해(분실제외,<br />자기부담금 1만원, 이동통신단말기 보상제외)</td>
-                        <td className="ag_center">20만원</td>
-                        <td className="ag_center">20만원</td>
-                        <td className="ag_center">20만원</td>
-                        <td className="ag_center">20만원</td>
+                        <td className="ag_center">50만원</td>
+                        <td className="ag_center">50만원</td>
+                        <td className="ag_center">50만원</td>
+                        <td className="ag_center">30만원</td>
                       </tr>
                       <tr>
                         <td colSpan={2} className="ag_left bgcolor_red">국내여행 골절(치아파절제외)진단비</td>
