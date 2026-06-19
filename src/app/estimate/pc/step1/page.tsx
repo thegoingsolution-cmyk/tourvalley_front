@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { ko } from 'date-fns/locale';
 import { format, parse } from 'date-fns';
@@ -39,7 +39,22 @@ const parseDate = (dateString: string): Date | null => {
 };
 
 export default function PCStep1Page() {
+  return (
+    <Suspense
+      fallback={
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+          <div>로딩 중...</div>
+        </div>
+      }
+    >
+      <PCStep1PageContent />
+    </Suspense>
+  );
+}
+
+function PCStep1PageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   
   // 오늘 날짜를 기본값으로 설정
   const today = new Date();
@@ -66,6 +81,24 @@ export default function PCStep1Page() {
   useEffect(() => {
     checkAndSaveTrackingInfo();
   }, []);
+
+  useEffect(() => {
+    const product_cd = searchParams.get('product_cd');
+    const travel_country = searchParams.get('travel_country');
+    const start_date = searchParams.get('start_date');
+    const start_hour = searchParams.get('start_hour');
+    const end_date = searchParams.get('end_date');
+    const end_hour = searchParams.get('end_hour');
+    const tour_num = searchParams.get('tour_num');
+
+    if (product_cd) setProductCd(product_cd);
+    if (travel_country) setTravelCountry(travel_country);
+    if (start_date) setStartDate(start_date);
+    if (start_hour) setStartHour(start_hour);
+    if (end_date) setEndDate(end_date);
+    if (end_hour) setEndHour(end_hour);
+    if (tour_num) setTourNum(tour_num);
+  }, [searchParams]);
 
   // 시간 옵션 생성 (01시 ~ 24시)
   const hourOptions = Array.from({ length: 24 }, (_, i) => {
@@ -154,6 +187,11 @@ export default function PCStep1Page() {
       return;
     }
 
+    if (productCd === '해외여행' && !travelCountry) {
+      alert('여행국가를 선택해주세요.');
+      return;
+    }
+
     // step2로 이동 (쿼리 파라미터로 데이터 전달)
     const params = new URLSearchParams({
       product_cd: productCd,
@@ -164,6 +202,10 @@ export default function PCStep1Page() {
       tour_num: tourNum,
       tour_day: String(diffDays),
     });
+
+    if (productCd === '해외여행' && travelCountry) {
+      params.set('travel_country', travelCountry);
+    }
 
     router.push(`/estimate/step2?${params.toString()}`);
   };

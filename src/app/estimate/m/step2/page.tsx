@@ -35,6 +35,7 @@ function MobileStep2PageContent() {
   const [endHour, setEndHour] = useState('');
   const [tourNum, setTourNum] = useState('');
   const [tourDay, setTourDay] = useState('');
+  const [travelCountry, setTravelCountry] = useState('');
   
   const [agree, setAgree] = useState(false);
   const [showParticipantList, setShowParticipantList] = useState(false);
@@ -63,6 +64,7 @@ function MobileStep2PageContent() {
     const end_hour = searchParams.get('end_hour') || '';
     const tour_num = searchParams.get('tour_num') || '';
     const tour_day = searchParams.get('tour_day') || '';
+    const travel_country = searchParams.get('travel_country') || '';
 
     setProductCd(product_cd);
     setStartDate(start_date);
@@ -71,6 +73,7 @@ function MobileStep2PageContent() {
     setEndHour(end_hour);
     setTourNum(tour_num);
     setTourDay(tour_day);
+    setTravelCountry(travel_country);
 
     // 필수 파라미터가 없으면 step1으로 리다이렉트
     if (!product_cd || !start_date || !end_date || !tour_num) {
@@ -165,6 +168,8 @@ function MobileStep2PageContent() {
           contractor_email: email,
           affiliate: trackingInfo.affiliate,
           access_path: trackingInfo.access_path,
+          travel_region: productCd === '국내여행' ? '전국일원' : null,
+          travel_country: productCd === '해외여행' ? travelCountry : null,
           participants: participants.map((p, index) => ({
             sequence: index + 1,
             gender: p.gender,
@@ -204,6 +209,10 @@ function MobileStep2PageContent() {
         tour_num: tourNum,
         tour_day: tourDay,
       });
+
+      if (productCd === '해외여행' && travelCountry) {
+        params.set('travel_country', travelCountry);
+      }
 
       router.push(`/estimate/step1?${params.toString()}`);
     }

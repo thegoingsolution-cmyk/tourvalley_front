@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { ko } from 'date-fns/locale';
 import { format, parse } from 'date-fns';
@@ -15,6 +15,7 @@ import {
   getOverseasShortTripMaxArrivalFromPickedDate,
   parseInsuranceDateHourToInstant,
 } from '@/utils/dateTime';
+import { allCountries, frequentCountries } from '@/components/travel/utils/countries';
 import './page.css';
 
 // 한국어 locale 등록
@@ -35,7 +36,22 @@ const parseDate = (dateString: string): Date | null => {
 };
 
 export default function MobileStep1Page() {
+  return (
+    <Suspense
+      fallback={
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+          <div>로딩 중...</div>
+        </div>
+      }
+    >
+      <MobileStep1PageContent />
+    </Suspense>
+  );
+}
+
+function MobileStep1PageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   
   // 오늘 날짜를 기본값으로 설정 (Korea timezone)
   const today = new Date();
@@ -57,12 +73,31 @@ export default function MobileStep1Page() {
   const [endHour, setEndHour] = useState(String(defaultHour).padStart(2, '0'));
   const [tourNum, setTourNum] = useState('1');
   const [productCd, setProductCd] = useState('국내여행'); // 기본값: 국내여행 (PC와 동일)
+  const [travelCountry, setTravelCountry] = useState('');
   const [hasSelectedStartDate, setHasSelectedStartDate] = useState(true);
   const [hasSelectedEndDate, setHasSelectedEndDate] = useState(true);
 
   useEffect(() => {
     checkAndSaveTrackingInfo();
   }, []);
+
+  useEffect(() => {
+    const product_cd = searchParams.get('product_cd');
+    const travel_country = searchParams.get('travel_country');
+    const start_date = searchParams.get('start_date');
+    const start_hour = searchParams.get('start_hour');
+    const end_date = searchParams.get('end_date');
+    const end_hour = searchParams.get('end_hour');
+    const tour_num = searchParams.get('tour_num');
+
+    if (product_cd) setProductCd(product_cd);
+    if (travel_country) setTravelCountry(travel_country);
+    if (start_date) setStartDate(start_date);
+    if (start_hour) setStartHour(start_hour);
+    if (end_date) setEndDate(end_date);
+    if (end_hour) setEndHour(end_hour);
+    if (tour_num) setTourNum(tour_num);
+  }, [searchParams]);
 
   // 시간 옵션 생성 (01시 ~ 24시)
   const hourOptions = Array.from({ length: 24 }, (_, i) => {
@@ -151,6 +186,11 @@ export default function MobileStep1Page() {
       return;
     }
 
+    if (productCd === '해외여행' && !travelCountry) {
+      alert('여행국가를 선택해주세요.');
+      return;
+    }
+
     // step2로 이동 (쿼리 파라미터로 데이터 전달)
     const params = new URLSearchParams({
       product_cd: productCd,
@@ -161,6 +201,10 @@ export default function MobileStep1Page() {
       tour_num: tourNum,
       tour_day: String(diffDays),
     });
+
+    if (productCd === '해외여행' && travelCountry) {
+      params.set('travel_country', travelCountry);
+    }
 
     router.push(`/estimate/step2?${params.toString()}`);
   };
@@ -365,6 +409,49 @@ export default function MobileStep1Page() {
                 </span>
               </div>
             </div>
+
+            {productCd === '해외여행' && (
+              <>
+                <div className="tourGuard_form_tt mag5 tourG_mab03">
+                  <label htmlFor="tour_place">여행국가</label>
+                  <div className="tourGuard_bg_join tourGuard_input_cell tourGuard_input_cell01 tourGuard" style={{ marginRight: 0 }}>
+                    <span className="tourGuard_ps_box">
+                      <select
+                        className="tourGuard_sel"
+                        id="tour_place"
+                        name="tour_place"
+                        value={travelCountry}
+                        onChange={(e) => setTravelCountry(e.target.value)}
+                      >
+                        <option value="">선택하세요</option>
+                        <optgroup label="자주가는 국가">
+                          {frequentCountries.map((country) => (
+                            <option key={`frequent-${country.code}`} value={country.name}>
+                              {country.name}
+                            </option>
+                          ))}
+                        </optgroup>
+                        <optgroup label="전체 국가">
+                          {allCountries.map((country) => (
+                            <option key={country.code} value={country.name}>
+                              {country.name}
+                            </option>
+                          ))}
+                        </optgroup>
+                      </select>
+                    </span>
+                  </div>
+                </div>
+                <div className="tour2023_txt01 tour2023_grey tourG_mleft04" style={{ marginTop: '15px', marginBottom: '20px' }}>
+                  <ul className="tourGuard_inline">
+                    <li className="tourGuard_inline_t01">※</li>
+                    <li className="tourGuard_inline_t02">
+                      여러국가를 여행하는 경우 <span className="tour2023_blue">최초 방문국가를</span> 선택하세요.
+                    </li>
+                  </ul>
+                </div>
+              </>
+            )}
           </div>
 
           <div className="tourG_mat04 tourG_mab02">

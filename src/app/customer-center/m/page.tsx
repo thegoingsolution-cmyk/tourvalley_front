@@ -211,7 +211,7 @@ function MobileCustomerCenterContent() {
             <h3 className="customer-info-title-m">보험금 청구안내(양식포함)</h3>
             <div className="customer-info-table-m customer-info-table-m--three">
               <div className="customer-info-cell-m">
-                <a href="/pdf/라이나손보_보험금청구서.pdf" download target="_blank" rel="noopener noreferrer" className="customer-info-link-m">라이나손보</a>
+                <a href="/pdf/라이나손보(여행자보험)_클레임 안내 및 청구서(20250801).pdf" download target="_blank" rel="noopener noreferrer" className="customer-info-link-m">라이나손보</a>
               </div>
               <div className="customer-info-cell-m">
                 <a href="/pdf/메리츠화재_보험금청구서(2024).pdf" download target="_blank" rel="noopener noreferrer" className="customer-info-link-m">메리츠화재</a>
