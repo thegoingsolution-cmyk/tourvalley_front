@@ -461,7 +461,7 @@ function MedicalExpenseExcludedTable() {
         <tr>
           <td className="ag_center bgcolor_red">해외상해의료실비<br />(해외치료)</td>
           <td className="ag_center">3,000만원</td>
-          <td className="ag_center">2,000만원</td>
+          <td className="ag_center">3,000만원</td>
           <td className="ag_center">5,000만원</td>
           <td className="ag_center">1억원</td>
           <td className="ag_center">1,000만원</td>
@@ -495,7 +495,7 @@ function MedicalExpenseExcludedTable() {
           <td rowSpan={8} className="ag_left bgcolor_red">질병</td>
           <td className="ag_center bgcolor_red">해외질병의료실비<br />(해외치료)</td>
           <td className="ag_center">3,000만원</td>
-          <td className="ag_center">2,000만원</td>
+          <td className="ag_center">3,000만원</td>
           <td className="ag_center">5,000만원</td>
           <td className="ag_center">1억원</td>
           <td className="ag_center">1,000만원</td>
@@ -528,7 +528,7 @@ function MedicalExpenseExcludedTable() {
         <tr>
           <td className="ag_left bgcolor_red">해외여행중 질병사망 및<br />질병 80%이상 후유장해</td>
           {empty}
-          <td className="ag_center">2,000만원</td>
+          <td className="ag_center">1,000만원</td>
           <td className="ag_center">3,000만원</td>
           <td className="ag_center">3,000만원</td>
           {empty}
@@ -560,7 +560,7 @@ function MedicalExpenseExcludedTable() {
         <tr>
           <td colSpan={2} className="ag_left bgcolor_red">해외여행중 배상책임(자기부담금 1만원)</td>
           <td className="ag_center">2,000만원</td>
-          <td className="ag_center">2,000만원</td>
+          <td className="ag_center">1,000만원</td>
           <td className="ag_center">2,000만원</td>
           <td className="ag_center">2,000만원</td>
           <td className="ag_center">1,000만원</td>
@@ -572,7 +572,7 @@ function MedicalExpenseExcludedTable() {
             자기부담금 1만원, 보상한도 개당 20만원(단, 이동통신단말기 10만원))
           </td>
           <td className="ag_center">150만원</td>
-          <td className="ag_center">50만원</td>
+          <td className="ag_center">80만원</td>
           <td className="ag_center">100만원</td>
           <td className="ag_center">150만원</td>
           <td className="ag_center">100만원</td>
@@ -610,7 +610,7 @@ function MedicalExpenseExcludedTable() {
         <tr>
           <td colSpan={2} className="ag_left bgcolor_red">해외여행중 중단사고발생 추가비용</td>
           <td className="ag_center">100만원</td>
-          <td className="ag_center">50만원</td>
+          <td className="ag_center">100만원</td>
           <td className="ag_center">100만원</td>
           <td className="ag_center">100만원</td>
           <td className="ag_center">100만원</td>
@@ -619,7 +619,7 @@ function MedicalExpenseExcludedTable() {
         <tr>
           <td colSpan={2} className="ag_left bgcolor_red">항공기 및 수화물 지연에 따른 추가비용</td>
           <td className="ag_center">50만원</td>
-          <td className="ag_center">10만원</td>
+          <td className="ag_center">40만원</td>
           <td className="ag_center">50만원</td>
           <td className="ag_center">80만원</td>
           <td className="ag_center">50만원</td>
