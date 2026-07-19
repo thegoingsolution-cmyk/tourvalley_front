@@ -96,8 +96,6 @@ export default function OverseasInsuranceStep2Page() {
   const [foreignerNoticeAgreed, setForeignerNoticeAgreed] = useState(false);
   // 엑셀 업로드된 참가자 데이터 (입력 필드 채우기용)
   const [excelParticipants, setExcelParticipants] = useState<Participant[] | null>(null);
-  // 대륙별 국가 목록 (각 피보험자별)
-  const [countryLists, setCountryLists] = useState<{ [key: number]: any[] }>({});
   const resno1Ref = useRef<HTMLInputElement>(null);
   const resno2Ref = useRef<HTMLInputElement>(null);
   const resno3Ref = useRef<HTMLInputElement>(null);
@@ -178,16 +176,6 @@ export default function OverseasInsuranceStep2Page() {
   // 국적 타입 변경 핸들러
   const handleCountryTypeChange = (index: number, value: string) => {
     setCountryTypes(prev => ({ ...prev, [index]: value }));
-    if (value === 'F') {
-      // 외국인 선택 시 국가 목록 초기화
-      setCountryLists(prev => ({ ...prev, [index]: [] }));
-    }
-  };
-
-  // 대륙 선택 시 국가 목록 업데이트
-  const handleContinentChange = (index: number, continentCode: string) => {
-    const countries = continentPlaces[continentCode] || [];
-    setCountryLists(prev => ({ ...prev, [index]: countries }));
   };
 
   // 이메일 도메인 선택 핸들러
@@ -551,9 +539,6 @@ export default function OverseasInsuranceStep2Page() {
       const countryTypeSelect = document.querySelector(`select[name="country_type_${i}"]`) as HTMLSelectElement;
       const ssn1Input = document.querySelector(`input[name="insured_ssn1_${i}"]`) as HTMLInputElement;
       const ssn2Input = document.querySelector(`input[name="insured_ssn2_${i}"]`) as HTMLInputElement;
-      const country1Select = document.querySelector(`select[name="insured_country1_${i}"]`) as HTMLSelectElement;
-      const country2Select = document.querySelector(`select[name="insured_country2_${i}"]`) as HTMLSelectElement;
-      
       // 성명이 입력되지 않으면 해당 인원은 미입력으로 처리
       if (!nameInput?.value || nameInput.value.trim() === '') {
         incompleteInsuredList.push(i);
@@ -591,17 +576,6 @@ export default function OverseasInsuranceStep2Page() {
         }
         
         if (!ssn2Input?.value || ssn2Input.value.length !== 7) {
-          incompleteInsuredList.push(i);
-          continue;
-        }
-        
-        // 외국인 국적 검증
-        if (!country1Select?.value || country1Select.value === '') {
-          incompleteInsuredList.push(i);
-          continue;
-        }
-        
-        if (!country2Select?.value || country2Select.value === '') {
           incompleteInsuredList.push(i);
           continue;
         }
@@ -707,9 +681,6 @@ export default function OverseasInsuranceStep2Page() {
       const countryTypeSelect = document.querySelector(`select[name="country_type_${i}"]`) as HTMLSelectElement;
       const ssn1Input = document.querySelector(`input[name="insured_ssn1_${i}"]`) as HTMLInputElement;
       const ssn2Input = document.querySelector(`input[name="insured_ssn2_${i}"]`) as HTMLInputElement;
-      const country1Select = document.querySelector(`select[name="insured_country1_${i}"]`) as HTMLSelectElement;
-      const country2Select = document.querySelector(`select[name="insured_country2_${i}"]`) as HTMLSelectElement;
-      
       step2Data[`insured_name_${savedIndex}`] = nameInput.value;
       
       // 영문 이름 저장
@@ -753,10 +724,6 @@ export default function OverseasInsuranceStep2Page() {
         // 외국인: 주민등록번호 저장
         step2Data[`insured_ssn1_${savedIndex}`] = ssn1Input.value;
         step2Data[`insured_ssn2_${savedIndex}`] = ssn2Input.value;
-        
-        // 외국인 국적 저장
-        step2Data[`insured_country1_${savedIndex}`] = country1Select.value;
-        step2Data[`insured_country2_${savedIndex}`] = country2Select.value;
       }
       
       savedIndex++;
@@ -1376,13 +1343,12 @@ export default function OverseasInsuranceStep2Page() {
                       {Array.from({ length: tourNum }, (_, i) => {
                         const index = i + 1;
                         const countryType = countryTypes[index] || 'D';
-                        const countryList = countryLists[index] || [];
                         const isForeigner = countryType === 'F';
                         
                         return (
                           <React.Fragment key={i}>
                             <tr>
-                              <td className="ag_center line_03" rowSpan={isForeigner ? 2 : 2}>{index}</td>
+                              <td className="ag_center line_03">{index}</td>
                               <td className="ag_center box line_03 bgcolor_red">
                                 <div className="in_wrap01">
                                   <div className="bg_join input_cell_01">
@@ -1443,47 +1409,6 @@ export default function OverseasInsuranceStep2Page() {
                                 </div>
                               </td>
                             </tr>
-                            {isForeigner && (
-                              <tr id={`insured_person_${i}_2`}>
-                                <td className="ag_center box line_03">
-                                  <div className="in_wrap01" style={{ padding: '0px 0px 0px 20%' }}>국적입력</div>
-                                </td>
-                                <td className="ag_center box bgcolor_red" colSpan={3}>
-                                  <div className="in_wrap01">
-                                    <div className="bg_join input_cell_01 wd_48">
-                                      <span className="ps_box02 wd_100">
-                                        <select 
-                                          className="sel01" 
-                                          name={`insured_country1_${index}`}
-                                          onChange={(e) => handleContinentChange(index, e.target.value)}
-                                        >
-                                          <option value="">선택</option>
-                                          <option value="EU">유럽</option>
-                                          <option value="AS">아시아</option>
-                                          <option value="AF">아프리카</option>
-                                          <option value="AU">오세아니아</option>
-                                          <option value="NA">북아메리카</option>
-                                          <option value="SA">남아메리카</option>
-                                        </select>
-                                      </span>
-                                    </div>
-                                    <div className="bg_join input_cell_01 wd_48 ml10">
-                                      <span className="ps_box02 wd_100">
-                                        <select className="sel01" name={`insured_country2_${index}`}>
-                                          <option value="">선택</option>
-                                          {countryList.map((country) => (
-                                            <option key={country.value} value={country.value}>
-                                              {country.label}
-                                            </option>
-                                          ))}
-                                        </select>
-                                      </span>
-                                    </div>
-                                  </div>
-                                </td>
-                              </tr>
-                            )}
-                            {!isForeigner && <tr></tr>}
                           </React.Fragment>
                         );
                       })}

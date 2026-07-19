@@ -160,10 +160,6 @@ export default function ParticipantInputPage() {
           alert(`가입자 ${i + 1}의 외국인등록번호를 올바르게 입력해주세요.`);
           return;
         }
-        if (!insured.country) {
-          alert(`가입자 ${i + 1}의 국적을 선택해주세요.`);
-          return;
-        }
       }
     }
 
@@ -496,50 +492,6 @@ export default function ParticipantInputPage() {
                           </div>
                         )}
 
-                        {/* 국적 - 외국인일 때만 표시 (국내여행 탭에서는 숨김) */}
-                        {insured.countryType === 'F' && travelType !== 'DS' && (
-                          <div id={`insured_country_area_${index + 1}`} className="tourGuard_form_tt mag5 tourG_mab03">
-                            <label htmlFor={`insured_country_${index + 1}`}>국적</label>
-                            <div className="tourGuard_bg_join tourGuard_input_cell tourGuard_input_cell01 tourGuard" style={{ marginRight: 0 }}>
-                              <span className="tourGuard_ps_box">
-                                <select
-                                  className="tourGuard_sel"
-                                  id={`insured_country_${index + 1}`}
-                                  name="insured_country"
-                                  value={insured.country}
-                                  onChange={(e) => handleInputChange(index, 'country', e.target.value)}
-                                >
-                                  <option value="">선택하세요</option>
-                                  <option value="US">미국</option>
-                                  <option value="CN">중국</option>
-                                  <option value="JP">일본</option>
-                                  <option value="VN">베트남</option>
-                                  <option value="TH">태국</option>
-                                  <option value="PH">필리핀</option>
-                                  <option value="ID">인도네시아</option>
-                                  <option value="MY">말레이시아</option>
-                                  <option value="SG">싱가포르</option>
-                                  <option value="HK">홍콩</option>
-                                  <option value="TW">대만(타이완)</option>
-                                  <option value="MO">마카오</option>
-                                  <option value="GB">영국</option>
-                                  <option value="FR">프랑스</option>
-                                  <option value="DE">독일</option>
-                                  <option value="IT">이탈리아</option>
-                                  <option value="ES">스페인</option>
-                                  <option value="CA">캐나다</option>
-                                  <option value="AU">호주</option>
-                                  <option value="NZ">뉴질랜드</option>
-                                  <option value="BR">브라질</option>
-                                  <option value="MX">멕시코</option>
-                                  <option value="RU">러시아</option>
-                                  <option value="IN">인도</option>
-                                  <option value="KR">한국</option>
-                                </select>
-                              </span>
-                            </div>
-                          </div>
-                        )}
                       </section>
                     </div>
                   ))}

@@ -55,8 +55,6 @@ export default function DomesticInsuranceStep2Page() {
   const [countryTypes, setCountryTypes] = useState<{ [key: number]: string }>({});
   // 외국인 가입 시 본국 여행 불가 동의 (외국인 1명이라도 있으면 체크 필수)
   const [foreignerNoticeAgreed, setForeignerNoticeAgreed] = useState(false);
-  // 대륙별 국가 목록 (각 피보험자별)
-  const [countryLists, setCountryLists] = useState<{ [key: number]: { value: string; label: string }[] }>({});
   // 엑셀 업로드된 참가자 데이터 (입력 필드 채우기용)
   const [excelParticipants, setExcelParticipants] = useState<Participant[] | null>(null);
   // 사업자번호 입력칸 자동 포커스 이동용 ref
@@ -70,54 +68,9 @@ export default function DomesticInsuranceStep2Page() {
   const ctelNo2Ref = useRef<HTMLInputElement>(null);
   const ctelNo3Ref = useRef<HTMLInputElement>(null);
 
-  // 대륙별 국가 목록 (해외 step2와 동일)
-  const continentPlaces: { [key: string]: { value: string; label: string }[] } = {
-    EU: [
-      { value: 'DE', label: '독일' }, { value: 'FR', label: '프랑스' }, { value: 'GB', label: '영국' },
-      { value: 'IT', label: '이탈리아' }, { value: 'ES', label: '스페인' }, { value: 'NL', label: '네덜란드' },
-      { value: 'BE', label: '벨기에' }, { value: 'CH', label: '스위스' }, { value: 'AT', label: '오스트리아' },
-      { value: 'GR', label: '그리스' }, { value: 'PT', label: '포르투갈' }, { value: 'CZ', label: '체코' },
-      { value: 'PL', label: '폴란드' }, { value: 'HU', label: '헝가리' }, { value: 'SE', label: '스웨덴' },
-      { value: 'NO', label: '노르웨이' }, { value: 'DK', label: '덴마크' }, { value: 'FI', label: '핀란드' },
-      { value: 'RU', label: '러시아' },
-    ],
-    AS: [
-      { value: 'JP', label: '일본' }, { value: 'CN', label: '중국' }, { value: 'TW', label: '대만(타이완)' },
-      { value: 'HK', label: '홍콩' }, { value: 'SG', label: '싱가포르' }, { value: 'TH', label: '태국' },
-      { value: 'VN', label: '베트남' }, { value: 'PH', label: '필리핀' }, { value: 'ID', label: '인도네시아' },
-      { value: 'MY', label: '말레이시아' }, { value: 'IN', label: '인도' }, { value: 'MN', label: '몽골' },
-      { value: 'KZ', label: '카자흐스탄' }, { value: 'UZ', label: '우즈베키스탄' },
-    ],
-    AF: [
-      { value: 'ZA', label: '남아프리카공화국' }, { value: 'EG', label: '이집트' }, { value: 'MA', label: '모로코' },
-      { value: 'KE', label: '케냐' }, { value: 'TZ', label: '탄자니아' },
-    ],
-    AU: [
-      { value: 'AU', label: '호주' }, { value: 'NZ', label: '뉴질랜드' }, { value: 'FJ', label: '피지' },
-      { value: 'PG', label: '파푸아뉴기니' },
-    ],
-    NA: [
-      { value: 'US', label: '미국' }, { value: 'CA', label: '캐나다' }, { value: 'MX', label: '멕시코' },
-      { value: 'CU', label: '쿠바' },
-    ],
-    SA: [
-      { value: 'BR', label: '브라질' }, { value: 'AR', label: '아르헨티나' }, { value: 'CL', label: '칠레' },
-      { value: 'PE', label: '페루' }, { value: 'CO', label: '콜롬비아' },
-    ],
-  };
-
   // 국적 타입 변경 핸들러
   const handleCountryTypeChange = (index: number, value: string) => {
     setCountryTypes(prev => ({ ...prev, [index]: value }));
-    if (value === 'F') {
-      setCountryLists(prev => ({ ...prev, [index]: [] }));
-    }
-  };
-
-  // 대륙 선택 시 국가 목록 업데이트
-  const handleContinentChange = (index: number, continentCode: string) => {
-    const countries = continentPlaces[continentCode] || [];
-    setCountryLists(prev => ({ ...prev, [index]: countries }));
   };
 
   // 이메일 도메인 선택 핸들러
@@ -472,8 +425,6 @@ export default function DomesticInsuranceStep2Page() {
       const countryTypeSelect = document.querySelector(`select[name="country_type_${i}"]`) as HTMLSelectElement;
       const ssn1Input = document.querySelector(`input[name="insured_ssn1_${i}"]`) as HTMLInputElement;
       const ssn2Input = document.querySelector(`input[name="insured_ssn2_${i}"]`) as HTMLInputElement;
-      const country1Select = document.querySelector(`select[name="insured_country1_${i}"]`) as HTMLSelectElement;
-      const country2Select = document.querySelector(`select[name="insured_country2_${i}"]`) as HTMLSelectElement;
       
       // 성명이 입력되지 않으면 해당 인원은 미입력으로 처리
       if (!nameInput?.value || nameInput.value.trim() === '') {
@@ -603,8 +554,6 @@ export default function DomesticInsuranceStep2Page() {
       const countryTypeSelect = document.querySelector(`select[name="country_type_${i}"]`) as HTMLSelectElement;
       const ssn1Input = document.querySelector(`input[name="insured_ssn1_${i}"]`) as HTMLInputElement;
       const ssn2Input = document.querySelector(`input[name="insured_ssn2_${i}"]`) as HTMLInputElement;
-      const country1Select = document.querySelector(`select[name="insured_country1_${i}"]`) as HTMLSelectElement;
-      const country2Select = document.querySelector(`select[name="insured_country2_${i}"]`) as HTMLSelectElement;
       
       step2Data[`insured_name_${savedIndex}`] = nameInput.value;
       
@@ -644,8 +593,6 @@ export default function DomesticInsuranceStep2Page() {
         // 외국인: 주민등록번호 저장 (국내 보험은 국적 선택 UI 없음)
         step2Data[`insured_ssn1_${savedIndex}`] = ssn1Input.value;
         step2Data[`insured_ssn2_${savedIndex}`] = ssn2Input.value;
-        step2Data[`insured_country1_${savedIndex}`] = '';
-        step2Data[`insured_country2_${savedIndex}`] = '';
       }
       
       savedIndex++;
@@ -1218,7 +1165,6 @@ export default function DomesticInsuranceStep2Page() {
                       {Array.from({ length: tourNum }, (_, i) => {
                         const index = i + 1;
                         const countryType = countryTypes[index] || 'D';
-                        const countryList = countryLists[index] || [];
                         const isForeigner = countryType === 'F';
                         return (
                           <React.Fragment key={i}>

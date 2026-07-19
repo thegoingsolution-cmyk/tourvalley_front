@@ -6,6 +6,7 @@ import { getCorporateMemberInfo } from '@/services/authService';
 import { getTrackingInfo } from '@/utils/tracking';
 import { requestNicepayPayment, openNicepayWindow, processNaverPayPayment, processKakaoPayPayment } from '@/services/paymentService';
 import { isDepartureAtLeastTwoHoursFromNow } from '@/utils/dateTime';
+import { resolveInsuredDisplayInfoFromStep2 } from '@/utils/age';
 import '../../popup/page.css';
 
 export default function LongStayInsuranceStep5Page() {
@@ -582,8 +583,7 @@ export default function LongStayInsuranceStep5Page() {
     const participants = [];
     for (let i = 1; i <= count; i++) {
       const name = step2Data[`insured_name_${i}`] || `피보험자${i}`;
-      const birthDate = step2Data[`insured_birth_${i}`] || '';
-      const gender = step2Data[`insured_gender_${i}`] || '남자';
+      const { gender, birthDate } = resolveInsuredDisplayInfoFromStep2(step2Data, i);
       const planCode = step3Data.selected_plans?.[i] || 'BAW';
       const premium = step3Data.premiums?.[i] || 0;
 
