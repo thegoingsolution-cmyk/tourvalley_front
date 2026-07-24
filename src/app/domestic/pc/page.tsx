@@ -811,6 +811,12 @@ export default function PCDomesticPage() {
       return;
     }
 
+    const durationValidation = validateDuration();
+    if (!durationValidation.valid) {
+      alert(durationValidation.message);
+      return;
+    }
+
     if (!paymentMethod) {
       alert('결제 방법을 선택해주세요.');
       return;

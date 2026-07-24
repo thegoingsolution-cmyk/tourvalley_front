@@ -6,6 +6,7 @@ import { requestNicepayPayment, openNicepayWindow, processNaverPayPayment, proce
 import { getTrackingInfo } from '@/utils/tracking';
 import {
   getDomesticInsuranceMaxArrivalFromPickedDate,
+  isDepartureAtLeastTwoHoursFromNow,
   parseInsuranceDateHourToInstant,
 } from '@/utils/dateTime';
 import { useAuth } from '@/contexts/AuthContext';
@@ -653,6 +654,18 @@ function MobileDomesticStep1Content() {
       alert('플랜을 선택해주세요.');
       return;
     }
+
+    const durationValidation = validateDuration();
+    if (!durationValidation.valid) {
+      alert(durationValidation.message);
+      return;
+    }
+
+    if (!isDepartureAtLeastTwoHoursFromNow(departureDate, String(departureTime))) {
+      alert('출발시간은 가입시점 2시간 뒤부터 설정 가능합니다');
+      return;
+    }
+
     setShowPlanSelection(false);
     setShowParticipantForm(true);
     setParticipants([
@@ -896,6 +909,22 @@ function MobileDomesticStep1Content() {
 
   // 결제 처리
   const handlePaymentSubmit = async () => {
+    if (!departureDate || departureTime == null || String(departureTime).trim() === '') {
+      alert('출발일시 정보가 없습니다. 처음부터 다시 진행해 주세요.');
+      return;
+    }
+
+    if (!isDepartureAtLeastTwoHoursFromNow(departureDate, String(departureTime))) {
+      alert('출발시간은 가입시점 2시간 뒤부터 설정 가능합니다');
+      return;
+    }
+
+    const durationValidation = validateDuration();
+    if (!durationValidation.valid) {
+      alert(durationValidation.message);
+      return;
+    }
+
     // 결제 방법 검증
     if (!paymentMethod) {
       alert('결제 방법을 선택해주세요.');

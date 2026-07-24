@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { isDepartureAtLeastTwoHoursFromNow } from '@/utils/dateTime';
+import { isDepartureAtLeastTwoHoursFromNow, parseInsuranceDateHourToInstant } from '@/utils/dateTime';
 import { PaymentMethod, PaymentSubMethod } from './types';
 
 interface PaymentStepProps {
@@ -639,6 +639,22 @@ export default function PaymentStep({
               if (departureDate && departureTime != null && String(departureTime).trim() !== '') {
                 if (!isDepartureAtLeastTwoHoursFromNow(departureDate, String(departureTime))) {
                   alert('출발시간은 가입시점 2시간 뒤부터 설정 가능합니다');
+                  return;
+                }
+              }
+
+              if (
+                departureDate &&
+                departureTime != null &&
+                String(departureTime).trim() !== '' &&
+                arrivalDate &&
+                arrivalTime != null &&
+                String(arrivalTime).trim() !== ''
+              ) {
+                const departure = parseInsuranceDateHourToInstant(departureDate, String(departureTime));
+                const arrival = parseInsuranceDateHourToInstant(arrivalDate, String(arrivalTime));
+                if (arrival.getTime() <= departure.getTime()) {
+                  alert('도착일시는 출발일시보다 이후여야 합니다.');
                   return;
                 }
               }

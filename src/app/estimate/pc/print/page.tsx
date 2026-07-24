@@ -726,7 +726,7 @@ function EstimatePrintContent() {
                       고객센터 1599-2541
                     </span>
                     <span style={{ fontFamily: "Noto Sans KR, sans-serif,'Malgun Gothic','맑은 고딕'", fontSize: '13px', color: '#999', textAlign: 'left', lineHeight: '140%', letterSpacing: '-0.7px', paddingTop: '1px', display: 'block' }}>
-                      서울특별시 중구 을지로11길15 동화빌딩 603호 팩스 02-2261-0098  tourmaster@insvalley.com
+                      서울특별시 중구 을지로11길15 동화빌딩 603호 팩스 02-2261-0098  admin@tourvalley.net
                     </span>
                   </td>
                 </tr>
