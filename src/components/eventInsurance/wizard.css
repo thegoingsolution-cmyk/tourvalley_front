@@ -1,0 +1,998 @@
+/* 행사보험 견적신청 6단계 마법사 - 공통 스타일 (.ei-wizard 로 스코프) */
+.ei-wizard {
+  --navy: #152a52;
+  --blue: #2b5cff;
+  --blue2: #1b46d6;
+  --sky: #eaf1ff;
+  --line: #e3e8f0;
+  --ink: #1c2430;
+  --sub: #6b7480;
+  --bg: #f4f6fb;
+  --ok: #12a150;
+  --warn: #e08a00;
+  --red: #d1435b;
+  --radius: 14px;
+
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: 22px 20px 60px;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+.ei-wizard * {
+  box-sizing: border-box;
+}
+
+.ei-wizard .ei-wrap {
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  min-width: 0;
+}
+
+.ei-wizard .ei-hero {
+  background: linear-gradient(135deg, #152a52, #2b5cff);
+  color: #fff;
+  border-radius: 18px;
+  padding: 26px 26px;
+  margin-bottom: 18px;
+}
+.ei-wizard .ei-hero h1 {
+  margin: 0 0 6px;
+  font-size: 23px;
+}
+.ei-wizard .ei-hero p {
+  margin: 0;
+  opacity: 0.92;
+  font-size: 14px;
+}
+
+/* progress */
+.ei-wizard .ei-prog {
+  display: flex;
+  align-items: center;
+  margin: 20px 0 8px;
+  gap: 0;
+}
+.ei-wizard .ei-prog .ei-st {
+  flex: 1;
+  text-align: center;
+  position: relative;
+}
+.ei-wizard .ei-prog .ei-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--line);
+  color: var(--sub);
+  font-weight: 800;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+  transition: 0.25s;
+}
+.ei-wizard .ei-prog .ei-st.on .ei-dot {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+.ei-wizard .ei-prog .ei-st.done .ei-dot {
+  background: var(--ok);
+  border-color: var(--ok);
+  color: #fff;
+}
+.ei-wizard .ei-prog .ei-lab {
+  font-size: 11px;
+  color: var(--sub);
+  margin-top: 5px;
+  font-weight: 600;
+}
+.ei-wizard .ei-prog .ei-st.on .ei-lab {
+  color: var(--blue);
+}
+.ei-wizard .ei-prog .ei-line {
+  position: absolute;
+  top: 15px;
+  left: -50%;
+  width: 100%;
+  height: 2px;
+  background: var(--line);
+  z-index: 1;
+}
+.ei-wizard .ei-prog .ei-st.done .ei-line,
+.ei-wizard .ei-prog .ei-st.on .ei-line {
+  background: var(--blue);
+}
+.ei-wizard .ei-prog .ei-st:first-child .ei-line {
+  display: none;
+}
+
+/* card */
+.ei-wizard .ei-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 26px 24px;
+  box-shadow: 0 2px 8px rgba(20, 40, 80, 0.05);
+}
+.ei-wizard .ei-card h2 {
+  margin: 0 0 4px;
+  font-size: 19px;
+  color: var(--navy);
+}
+.ei-wizard .ei-card .ei-desc {
+  color: var(--sub);
+  font-size: 13.5px;
+  margin: 0 0 20px;
+}
+.ei-wizard .ei-field {
+  margin-bottom: 18px;
+}
+.ei-wizard .ei-field > label {
+  display: block;
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: var(--navy);
+}
+.ei-wizard .ei-field .ei-req {
+  color: var(--red);
+  margin-left: 3px;
+}
+.ei-wizard .ei-hint {
+  font-size: 12px;
+  color: var(--sub);
+  margin-top: 5px;
+}
+.ei-wizard input[type='text'],
+.ei-wizard input[type='tel'],
+.ei-wizard input[type='email'],
+.ei-wizard input[type='number'],
+.ei-wizard input[type='date'],
+.ei-wizard select,
+.ei-wizard textarea {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  border: 1.5px solid var(--line);
+  border-radius: 11px;
+  padding: 12px 13px;
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--ink);
+  background: #fff;
+  transition: 0.15s;
+  box-sizing: border-box;
+}
+/* 모바일 네이티브 date 입력의 고유 최소너비로 가로 넘침 방지 */
+.ei-wizard input[type='date'] {
+  display: block;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.ei-wizard input:focus,
+.ei-wizard select:focus,
+.ei-wizard textarea:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(43, 92, 255, 0.12);
+}
+.ei-wizard input.ei-err,
+.ei-wizard select.ei-err {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(209, 67, 91, 0.1);
+}
+.ei-wizard .ei-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+  max-width: 100%;
+}
+.ei-wizard .ei-two > * {
+  min-width: 0;
+  max-width: 100%;
+}
+.ei-wizard .ei-period-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+}
+.ei-wizard .ei-period-col select {
+  margin-top: 0;
+}
+.ei-wizard .ei-three {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.ei-wizard .ei-suffix {
+  position: relative;
+}
+.ei-wizard .ei-suffix .ei-u {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--sub);
+  font-size: 14px;
+  font-weight: 600;
+  pointer-events: none;
+}
+.ei-wizard .ei-suffix input {
+  padding-right: 44px;
+}
+
+/* option cards */
+.ei-wizard .ei-opts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.ei-wizard .ei-opt {
+  border: 1.5px solid var(--line);
+  border-radius: 13px;
+  padding: 16px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.15s;
+  background: #fff;
+  position: relative;
+}
+.ei-wizard .ei-opt:hover {
+  border-color: #b9c6e8;
+}
+.ei-wizard .ei-opt.sel {
+  border-color: var(--blue);
+  background: var(--sky);
+}
+.ei-wizard .ei-opt .ei-t {
+  font-weight: 800;
+  color: var(--navy);
+  font-size: 15px;
+}
+.ei-wizard .ei-opt .ei-d {
+  font-size: 11.5px;
+  color: var(--sub);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+.ei-wizard .ei-opt.sel .ei-t {
+  color: var(--blue2);
+}
+
+/* checkbox chips */
+.ei-wizard .ei-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.ei-wizard .ei-chip {
+  border: 1.5px solid var(--line);
+  background: #fff;
+  border-radius: 20px;
+  padding: 7px 13px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--sub);
+  cursor: pointer;
+  font-family: inherit;
+  transition: 0.12s;
+  user-select: none;
+}
+.ei-wizard .ei-chip:hover {
+  border-color: #b9c6e8;
+}
+.ei-wizard .ei-chip.on {
+  border-color: var(--blue);
+  background: var(--blue);
+  color: #fff;
+}
+
+/* seg */
+.ei-wizard .ei-seg {
+  display: inline-flex;
+  border: 1.5px solid var(--line);
+  border-radius: 11px;
+  overflow: hidden;
+  flex-wrap: wrap;
+}
+.ei-wizard .ei-seg button {
+  border: none;
+  background: #fff;
+  padding: 11px 22px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--sub);
+  cursor: pointer;
+  font-family: inherit;
+}
+.ei-wizard .ei-seg button.on {
+  background: var(--blue);
+  color: #fff;
+}
+.ei-wizard .ei-seg.sm button {
+  padding: 8px 18px;
+  font-size: 13px;
+}
+.ei-wizard .ei-route {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ei-wizard .ei-route textarea {
+  resize: vertical;
+}
+
+/* attachments */
+.ei-wizard .ei-upl {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ei-wizard .ei-uplrow {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 12px;
+  align-items: center;
+}
+.ei-wizard .ei-upll {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--navy);
+}
+.ei-wizard .ei-upl input[type='file'] {
+  font-size: 12px;
+  border: 1.5px dashed var(--line);
+  border-radius: 9px;
+  padding: 10px;
+  background: #fff;
+  width: 100%;
+}
+.ei-wizard .ei-uplreco {
+  font-size: 12.5px;
+  color: var(--blue2);
+  background: var(--sky);
+  border: 1px solid #cdddff;
+  border-radius: 9px;
+  padding: 9px 13px;
+  margin-bottom: 11px;
+  line-height: 1.55;
+  font-weight: 600;
+}
+.ei-wizard .ei-uplnote {
+  font-size: 11.5px;
+  color: var(--sub);
+  margin-top: 9px;
+  line-height: 1.65;
+  background: #fbfcfe;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 10px 13px;
+}
+.ei-wizard .ei-amtwrap {
+  position: relative;
+}
+.ei-wizard .ei-amtwrap input {
+  padding-right: 34px;
+}
+.ei-wizard .ei-amtunit {
+  position: absolute;
+  right: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13.5px;
+  color: var(--sub);
+  font-weight: 600;
+  pointer-events: none;
+}
+.ei-wizard .ei-privguard {
+  font-size: 12px;
+  color: var(--ok);
+  background: #eef8f1;
+  border: 1px solid #cfeeda;
+  border-radius: 9px;
+  padding: 9px 13px;
+  margin-bottom: 4px;
+}
+@media (max-width: 560px) {
+  .ei-wizard .ei-uplrow {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+}
+
+/* consent */
+.ei-wizard .ei-consent {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  background: #fbfcfe;
+}
+.ei-wizard .ei-consent .ei-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.ei-wizard .ei-consent input {
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--blue);
+  flex-shrink: 0;
+}
+.ei-wizard .ei-consent .ei-txt {
+  font-size: 13.5px;
+}
+.ei-wizard .ei-consent .ei-txt b {
+  color: var(--navy);
+}
+.ei-wizard .ei-consent .ei-more {
+  font-size: 12px;
+  color: var(--sub);
+  margin-top: 5px;
+  padding-left: 28px;
+}
+
+/* nav buttons */
+.ei-wizard .ei-nav {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+}
+.ei-wizard .ei-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 15px;
+  font-size: 15.5px;
+  font-weight: 800;
+  cursor: pointer;
+  flex: 1;
+  transition: 0.15s;
+}
+.ei-wizard .ei-btn.pri {
+  background: var(--blue);
+  color: #fff;
+}
+.ei-wizard .ei-btn.pri:hover {
+  background: var(--blue2);
+}
+.ei-wizard .ei-btn.pri:disabled {
+  background: #c3cee6;
+  cursor: not-allowed;
+}
+.ei-wizard .ei-btn.gho {
+  background: #fff;
+  border: 1.5px solid var(--line);
+  color: var(--sub);
+  flex: 0 0 110px;
+}
+.ei-wizard .ei-btn.gho:hover {
+  background: #f2f4f9;
+}
+
+/* review */
+.ei-wizard .ei-rev {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.ei-wizard .ei-rev .ei-rrow {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  font-size: 13.5px;
+  border-bottom: 1px solid var(--line);
+}
+.ei-wizard .ei-rev .ei-rrow:last-child {
+  border-bottom: none;
+}
+.ei-wizard .ei-rev .ei-rk {
+  background: #f7f9ff;
+  padding: 11px 14px;
+  color: var(--sub);
+  font-weight: 600;
+}
+.ei-wizard .ei-rev .ei-rv {
+  padding: 11px 14px;
+}
+
+/* done */
+.ei-wizard .ei-done {
+  text-align: center;
+  padding: 20px 10px;
+}
+.ei-wizard .ei-done .ei-ico {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #e6f6ec;
+  color: var(--ok);
+  font-size: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+}
+.ei-wizard .ei-done h2 {
+  font-size: 22px;
+  color: var(--navy);
+  margin: 0 0 8px;
+}
+.ei-wizard .ei-done p {
+  color: var(--sub);
+  font-size: 14.5px;
+  margin: 4px 0;
+}
+.ei-wizard .ei-qno {
+  display: inline-block;
+  background: var(--sky);
+  color: var(--blue2);
+  font-weight: 800;
+  font-size: 17px;
+  padding: 10px 22px;
+  border-radius: 12px;
+  margin: 16px 0;
+  letter-spacing: 0.5px;
+}
+.ei-wizard .ei-steps-next {
+  text-align: left;
+  background: #fbfcfe;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-top: 18px;
+  font-size: 13.5px;
+}
+.ei-wizard .ei-steps-next b {
+  color: var(--navy);
+}
+.ei-wizard .ei-err-msg {
+  color: var(--red);
+  font-size: 12px;
+  margin-top: 5px;
+  display: none;
+}
+.ei-wizard .ei-err-msg.show {
+  display: block;
+}
+.ei-wizard .ei-tip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #d6deef;
+  color: #4a5b82;
+  font-size: 11px;
+  font-weight: 800;
+  margin-left: 5px;
+  cursor: help;
+  vertical-align: middle;
+}
+.ei-wizard .ei-tip:hover,
+.ei-wizard .ei-tip:focus {
+  background: var(--blue);
+  color: #fff;
+  outline: none;
+}
+.ei-wizard .ei-tip:hover::after,
+.ei-wizard .ei-tip:focus::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 0;
+  top: 150%;
+  width: 240px;
+  max-width: 76vw;
+  background: var(--navy);
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 1.55;
+  padding: 9px 11px;
+  border-radius: 9px;
+  box-shadow: 0 8px 24px rgba(21, 42, 82, 0.28);
+  white-space: normal;
+  text-align: left;
+  z-index: 60;
+  pointer-events: none;
+}
+.ei-wizard .ei-tip:hover::before,
+.ei-wizard .ei-tip:focus::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 130%;
+  border: 6px solid transparent;
+  border-bottom-color: var(--navy);
+  z-index: 61;
+}
+.ei-wizard .ei-foot {
+  max-width: 720px;
+  margin: 24px auto 0;
+  padding: 24px 20px 40px;
+  color: var(--sub);
+  font-size: 11px;
+  line-height: 1.7;
+}
+.ei-wizard .ei-foot .ei-co {
+  color: var(--navy);
+  font-weight: 700;
+  font-size: 12.5px;
+}
+
+/* step3 risk rows */
+.ei-wizard .ei-rrow2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1.5px solid var(--line);
+  border-radius: 11px;
+  padding: 9px 14px;
+  margin-bottom: 8px;
+}
+.ei-wizard .ei-rrow2 .ei-rl {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--navy);
+}
+.ei-wizard .ei-rgroup {
+  margin-bottom: 8px;
+}
+.ei-wizard .ei-rgroup .ei-rrow2 {
+  margin-bottom: 0;
+}
+.ei-wizard .ei-rdetail {
+  border: 1.5px solid #b9c6e8;
+  background: #f7f9ff;
+  border-radius: 11px;
+  margin: 6px 0 2px;
+  padding: 12px 14px 14px;
+}
+.ei-wizard .ei-rdh {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--blue2);
+  margin-bottom: 10px;
+}
+.ei-wizard .ei-rdgrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.ei-wizard .ei-rdgrid label,
+.ei-wizard .ei-rdfile .ei-fl {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--navy);
+}
+.ei-wizard .ei-rdgrid label input,
+.ei-wizard .ei-rdgrid label select {
+  margin-top: 4px;
+}
+.ei-wizard .ei-rdgrid label.full {
+  grid-column: 1 / -1;
+}
+.ei-wizard .ei-rdblk {
+  margin-bottom: 10px;
+}
+.ei-wizard .ei-rdlbl {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 6px;
+}
+.ei-wizard .ei-rdlbl .ei-mini {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--blue2);
+  background: #e7edff;
+  border-radius: 20px;
+  padding: 2px 8px;
+  margin-left: 4px;
+}
+.ei-wizard .ei-rdetail textarea {
+  resize: vertical;
+}
+.ei-wizard .ei-rdfile {
+  margin-top: 8px;
+}
+.ei-wizard .ei-rdfile input[type='file'] {
+  margin-top: 6px;
+  font-size: 12px;
+  border: 1.5px dashed var(--line);
+  border-radius: 9px;
+  padding: 9px;
+  width: 100%;
+  background: #fff;
+}
+@media (max-width: 560px) {
+  .ei-wizard .ei-rdgrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* coverage table */
+.ei-wizard .ei-covtbl {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  table-layout: fixed;
+}
+.ei-wizard .ei-covtbl th {
+  background: #f7f9ff;
+  color: var(--sub);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: left;
+  padding: 8px 7px;
+  border-bottom: 1px solid var(--line);
+}
+.ei-wizard .ei-covtbl td {
+  padding: 9px 7px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+  font-size: 12.5px;
+  text-align: left;
+}
+.ei-wizard .ei-covtbl tr:last-child td {
+  border-bottom: none;
+}
+.ei-wizard .ei-covtbl th.c1,
+.ei-wizard .ei-covtbl td.cs {
+  width: 44px;
+  text-align: center;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+.ei-wizard .ei-covtbl th.c2 {
+  width: 33%;
+}
+.ei-wizard .ei-covtbl td.cn {
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1.35;
+}
+.ei-wizard .ei-covtbl td b {
+  color: var(--ink);
+  font-weight: 700;
+}
+.ei-wizard .ei-covtbl td.dash,
+.ei-wizard .ei-covtbl .dash,
+.ei-wizard .ei-covtbl .mut {
+  color: #b6bdc9;
+}
+.ei-wizard .ei-covtbl select {
+  width: 100%;
+  padding: 6px 4px;
+  font-size: 12px;
+  border-radius: 8px;
+}
+.ei-wizard .ei-covtbl .reqb {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--sub);
+  background: #eef1f6;
+  border-radius: 20px;
+  padding: 2px 6px;
+}
+.ei-wizard .ei-covtbl .chk {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.ei-wizard .ei-covtbl .chk input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--blue);
+  margin: 0;
+  cursor: pointer;
+}
+.ei-wizard .ei-covtbl tr.optr.on {
+  background: var(--sky);
+}
+.ei-wizard .ei-covtbl tr.optr.on .cn {
+  color: var(--blue2);
+}
+.ei-wizard .ei-covtbl tr.optr.dis {
+  opacity: 0.5;
+}
+.ei-wizard .ei-covtbl .adv {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 800;
+  color: #7a3cff;
+  background: #f1ebff;
+  padding: 1px 5px;
+  border-radius: 20px;
+  margin-left: 3px;
+  vertical-align: middle;
+}
+.ei-wizard .ei-covtbl .dedln {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 5px;
+  font-size: 11px;
+  color: var(--sub);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* plan cards */
+.ei-wizard .ei-planwrap.three-col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.ei-wizard .ei-planwrap.three-col .ei-plan {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  min-height: 50px;
+}
+.ei-wizard .ei-planwrap.three-col .ei-ph {
+  justify-content: center;
+}
+.ei-wizard .ei-covguide {
+  border: 1px solid #dbe4f7;
+  background: #f4f8ff;
+  border-radius: 11px;
+  padding: 11px 14px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 12.5px;
+  color: #3a465c;
+  line-height: 1.5;
+}
+.ei-wizard .ei-covguide b {
+  color: var(--blue2);
+}
+.ei-wizard .ei-plan {
+  border: 1.5px solid var(--line);
+  border-radius: 13px;
+  padding: 14px;
+  cursor: pointer;
+  transition: 0.15s;
+  background: #fff;
+}
+.ei-wizard .ei-plan:hover {
+  border-color: #b9c6e8;
+}
+.ei-wizard .ei-plan.sel {
+  border-color: var(--blue);
+  background: var(--sky);
+}
+.ei-wizard .ei-plan .ei-ph {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 3px;
+}
+.ei-wizard .ei-plan .ei-pn {
+  font-weight: 800;
+  color: var(--navy);
+  font-size: 15px;
+}
+.ei-wizard .ei-plan.sel .ei-pn {
+  color: var(--blue2);
+}
+.ei-wizard .ei-plan .ei-recb {
+  background: var(--ok);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 800;
+  padding: 1px 8px;
+  border-radius: 20px;
+}
+
+/* optional coverage list (not currently used but kept for design parity) */
+.ei-wizard .ei-optlist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ei-wizard .ei-optitem {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  padding: 13px 15px;
+  cursor: pointer;
+  transition: 0.15s;
+  background: #fff;
+}
+.ei-wizard .ei-optitem:hover {
+  border-color: #b9c6e8;
+}
+.ei-wizard .ei-optitem.sel {
+  border-color: var(--blue);
+  background: var(--sky);
+}
+.ei-wizard .ei-optitem.dis {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: #f2f4f9;
+}
+.ei-wizard .ei-note2 {
+  background: #f7f9ff;
+  border: 1px solid #dbe4f7;
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-size: 12px;
+  color: var(--sub);
+  margin-top: 6px;
+}
+
+/* 터치 기기: 입력 포커스 시 iOS 자동 줌 방지 (16px 미만이면 확대됨) */
+@media (hover: none) and (pointer: coarse) {
+  .ei-wizard input[type='text'],
+  .ei-wizard input[type='tel'],
+  .ei-wizard input[type='email'],
+  .ei-wizard input[type='number'],
+  .ei-wizard input[type='date'],
+  .ei-wizard select,
+  .ei-wizard textarea {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 560px) {
+  .ei-wizard .ei-opts {
+    grid-template-columns: 1fr;
+  }
+  .ei-wizard .ei-two,
+  .ei-wizard .ei-three {
+    grid-template-columns: 1fr;
+  }
+  .ei-wizard .ei-card {
+    overflow-x: hidden;
+  }
+  .ei-wizard input[type='text'],
+  .ei-wizard input[type='tel'],
+  .ei-wizard input[type='email'],
+  .ei-wizard input[type='number'],
+  .ei-wizard input[type='date'],
+  .ei-wizard select,
+  .ei-wizard textarea {
+    font-size: 16px;
+    padding: 12px 10px;
+  }
+  .ei-wizard .ei-prog .ei-lab {
+    font-size: 10px;
+  }
+  .ei-wizard .ei-planwrap.three-col {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+  }
+  .ei-wizard .ei-planwrap.three-col .ei-plan {
+    padding: 11px 7px;
+  }
+  .ei-wizard .ei-planwrap.three-col .ei-pn {
+    font-size: 14px;
+  }
+}
