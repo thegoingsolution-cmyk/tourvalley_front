@@ -1014,7 +1014,7 @@ export default function EventInsuranceWizard({ device }: WizardProps) {
                   type="email"
                   className={errors.email ? 'ei-err' : ''}
                   value={data.email}
-                  placeholder="예: bzvalley@naver.com"
+                  placeholder="admin@tourvalley.net"
                   onChange={(e) => update({ email: e.target.value })}
                 />
                 {errors.email && <div className="ei-err-msg show">이메일을 정확히 입력해 주세요.</div>}

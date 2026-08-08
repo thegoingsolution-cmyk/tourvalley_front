@@ -153,6 +153,8 @@
   color: var(--sub);
   margin-top: 5px;
 }
+/* type 미지정 input 도 text 와 동일 스타일 (상세정보 입력 등) */
+.ei-wizard input:not([type]),
 .ei-wizard input[type='text'],
 .ei-wizard input[type='tel'],
 .ei-wizard input[type='email'],
@@ -306,7 +308,8 @@
   border: 1.5px solid var(--line);
   border-radius: 11px;
   overflow: hidden;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
 }
 .ei-wizard .ei-seg button {
   border: none;
@@ -317,13 +320,14 @@
   color: var(--sub);
   cursor: pointer;
   font-family: inherit;
+  flex-shrink: 0;
 }
 .ei-wizard .ei-seg button.on {
   background: var(--blue);
   color: #fff;
 }
 .ei-wizard .ei-seg.sm button {
-  padding: 8px 18px;
+  padding: 8px 14px;
   font-size: 13px;
 }
 .ei-wizard .ei-route {
@@ -640,15 +644,23 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
   border: 1.5px solid var(--line);
   border-radius: 11px;
-  padding: 9px 14px;
+  padding: 9px 12px;
   margin-bottom: 8px;
 }
 .ei-wizard .ei-rrow2 .ei-rl {
-  font-size: 14px;
+  flex: 1;
+  min-width: 0;
+  font-size: 13.5px;
   font-weight: 600;
   color: var(--navy);
+  line-height: 1.35;
+  word-break: keep-all;
+}
+.ei-wizard .ei-rrow2 .ei-seg {
+  flex-shrink: 0;
 }
 .ei-wizard .ei-rgroup {
   margin-bottom: 8px;
@@ -671,7 +683,8 @@
 }
 .ei-wizard .ei-rdgrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* 좁은 셸(B2B 428px)에서는 1열, 넓을 때만 2열 */
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 10px;
   margin-bottom: 8px;
 }
@@ -681,10 +694,18 @@
   font-size: 12px;
   font-weight: 600;
   color: var(--navy);
+  min-width: 0;
 }
 .ei-wizard .ei-rdgrid label input,
-.ei-wizard .ei-rdgrid label select {
+.ei-wizard .ei-rdgrid label select,
+.ei-wizard .ei-rdetail input:not([type]),
+.ei-wizard .ei-rdetail input[type='text'],
+.ei-wizard .ei-rdetail select,
+.ei-wizard .ei-rdblk input:not([type]),
+.ei-wizard .ei-rdblk input[type='text'] {
   margin-top: 4px;
+  width: 100%;
+  min-width: 0;
 }
 .ei-wizard .ei-rdgrid label.full {
   grid-column: 1 / -1;
@@ -950,6 +971,7 @@
 
 /* 터치 기기: 입력 포커스 시 iOS 자동 줌 방지 (16px 미만이면 확대됨) */
 @media (hover: none) and (pointer: coarse) {
+  .ei-wizard input:not([type]),
   .ei-wizard input[type='text'],
   .ei-wizard input[type='tel'],
   .ei-wizard input[type='email'],
@@ -972,6 +994,7 @@
   .ei-wizard .ei-card {
     overflow-x: hidden;
   }
+  .ei-wizard input:not([type]),
   .ei-wizard input[type='text'],
   .ei-wizard input[type='tel'],
   .ei-wizard input[type='email'],

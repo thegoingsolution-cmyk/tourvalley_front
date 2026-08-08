@@ -1,330 +1,626 @@
-/* 기본 스타일 */
-* {
-  margin: 0;
-  padding: 0;
+.event-guide-page {
+  --navy: #152a52;
+  --blue: #2b5cff;
+  --blue2: #1b46d6;
+  --sky: #eaf1ff;
+  --line: #e3e8f0;
+  --ink: #1c2430;
+  --sub: #6b7480;
+  --bg: #f4f6fb;
+  --ok: #12a150;
+  --warn: #e08a00;
+  --radius: 14px;
+}
+
+/* 우측 버튼은 견적신청 PC와 동일하게 site 기본 폰트(Noto Sans KR) 유지 */
+.event-guide-page .container_box_w,
+.event-guide-page .container_box_w a {
+  font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  font-weight: 400;
+  color: inherit;
+  text-decoration: none;
+  line-height: normal;
+}
+
+.event-guide-page .container_box_w .fixedRight_txt01,
+.event-guide-page .container_box_w .fixedRight_txt02 {
+  font-family: inherit;
+  font-weight: 400;
+}
+
+/* 모바일: Header/Footer 래퍼 */
+.event-guide-page--mobile {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.event-guide-main-m {
+  flex: 1;
+  width: 100%;
+}
+
+.event-guide-wrap {
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 0 40px;
+  color: var(--ink);
+  font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+.event-guide-wrap * {
   box-sizing: border-box;
 }
 
-body {
-  background-color: #fff;
-  line-height: 1.6;
-  color: #333;
+.event-guide-page--mobile .event-guide-wrap {
+  padding: 22px 20px 70px;
 }
 
-#isbwrapper {
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-  background: #fff;
+.event-guide-hero {
+  background: linear-gradient(135deg, #152a52, #2b5cff);
+  color: #fff;
+  border-radius: 18px;
+  padding: 30px 28px;
+  margin-bottom: 20px;
 }
 
-/* 레이어 헤더 */
-.layer_header {
-  position: relative;
-  padding: 10px 15px;
-  border-bottom: 1px solid #eaebef;
-  background: #fff;
-}
-
-.layer_header.prow_01 {
-  width: 95%;
-  margin: 0 auto;
-}
-
-.layer_title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #333;
+.event-guide-hero .tag {
   display: inline-block;
-  line-height: 40px;
+  background: rgba(255, 255, 255, 0.16);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 11px;
+  border-radius: 20px;
+  margin-bottom: 12px;
 }
 
-.layer_header .close {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  padding: 0;
-  background: none;
-  border: none;
-  text-decoration: none;
-  cursor: pointer;
-  line-height: 0;
+.event-guide-hero h1 {
+  margin: 0 0 10px;
+  font-size: 25px;
+  line-height: 1.3;
 }
 
-.layer_header .close img {
-  display: block;
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
+.event-guide-hero p {
+  margin: 0;
+  opacity: 0.93;
+  font-size: 14.5px;
+  line-height: 1.65;
 }
 
-.layer_header .close:hover {
-  opacity: 0.7;
+.event-guide-sec {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 26px 24px;
+  box-shadow: 0 2px 8px rgba(20, 40, 80, 0.05);
+  margin-bottom: 16px;
 }
 
-/* 본문 */
-#contentWrap {
-  padding: 20px 15px;
+.event-guide-sec > h2 {
+  margin: 0 0 4px;
+  font-size: 19px;
+  color: var(--navy);
 }
 
-.prow_01 {
-  width: 95%;
-  margin: 0 auto;
+.event-guide-sec > .lead {
+  color: var(--sub);
+  font-size: 13.5px;
+  margin: 0 0 18px;
+  line-height: 1.6;
 }
 
-.bgcolor_white {
-  background-color: #fff;
+.event-guide-sec > h2 + .lead {
+  margin-top: 6px;
 }
 
-.ag_center {
-  text-align: center;
+.event-guide-kbox {
+  background: var(--sky);
+  border: 1px solid #cdddff;
+  border-radius: 12px;
+  padding: 16px 18px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ink);
 }
 
-.ag_left {
-  text-align: left !important;
+.event-guide-kbox b {
+  color: var(--blue2);
 }
 
-/* 투어가드 배경 */
-.tourGuard_bg {
-  background-color: #fff;
-  padding: 0;
+.event-guide-who2 {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
 }
 
-.tourGuard_Topbg01 {
-  max-width: 100%;
+.event-guide-wrow {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 16px;
 }
 
-/* Wrapper */
-.tourG_Wrap {
+.event-guide-wlab {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 10px;
+}
+
+.event-guide-wlab span {
+  color: var(--sub);
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.event-guide-wchips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.event-guide-wchips span {
+  background: var(--sky);
+  border: 1px solid #cdddff;
+  color: var(--blue2);
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+.event-guide-wtxt {
+  font-size: 13.5px;
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+.event-guide-wtxt b {
+  color: var(--navy);
+}
+
+.event-guide-wnote {
+  font-size: 12px;
+  color: var(--sub);
+  margin-top: 7px;
+  line-height: 1.6;
+  background: #fbfcfe;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 9px 12px;
+}
+
+.event-guide-cov2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.event-guide-cov2 .col {
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  overflow: hidden;
+}
+
+.event-guide-cov2 .ch {
+  padding: 12px 15px;
+  font-weight: 800;
+  font-size: 14.5px;
+  color: #fff;
+}
+
+.event-guide-cov2 .o .ch {
+  background: var(--ok);
+}
+
+.event-guide-cov2 .x .ch {
+  background: #8a94a3;
+}
+
+.event-guide-cov2 ul {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 12px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-/* Margins - test.css의 정확한 값 */
-.tourG_mat04 {
-  margin-top: 20px !important;
+.event-guide-cov2 li {
+  font-size: 13.5px;
+  line-height: 1.5;
+  padding-left: 22px;
+  position: relative;
+  color: var(--ink);
 }
 
-.tourG_mat06 {
-  margin-top: 15px !important;
+.event-guide-cov2 .o li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--ok);
+  font-weight: 800;
 }
 
-.tourG_mat11 {
-  margin-top: 45px;
+.event-guide-cov2 .x li::before {
+  content: '✕';
+  position: absolute;
+  left: 0;
+  color: #8a94a3;
+  font-weight: 800;
 }
 
-.tourG_mat12 {
-  margin-top: 30px;
+.event-guide-cov2 .x li .fix {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--blue2);
+  font-weight: 700;
 }
 
-.tourG_mat22 {
-  margin-top: 5px;
+.event-guide-covlist {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 
-.tourG_mat27 {
-  margin-top: 11px;
+.event-guide-ccard {
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  padding: 15px 16px;
+  background: #fff;
+  position: relative;
 }
 
-.tourG_mat23 {
-  margin-top: 160px;
+.event-guide-ccard.hl {
+  border-color: #cfeeda;
+  background: #f4fbf6;
 }
 
-/* 텍스트 스타일 - test.css 참조 */
-.tour2023_txt42 {
-  font-size: 30px;
-  letter-spacing: -1px;
-  color: #2c2c2c;
-  line-height: 126%;
+.event-guide-cbadge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 20px;
+  margin-bottom: 8px;
 }
 
-.tour2023_txt32 {
-  font-size: 17px;
-  letter-spacing: -0.5px;
-  color: #3e3e3e;
-  line-height: 158%;
+.event-guide-cbadge.basic {
+  background: var(--navy);
+  color: #fff;
 }
 
-.tourGuard_txt08 {
-  font-size: 19px;
-  letter-spacing: -1px;
-  color: #2c2c2c;
-  line-height: 158%;
+.event-guide-cbadge.opt {
+  background: var(--sky);
+  color: var(--blue2);
+  border: 1px solid #cdddff;
 }
 
-/* 색상 */
-.tour2023_blue {
-  color: #1b37e1 !important;
+.event-guide-cbadge.must {
+  background: var(--ok);
+  color: #fff;
 }
 
-.tour2023_red {
-  color: #ff3e5e !important;
+.event-guide-cttl {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 5px;
 }
 
-.tourGuard_gray {
-  color: #999999;
+.event-guide-ccard.hl .event-guide-cttl {
+  color: #0d7d3e;
 }
 
-/* 이벤트 박스 */
-.tour2023_event_Box {
-  padding: 15px 15px 15px 18px;
-  background-color: #f3f6fa;
+.event-guide-cdesc {
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.55;
+  margin-bottom: 9px;
+}
+
+.event-guide-cex {
+  font-size: 12.5px;
+  color: var(--sub);
+  line-height: 1.55;
+  background: #fbfcfe;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 9px 11px;
+}
+
+.event-guide-cex b {
+  color: var(--blue2);
+}
+
+.event-guide-ccard.hl .event-guide-cex {
+  background: #eef8f1;
+  border-color: #cfeeda;
+}
+
+.event-guide-ccard.hl .event-guide-cex b {
+  color: #0d7d3e;
+}
+
+.event-guide-covfoot {
+  font-size: 12px;
+  color: var(--sub);
+  margin-top: 12px;
+  line-height: 1.65;
+  background: #fbfcfe;
+  border: 1px solid var(--line);
   border-radius: 10px;
-  line-height: 26px;
+  padding: 11px 14px;
 }
 
-.tour2023_event_Box01 {
-  padding: 15px;
-  border: solid 1px #d8d8d8;
+.event-guide-covfoot b {
+  color: var(--navy);
+}
+
+.event-guide-factors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-bottom: 14px;
+}
+
+.event-guide-factor {
+  background: var(--sky);
+  border: 1px solid #cdddff;
+  color: var(--blue2);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 9px 14px;
+  border-radius: 11px;
+}
+
+.event-guide-mininote {
+  font-size: 12px;
+  color: var(--sub);
+  margin-top: 12px;
+  line-height: 1.6;
+  background: #fbfcfe;
+  border: 1px solid var(--line);
   border-radius: 10px;
-  min-height: 52px;
+  padding: 11px 14px;
 }
 
-/* 버튼 리스트 */
-.tourGuard_btn_bw {
+.event-guide-docs {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.event-guide-doc {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  padding: 13px 15px;
+}
+
+.event-guide-doc .n {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #fff;
+  font-weight: 800;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.event-guide-doc b {
+  font-size: 14px;
+  color: var(--navy);
+}
+
+.event-guide-doc span {
+  font-size: 12.5px;
+  color: var(--sub);
+  margin-left: 4px;
+}
+
+.event-guide-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.event-guide-step {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 15px 8px;
+  text-align: center;
+  background: #fbfcfe;
+  position: relative;
+}
+
+.event-guide-step .ic {
+  font-size: 22px;
+}
+
+.event-guide-step .t {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-top: 6px;
+}
+
+.event-guide-step .s {
+  font-size: 11px;
+  color: var(--sub);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+.event-guide-qa {
+  border-top: 1px solid var(--line);
+}
+
+.event-guide-qa details {
+  border-bottom: 1px solid var(--line);
+}
+
+.event-guide-qa summary {
   list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.tourGuard_btn_bw li {
-  flex: 1;
-}
-
-.tour2023_event_arrow {
-  flex: 0 0 auto !important;
-  text-align: center;
-  font-size: 18px;
-  color: #999999;
-  padding: 0 10px;
-}
-
-/* 하단 고정 버튼 */
-#tour2023_fixedBanner {
-  position: sticky;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #fff;
-  padding: 15px 20px;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-  border-top: 1px solid #eaebef;
-}
-
-.tour2023_bottom_btn {
-  width: 100%;
-  max-width: 650px;
-  margin: 0 auto;
-}
-
-.tour2023_btn_b {
-  width: 100%;
-  font-size: 21px;
-  letter-spacing: -1px;
-  padding-top: 17px;
-  height: 60px;
-  background-color: #fe5700;
-  border-radius: 7px;
-  box-sizing: border-box;
-  color: #fff !important;
-  text-align: center;
-  display: inline-block;
-  text-decoration: none;
-  border: none;
   cursor: pointer;
+  padding: 15px 2px 15px 30px;
+  position: relative;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--navy);
 }
 
-.tour2023_btn_b:hover {
-  background-color: #e54e00;
+.event-guide-qa summary::-webkit-details-marker {
+  display: none;
 }
 
-.tour2023_btn07 {
-  background-color: #fe5700;
+.event-guide-qa summary::before {
+  content: 'Q';
+  position: absolute;
+  left: 2px;
+  top: 15px;
+  color: var(--blue);
+  font-weight: 800;
 }
 
-.tour2023_btn07:hover {
-  background-color: #e54e00;
+.event-guide-qa summary::after {
+  content: '+';
+  position: absolute;
+  right: 4px;
+  top: 14px;
+  color: var(--sub);
+  font-size: 18px;
+  font-weight: 400;
 }
 
-/* 리스트 스타일 */
-ul {
-  list-style: none;
+.event-guide-qa details[open] summary::after {
+  content: '−';
 }
 
-li {
-  margin: 0;
-  padding: 0;
+.event-guide-qa .a {
+  padding: 0 2px 16px 30px;
+  font-size: 13.5px;
+  color: var(--ink);
+  line-height: 1.7;
 }
 
-/* 링크 스타일 */
-a {
-  color: #1b37e1;
+.event-guide-qa .a b {
+  color: var(--blue2);
+}
+
+.event-guide-qlink {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+  background: var(--blue);
+  color: #fff;
   text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 9px 15px;
+  border-radius: 10px;
 }
 
-a:hover {
-  text-decoration: underline;
+.event-guide-qlink:hover {
+  background: var(--blue2);
 }
 
-/* 반응형 */
-@media (max-width: 768px) {
-  #isbwrapper {
-    max-width: 100%;
-  }
-
-  .layer_header {
-    padding: 10px 15px;
-  }
-
-  .layer_title {
-    font-size: 16px;
-    line-height: 36px;
-  }
-
-  #contentWrap {
-    padding: 15px 10px;
-  }
-
-  .tour2023_txt42 {
-    font-size: 24px;
-  }
-
-  .tour2023_txt32 {
-    font-size: 15px;
-  }
-
-  .tourGuard_txt08 {
-    font-size: 17px;
-  }
-
-  .tourGuard_btn_bw {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .tourGuard_btn_bw li {
-    width: 100%;
-  }
-
-  .tour2023_event_arrow {
-    transform: rotate(90deg);
-    margin: 5px 0;
-    padding: 0;
-  }
-
-  .tour2023_btn_b {
-    font-size: 18px;
-    padding-top: 15px;
-    height: 52px;
-  }
-
-  .tour2023_bottom_btn {
-    max-width: 100%;
-  }
+.event-guide-deadline {
+  display: flex;
+  gap: 12px;
+  background: #fff7ea;
+  border: 1px solid #f3dcae;
+  border-radius: 13px;
+  padding: 16px 18px;
+  align-items: flex-start;
 }
 
+.event-guide-deadline .ic {
+  font-size: 22px;
+}
 
+.event-guide-deadline .tx {
+  font-size: 13.5px;
+  line-height: 1.65;
+}
+
+.event-guide-deadline .tx b {
+  color: var(--warn);
+}
+
+.event-guide-cta {
+  background: linear-gradient(135deg, #152a52, #2b5cff);
+  border-radius: 18px;
+  padding: 30px 26px;
+  text-align: center;
+  color: #fff;
+  margin-top: 16px;
+}
+
+.event-guide-cta h3 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.event-guide-cta p {
+  margin: 0 0 18px;
+  font-size: 13.5px;
+  opacity: 0.92;
+}
+
+.event-guide-cta a.btn {
+  display: inline-block;
+  background: #fff;
+  color: var(--blue2);
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 15px;
+  padding: 14px 34px;
+  border-radius: 12px;
+}
+
+.event-guide-cta a.btn:hover {
+  opacity: 0.95;
+}
+
+.event-guide-cta .call {
+  display: block;
+  margin-top: 14px;
+  font-size: 12.5px;
+  opacity: 0.85;
+}
+
+.event-guide-disc {
+  font-size: 11.5px;
+  color: var(--sub);
+  text-align: center;
+  margin-top: 18px;
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .event-guide-cov2,
+  .event-guide-covlist {
+    grid-template-columns: 1fr;
+  }
+
+  .event-guide-steps {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .event-guide-hero h1 {
+    font-size: 21px;
+  }
+}
