@@ -8,7 +8,7 @@ export type EventFormType = '단일행사' | '반복행사' | '상시행사';
 
 export type VenueType = '실외' | '실내' | '혼합';
 
-export type LocationType = '단일' | '복수';
+export type LocationType = '단일' | '복수' | '이동';
 
 /** 담보 유형 카드 (내부 상태값). 제출 시 '직접' -> '직접입력' 으로 매핑 */
 export type PlanKey = '1형' | '2형' | '직접';
@@ -75,6 +75,8 @@ export interface WizardState {
   venue: VenueType;
   locType: LocationType;
   region: string;
+  /** 복수 장소 — 도로명 주소 배열 (최소 2곳) */
+  places: string[];
   routeFrom: string;
   routeVia: string;
   routeTo: string;

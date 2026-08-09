@@ -29,7 +29,11 @@ import {
 import {
   applyPlanDefaults,
   buildFormData,
+  buildPlaceText,
   curLimits,
+  formatBizNoInput,
+  formatMobileInput,
+  formatTelInput,
   optCovSummaryLabel,
   planDisplayName,
   recommendPlan,
@@ -294,29 +298,37 @@ export default function EventInsuranceWizard({ device }: WizardProps) {
                 <label>
                   행사 장소<span className="ei-req">*</span>
                 </label>
-                <div className="ei-seg" style={{ marginBottom: 8 }}>
-                  {(['실외', '실내', '혼합'] as VenueType[]).map((v) => (
-                    <button
-                      key={v}
-                      type="button"
-                      className={data.venue === v ? 'on' : ''}
-                      onClick={() => update({ venue: v })}
-                    >
-                      {v === '혼합' ? '실내외 혼합' : v}
-                    </button>
-                  ))}
-                </div>
-                <div className="ei-seg" style={{ marginBottom: 10 }}>
-                  {(['단일', '복수'] as LocationType[]).map((v) => (
-                    <button
-                      key={v}
-                      type="button"
-                      className={data.locType === v ? 'on' : ''}
-                      onClick={() => update({ locType: v })}
-                    >
-                      {v === '단일' ? '단일 장소' : '복수·이동 구간'}
-                    </button>
-                  ))}
+                <div className="ei-seg-col">
+                  <div className="ei-seg">
+                    {(['실외', '실내', '혼합'] as VenueType[]).map((v) => (
+                      <button
+                        key={v}
+                        type="button"
+                        className={data.venue === v ? 'on' : ''}
+                        onClick={() => update({ venue: v })}
+                      >
+                        {v === '혼합' ? '실내외 혼합' : v}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="ei-seg">
+                    {(
+                      [
+                        ['단일', '단일 장소'],
+                        ['복수', '복수 장소'],
+                        ['이동', '이동 구간'],
+                      ] as [LocationType, string][]
+                    ).map(([v, label]) => (
+                      <button
+                        key={v}
+                        type="button"
+                        className={data.locType === v ? 'on' : ''}
+                        onClick={() => update({ locType: v })}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
                 {data.locType === '단일' ? (
                   <>
@@ -324,10 +336,52 @@ export default function EventInsuranceWizard({ device }: WizardProps) {
                       type="text"
                       className={errors.region ? 'ei-err' : ''}
                       value={data.region}
-                      placeholder="지역/주소 (예: 서울 마포구 상암동)"
+                      placeholder="행사장 주소를 입력해 주세요. (도로명 주소)"
                       onChange={(e) => update({ region: e.target.value })}
                     />
-                    {errors.region && <div className="ei-err-msg show">행사 장소를 입력해 주세요.</div>}
+                    {errors.region && <div className="ei-err-msg show">행사장 주소를 입력해 주세요.</div>}
+                  </>
+                ) : data.locType === '복수' ? (
+                  <>
+                    <div className="ei-places">
+                      {data.places.map((place, i) => (
+                        <div key={i} className="ei-placerow">
+                          <input
+                            type="text"
+                            className={errors.region ? 'ei-err' : ''}
+                            value={place}
+                            placeholder="행사장 주소를 입력해 주세요. (도로명 주소)"
+                            onChange={(e) => {
+                              const next = [...data.places];
+                              next[i] = e.target.value;
+                              update({ places: next });
+                            }}
+                          />
+                          <button
+                            type="button"
+                            className="ei-place-rm"
+                            title="삭제"
+                            disabled={data.places.length <= 2}
+                            onClick={() => {
+                              if (data.places.length <= 2) return;
+                              update({ places: data.places.filter((_, idx) => idx !== i) });
+                            }}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        className="ei-place-add"
+                        onClick={() => update({ places: [...data.places, ''] })}
+                      >
+                        ＋ 장소 추가
+                      </button>
+                    </div>
+                    {errors.region && (
+                      <div className="ei-err-msg show">도로명 주소를 최소 2곳 입력해 주세요.</div>
+                    )}
                   </>
                 ) : (
                   <>
@@ -336,7 +390,7 @@ export default function EventInsuranceWizard({ device }: WizardProps) {
                         type="text"
                         className={errors.region ? 'ei-err' : ''}
                         value={data.routeFrom}
-                        placeholder="출발지 (예: 잠실종합운동장)"
+                        placeholder="출발지 주소를 입력해 주세요. (도로명 주소)"
                         onChange={(e) => update({ routeFrom: e.target.value })}
                       />
                       <input
@@ -349,13 +403,13 @@ export default function EventInsuranceWizard({ device }: WizardProps) {
                         type="text"
                         className={errors.region ? 'ei-err' : ''}
                         value={data.routeTo}
-                        placeholder="도착지 (예: 여의도 한강공원)"
+                        placeholder="도착지 주소를 입력해 주세요. (도로명 주소)"
                         onChange={(e) => update({ routeTo: e.target.value })}
                       />
                       <textarea
                         rows={2}
                         value={data.moveNote}
-                        placeholder="이동수단·구간·도로점용 등 참고사항 (예: 도보 행진 약 8km, 차량 통제 구간 포함)"
+                        placeholder="이동수단·구간·도로점용 등 참고사항 (선택)"
                         onChange={(e) => update({ moveNote: e.target.value })}
                       />
                     </div>
@@ -371,8 +425,8 @@ export default function EventInsuranceWizard({ device }: WizardProps) {
                 <label>
                   행사 기간<span className="ei-req">*</span>
                 </label>
-                <div className="ei-two">
-                  <div className="ei-period-col">
+                <div className="ei-period-stack">
+                  <div className="ei-period-row">
                     <input
                       type="date"
                       className={errors.date ? 'ei-err' : ''}
@@ -392,7 +446,7 @@ export default function EventInsuranceWizard({ device }: WizardProps) {
                       ))}
                     </select>
                   </div>
-                  <div className="ei-period-col">
+                  <div className="ei-period-row">
                     <input
                       type="date"
                       className={errors.date ? 'ei-err' : ''}
@@ -709,6 +763,8 @@ export default function EventInsuranceWizard({ device }: WizardProps) {
                         <span className="ei-pn">{planDisplayName(k)}</span>
                         {rec === k && <span className="ei-recb">추천</span>}
                       </div>
+                      {k === '1형' && <span className="ei-psub">실속형</span>}
+                      {k === '2형' && <span className="ei-psub">표준형</span>}
                     </div>
                   ))}
                 </div>
@@ -947,8 +1003,8 @@ export default function EventInsuranceWizard({ device }: WizardProps) {
                     inputMode="numeric"
                     className={errors.bizNo ? 'ei-err' : ''}
                     value={data.bizNo}
-                    placeholder="숫자만 입력 (예: 0000000000)"
-                    onChange={(e) => update({ bizNo: e.target.value.replace(/[^0-9]/g, '') })}
+                    placeholder="예: 000-00-00000"
+                    onChange={(e) => update({ bizNo: formatBizNoInput(e.target.value) })}
                   />
                   {errors.bizNo && <div className="ei-err-msg show">사업자번호를 정확히 입력해 주세요.</div>}
                 </div>
@@ -986,8 +1042,8 @@ export default function EventInsuranceWizard({ device }: WizardProps) {
                     type="tel"
                     inputMode="numeric"
                     value={data.tel}
-                    placeholder="지역번호 포함 숫자만 (예: 0222610098)"
-                    onChange={(e) => update({ tel: e.target.value.replace(/[^0-9]/g, '') })}
+                    placeholder="예: 02-2261-0098"
+                    onChange={(e) => update({ tel: formatTelInput(e.target.value) })}
                   />
                 </div>
                 <div className="ei-field">
@@ -999,8 +1055,8 @@ export default function EventInsuranceWizard({ device }: WizardProps) {
                     inputMode="numeric"
                     className={errors.phone ? 'ei-err' : ''}
                     value={data.phone}
-                    placeholder="숫자만 입력 (예: 01012345678)"
-                    onChange={(e) => update({ phone: e.target.value.replace(/[^0-9]/g, '') })}
+                    placeholder="예: 010-1234-5678"
+                    onChange={(e) => update({ phone: formatMobileInput(e.target.value) })}
                   />
                   {errors.phone && <div className="ei-err-msg show">휴대폰번호를 정확히 입력해 주세요.</div>}
                 </div>
@@ -1150,12 +1206,7 @@ export default function EventInsuranceWizard({ device }: WizardProps) {
                 <div className="ei-rrow">
                   <div className="ei-rk">종류/장소</div>
                   <div className="ei-rv">
-                    {data.category} · {data.venue} ·{' '}
-                    {data.locType === '단일'
-                      ? data.region || '-'
-                      : `[이동] ${data.routeFrom} → ${data.routeVia ? data.routeVia + ' → ' : ''}${data.routeTo}${
-                          data.moveNote ? ' (' + data.moveNote + ')' : ''
-                        }`}
+                    {data.category} · {data.venue} · {buildPlaceText(data) || '-'}
                   </div>
                 </div>
                 <div className="ei-rrow">

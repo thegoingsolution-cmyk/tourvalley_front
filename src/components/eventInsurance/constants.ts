@@ -220,6 +220,7 @@ export function createInitialState(): WizardState {
     venue: '실외',
     locType: '단일',
     region: '',
+    places: ['', ''],
     routeFrom: '',
     routeVia: '',
     routeTo: '',
@@ -229,7 +230,7 @@ export function createInitialState(): WizardState {
     endDate: '',
     endTime: '',
     people: '',
-    performer: null,
+    performer: false,
 
     riskFlags: {
       체육활동: false,
