@@ -83,21 +83,15 @@ export default function EventInsuranceWizard({ device }: WizardProps) {
       setData((prev) => (prev.plan === rec ? prev : applyPlanDefaults(prev, rec)));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rec, data.riskFlags.체육활동]);
+  }, [rec]);
 
   const update = (patch: Partial<WizardState>) => setData((prev) => ({ ...prev, ...patch }));
 
   const setRisk = (key: RiskKey, val: boolean) => {
-    setData((prev) => {
-      const next: WizardState = {
-        ...prev,
-        riskFlags: { ...prev.riskFlags, [key]: val },
-      };
-      if (key === '체육활동' && val) {
-        next.optCov = { ...next.optCov, 참가자치료비: false };
-      }
-      return next;
-    });
+    setData((prev) => ({
+      ...prev,
+      riskFlags: { ...prev.riskFlags, [key]: val },
+    }));
   };
 
   const setPlan = (key: PlanKey) => {
@@ -111,7 +105,6 @@ export default function EventInsuranceWizard({ device }: WizardProps) {
   };
 
   const toggleOpt = (key: OptCovKey) => {
-    if (key === '참가자치료비' && data.riskFlags.체육활동) return;
     update({ optCov: { ...data.optCov, [key]: !data.optCov[key] } });
   };
 
@@ -205,7 +198,6 @@ export default function EventInsuranceWizard({ device }: WizardProps) {
   };
 
   const limits = curLimits(data);
-  const athletic = data.riskFlags.체육활동;
   const isDirect = data.plan === '직접';
 
   return (
@@ -866,17 +858,15 @@ export default function EventInsuranceWizard({ device }: WizardProps) {
 
                     {OPTROWS.map((row) => {
                       const on = data.optCov[row.k];
-                      const dis = row.k === '참가자치료비' && athletic;
                       const col1 = row.cols.find(([c]) => c === '1인당');
                       const col2 = row.cols.find(([c]) => c === '1사고당');
                       return (
-                        <tr key={row.k} className={`optr ${on ? 'on' : ''} ${dis ? 'dis' : ''}`}>
+                        <tr key={row.k} className={`optr ${on ? 'on' : ''}`}>
                           <td className="cs">
                             <label className="chk">
                               <input
                                 type="checkbox"
                                 checked={on}
-                                disabled={dis}
                                 onChange={() => toggleOpt(row.k)}
                               />
                             </label>
@@ -950,13 +940,7 @@ export default function EventInsuranceWizard({ device }: WizardProps) {
                   </div>
                 </div>
 
-                {athletic ? (
-                  <div className="ei-hint" style={{ color: 'var(--red)' }}>
-                    ※ 체육활동이 포함된 경우 참가자치료비 특약은 가입할 수 없습니다.
-                  </div>
-                ) : (
-                  <div className="ei-hint">선택 특약은 필요한 항목만 체크하고 가입금액을 선택해 주세요.</div>
-                )}
+                <div className="ei-hint">선택 특약은 필요한 항목만 체크하고 가입금액을 선택해 주세요.</div>
               </div>
 
               <div className="ei-note2">

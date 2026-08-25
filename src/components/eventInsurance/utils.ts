@@ -56,16 +56,15 @@ export function amountLabelToManwon(label: string | undefined | null): number {
   return manwon;
 }
 
-/** 플랜(1형/2형) 선택 시 참가자치료비 기본값 적용 (체육활동이면 강제 off) */
+/** 플랜(1형/2형) 선택 시 참가자치료비 기본값 적용 */
 export function applyPlanDefaults(state: WizardState, plan: '1형' | '2형'): WizardState {
   const planDef = PLANS[plan];
-  const athletic = state.riskFlags.체육활동;
   return {
     ...state,
     plan,
     optCov: {
       ...state.optCov,
-      참가자치료비: athletic ? false : true,
+      참가자치료비: true,
     },
     optLimits: {
       ...state.optLimits,
