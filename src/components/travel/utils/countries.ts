@@ -3,19 +3,6 @@ export interface Country {
   name: string;
 }
 
-// 자주가는 국가 목록
-export const frequentCountries: Country[] = [
-  { code: 'JP', name: '일본' },
-  { code: 'VN', name: '베트남' },
-  { code: 'TH', name: '태국' },
-  { code: 'TW', name: '대만(타이완)' },
-  { code: 'PH', name: '필리핀' },
-  { code: 'GU', name: '괌' },
-  { code: 'SG', name: '싱가포르' },
-  { code: 'US', name: '미국' },
-  { code: 'MY', name: '말레이시아' },
-];
-
 // 전체 국가 목록 (원본 데이터)
 const allCountriesSource: Country[] = [
   { code: 'GY', name: '가이아나' },
@@ -263,6 +250,14 @@ const allCountriesSource: Country[] = [
   { code: 'YT', name: 'MAYOTTE' },
   { code: 'PN', name: 'PITCAIRN' },
 ];
+
+// 자주가는 국가는 전체 목록의 공식 국가명(예: 태국(타이))을 그대로 사용한다.
+const FREQUENT_COUNTRY_CODES = ['JP', 'VN', 'TH', 'TW', 'PH', 'GU', 'SG', 'US', 'MY'] as const;
+
+export const frequentCountries: Country[] = FREQUENT_COUNTRY_CODES.map((code) => {
+  const found = allCountriesSource.find((country) => country.code === code);
+  return found ?? { code, name: code };
+});
 
 // ㄱ,ㄴ,ㄷ... (가나다) 순 정렬
 export const allCountries: Country[] = [...allCountriesSource].sort((a, b) =>
