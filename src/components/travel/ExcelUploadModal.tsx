@@ -13,6 +13,11 @@ if (typeof window !== 'undefined') {
   }
 }
 
+interface ExcelParseResult {
+  participants: Participant[];
+  skippedCount: number;
+}
+
 interface ExcelUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -22,6 +27,71 @@ interface ExcelUploadModalProps {
   variant?: 'modal' | 'page';
   includeEnglishName?: boolean;
 }
+
+const isValidYmd = (ymd: string): boolean => {
+  if (!/^\d{8}$/.test(ymd)) return false;
+  const month = parseInt(ymd.slice(4, 6), 10);
+  const day = parseInt(ymd.slice(6, 8), 10);
+  return month >= 1 && month <= 12 && day >= 1 && day <= 31;
+};
+
+const formatYmd = (year: number, month: number, day: number): string => {
+  const ymd = `${year}${String(month).padStart(2, '0')}${String(day).padStart(2, '0')}`;
+  return isValidYmd(ymd) ? ymd : '';
+};
+
+const normalizeBirthDate = (raw: unknown, cell?: { t?: string; v?: unknown; z?: string }): string => {
+  const serial = typeof raw === 'number'
+    ? raw
+    : cell?.t === 'n' && typeof cell.v === 'number'
+      ? cell.v
+      : null;
+
+  if (serial !== null && Number.isFinite(serial)) {
+    const digits = String(Math.trunc(Math.abs(serial)));
+    if (digits.length === 8 && isValidYmd(digits)) return digits;
+
+    const formattedAsDate = Boolean(cell?.z && XLSX?.SSF?.is_date?.(cell.z));
+    const looksLikeSerial = digits.length === 5 && serial >= 10000 && serial < 80000;
+    if ((formattedAsDate || looksLikeSerial) && XLSX?.SSF?.parse_date_code) {
+      const parsed = XLSX.SSF.parse_date_code(serial);
+      if (parsed) {
+        const ymd = formatYmd(parsed.y, parsed.m, parsed.d);
+        if (ymd) return ymd;
+      }
+    }
+  }
+
+  if (raw instanceof Date && !Number.isNaN(raw.getTime())) {
+    return formatYmd(raw.getFullYear(), raw.getMonth() + 1, raw.getDate());
+  }
+
+  let birthDateStr = String(raw ?? '').trim().replace(/[^0-9]/g, '');
+  if (birthDateStr.length === 13) {
+    const yy = birthDateStr.substring(0, 2);
+    const mm = birthDateStr.substring(2, 4);
+    const dd = birthDateStr.substring(4, 6);
+    const yearPrefix = parseInt(yy, 10) >= 50 ? '19' : '20';
+    birthDateStr = `${yearPrefix}${yy}${mm}${dd}`;
+  } else if (birthDateStr.length === 6) {
+    const yy = birthDateStr.substring(0, 2);
+    const yearPrefix = parseInt(yy, 10) >= 50 ? '19' : '20';
+    birthDateStr = `${yearPrefix}${birthDateStr}`;
+  } else if (birthDateStr.length > 8) {
+    birthDateStr = birthDateStr.substring(0, 8);
+  }
+
+  return isValidYmd(birthDateStr) ? birthDateStr : '';
+};
+
+const rowHasContent = (row: unknown): boolean => {
+  if (!Array.isArray(row)) return false;
+  return row.some((cell) => {
+    if (cell == null) return false;
+    if (cell instanceof Date) return !Number.isNaN(cell.getTime());
+    return String(cell).trim() !== '';
+  });
+};
 
 export default function ExcelUploadModal({
   isOpen,
@@ -43,7 +113,7 @@ export default function ExcelUploadModal({
     }
   };
 
-  const parseExcelFile = async (file: File): Promise<Participant[]> => {
+  const parseExcelFile = async (file: File): Promise<ExcelParseResult> => {
     return new Promise((resolve, reject) => {
       if (!XLSX) {
         reject(new Error('xlsx 라이브러리가 설치되지 않았습니다. npm install xlsx를 실행해주세요.'));
@@ -86,48 +156,33 @@ export default function ExcelUploadModal({
 
           // 데이터 파싱
           const participants: Participant[] = [];
+          let skippedCount = 0;
           const startId = currentParticipants.length > 0 
             ? Math.max(...currentParticipants.map(p => p.id)) + 1 
             : 1;
+          const genderColIdx = includeEnglishName ? 2 : 1;
+          const birthColIdx = includeEnglishName ? 3 : 2;
 
           for (let i = 1; i < jsonData.length; i++) {
             const row = jsonData[i];
-            if (!row || row.length < (includeEnglishName ? 4 : 3)) continue;
+            if (!rowHasContent(row)) continue;
 
             const name = String(row[0] || '').trim();
             const englishName = includeEnglishName ? String(row[1] || '').trim() : '';
-            const genderColIdx = includeEnglishName ? 2 : 1;
-            const birthColIdx = includeEnglishName ? 3 : 2;
             const genderStr = String(row[genderColIdx] || '').trim();
-            let birthDateStr = String(row[birthColIdx] || '').trim().replace(/[^0-9]/g, '');
+            const birthCell = worksheet[XLSX.utils.encode_cell({ r: i, c: birthColIdx })];
+            const birthDateStr = normalizeBirthDate(birthCell ? birthCell.v : row[birthColIdx], birthCell);
 
-            // 유효성 검증
-            if (!name || !genderStr || !birthDateStr) continue;
-            
-            // 주민번호 형태(13자리)인 경우 생년월일(앞 6자리)만 추출
-            if (birthDateStr.length === 13) {
-              const yy = birthDateStr.substring(0, 2);
-              const mm = birthDateStr.substring(2, 4);
-              const dd = birthDateStr.substring(4, 6);
-              // 주민번호 앞자리가 50 이상이면 1900년대, 아니면 2000년대
-              const yearPrefix = parseInt(yy) >= 50 ? '19' : '20';
-              birthDateStr = `${yearPrefix}${yy}${mm}${dd}`;
-            } else if (birthDateStr.length > 8) {
-              // 8자리보다 긴 경우 앞 8자리만 사용
-              birthDateStr = birthDateStr.substring(0, 8);
-            }
-            
-            // 최종 검증: 8자리가 아니면 건너뜀
-            if (birthDateStr.length !== 8) continue;
-
-            // 성별 변환: "남" -> "남자", "여" -> "여자"
-            let gender: '남자' | '여자' = '남자';
+            let gender: '남자' | '여자' | '' = '';
             if (genderStr === '여' || genderStr === '여자' || genderStr.toLowerCase() === 'f' || genderStr.toLowerCase() === 'female') {
               gender = '여자';
             } else if (genderStr === '남' || genderStr === '남자' || genderStr.toLowerCase() === 'm' || genderStr.toLowerCase() === 'male') {
               gender = '남자';
-            } else {
-              continue; // 유효하지 않은 성별은 건너뜀
+            }
+
+            if (!name || !gender || !birthDateStr) {
+              skippedCount += 1;
+              continue;
             }
 
             participants.push({
@@ -145,11 +200,14 @@ export default function ExcelUploadModal({
           }
 
           if (participants.length === 0) {
-            reject(new Error('유효한 데이터를 찾을 수 없습니다. 파일 형식을 확인해주세요.'));
+            const skippedText = skippedCount > 0
+              ? ` ${skippedCount}명은 이름, 성별 또는 생년월일 형식이 맞지 않습니다.`
+              : '';
+            reject(new Error(`유효한 데이터를 찾을 수 없습니다. 파일 형식을 확인해주세요.${skippedText}`));
             return;
           }
 
-          resolve(participants);
+          resolve({ participants, skippedCount });
         } catch (error) {
           reject(error);
         }
@@ -193,14 +251,17 @@ export default function ExcelUploadModal({
 
     setIsProcessing(true);
     try {
-      const participants = await parseExcelFile(selectedFile);
+      const { participants, skippedCount } = await parseExcelFile(selectedFile);
       const startId = currentParticipants.length > 0 
         ? Math.max(...currentParticipants.map(p => p.id)) + 1 
         : 1;
 
       if (onUpload) {
         onUpload(participants, startId);
-        alert(`${participants.length}명의 가입자 정보가 등록되었습니다.`);
+        const skippedText = skippedCount > 0
+          ? `\n${skippedCount}명은 이름, 성별 또는 생년월일 형식이 맞지 않아 제외되었습니다.`
+          : '';
+        alert(`${participants.length}명의 가입자 정보가 등록되었습니다.${skippedText}`);
         setSelectedFile(null);
         onClose();
       } else {

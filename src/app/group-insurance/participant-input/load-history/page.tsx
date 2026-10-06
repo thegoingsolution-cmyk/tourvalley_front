@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { isYyyyMmDdPrefix, parseResidentBirth, toDisplayYyMmDd } from '@/utils/birthDate';
 import '../../m/page.css';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
@@ -233,51 +234,37 @@ export default function LoadHistoryPage() {
         const companions = data.companions.map((c: Companion) => {
           let birthDate = '';
           let gender: 'M' | 'W' = 'M';
-          
-          // resident_number가 있는 경우 파싱
+          let countryType: 'D' | 'F' = 'D';
+          let ssn1 = '';
+          let ssn2 = '';
+
           if (c.resident_number) {
-            // resident_number 형식: YYMMDD + 뒷자리첫번째숫자 (예: 8507301)
-            // 또는 YYMMDD + 뒷자리첫번째숫자 + 기타 (예: 85073010)
-            const residentNumber = c.resident_number.replace(/[^0-9]/g, ''); // 숫자만 추출
-            const length = residentNumber.length;
-            
-            if (length >= 7) {
-              // 앞 6자리는 생년월일 (YYMMDD)
-              const yymmdd = residentNumber.substring(0, 6);
-              // 7번째 자리는 성별 (1=남자, 2=여자, 3=남자2000년대, 4=여자2000년대)
-              const genderDigit = parseInt(residentNumber.substring(6, 7), 10);
-              
-              // YYMMDD를 YYYYMMDD로 변환
-              const yy = parseInt(yymmdd.substring(0, 2), 10);
-              const mm = yymmdd.substring(2, 4);
-              const dd = yymmdd.substring(4, 6);
-              
-              // 성별에 따라 연도 결정 (1,2는 1900년대, 3,4는 2000년대)
-              const yyyy = (genderDigit === 3 || genderDigit === 4) ? `20${yy.toString().padStart(2, '0')}` : `19${yy.toString().padStart(2, '0')}`;
-              birthDate = `${yyyy}${mm}${dd}`;
-              
-              // 성별 결정 (1,3=남자, 2,4=여자)
-              if (genderDigit === 1 || genderDigit === 3) {
-                gender = 'M';
-              } else if (genderDigit === 2 || genderDigit === 4) {
-                gender = 'W';
-              }
+            const digits = c.resident_number.replace(/[^0-9]/g, '');
+            const parsed = parseResidentBirth(c.resident_number);
+            birthDate = parsed.birthDate;
+            if (parsed.gender) gender = parsed.gender;
+            if (digits.length >= 7) {
+              const storedAsYyyyMmDd = digits.length !== 13 && isYyyyMmDdPrefix(digits);
+              const codeIndex = storedAsYyyyMmDd ? 8 : 6;
+              const genderDigit = parseInt(digits[codeIndex] ?? '', 10);
+              if ([5, 6, 7, 8].includes(genderDigit)) countryType = 'F';
+              ssn1 = toDisplayYyMmDd(digits);
+              ssn2 = digits.slice(codeIndex, codeIndex + 7);
             }
           }
-          
-          // gender 필드가 있으면 우선 사용
+
           if (c.gender) {
             gender = c.gender === '남자' ? 'M' : 'W';
           }
-          
+
           return {
             name: c.name,
-            countryType: 'D' as const,
+            countryType,
             engName: '',
             birthDate: birthDate,
             gender: gender,
-            ssn1: c.resident_number ? c.resident_number.substring(0, 6) : '',
-            ssn2: c.resident_number && c.resident_number.length >= 7 ? c.resident_number.substring(6) : '',
+            ssn1,
+            ssn2,
             country: '',
             hasIllnessHistory: c.has_illness_history === 1,
             hasMedicalExpense: c.has_medical_expense === 1,

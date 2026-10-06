@@ -7,6 +7,7 @@ import {
   readNonMemberContractAuth,
   buildFullBirthDateFromSixDigits,
 } from '@/utils/nonMemberContractAuth';
+import { toDisplayYyMmDd } from '@/utils/birthDate';
 import {
   buildCoverageDetailsRequestBody,
   buildPlanCoverageKey,
@@ -143,14 +144,8 @@ const formatPeriod = (start?: string | null, end?: string | null) => {
   return `${formatDate(start)} ~ ${formatDate(end)}`;
 };
 
-/** 생년월일을 YYMMDD 6자리 형식으로 (예: 981212) */
-const formatBirth = (resident?: string | null) => {
-  if (!resident) return '';
-  const digits = String(resident).replace(/[^0-9]/g, '');
-  if (digits.length < 6) return '';
-  if (digits.length >= 8) return digits.slice(2, 8);
-  return digits.slice(0, 6);
-};
+/** 생년월일을 YYMMDD 6자리로. 13자리는 앞 6자리, YYYYMMDD는 세기를 뺀다. */
+const formatBirth = (resident?: string | null) => toDisplayYyMmDd(resident);
 
 const formatNumber = (value?: number | null) => {
   if (value === null || value === undefined) return '';
@@ -494,7 +489,7 @@ function ConfirmationContent() {
                   <th>계약자명</th>
                   <td className="cf-dotted">{companyOrContractor === '(주)빨주노초파남보' ? (detail?.memberName ?? '') : companyOrContractor}</td>
                   <th>주민번호(사업자번호)</th>
-                  <td className="cf-dotted">{detail?.contractorType === '법인' && detail?.businessNumber ? detail.businessNumber : (detail?.memberBirthDate ? `${detail.memberBirthDate.substring(0, 6)}-*******` : '')}</td>
+                  <td className="cf-dotted">{detail?.contractorType === '법인' && detail?.businessNumber ? detail.businessNumber : (detail?.memberBirthDate ? `${formatBirth(detail.memberBirthDate)}-*******` : '')}</td>
                 </tr>
                 {/* 휴대폰번호, E-MAIL
                 <tr>

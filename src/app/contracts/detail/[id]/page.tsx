@@ -8,6 +8,7 @@ import {
   readNonMemberContractAuth,
   buildFullBirthDateFromSixDigits,
 } from '@/utils/nonMemberContractAuth';
+import { toDisplayYyMmDd } from '@/utils/birthDate';
 import './page.css';
 
 export default function ContractDetailPage() {
@@ -408,7 +409,7 @@ export default function ContractDetailPage() {
               <span className="tour2023_txt09">대표 가입자</span>
               <span className="tour2023_txt10">
                 {contractDetail.memberName || '-'}<br />
-                {contractDetail.memberBirthDate ? `${contractDetail.memberBirthDate.substring(0, 6)}-*******` : '-'}<br />
+                {contractDetail.memberBirthDate ? `${toDisplayYyMmDd(contractDetail.memberBirthDate)}-*******` : '-'}<br />
                 {contractDetail.memberPhone || '-'}<br />
                 {contractDetail.memberEmail || '-'}
               </span>

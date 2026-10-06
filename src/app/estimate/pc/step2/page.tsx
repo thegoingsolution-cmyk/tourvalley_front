@@ -167,7 +167,7 @@ function PCStep2PageContent() {
           start_hour: startHour,
           end_date: endDate,
           end_hour: endHour,
-          tour_num: tourNum,
+          tour_num: String(participants.length),
           tour_day: tourDay,
           contractor_name: contractorInfo.name,
           contractor_phone: contractorInfo.phone,
@@ -724,6 +724,7 @@ function PCStep2PageContent() {
           }));
           
           setParticipants(participantsWithCorrectIds);
+          setTourNum(String(participantsWithCorrectIds.length));
           setShowExcelModal(false);
         }}
         currentParticipants={participants.map(p => ({
